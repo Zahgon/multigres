@@ -20,10 +20,7 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	"errors"
-	"fmt"
 	"regexp"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -106,54 +103,28 @@ type ExpectedExecuteFetch struct {
 }
 
 // New creates a new fake PostgreSQL database for testing.
-func New(t testing.TB) *DB {
-	db := &DB{
-		t:                        t,
-		name:                     "fakepgdb",
-		data:                     make(map[string]*ExpectedResult),
-		rejectedData:             make(map[string]error),
-		queryCalled:              make(map[string]int),
-		queryPatternUserCallback: make(map[*regexp.Regexp]func(string)),
-		patternData:              make(map[string]exprResult),
-	}
-
-	return db
-}
+func New(t testing.TB) *DB { _ = "STUB: not implemented"; return nil }
 
 // Name returns the name of the DB.
-func (db *DB) Name() string {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	return db.name
-}
+func (db *DB) Name() string { _ = "STUB: not implemented"; return "" }
 
 // SetName sets the name of the DB.
-func (db *DB) SetName(name string) *DB {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.name = name
-	return db
-}
+func (db *DB) SetName(name string) *DB { _ = "STUB: not implemented"; return nil }
 
 // OrderMatters sets the orderMatters flag.
-func (db *DB) OrderMatters() {
-	db.orderMatters.Store(true)
-}
+func (db *DB) OrderMatters() { _ = "STUB: not implemented"; return }
 
 // Connect returns a driver.Conn implementation.
 func (db *DB) Connect(ctx context.Context) (driver.Conn, error) {
-	return &fakeConn{db: db}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Conn), nil
 }
 
 // Driver returns a driver.Driver implementation.
-func (db *DB) Driver() driver.Driver {
-	return &fakeDriver{db: db}
-}
+func (db *DB) Driver() driver.Driver { _ = "STUB: not implemented"; return *new(driver.Driver) }
 
 // OpenDB returns a *sql.DB connected to this fake database.
-func (db *DB) OpenDB() *sql.DB {
-	return sql.OpenDB(db)
-}
+func (db *DB) OpenDB() *sql.DB { _ = "STUB: not implemented"; return nil }
 
 //
 // Methods to add expected queries and results.
@@ -161,134 +132,57 @@ func (db *DB) OpenDB() *sql.DB {
 
 // AddQuery adds a query and its expected result.
 func (db *DB) AddQuery(query string, expectedResult *ExpectedResult) *ExpectedResult {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	key := strings.ToLower(query)
-	r := &ExpectedResult{
-		Columns:    expectedResult.Columns,
-		Rows:       expectedResult.Rows,
-		BeforeFunc: expectedResult.BeforeFunc,
-	}
-	db.data[key] = r
-	db.queryCalled[key] = 0
-	return r
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetBeforeFunc sets the BeforeFunc field for the previously registered "query".
-func (db *DB) SetBeforeFunc(query string, f func()) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	key := strings.ToLower(query)
-	r, ok := db.data[key]
-	if !ok {
-		db.t.Fatalf("BUG: no query registered for: %v", query)
-	}
-	r.BeforeFunc = f
-}
+func (db *DB) SetBeforeFunc(query string, f func()) { _ = "STUB: not implemented"; return }
 
 // AddQueryPattern adds an expected result for a set of queries.
 // These patterns are checked if no exact matches from AddQuery() are found.
 // This function forces the addition of begin/end anchors (^$) and turns on
 // case-insensitive matching mode.
 func (db *DB) AddQueryPattern(queryPattern string, expectedResult *ExpectedResult) {
-	expr := regexp.MustCompile("(?is)^" + queryPattern + "$")
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.patternData[queryPattern] = exprResult{
-		queryPattern: queryPattern,
-		expr:         expr,
-		result:       expectedResult,
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // RemoveQueryPattern removes a query pattern that was previously added.
-func (db *DB) RemoveQueryPattern(queryPattern string) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	delete(db.patternData, queryPattern)
-}
+func (db *DB) RemoveQueryPattern(queryPattern string) { _ = "STUB: not implemented"; return }
 
 // RejectQueryPattern allows a query pattern to be rejected with an error
-func (db *DB) RejectQueryPattern(queryPattern, error string) {
-	expr := regexp.MustCompile("(?is)^" + queryPattern + "$")
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.patternData[queryPattern] = exprResult{
-		queryPattern: queryPattern,
-		expr:         expr,
-		err:          error,
-	}
-}
+func (db *DB) RejectQueryPattern(queryPattern, error string) { _ = "STUB: not implemented"; return }
 
 // ClearQueryPattern removes all query patterns set up
-func (db *DB) ClearQueryPattern() {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.patternData = make(map[string]exprResult)
-}
+func (db *DB) ClearQueryPattern() { _ = "STUB: not implemented"; return }
 
 // AddQueryPatternWithCallback is similar to AddQueryPattern: in addition it calls the provided callback function
 func (db *DB) AddQueryPatternWithCallback(queryPattern string, expectedResult *ExpectedResult, callback func(string)) {
-	db.AddQueryPattern(queryPattern, expectedResult)
-	db.queryPatternUserCallback[db.patternData[queryPattern].expr] = callback
+	_ = "STUB: not implemented"
+	return
 }
 
 // DeleteQuery deletes query from the fake DB.
-func (db *DB) DeleteQuery(query string) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	key := strings.ToLower(query)
-	delete(db.data, key)
-	delete(db.queryCalled, key)
-}
+func (db *DB) DeleteQuery(query string) { _ = "STUB: not implemented"; return }
 
 // DeleteAllQueries deletes all expected queries from the fake DB.
-func (db *DB) DeleteAllQueries() {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.data = make(map[string]*ExpectedResult)
-	db.patternData = make(map[string]exprResult)
-	db.queryCalled = make(map[string]int)
-}
+func (db *DB) DeleteAllQueries() { _ = "STUB: not implemented"; return }
 
 // AddRejectedQuery adds a query which will be rejected at execution time.
-func (db *DB) AddRejectedQuery(query string, err error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.rejectedData[strings.ToLower(query)] = err
-}
+func (db *DB) AddRejectedQuery(query string, err error) { _ = "STUB: not implemented"; return }
 
 // DeleteRejectedQuery deletes query from the fake DB.
-func (db *DB) DeleteRejectedQuery(query string) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	delete(db.rejectedData, strings.ToLower(query))
-}
+func (db *DB) DeleteRejectedQuery(query string) { _ = "STUB: not implemented"; return }
 
 // GetQueryCalledNum returns how many times db executes a certain query.
-func (db *DB) GetQueryCalledNum(query string) int {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	num, ok := db.queryCalled[strings.ToLower(query)]
-	if !ok {
-		return 0
-	}
-	return num
-}
+func (db *DB) GetQueryCalledNum(query string) int { _ = "STUB: not implemented"; return 0 }
 
 // QueryLog returns the query log as a semicolon separated string
-func (db *DB) QueryLog() string {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	return strings.Join(db.querylog, ";")
-}
+func (db *DB) QueryLog() string { _ = "STUB: not implemented"; return "" }
 
 // ResetQueryLog resets the query log
-func (db *DB) ResetQueryLog() {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.querylog = nil
-}
+func (db *DB) ResetQueryLog() { _ = "STUB: not implemented"; return }
 
 //
 // Methods for ordered expected queries.
@@ -296,172 +190,52 @@ func (db *DB) ResetQueryLog() {
 
 // AddExpectedExecuteFetch adds an ExpectedExecuteFetch directly.
 func (db *DB) AddExpectedExecuteFetch(entry ExpectedExecuteFetch) {
-	db.AddExpectedExecuteFetchAtIndex(appendEntry, entry)
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddExpectedExecuteFetchAtIndex inserts a new entry at index.
 func (db *DB) AddExpectedExecuteFetchAtIndex(index int, entry ExpectedExecuteFetch) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if db.expectedExecuteFetch == nil || index < 0 || index >= len(db.expectedExecuteFetch) {
-		index = appendEntry
-	}
-	if index == appendEntry {
-		db.expectedExecuteFetch = append(db.expectedExecuteFetch, entry)
-	} else {
-		// Grow the slice by one element
-		if cap(db.expectedExecuteFetch) == len(db.expectedExecuteFetch) {
-			db.expectedExecuteFetch = append(db.expectedExecuteFetch, make([]ExpectedExecuteFetch, 1)...)
-		} else {
-			db.expectedExecuteFetch = db.expectedExecuteFetch[0 : len(db.expectedExecuteFetch)+1]
-		}
-		// Use copy to move the upper part of the slice out of the way and open a hole
-		copy(db.expectedExecuteFetch[index+1:], db.expectedExecuteFetch[index:])
-		// Store the new value
-		db.expectedExecuteFetch[index] = entry
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Grow the slice by one element
+
+// Use copy to move the upper part of the slice out of the way and open a hole
+
+// Store the new value
 
 // AddExpectedQuery adds a single query with no result.
-func (db *DB) AddExpectedQuery(query string, err error) {
-	db.AddExpectedExecuteFetch(ExpectedExecuteFetch{
-		Query:       query,
-		QueryResult: &ExpectedResult{},
-		Error:       err,
-	})
-}
+func (db *DB) AddExpectedQuery(query string, err error) { _ = "STUB: not implemented"; return }
 
 // DeleteAllEntries removes all ordered entries.
-func (db *DB) DeleteAllEntries() {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	db.expectedExecuteFetch = make([]ExpectedExecuteFetch, 0)
-	db.expectedExecuteFetchIndex = 0
-}
+func (db *DB) DeleteAllEntries() { _ = "STUB: not implemented"; return }
 
 // VerifyAllExecutedOrFail checks that all expected queries were actually executed.
-func (db *DB) VerifyAllExecutedOrFail() {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if db.expectedExecuteFetchIndex != len(db.expectedExecuteFetch) {
-		db.t.Errorf("%v: not all expected queries were executed. leftovers: %v", db.name, db.expectedExecuteFetch[db.expectedExecuteFetchIndex:])
-	}
-}
+func (db *DB) VerifyAllExecutedOrFail() { _ = "STUB: not implemented"; return }
 
 // SetAllowAll makes all queries return empty results.
-func (db *DB) SetAllowAll(allowAll bool) {
-	db.allowAll.Store(allowAll)
-}
+func (db *DB) SetAllowAll(allowAll bool) { _ = "STUB: not implemented"; return }
 
 // SetNeverFail makes unmatched queries return empty results instead of errors.
-func (db *DB) SetNeverFail(neverFail bool) {
-	db.neverFail.Store(neverFail)
-}
+func (db *DB) SetNeverFail(neverFail bool) { _ = "STUB: not implemented"; return }
 
 // handleQuery handles a query and returns the result.
 func (db *DB) handleQuery(query string) (*ExpectedResult, error) {
-	if db.allowAll.Load() {
-		return &ExpectedResult{}, nil
-	}
-
-	if db.orderMatters.Load() {
-		return db.handleQueryOrdered(query)
-	}
-
-	key := strings.ToLower(query)
-	db.mu.Lock()
-	db.queryCalled[key]++
-	db.querylog = append(db.querylog, key)
-
-	// Check if we should reject it
-	if err, ok := db.rejectedData[key]; ok {
-		db.mu.Unlock()
-		return nil, err
-	}
-
-	// Check explicit queries from AddQuery()
-	result, ok := db.data[key]
-	if ok {
-		db.mu.Unlock()
-		if f := result.BeforeFunc; f != nil {
-			f()
-		}
-		return result, nil
-	}
-
-	// Check query patterns from AddQueryPattern()
-	for _, pat := range db.patternData {
-		if pat.expr.MatchString(query) {
-			userCallback, ok := db.queryPatternUserCallback[pat.expr]
-			db.mu.Unlock()
-			if ok {
-				userCallback(query)
-			}
-			if pat.err != "" {
-				return nil, errors.New(pat.err)
-			}
-			return pat.result, nil
-		}
-	}
-
-	db.mu.Unlock()
-
-	if db.neverFail.Load() {
-		return &ExpectedResult{}, nil
-	}
-
-	// Nothing matched
-	return nil, fmt.Errorf("fakepgdb: query '%s' is not supported on %v", query, db.name)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// Check if we should reject it
+
+// Check explicit queries from AddQuery()
+
+// Check query patterns from AddQueryPattern()
+
+// Nothing matched
+
 func (db *DB) handleQueryOrdered(query string) (*ExpectedResult, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	index := db.expectedExecuteFetchIndex
-
-	if index >= len(db.expectedExecuteFetch) {
-		if db.neverFail.Load() {
-			return &ExpectedResult{}, nil
-		}
-		db.t.Errorf("%v: got unexpected out of bound fetch: %v >= %v (%s)", db.name, index, len(db.expectedExecuteFetch), query)
-		return nil, errors.New("unexpected out of bound fetch")
-	}
-
-	entry := db.expectedExecuteFetch[index]
-
-	if entry.AfterFunc != nil {
-		defer entry.AfterFunc()
-	}
-
-	expected := entry.Query
-
-	if strings.HasSuffix(expected, "*") {
-		if !strings.HasPrefix(query, expected[0:len(expected)-1]) {
-			if db.neverFail.Load() {
-				return &ExpectedResult{}, nil
-			}
-			db.t.Errorf("%v: got unexpected query start (index=%v): %v != %v", db.name, index, query, expected)
-			return nil, errors.New("unexpected query")
-		}
-	} else {
-		if query != expected {
-			if db.neverFail.Load() {
-				return &ExpectedResult{}, nil
-			}
-			db.t.Errorf("%v: got unexpected query (index=%v): %v != %v", db.name, index, query, expected)
-			return nil, errors.New("unexpected query")
-		}
-	}
-
-	db.expectedExecuteFetchIndex++
-	db.t.Logf("ExecuteFetch: %v: %v", db.name, query)
-
-	if entry.Error != nil {
-		return nil, entry.Error
-	}
-
-	return entry.QueryResult, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -14,11 +14,7 @@
 
 package memorytopo
 
-import "strconv"
-
 // NodeVersion is the local topoclient.Version implementation
 type NodeVersion uint64
 
-func (v NodeVersion) String() string {
-	return strconv.FormatUint(uint64(v), 10)
-}
+func (v NodeVersion) String() string { _ = "STUB: not implemented"; return "" }

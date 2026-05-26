@@ -16,15 +16,9 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
-	"os"
 	"regexp"
-	"strings"
 
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/services/pgctld"
-	"github.com/multigres/multigres/go/tools/executil"
 	"github.com/multigres/multigres/go/tools/retry"
 )
 
@@ -39,41 +33,23 @@ var postgresAlreadyRunningPattern = regexp.MustCompile(`lock file ".*" already e
 // isPostgresCleanlyStopped checks if PostgreSQL is in a clean shutdown state.
 // Returns true if state is "shut down" or "shut down in recovery", false otherwise.
 func isPostgresCleanlyStopped(ctx context.Context) (bool, error) {
-	cmd := executil.Command(ctx, "pg_controldata", pgctld.PostgresDataDir())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return false, fmt.Errorf("pg_controldata failed: %w (output: %s)", err, string(output))
-	}
-
-	outputStr := string(output)
-	clusterStateStr := extractClusterState(outputStr)
-
-	// Clean states: "shut down", "shut down in recovery"
-	// Anything else means we should try crash recovery
-	cleanlyStopped := clusterStateStr == "shut down" || clusterStateStr == "shut down in recovery"
-
-	return cleanlyStopped, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
+
+// Clean states: "shut down", "shut down in recovery"
+// Anything else means we should try crash recovery
 
 // extractClusterState extracts the cluster state from pg_controldata output
-func extractClusterState(output string) string {
-	for line := range strings.SplitSeq(output, "\n") {
-		if strings.Contains(line, "Database cluster state:") {
-			// Format: "Database cluster state:               in production"
-			parts := strings.Split(line, ":")
-			if len(parts) >= 2 {
-				return strings.TrimSpace(parts[1])
-			}
-		}
-	}
-	return "unknown"
-}
+func extractClusterState(output string) string { _ = "STUB: not implemented"; return "" }
+
+// Format: "Database cluster state:               in production"
 
 // runCrashRecovery performs crash recovery in single-user mode.
 // This runs postgres --single to complete crash recovery, then exits cleanly.
 func runCrashRecovery(ctx context.Context, logger *slog.Logger) error {
-	r := retry.New(constants.CrashRecoveryRetryDelay, constants.CrashRecoveryRetryDelay)
-	return runCrashRecoveryAttempts(ctx, logger, runSingleUserPostgres, r)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // runCrashRecoveryAttempts retries `postgres --single` while the lock file is held.
@@ -86,42 +62,7 @@ func runCrashRecoveryAttempts(
 	run func(context.Context) ([]byte, error),
 	r *retry.Retry,
 ) error {
-	logger.InfoContext(ctx, "Starting single-user crash recovery")
-
-	var lastOutput string
-	for attempt, rerr := range r.Attempts(ctx) {
-		if rerr != nil {
-			return rerr
-		}
-
-		output, err := run(ctx)
-		if err == nil {
-			return nil
-		}
-
-		outputStr := string(output)
-		lastOutput = outputStr
-
-		if !postgresAlreadyRunningPattern.MatchString(outputStr) {
-			logger.WarnContext(ctx, "Single-user crash recovery failed",
-				"error", err,
-				"output", outputStr)
-			return fmt.Errorf("crash recovery failed: %w", err)
-		}
-
-		if attempt >= constants.CrashRecoveryMaxAttempts {
-			break
-		}
-
-		logger.InfoContext(ctx, "Single-user crash recovery: lock file held, retrying",
-			"attempt", attempt,
-			"max_attempts", constants.CrashRecoveryMaxAttempts,
-			"output", outputStr)
-	}
-
-	logger.InfoContext(ctx, "Single-user crash recovery not needed, postgres is already running",
-		"attempts", constants.CrashRecoveryMaxAttempts,
-		"output", lastOutput)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -129,14 +70,6 @@ func runCrashRecoveryAttempts(
 // output and exit error. /dev/null on stdin causes single-user mode to perform
 // recovery and exit on EOF.
 func runSingleUserPostgres(ctx context.Context) ([]byte, error) {
-	cmd := executil.Command(ctx, "postgres", "--single", "-D", pgctld.PostgresDataDir(), "template1")
-
-	devNull, err := os.Open("/dev/null")
-	if err != nil {
-		return nil, fmt.Errorf("failed to open /dev/null: %w", err)
-	}
-	defer devNull.Close()
-
-	cmd.SetStdin(devNull)
-	return cmd.CombinedOutput()
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -14,14 +14,10 @@
 
 package etcdtopo
 
-import "strconv"
-
 // EtcdVersion is etcd's idea of a version.
 // It implements topoclient.Version.
 // We use the native etcd version type, int64.
 type EtcdVersion int64
 
 // String is part of the topoclient.Version interface.
-func (v EtcdVersion) String() string {
-	return strconv.FormatInt(int64(v), 10)
-}
+func (v EtcdVersion) String() string { _ = "STUB: not implemented"; return "" }

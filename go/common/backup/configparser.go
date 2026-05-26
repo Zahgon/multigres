@@ -14,12 +14,6 @@
 
 package backup
 
-import (
-	"bufio"
-	"fmt"
-	"strings"
-)
-
 // credentialKeys are the keys that should be updated during credential refresh
 var credentialKeys = map[string]bool{
 	"repo1-s3-key":        true,
@@ -31,38 +25,12 @@ var credentialKeys = map[string]bool{
 // UpdateCredentialsInConfig updates only S3 credential lines in pgbackrest.conf
 // while preserving all other configuration, comments, and formatting.
 func UpdateCredentialsInConfig(configContent string, newCredentials map[string]string) (string, error) {
-	var result strings.Builder
-	scanner := bufio.NewScanner(strings.NewReader(configContent))
-
-	updatedKeys := make(map[string]bool)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		// Check if this line is a credential key=value pair
-		if strings.Contains(line, "=") {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				key := strings.TrimSpace(parts[0])
-
-				// If this is a credential key and we have a new value, replace it
-				if credentialKeys[key] {
-					if newValue, exists := newCredentials[key]; exists {
-						result.WriteString(key + "=" + newValue + "\n")
-						updatedKeys[key] = true
-						continue
-					}
-				}
-			}
-		}
-
-		// Preserve all other lines as-is
-		result.WriteString(line + "\n")
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", fmt.Errorf("failed to scan config: %w", err)
-	}
-
-	return result.String(), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Check if this line is a credential key=value pair
+
+// If this is a credential key and we have a new value, replace it
+
+// Preserve all other lines as-is

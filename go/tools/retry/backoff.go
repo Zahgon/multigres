@@ -15,7 +15,6 @@
 package retry
 
 import (
-	"math"
 	"math/rand/v2"
 	"sync"
 	"time"
@@ -69,79 +68,51 @@ type exponentialFullJitterBackoff struct {
 
 // newExponentialFullJitterBackoff creates a new exponential backoff with full jitter.
 func newExponentialFullJitterBackoff(baseDelay, maxDelay time.Duration) *exponentialFullJitterBackoff {
-	return &exponentialFullJitterBackoff{
-		baseDelay: baseDelay,
-		maxDelay:  maxDelay,
-		rng:       rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), uint64(time.Now().UnixNano()))),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newExponentialFullJitterBackoffWithRNG creates a backoff with a specific RNG (for testing).
 func newExponentialFullJitterBackoffWithRNG(baseDelay, maxDelay time.Duration, rng *rand.Rand) *exponentialFullJitterBackoff {
-	return &exponentialFullJitterBackoff{
-		baseDelay: baseDelay,
-		maxDelay:  maxDelay,
-		rng:       rng,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newExponentialBackoffNoJitter creates a backoff without jitter (for testing).
 func newExponentialBackoffNoJitter(baseDelay, maxDelay time.Duration) *exponentialFullJitterBackoff {
-	return &exponentialFullJitterBackoff{
-		baseDelay:     baseDelay,
-		maxDelay:      maxDelay,
-		disableJitter: true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // nextDelay calculates the next delay using exponential backoff with full jitter,
 // then increments the internal attempt counter.
 // Thread-safe: can be called concurrently with reset().
 func (e *exponentialFullJitterBackoff) nextDelay() time.Duration {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	// Exponential backoff: baseDelay * 2^attempt
-	// Use bit shifting for precise integer math and overflow protection
-
-	cappedAttempt := min(
-		// Cap attempt count to prevent overflow (shifting more than 62 bits would overflow int64)
-		e.attempt, 62)
-
-	// Calculate delay = baseDelay * (1 << attempt)
-	// time.Duration is int64, so we can work with it directly
-	multiplier := int64(1 << cappedAttempt)
-	baseDelayInt := int64(e.baseDelay)
-
-	var delay time.Duration
-	if baseDelayInt > 0 && multiplier > math.MaxInt64/baseDelayInt {
-		// Would overflow, use maxDelay
-		delay = e.maxDelay
-	} else {
-		delay = min(
-			// Apply max delay cap
-			time.Duration(baseDelayInt*multiplier), e.maxDelay)
-	}
-
-	// Apply Full Jitter: randomize between 0 and computed delay
-	// This prevents synchronized retries by spreading retries across time
-	// Note: rand.Rand is not thread-safe, so we call it while holding the mutex
-	if !e.disableJitter {
-		// random_between(0, delay)
-		// rng.Float64() returns [0.0, 1.0)
-		delay = time.Duration(float64(delay) * e.rng.Float64())
-	}
-
-	// Increment attempt counter for next call
-	e.attempt++
-
-	return delay
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
+
+// Exponential backoff: baseDelay * 2^attempt
+// Use bit shifting for precise integer math and overflow protection
+
+// Cap attempt count to prevent overflow (shifting more than 62 bits would overflow int64)
+
+// Calculate delay = baseDelay * (1 << attempt)
+// time.Duration is int64, so we can work with it directly
+
+// Would overflow, use maxDelay
+
+// Apply max delay cap
+
+// Apply Full Jitter: randomize between 0 and computed delay
+// This prevents synchronized retries by spreading retries across time
+// Note: rand.Rand is not thread-safe, so we call it while holding the mutex
+
+// random_between(0, delay)
+// rng.Float64() returns [0.0, 1.0)
+
+// Increment attempt counter for next call
 
 // reset resets the backoff state to initial values.
 // Thread-safe: can be called concurrently with nextDelay().
-func (e *exponentialFullJitterBackoff) reset() {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	e.attempt = 0
-}
+func (e *exponentialFullJitterBackoff) reset() { _ = "STUB: not implemented"; return }

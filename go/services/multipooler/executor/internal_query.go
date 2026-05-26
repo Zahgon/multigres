@@ -16,9 +16,7 @@ package executor
 
 import (
 	"context"
-	"errors"
 
-	"github.com/multigres/multigres/go/common/pgprotocol/client"
 	"github.com/multigres/multigres/go/common/sqltypes"
 )
 
@@ -53,42 +51,16 @@ var _ InternalQueryService = (*Executor)(nil)
 // Internal queries include SQL text in trace spans since they use system
 // functions.
 func (e *Executor) Query(ctx context.Context, queryStr string) (*sqltypes.Result, error) {
+	_ = "STUB: not implemented"
 	// Enable SQL text in trace spans for internal queries (safe - no user data)
-	ctx = client.WithQueryTracing(ctx, client.QueryTracingConfig{
-		IncludeQueryText: true,
-	})
-
-	conn, err := e.poolManager.GetRegularConn(ctx, e.poolManager.PgUser(), nil, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Recycle()
-
-	results, err := conn.Conn.QueryWithRetry(ctx, queryStr)
-	if err != nil {
-		return nil, err
-	}
-	if len(results) != 1 {
-		return nil, errors.New("unexpected number of results")
-	}
-	return results[0], nil
+	return nil, nil
 }
 
 // QueryMultiStatement implements InternalQueryService for multi-statement queries.
 // It executes a query using the simple query protocol and does not check the number of result sets.
 func (e *Executor) QueryMultiStatement(ctx context.Context, queryStr string) error {
-	ctx = client.WithQueryTracing(ctx, client.QueryTracingConfig{
-		IncludeQueryText: true,
-	})
-
-	conn, err := e.poolManager.GetRegularConn(ctx, e.poolManager.PgUser(), nil, nil)
-	if err != nil {
-		return err
-	}
-	defer conn.Recycle()
-
-	_, err = conn.Conn.QueryWithRetry(ctx, queryStr)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // QueryArgs implements InternalQueryService for simple internal queries.
@@ -98,23 +70,7 @@ func (e *Executor) QueryMultiStatement(ctx context.Context, queryStr string) err
 // float32, float64, bool, and time.Time.
 // Internal queries include SQL text in trace spans since they use system functions.
 func (e *Executor) QueryArgs(ctx context.Context, sql string, args ...any) (*sqltypes.Result, error) {
+	_ = "STUB: not implemented"
 	// Enable SQL text in trace spans for internal queries (safe - no user data)
-	ctx = client.WithQueryTracing(ctx, client.QueryTracingConfig{
-		IncludeQueryText: true,
-	})
-
-	conn, err := e.poolManager.GetRegularConn(ctx, e.poolManager.PgUser(), nil, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Recycle()
-
-	results, err := conn.Conn.QueryArgsWithRetry(ctx, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-	if len(results) != 1 {
-		return nil, errors.New("unexpected number of results")
-	}
-	return results[0], nil
+	return nil, nil
 }

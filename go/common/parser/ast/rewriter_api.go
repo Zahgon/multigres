@@ -51,21 +51,11 @@ package ast
 //	    return true
 //	}, nil)
 func Rewrite(node Node, pre, post ApplyFunc) (result Node) {
-	parent := &RootNode{node}
+	_ = "STUB: not implemented"
+	return *
 
 	// this is the root-replacer, used when the user replaces the root of the ast
-	replacer := func(newNode Node, _ Node) {
-		parent.Node = newNode
-	}
-
-	a := &application{
-		pre:  pre,
-		post: post,
-	}
-
-	a.rewriteNode(parent, node, replacer)
-
-	return parent.Node
+	new(Node)
 }
 
 // RootNode is the root node of the AST when rewriting. It is the first element of the tree.
@@ -94,27 +84,28 @@ type Cursor struct {
 }
 
 // Node returns the current Node.
-func (c *Cursor) Node() Node { return c.node }
+func (c *Cursor) Node() Node {
+	_ = "STUB: not implemented"
 
-// Parent returns the parent of the current Node.
-func (c *Cursor) Parent() Node { return c.parent }
-
-// Replace replaces the current node in the parent field with this new object.
-// The caller needs to make sure to not replace the object with something of
-// the wrong type, or the visitor will panic.
-func (c *Cursor) Replace(newNode Node) {
-	c.replacer(newNode, c.parent)
-	c.node = newNode
+	// Parent returns the parent of the current Node.
+	return *new(Node)
 }
+
+func (c *Cursor) Parent() Node {
+	_ = "STUB: not implemented"
+
+	// Replace replaces the current node in the parent field with this new object.
+	// The caller needs to make sure to not replace the object with something of
+	// the wrong type, or the visitor will panic.
+	return *new(Node)
+}
+
+func (c *Cursor) Replace(newNode Node) { _ = "STUB: not implemented"; return }
 
 // ReplaceAndRevisit replaces the current node in the parent field with this new object.
 // When used, this will abort the visitation of the current node - no post or children visited,
 // and the new node visited.
-func (c *Cursor) ReplaceAndRevisit(newNode Node) {
-	c.replacer(newNode, c.parent)
-	c.node = newNode
-	c.revisit = true
-}
+func (c *Cursor) ReplaceAndRevisit(newNode Node) { _ = "STUB: not implemented"; return }
 
 type replacerFunc func(newNode, parent Node)
 

@@ -24,12 +24,11 @@
 package mtrpc
 
 import (
+	sync "sync"
+
 	query "github.com/multigres/multigres/go/pb/query"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -200,32 +199,27 @@ var (
 	}
 )
 
-func (x Code) Enum() *Code {
-	p := new(Code)
-	*p = x
-	return p
-}
+func (x Code) Enum() *Code { _ = "STUB: not implemented"; return nil }
 
-func (x Code) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x Code) String() string { _ = "STUB: not implemented"; return "" }
 
 func (Code) Descriptor() protoreflect.EnumDescriptor {
-	return file_mtrpc_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (Code) Type() protoreflect.EnumType {
-	return &file_mtrpc_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x Code) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use Code.Descriptor instead.
-func (Code) EnumDescriptor() ([]byte, []int) {
-	return file_mtrpc_proto_rawDescGZIP(), []int{0}
-}
+func (Code) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // CallerID is passed along RPCs to identify the originating client
 // for a request. It is not meant to be secure, but only
@@ -257,63 +251,27 @@ type CallerID struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CallerID) Reset() {
-	*x = CallerID{}
-	mi := &file_mtrpc_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *CallerID) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *CallerID) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *CallerID) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*CallerID) ProtoMessage() {}
+func (*CallerID) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *CallerID) ProtoReflect() protoreflect.Message {
-	mi := &file_mtrpc_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use CallerID.ProtoReflect.Descriptor instead.
-func (*CallerID) Descriptor() ([]byte, []int) {
-	return file_mtrpc_proto_rawDescGZIP(), []int{0}
-}
+func (*CallerID) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *CallerID) GetPrincipal() string {
-	if x != nil {
-		return x.Principal
-	}
-	return ""
-}
+func (x *CallerID) GetPrincipal() string { _ = "STUB: not implemented"; return "" }
 
-func (x *CallerID) GetComponent() string {
-	if x != nil {
-		return x.Component
-	}
-	return ""
-}
+func (x *CallerID) GetComponent() string { _ = "STUB: not implemented"; return "" }
 
-func (x *CallerID) GetSubcomponent() string {
-	if x != nil {
-		return x.Subcomponent
-	}
-	return ""
-}
+func (x *CallerID) GetSubcomponent() string { _ = "STUB: not implemented"; return "" }
 
-func (x *CallerID) GetGroups() []string {
-	if x != nil {
-		return x.Groups
-	}
-	return nil
-}
+func (x *CallerID) GetGroups() []string { _ = "STUB: not implemented"; return nil }
 
 // RPCError is an application-level error structure returned by
 // MultiPooler (and passed along by MultiGateway if appropriate).
@@ -333,56 +291,25 @@ type RPCError struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RPCError) Reset() {
-	*x = RPCError{}
-	mi := &file_mtrpc_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RPCError) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RPCError) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RPCError) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RPCError) ProtoMessage() {}
+func (*RPCError) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RPCError) ProtoReflect() protoreflect.Message {
-	mi := &file_mtrpc_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RPCError.ProtoReflect.Descriptor instead.
-func (*RPCError) Descriptor() ([]byte, []int) {
-	return file_mtrpc_proto_rawDescGZIP(), []int{1}
-}
+func (*RPCError) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *RPCError) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *RPCError) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RPCError) GetCode() Code {
-	if x != nil {
-		return x.Code
-	}
-	return Code_OK
-}
+func (x *RPCError) GetCode() Code { _ = "STUB: not implemented"; return *new(Code) }
 
-func (x *RPCError) GetPgDiagnostic() *query.PgDiagnostic {
-	if x != nil {
-		return x.PgDiagnostic
-	}
-	return nil
-}
+func (x *RPCError) GetPgDiagnostic() *query.PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 var File_mtrpc_proto protoreflect.FileDescriptor
 
@@ -426,12 +353,7 @@ var (
 	file_mtrpc_proto_rawDescData []byte
 )
 
-func file_mtrpc_proto_rawDescGZIP() []byte {
-	file_mtrpc_proto_rawDescOnce.Do(func() {
-		file_mtrpc_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_mtrpc_proto_rawDesc), len(file_mtrpc_proto_rawDesc)))
-	})
-	return file_mtrpc_proto_rawDescData
-}
+func file_mtrpc_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_mtrpc_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_mtrpc_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
@@ -451,28 +373,5 @@ var file_mtrpc_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_mtrpc_proto_init() }
-func file_mtrpc_proto_init() {
-	if File_mtrpc_proto != nil {
-		return
-	}
-	file_mtrpc_proto_msgTypes[1].OneofWrappers = []any{}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mtrpc_proto_rawDesc), len(file_mtrpc_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   2,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_mtrpc_proto_goTypes,
-		DependencyIndexes: file_mtrpc_proto_depIdxs,
-		EnumInfos:         file_mtrpc_proto_enumTypes,
-		MessageInfos:      file_mtrpc_proto_msgTypes,
-	}.Build()
-	File_mtrpc_proto = out.File
-	file_mtrpc_proto_goTypes = nil
-	file_mtrpc_proto_depIdxs = nil
-}
+func init()                  { file_mtrpc_proto_init() }
+func file_mtrpc_proto_init() { _ = "STUB: not implemented"; return }

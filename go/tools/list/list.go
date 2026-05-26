@@ -36,20 +36,10 @@ type Element[T any] struct {
 }
 
 // Next returns the next list element or nil.
-func (e *Element[T]) Next() *Element[T] {
-	if p := e.next; e.list != nil && p != &e.list.root {
-		return p
-	}
-	return nil
-}
+func (e *Element[T]) Next() *Element[T] { _ = "STUB: not implemented"; return nil }
 
 // Prev returns the previous list element or nil.
-func (e *Element[T]) Prev() *Element[T] {
-	if p := e.prev; e.list != nil && p != &e.list.root {
-		return p
-	}
-	return nil
-}
+func (e *Element[T]) Prev() *Element[T] { _ = "STUB: not implemented"; return nil }
 
 // List represents a doubly linked list.
 // The zero value for List is an empty list ready to use.
@@ -59,87 +49,48 @@ type List[T any] struct {
 }
 
 // Init initializes or clears list l.
-func (l *List[T]) Init() *List[T] {
-	l.root.next = &l.root
-	l.root.prev = &l.root
-	return l
-}
+func (l *List[T]) Init() *List[T] { _ = "STUB: not implemented"; return nil }
 
-func (l *List[T]) Len() int {
-	return int(l.len.Load())
-}
+func (l *List[T]) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // New returns an initialized list.
-func New[T any]() *List[T] { return new(List[T]).Init() }
+func New[T any]() *List[T] { _ = "STUB: not implemented"; return nil }
 
 // Front returns the first element of list l or nil if the list is empty.
-func (l *List[T]) Front() *Element[T] {
-	if l.len.Load() == 0 {
-		return nil
-	}
-	return l.root.next
-}
+func (l *List[T]) Front() *Element[T] { _ = "STUB: not implemented"; return nil }
 
 // Back returns the last element of list l or nil if the list is empty.
-func (l *List[T]) Back() *Element[T] {
-	if l.len.Load() == 0 {
-		return nil
-	}
-	return l.root.prev
-}
+func (l *List[T]) Back() *Element[T] { _ = "STUB: not implemented"; return nil }
 
 // insert inserts e after at, increments l.len, and returns e.
-func (l *List[T]) insert(e, at *Element[T]) *Element[T] {
-	e.prev = at
-	e.next = at.next
-	e.prev.next = e
-	e.next.prev = e
-	e.list = l
-	l.len.Add(1)
-	return e
-}
+func (l *List[T]) insert(e, at *Element[T]) *Element[T] { _ = "STUB: not implemented"; return nil }
 
 // insertValue is a convenience wrapper for insert(&Element{Value: v}, at).
 func (l *List[T]) insertValue(v T, at *Element[T]) *Element[T] {
-	return l.insert(&Element[T]{Value: v}, at)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // remove removes e from its list, decrements l.len
-func (l *List[T]) remove(e *Element[T]) {
-	e.prev.next = e.next
-	e.next.prev = e.prev
-	e.next = nil // avoid memory leaks
-	e.prev = nil // avoid memory leaks
-	e.list = nil
-	l.len.Add(-1)
-}
+func (l *List[T]) remove(e *Element[T]) { _ = "STUB: not implemented"; return }
+
+// avoid memory leaks
+// avoid memory leaks
 
 // Remove removes e from l if e is an element of list l.
 // It returns the element value e.Value.
 // The element must not be nil.
-func (l *List[T]) Remove(e *Element[T]) {
-	if e.list != l {
-		panic("removing from wrong List")
-	}
-	// if e.list == l, l must have been initialized when e was inserted
-	// in l or l == nil (e is a zero Element) and l.remove will crash
-	l.remove(e)
-}
+func (l *List[T]) Remove(e *Element[T]) { _ = "STUB: not implemented"; return }
+
+// if e.list == l, l must have been initialized when e was inserted
+// in l or l == nil (e is a zero Element) and l.remove will crash
 
 // PushFront inserts a new element e with value v at the front of list l and returns e.
-func (l *List[T]) PushFront(v T) *Element[T] {
-	return l.insertValue(v, &l.root)
-}
+func (l *List[T]) PushFront(v T) *Element[T] { _ = "STUB: not implemented"; return nil }
 
-func (l *List[T]) PushFrontValue(v *Element[T]) {
-	l.insert(v, &l.root)
-}
+func (l *List[T]) PushFrontValue(v *Element[T]) { _ = "STUB: not implemented"; return }
 
 // PushBack inserts a new element e with value v at the back of list l and returns e.
-func (l *List[T]) PushBack(v T) *Element[T] {
-	return l.insertValue(v, l.root.prev)
-}
+func (l *List[T]) PushBack(v T) *Element[T] { _ = "STUB: not implemented"; return nil }
 
-func (l *List[T]) PushBackValue(v *Element[T]) {
-	l.insert(v, l.root.prev)
-}
+func (l *List[T]) PushBackValue(v *Element[T]) { _ = "STUB: not implemented"; return }

@@ -152,13 +152,8 @@
 package mterrors
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"io"
-	"net"
 	"sync"
-	"syscall"
 
 	"github.com/spf13/pflag"
 
@@ -172,46 +167,25 @@ var (
 	muLogErrStacks sync.Mutex
 )
 
-func getLogErrStacks() bool {
-	muLogErrStacks.Lock()
-	defer muLogErrStacks.Unlock()
-	return logErrStacks
-}
+func getLogErrStacks() bool { _ = "STUB: not implemented"; return false }
 
-func setLogErrStacks(val bool) {
-	muLogErrStacks.Lock()
-	defer muLogErrStacks.Unlock()
-	logErrStacks = val
-}
+func setLogErrStacks(val bool) { _ = "STUB: not implemented"; return }
 
 // RegisterFlags registers the command-line options that control mtterror
 // behavior on the provided FlagSet.
-func RegisterFlags(fs *pflag.FlagSet) {
-	muLogErrStacks.Lock()
-	defer muLogErrStacks.Unlock()
-	fs.BoolVar(&logErrStacks, "log-err-stacks", false, "log stack traces for errors")
-}
+func RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // New returns an error with the supplied message.
 // New also records the stack trace at the point it was called.
-func New(code mtrpcpb.Code, message string) error {
-	return &fundamental{
-		msg:   message,
-		code:  code,
-		stack: callers(),
-	}
-}
+func New(code mtrpcpb.Code, message string) error { _ = "STUB: not implemented"; return nil }
 
 // Errorf formats according to a format specifier and returns the string
 // as a value that satisfies error.
 // Errorf also records the stack trace at the point it was called.
 // Use this for Multigres-specific errors that don't have a PostgreSQL counterpart
 func Errorf(code mtrpcpb.Code, format string, args ...any) error {
-	return &fundamental{
-		msg:   fmt.Sprintf(format, args...),
-		code:  code,
-		stack: callers(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // fundamental is an error that has a message and a stack, but no caller.
@@ -221,90 +195,38 @@ type fundamental struct {
 	*stack
 }
 
-func (f *fundamental) Error() string { return f.msg }
+func (f *fundamental) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (f *fundamental) Format(s fmt.State, verb rune) {
-	switch verb {
-	case 'v':
-		panicIfError(io.WriteString(s, "Code: "+f.code.String()+"\n"))
-		panicIfError(io.WriteString(s, f.msg+"\n"))
-		if getLogErrStacks() {
-			f.stack.Format(s, verb)
-		}
-		return
-	case 's':
-		panicIfError(io.WriteString(s, f.msg))
-	case 'q':
-		panicIfError(fmt.Fprintf(s, "%q", f.msg))
-	}
-}
+func (f *fundamental) Format(s fmt.State, verb rune) { _ = "STUB: not implemented"; return }
 
 // Code returns the error code if it's a mtError.
 // If err is nil, it returns ok.
-func Code(err error) mtrpcpb.Code {
-	if err == nil {
-		return mtrpcpb.Code_OK
-	}
-	if err, ok := err.(ErrorWithCode); ok {
-		return err.ErrorCode()
-	}
+func Code(err error) mtrpcpb.Code { _ = "STUB: not implemented"; return *new(mtrpcpb.Code) }
 
-	cause := Cause(err)
-	if cause != err && cause != nil {
-		// If we did not find an error code at the outer level, let's find the cause and check it's code
-		return Code(cause)
-	}
+// If we did not find an error code at the outer level, let's find the cause and check it's code
 
-	// Handle some special cases.
-	switch err {
-	case context.Canceled:
-		return mtrpcpb.Code_CANCELED
-	case context.DeadlineExceeded:
-		return mtrpcpb.Code_DEADLINE_EXCEEDED
-	}
-	return mtrpcpb.Code_UNKNOWN
-}
+// Handle some special cases.
 
 // Wrap returns an error annotating err with a stack trace
 // at the point Wrap is called, and the supplied message.
 // If err is nil, Wrap returns nil.
-func Wrap(err error, message string) error {
-	if err == nil {
-		return nil
-	}
-	return &wrapping{
-		cause: err,
-		msg:   message,
-		stack: callers(),
-	}
-}
+func Wrap(err error, message string) error { _ = "STUB: not implemented"; return nil }
 
 // Wrapf returns an error annotating err with a stack trace
 // at the point Wrapf is call, and the format specifier.
 // If err is nil, Wrapf returns nil.
-func Wrapf(err error, format string, args ...any) error {
-	return Wrap(err, fmt.Sprintf(format, args...))
-}
+func Wrapf(err error, format string, args ...any) error { _ = "STUB: not implemented"; return nil }
 
 // Unwrap attempts to return the Cause of the given error, if it is indeed the result of a mterrors.Wrapf()
 // The function indicates whether the error was indeed wrapped. If the error was not wrapped, the function
 // returns the original error.
 func Unwrap(err error) (wasWrapped bool, unwrapped error) {
-	var w *wrapping
-	if errors.As(err, &w) {
-		return true, w.Cause()
-	}
-	return false, err
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // UnwrapAll attempts to recursively unwrap the given error, and returns the most underlying cause
-func UnwrapAll(err error) error {
-	wasWrapped := true
-	for wasWrapped {
-		wasWrapped, err = Unwrap(err)
-	}
-	return err
-}
+func UnwrapAll(err error) error { _ = "STUB: not implemented"; return nil }
 
 type wrapping struct {
 	cause error
@@ -312,34 +234,21 @@ type wrapping struct {
 	stack *stack
 }
 
-func (w *wrapping) Error() string { return w.msg + ": " + w.cause.Error() }
-func (w *wrapping) Cause() error  { return w.cause }
+func (w *wrapping) Error() string { _ = "STUB: not implemented"; return "" }
+func (w *wrapping) Cause() error {
+	_ = "STUB: not implemented"
 
-// Unwrap implements Go's standard error unwrapping interface.
-// This allows errors.Is() and errors.As() to work with wrapped errors.
-func (w *wrapping) Unwrap() error { return w.cause }
-
-func (w *wrapping) Format(s fmt.State, verb rune) {
-	if rune('v') == verb {
-		panicIfError(fmt.Fprintf(s, "%v\n", w.Cause()))
-		panicIfError(io.WriteString(s, w.msg))
-		if getLogErrStacks() {
-			w.stack.Format(s, verb)
-		}
-		return
-	}
-
-	if rune('s') == verb || rune('q') == verb {
-		panicIfError(io.WriteString(s, w.Error()))
-	}
+	// Unwrap implements Go's standard error unwrapping interface.
+	// This allows errors.Is() and errors.As() to work with wrapped errors.
+	return nil
 }
+
+func (w *wrapping) Unwrap() error { _ = "STUB: not implemented"; return nil }
+
+func (w *wrapping) Format(s fmt.State, verb rune) { _ = "STUB: not implemented"; return }
 
 // since we can't return an error, let's panic if something goes wrong here
-func panicIfError(_ int, err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+func panicIfError(_ int, err error) { _ = "STUB: not implemented"; return }
 
 // RootCause returns the underlying cause of the error, if possible.
 // An error value has a cause if it implements the following
@@ -352,15 +261,7 @@ func panicIfError(_ int, err error) {
 // If the error does not implement Cause, the original error will
 // be returned. If the error is nil, nil will be returned without further
 // investigation.
-func RootCause(err error) error {
-	for {
-		cause := Cause(err)
-		if cause == nil {
-			return err
-		}
-		err = cause
-	}
-}
+func RootCause(err error) error { _ = "STUB: not implemented"; return nil }
 
 // Cause will return the immediate cause, if possible.
 // An error value has a cause if it implements the following
@@ -371,128 +272,70 @@ func RootCause(err error) error {
 //	}
 //
 // If the error does not implement Cause, nil will be returned
-func Cause(err error) error {
-	type causer interface {
-		Cause() error
-	}
-
-	causerObj, ok := err.(causer)
-	if !ok {
-		return nil
-	}
-
-	return causerObj.Cause()
-}
+func Cause(err error) error { _ = "STUB: not implemented"; return nil }
 
 // Equals returns true iff the error message and the code returned by Code()
 // are equal.
-func Equals(a, b error) bool {
-	if a == nil && b == nil {
-		// Both are nil.
-		return true
-	}
+func Equals(a, b error) bool { _ = "STUB: not implemented"; return false }
 
-	if a == nil || b == nil {
-		// One of the two is nil, since we know both are not nil.
-		return false
-	}
+// Both are nil.
 
-	return a.Error() == b.Error() && Code(a) == Code(b)
-}
+// One of the two is nil, since we know both are not nil.
 
 // Print is meant to print the mtError object in test failures.
 // For comparing two mterrors, use Equals() instead.
-func Print(err error) string {
-	return fmt.Sprintf("%v: %v\n", Code(err), err.Error())
-}
+func Print(err error) string { _ = "STUB: not implemented"; return "" }
 
 // TruncateError truncates error messages that are longer than the
 // specified length.
-func TruncateError(oldErr error, max int) error {
-	if oldErr == nil || max <= 0 || len(oldErr.Error()) <= max {
-		return oldErr
-	}
+func TruncateError(oldErr error, max int) error { _ = "STUB: not implemented"; return nil }
 
-	if max <= 12 {
-		return New(Code(oldErr), "[TRUNCATED]")
-	}
+func (f *fundamental) ErrorCode() mtrpcpb.Code {
+	_ = "STUB: not implemented"
 
-	return New(Code(oldErr), oldErr.Error()[:max-12]+" [TRUNCATED]")
+	// IsConnectionError returns true if the error indicates a broken or lost
+	// connection to PostgreSQL. It checks two categories:
+	//
+	//  1. Go I/O errors: EOF, connection reset, broken pipe, etc. These occur
+	//     when the TCP/Unix socket is broken.
+	//
+	//  2. PostgreSQL SQLSTATE codes: When PostgreSQL shuts down or crashes, it may
+	//     send a FATAL ErrorResponse before closing the connection. We check for
+	//     Class 08 (Connection Exception) and specific Class 57 shutdown codes.
+	//
+	// This is the PostgreSQL equivalent of Vitess's sqlerror.IsConnErr, which
+	// checks MySQL CR_* client error codes.
+	return *new(mtrpcpb.Code)
 }
 
-func (f *fundamental) ErrorCode() mtrpcpb.Code { return f.code }
+func IsConnectionError(err error) bool { _ = "STUB: not implemented"; return false }
 
-// IsConnectionError returns true if the error indicates a broken or lost
-// connection to PostgreSQL. It checks two categories:
-//
-//  1. Go I/O errors: EOF, connection reset, broken pipe, etc. These occur
-//     when the TCP/Unix socket is broken.
-//
-//  2. PostgreSQL SQLSTATE codes: When PostgreSQL shuts down or crashes, it may
-//     send a FATAL ErrorResponse before closing the connection. We check for
-//     Class 08 (Connection Exception) and specific Class 57 shutdown codes.
-//
-// This is the PostgreSQL equivalent of Vitess's sqlerror.IsConnErr, which
-// checks MySQL CR_* client error codes.
-func IsConnectionError(err error) bool {
-	if err == nil {
-		return false
-	}
+// Check PostgreSQL SQLSTATE codes for server-initiated disconnection.
+// When PostgreSQL shuts down or crashes, it sends a FATAL error with
+// a specific SQLSTATE before closing the connection.
 
-	// Check PostgreSQL SQLSTATE codes for server-initiated disconnection.
-	// When PostgreSQL shuts down or crashes, it sends a FATAL error with
-	// a specific SQLSTATE before closing the connection.
-	var diag *PgDiagnostic
-	if errors.As(err, &diag) {
-		// Class 08: Connection Exception (all codes in this class).
-		if diag.IsClass("08") {
-			return true
-		}
-		// Specific Class 57 (Operator Intervention) shutdown codes.
-		// Note: we intentionally exclude 57014 (query_canceled) and the
-		// generic 57000 since those don't indicate a lost connection.
-		switch diag.Code {
-		case "57P01", // admin_shutdown
-			"57P02", // crash_shutdown
-			"57P03": // cannot_connect_now
-			return true
-		}
-		// Don't return false here — fall through to check for I/O errors.
-		// A wrapped error chain could contain both a PgDiagnostic and an
-		// underlying I/O error (e.g., EOF), and we don't want the
-		// non-connection SQLSTATE to mask the transport-level failure.
-	}
+// Class 08: Connection Exception (all codes in this class).
 
-	// Common I/O errors indicating connection loss.
-	if errors.Is(err, io.EOF) ||
-		errors.Is(err, io.ErrUnexpectedEOF) ||
-		errors.Is(err, net.ErrClosed) {
-		return true
-	}
+// Specific Class 57 (Operator Intervention) shutdown codes.
+// Note: we intentionally exclude 57014 (query_canceled) and the
+// generic 57000 since those don't indicate a lost connection.
 
-	// Syscall-level connection errors.
-	if errors.Is(err, syscall.ECONNRESET) ||
-		errors.Is(err, syscall.EPIPE) ||
-		errors.Is(err, syscall.ECONNREFUSED) ||
-		errors.Is(err, syscall.ECONNABORTED) {
-		return true
-	}
+// admin_shutdown
+// crash_shutdown
+// cannot_connect_now
 
-	return false
-}
+// Don't return false here — fall through to check for I/O errors.
+// A wrapped error chain could contain both a PgDiagnostic and an
+// underlying I/O error (e.g., EOF), and we don't want the
+// non-connection SQLSTATE to mask the transport-level failure.
+
+// Common I/O errors indicating connection loss.
+
+// Syscall-level connection errors.
 
 // IsAuthenticationError reports whether err surfaced from PostgreSQL's
 // authentication phase — either an invalid password (28P01) or any other
 // class-28 "Invalid Authorization Specification" code. Callers use this to
 // distinguish a stale-credentials failure (where retrying against a fresh
 // verifier might help) from a genuine configuration or connectivity problem.
-func IsAuthenticationError(err error) bool {
-	if err == nil {
-		return false
-	}
-	var diag *PgDiagnostic
-	if errors.As(err, &diag) {
-		return diag.IsClass("28")
-	}
-	return false
-}
+func IsAuthenticationError(err error) bool { _ = "STUB: not implemented"; return false }

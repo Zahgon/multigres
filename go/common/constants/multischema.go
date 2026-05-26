@@ -14,8 +14,6 @@
 
 package constants
 
-import "fmt"
-
 // DefaultTableGroup is the tablegroup value that indicates this multipooler
 // serves the default database where multischema global tables should be created.
 const DefaultTableGroup = "default"
@@ -28,11 +26,6 @@ const DefaultShard = "0-inf"
 //
 // MVP Limitation: Currently, we only support the default tablegroup with shard "0-inf".
 func ValidateMVPTableGroupAndShard(tableGroup, shard string) error {
-	if tableGroup != DefaultTableGroup {
-		return fmt.Errorf("only default tablegroup is supported, got: %s", tableGroup)
-	}
-	if shard != DefaultShard {
-		return fmt.Errorf("only shard %s is supported for default tablegroup, got: %s", DefaultShard, shard)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }

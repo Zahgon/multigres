@@ -17,10 +17,7 @@ package poolerserver
 import (
 	"context"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // drainStats holds OpenTelemetry metrics for graceful-drain observability.
@@ -35,43 +32,7 @@ type drainStats struct {
 	forceClosed metric.Int64Counter
 }
 
-func newDrainStats() *drainStats {
-	s := &drainStats{
-		meter: otel.Meter("github.com/multigres/multigres/go/services/multipooler/poolerserver"),
-	}
-
-	var err error
-
-	s.duration, err = s.meter.Float64Histogram(
-		"mg.pooler.drain.duration",
-		metric.WithDescription("Wall-clock duration of graceful drain on NOT_SERVING transition"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(0.1, 0.5, 1, 2, 5, 10, 30, 60),
-	)
-	if err != nil {
-		s.duration = noop.Float64Histogram{}
-	}
-
-	s.outcome, err = s.meter.Int64Counter(
-		"mg.pooler.drain.outcome",
-		metric.WithDescription("Drain events by outcome (graceful vs. force_close)"),
-		metric.WithUnit("{drain}"),
-	)
-	if err != nil {
-		s.outcome = noop.Int64Counter{}
-	}
-
-	s.forceClosed, err = s.meter.Int64Counter(
-		"mg.pooler.drain.force_closed",
-		metric.WithDescription("Reserved connections force-closed because drain exceeded the grace period"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		s.forceClosed = noop.Int64Counter{}
-	}
-
-	return s
-}
+func newDrainStats() *drainStats { _ = "STUB: not implemented"; return nil }
 
 const (
 	drainOutcomeGraceful   = "graceful"
@@ -81,15 +42,13 @@ const (
 // recordDrain records a completed drain event with its wall-clock duration
 // and outcome.
 func (s *drainStats) recordDrain(ctx context.Context, seconds float64, outcome string) {
-	s.duration.Record(ctx, seconds)
-	s.outcome.Add(ctx, 1, metric.WithAttributes(attribute.String("outcome", outcome)))
+	_ = "STUB: not implemented"
+	return
 }
 
 // recordForceClosed adds to the count of connections force-closed across
 // all drain events.
 func (s *drainStats) recordForceClosed(ctx context.Context, n int) {
-	if n <= 0 {
-		return
-	}
-	s.forceClosed.Add(ctx, int64(n))
+	_ = "STUB: not implemented"
+	return
 }

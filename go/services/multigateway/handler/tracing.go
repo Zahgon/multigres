@@ -17,12 +17,7 @@ package handler
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
-
-	"github.com/multigres/multigres/go/tools/telemetry"
 )
 
 // startQuerySpan creates a server-side span for a gateway query operation.
@@ -35,42 +30,19 @@ func startQuerySpan(
 	dbNamespace string,
 	user string,
 ) (context.Context, trace.Span) {
-	return telemetry.Tracer().Start(ctx, "gateway.query",
-		trace.WithSpanKind(trace.SpanKindServer),
-		trace.WithAttributes(
-			semconv.DBSystemNamePostgreSQL,
-			semconv.DBOperationName(operationName),
-			semconv.DBNamespace(dbNamespace),
-			attribute.String("db.query.protocol", protocol),
-			attribute.String("db.user", user),
-		),
-	)
+	_ = "STUB: not implemented"
+	return *new(context.Context), *new(trace.Span)
 }
 
 // setSpanPlanAttributes enriches the active span with plan-level metadata.
 // Called from recordQueryCompletion after the executor returns.
 func setSpanPlanAttributes(ctx context.Context, planType string, tablesUsed []string) {
-	span := trace.SpanFromContext(ctx)
-	if !span.IsRecording() {
-		return
-	}
-	if planType != "" {
-		span.SetAttributes(attribute.String("db.plan.type", planType))
-	}
-	if len(tablesUsed) > 0 {
-		span.SetAttributes(attribute.StringSlice("db.tables_used", tablesUsed))
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // recordSpanError records an error on a span with its SQLSTATE code.
 func recordSpanError(span trace.Span, err error, sqlstate string) {
-	span.RecordError(err)
-	attrs := []attribute.KeyValue{}
-	if sqlstate != "" {
-		attrs = append(attrs, attribute.String("db.response.status_code", sqlstate))
-	}
-	span.SetStatus(codes.Error, err.Error())
-	if len(attrs) > 0 {
-		span.SetAttributes(attrs...)
-	}
+	_ = "STUB: not implemented"
+	return
 }

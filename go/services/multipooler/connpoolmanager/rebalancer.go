@@ -16,8 +16,6 @@ package connpoolmanager
 
 import (
 	"context"
-	"maps"
-	"time"
 )
 
 // startRebalancer starts the background rebalancer goroutine.
@@ -26,145 +24,41 @@ import (
 //  2. Computes fair allocations using FairShareAllocator
 //  3. Applies new capacities via UserPool.SetCapacity()
 //  4. Garbage collects inactive user pools
-func (m *Manager) startRebalancer() {
-	m.rebalancerWg.Add(1)
-	go m.rebalanceLoop()
-}
+func (m *Manager) startRebalancer() { _ = "STUB: not implemented"; return }
 
 // rebalanceLoop is the main loop for the rebalancer goroutine.
-func (m *Manager) rebalanceLoop() {
-	defer m.rebalancerWg.Done()
-
-	interval := m.config.RebalanceInterval()
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-m.rebalancerCtx.Done():
-			return
-		case <-ticker.C:
-			m.rebalance(m.rebalancerCtx)
-		}
-	}
-}
+func (m *Manager) rebalanceLoop() { _ = "STUB: not implemented"; return }
 
 // rebalance performs one rebalance cycle:
 // - Collects demand from all user pools
 // - Computes fair allocations
 // - Applies new capacities
 // - Garbage collects inactive pools
-func (m *Manager) rebalance(ctx context.Context) {
-	pools := m.userPoolsSnapshot.Load()
-	if pools == nil || len(*pools) == 0 {
-		return
-	}
+func (m *Manager) rebalance(ctx context.Context) { _ = "STUB: not implemented"; return }
 
-	// 1. Collect demands from all user pools
-	regularDemands := make(map[string]int64, len(*pools))
-	reservedDemands := make(map[string]int64, len(*pools))
-	for user, pool := range *pools {
-		regularDemands[user] = pool.RegularDemand()
-		reservedDemands[user] = pool.ReservedDemand()
-	}
+// 1. Collect demands from all user pools
 
-	// 2. Compute fair allocations
-	regularAllocs := m.regularAllocator.Allocate(regularDemands)
-	reservedAllocs := m.reservedAllocator.Allocate(reservedDemands)
+// 2. Compute fair allocations
 
-	// 3. Apply new capacities to each pool
-	for user, pool := range *pools {
-		regularCap := regularAllocs[user]
-		reservedCap := reservedAllocs[user]
+// 3. Apply new capacities to each pool
 
-		m.logger.DebugContext(ctx, "rebalance user",
-			"user", user,
-			"regular_demand", regularDemands[user],
-			"reserved_demand", reservedDemands[user],
-			"regular_cap", regularCap,
-			"reserved_cap", reservedCap)
-
-		if err := pool.SetCapacity(ctx, regularCap, reservedCap); err != nil {
-			m.logger.WarnContext(ctx, "failed to set capacity",
-				"user", user,
-				"regular_cap", regularCap,
-				"reserved_cap", reservedCap,
-				"error", err)
-		}
-	}
-
-	// 4. Garbage collect inactive pools
-	m.garbageCollectInactivePools(ctx)
-}
+// 4. Garbage collect inactive pools
 
 // garbageCollectInactivePools removes user pools that have been inactive
 // longer than the configured timeout.
 func (m *Manager) garbageCollectInactivePools(ctx context.Context) {
-	inactiveTimeout := m.config.InactiveTimeout()
-	if inactiveTimeout <= 0 {
-		return
-	}
-
-	pools := m.userPoolsSnapshot.Load()
-	if pools == nil || len(*pools) == 0 {
-		return
-	}
-
-	now := time.Now().UnixNano()
-	cutoff := now - inactiveTimeout.Nanoseconds()
-
-	// Find inactive pools
-	var inactiveUsers []string
-	for user, pool := range *pools {
-		if pool.LastActivity() < cutoff {
-			inactiveUsers = append(inactiveUsers, user)
-		}
-	}
-
-	if len(inactiveUsers) == 0 {
-		return
-	}
-
-	// Remove inactive pools using copy-on-write
-	m.createMu.Lock()
-	defer m.createMu.Unlock()
-
-	// Re-read snapshot with lock held
-	pools = m.userPoolsSnapshot.Load()
-	if pools == nil {
-		return
-	}
-
-	// Create new map without inactive pools
-	newPools := make(map[string]*UserPool, len(*pools)-len(inactiveUsers))
-	maps.Copy(newPools, *pools)
-
-	var closedCount int
-	for _, user := range inactiveUsers {
-		pool, ok := newPools[user]
-		if !ok {
-			continue
-		}
-
-		// Double-check activity timestamp (may have been updated since first check)
-		if pool.LastActivity() >= cutoff {
-			continue
-		}
-
-		// Close and remove the pool
-		pool.Close()
-		delete(newPools, user)
-		closedCount++
-
-		m.logger.InfoContext(ctx, "garbage collected inactive user pool",
-			"user", user,
-			"inactive_duration", time.Duration(now-pool.LastActivity()))
-	}
-
-	if closedCount > 0 {
-		m.userPoolsSnapshot.Store(&newPools)
-		m.logger.InfoContext(ctx, "garbage collection complete",
-			"removed_pools", closedCount,
-			"remaining_pools", len(newPools))
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Find inactive pools
+
+// Remove inactive pools using copy-on-write
+
+// Re-read snapshot with lock held
+
+// Create new map without inactive pools
+
+// Double-check activity timestamp (may have been updated since first check)
+
+// Close and remove the pool

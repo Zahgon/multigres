@@ -16,19 +16,15 @@ package multigateway
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/multigres/multigres/go/common/pgprotocol/pid"
 	"github.com/multigres/multigres/go/common/topoclient"
 	multigatewayservicepb "github.com/multigres/multigres/go/pb/multigatewayservice"
-	"github.com/multigres/multigres/go/tools/grpccommon"
 )
 
 const (
@@ -97,59 +93,32 @@ func NewCancelManager(
 	logger *slog.Logger,
 	transportCreds grpc.DialOption,
 ) *CancelManager {
-	if transportCreds == nil {
-		transportCreds = grpc.WithTransportCredentials(insecure.NewCredentials())
-	}
-
-	ctx, cancel := context.WithCancel(context.TODO())
-	cm := &CancelManager{
-		primaryCancelFn: primaryCancelFn,
-		replicaCancelFn: replicaCancelFn,
-		ownPrefix:       ownPrefix,
-		ts:              ts,
-		logger:          logger,
-		clients:         make(map[string]*gatewayConn),
-		transportCreds:  transportCreds,
-		stop:            cancel,
-	}
-	empty := make(map[uint32]string)
-	cm.prefixCache.Store(&empty)
-	go cm.refreshPrefixCachePeriodically(ctx)
-	return cm
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RegisterWithGRPCServer registers the CancelManager as a gRPC service.
 func (cm *CancelManager) RegisterWithGRPCServer(grpcServer *grpc.Server) {
-	multigatewayservicepb.RegisterMultiGatewayServiceServer(grpcServer, cm)
+	_ = "STUB: not implemented"
+	return
 }
 
 // handleCancel decodes the PID prefix and either cancels locally or forwards
 // to the owning gateway. The replica flag indicates whether the cancel arrived
 // on a replica-reads listener.
 func (cm *CancelManager) handleCancel(ctx context.Context, processID, secretKey uint32, replica bool) {
-	prefix, _ := pid.DecodePID(processID)
-
-	if prefix == cm.ownPrefix {
-		cm.cancelLocal(processID, secretKey, replica)
-		return
-	}
-
-	// Forward to the gateway that owns this PID prefix.
-	if err := cm.forwardCancel(ctx, prefix, processID, secretKey, replica); err != nil {
-		cm.logger.WarnContext(ctx, "failed to forward cancel request",
-			"target_prefix", prefix,
-			"process_id", processID,
-			"replica", replica,
-			"error", err,
-		)
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Forward to the gateway that owns this PID prefix.
 
 // ForListener returns a server.CancelHandler that routes cancel requests
 // through this CancelManager with the given connection type baked in.
 // This avoids adding replica awareness to the generic server package.
 func (cm *CancelManager) ForListener(replica bool) *ListenerCancelHandler {
-	return &ListenerCancelHandler{cm: cm, replica: replica}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ListenerCancelHandler adapts CancelManager to the server.CancelHandler
@@ -161,142 +130,49 @@ type ListenerCancelHandler struct {
 
 // HandleCancelRequest implements server.CancelHandler.
 func (h *ListenerCancelHandler) HandleCancelRequest(ctx context.Context, processID, secretKey uint32) {
-	h.cm.handleCancel(ctx, processID, secretKey, h.replica)
+	_ = "STUB: not implemented"
+	return
 }
 
 // cancelLocal dispatches a cancel to the correct local listener based on connection type.
 func (cm *CancelManager) cancelLocal(processID, secretKey uint32, replica bool) {
-	if replica {
-		if cm.replicaCancelFn != nil {
-			cm.replicaCancelFn(processID, secretKey)
-		}
-	} else {
-		cm.primaryCancelFn(processID, secretKey)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // CancelQuery implements MultiGatewayServiceServer.
 // This is called by other gateways forwarding cancel requests via gRPC.
 func (cm *CancelManager) CancelQuery(ctx context.Context, req *multigatewayservicepb.CancelQueryRequest) (*multigatewayservicepb.CancelQueryResponse, error) {
-	prefix, _ := pid.DecodePID(req.ProcessId)
-	if prefix != cm.ownPrefix {
-		cm.logger.WarnContext(ctx, "received cancel for wrong prefix",
-			"expected", cm.ownPrefix,
-			"got", prefix,
-			"process_id", req.ProcessId,
-		)
-	}
-	cm.cancelLocal(req.ProcessId, req.SecretKey, req.Replica)
-	return &multigatewayservicepb.CancelQueryResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // forwardCancel finds the gateway with the given PID prefix and forwards the cancel request.
 // Cancellation is best-effort — no retries on failure.
 func (cm *CancelManager) forwardCancel(ctx context.Context, targetPrefix, processID, secretKey uint32, replica bool) error {
-	cache := *cm.prefixCache.Load()
-	addr, ok := cache[targetPrefix]
-	if !ok {
-		// Cache miss — rebuild from topo and try again.
-		cm.rebuildPrefixCache(ctx)
-		cache = *cm.prefixCache.Load()
-		addr, ok = cache[targetPrefix]
-		if !ok {
-			return fmt.Errorf("no gateway found with pid_prefix=%d", targetPrefix)
-		}
-	}
-
-	client, err := cm.getClient(addr)
-	if err != nil {
-		return fmt.Errorf("connecting to gateway at %s: %w", addr, err)
-	}
-
-	_, err = client.CancelQuery(ctx, &multigatewayservicepb.CancelQueryRequest{
-		ProcessId: processID,
-		SecretKey: secretKey,
-		Replica:   replica,
-	})
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Cache miss — rebuild from topo and try again.
 
 // rebuildPrefixCache reads all gateways from topo and atomically replaces the
 // prefix cache.
-func (cm *CancelManager) rebuildPrefixCache(ctx context.Context) {
-	cells, err := cm.ts.GetCellNames(ctx)
-	if err != nil {
-		cm.logger.WarnContext(ctx, "failed to get cell names for prefix cache rebuild", "error", err)
-		return
-	}
-
-	cache := make(map[uint32]string)
-	for _, cell := range cells {
-		gateways, err := cm.ts.GetMultiGatewaysByCell(ctx, cell)
-		if err != nil {
-			cm.logger.WarnContext(ctx, "failed to get gateways for cell", "cell", cell, "error", err)
-			continue
-		}
-		for _, gw := range gateways {
-			prefix := gw.GetPidPrefix()
-			grpcPort := gw.PortMap["grpc"]
-			if prefix > 0 && grpcPort > 0 {
-				cache[prefix] = fmt.Sprintf("%s:%d", gw.GetHostname(), grpcPort)
-			}
-		}
-	}
-
-	cm.prefixCache.Store(&cache)
-}
+func (cm *CancelManager) rebuildPrefixCache(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 // refreshPrefixCachePeriodically rebuilds the prefix cache on a regular interval
 // so that gateway additions/removals are picked up even without a cache miss.
 func (cm *CancelManager) refreshPrefixCachePeriodically(ctx context.Context) {
-	ticker := time.NewTicker(prefixCacheRefreshInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			cm.rebuildPrefixCache(ctx)
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // getClient returns a cached gRPC client for the given address, creating one if needed.
 // Connections use gRPC's built-in idle timeout to close unused transports.
 func (cm *CancelManager) getClient(addr string) (multigatewayservicepb.MultiGatewayServiceClient, error) {
-	cm.clientsMu.Lock()
-	defer cm.clientsMu.Unlock()
-
-	if gc, ok := cm.clients[addr]; ok {
-		return gc.client, nil
-	}
-
-	dialOpts := append(grpccommon.ClientDialOptions(cm.transportCreds), grpc.WithIdleTimeout(grpcIdleTimeout))
-	conn, err := grpccommon.NewClient(addr,
-		grpccommon.WithDialOptions(dialOpts...),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	gc := &gatewayConn{
-		client: multigatewayservicepb.NewMultiGatewayServiceClient(conn),
-		conn:   conn,
-	}
-	cm.clients[addr] = gc
-	return gc.client, nil
+	_ = "STUB: not implemented"
+	return *new(multigatewayservicepb.MultiGatewayServiceClient), nil
 }
 
 // Close stops the background refresh goroutine and closes all cached gRPC connections.
-func (cm *CancelManager) Close() {
-	cm.stop()
-
-	cm.clientsMu.Lock()
-	defer cm.clientsMu.Unlock()
-
-	for addr, gc := range cm.clients {
-		gc.conn.Close()
-		delete(cm.clients, addr)
-	}
-}
+func (cm *CancelManager) Close() { _ = "STUB: not implemented"; return }

@@ -15,65 +15,25 @@
 package topo
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"time"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // AddGetCellCommand adds the getcell subcommand
-func AddGetCellCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getcell",
-		Short: "Get information about a specific cell",
-		Long:  "Retrieve detailed information about a cell from the multiadmin server.",
-		RunE:  runGetCell,
-	}
+func AddGetCellCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }
 
-	// Add command-specific flags
-	cmd.Flags().String("name", "", "Name of the cell to retrieve (required)")
-	cmd.Flags().String("admin-server", "", "gRPC address of the multiadmin server (e.g., localhost:15990)")
+// Add command-specific flags
 
-	// Mark the name flag as required
-	_ = cmd.MarkFlagRequired("name")
-
-	return cmd
-}
+// Mark the name flag as required
 
 // runGetCell executes the getcell command
 func runGetCell(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Get the cell name
-	cellName, _ := cmd.Flags().GetString("name")
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	// Create context with timeout and call GetCell RPC
-	ctx, cancel := context.WithTimeout(cmd.Context(), 10*time.Second)
-	defer cancel()
-
-	response, err := client.GetCell(ctx, &multiadminpb.GetCellRequest{
-		Name: cellName,
-	})
-	if err != nil {
-		return fmt.Errorf("GetCell RPC failed: %w", err)
-	}
-
-	// Output the response in JSON format
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
+
+// Create admin client
+
+// Create context with timeout and call GetCell RPC
+
+// Output the response in JSON format

@@ -49,53 +49,16 @@ type connStack[C Connection] struct {
 }
 
 // Push adds a connection to the top of the stack.
-func (s *connStack[C]) Push(conn *Pooled[C]) {
-	s.mu.Lock()
-	conn.next = s.top
-	s.top = conn
-	s.count++
-	s.mu.Unlock()
-	if s.onPush != nil {
-		s.onPush()
-	}
-}
+func (s *connStack[C]) Push(conn *Pooled[C]) { _ = "STUB: not implemented"; return }
 
 // Pop removes and returns the connection from the top of the stack.
 // Returns nil and false if the stack is empty.
-func (s *connStack[C]) Pop() (*Pooled[C], bool) {
-	s.mu.Lock()
-	if s.top == nil {
-		s.mu.Unlock()
-		return nil, false
-	}
-	conn := s.top
-	s.top = conn.next
-	s.count--
-	s.mu.Unlock()
-	conn.next = nil
-	if s.onPop != nil {
-		s.onPop()
-	}
-	return conn, true
-}
+func (s *connStack[C]) Pop() (*Pooled[C], bool) { _ = "STUB: not implemented"; return nil, false }
 
 // Len returns the number of connections in the stack.
-func (s *connStack[C]) Len() int {
-	s.mu.Lock()
-	n := s.count
-	s.mu.Unlock()
-	return n
-}
+func (s *connStack[C]) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // ForEach iterates over all connections in the stack and calls fn for each.
 // The iteration happens under the lock, so fn should be fast and non-blocking.
 // If fn returns false, iteration stops early.
-func (s *connStack[C]) ForEach(fn func(*Pooled[C]) bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for conn := s.top; conn != nil; conn = conn.next {
-		if !fn(conn) {
-			return
-		}
-	}
-}
+func (s *connStack[C]) ForEach(fn func(*Pooled[C]) bool) { _ = "STUB: not implemented"; return }

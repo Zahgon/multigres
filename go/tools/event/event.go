@@ -89,68 +89,30 @@ var (
 // invalid listener function.
 type BadListenerError string
 
-func (why BadListenerError) Error() string {
-	return "bad listener func: " + string(why)
-}
+func (why BadListenerError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // AddListener registers a listener function that will be called when a matching
 // event is dispatched. The type of the function's first (and only) argument
 // declares the event type (or interface) to listen for.
-func AddListener(fn any) {
-	listenersMutex.Lock()
-	defer listenersMutex.Unlock()
+func AddListener(fn any) { _ = "STUB: not implemented"; return }
 
-	fnType := reflect.TypeOf(fn)
+// check that the function type is what we think: # of inputs/outputs, etc.
+// panic if conditions not met (because it's a programming error to have that happen)
 
-	// check that the function type is what we think: # of inputs/outputs, etc.
-	// panic if conditions not met (because it's a programming error to have that happen)
-	switch {
-	case fnType.Kind() != reflect.Func:
-		panic(BadListenerError("listener must be a function"))
-	case fnType.NumIn() != 1:
-		panic(BadListenerError("listener must take exactly one input argument"))
-	}
+// the first input parameter is the event
 
-	// the first input parameter is the event
-	evType := fnType.In(0)
+// keep a list of listeners for each event type
 
-	// keep a list of listeners for each event type
-	listeners[evType] = append(listeners[evType], fn)
-
-	// if eventType is an interface, store it in a separate list
-	// so we can check non-interface objects against all interfaces
-	if evType.Kind() == reflect.Interface {
-		interfaces = append(interfaces, evType)
-	}
-}
+// if eventType is an interface, store it in a separate list
+// so we can check non-interface objects against all interfaces
 
 // Dispatch sends an event to all registered listeners that were declared
 // to accept values of the event's type, or interfaces that the value implements.
-func Dispatch(ev any) {
-	evType := reflect.TypeOf(ev)
-	listenersMap := make(map[reflect.Type][]any)
+func Dispatch(ev any) { _ = "STUB: not implemented"; return }
 
-	// Build a map of listeners to be called while holding the lock
-	func() {
-		listenersMutex.Lock()
-		defer listenersMutex.Unlock()
+// Build a map of listeners to be called while holding the lock
 
-		listenersMap[evType] = append(listenersMap[evType], listeners[evType]...)
-
-		// also check if the type implements any of the registered interfaces
-		for _, in := range interfaces {
-			if evType.Implements(in) {
-				listenersMap[in] = append(listenersMap[in], listeners[in]...)
-			}
-		}
-	}()
-
-	for _, list := range listenersMap {
-		for _, fn := range list {
-			reflect.ValueOf(fn).Call([]reflect.Value{reflect.ValueOf(ev)})
-		}
-	}
-}
+// also check if the type implements any of the registered interfaces
 
 // Updater is an interface that events can implement to combine updating and
 // dispatching into one call.
@@ -161,7 +123,4 @@ type Updater interface {
 
 // DispatchUpdate calls Update() on the event and then dispatches it. This is a
 // shortcut for combining updates and dispatches into a single call.
-func DispatchUpdate(ev Updater, update any) {
-	ev.Update(update)
-	Dispatch(ev)
-}
+func DispatchUpdate(ev Updater, update any) { _ = "STUB: not implemented"; return }

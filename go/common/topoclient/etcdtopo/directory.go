@@ -16,68 +16,26 @@ package etcdtopo
 
 import (
 	"context"
-	"path"
-	"strings"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"github.com/multigres/multigres/go/common/topoclient"
 )
 
 // ListDir is part of the topoclient.Conn interface.
 func (s *etcdtopo) ListDir(ctx context.Context, dirPath string, full bool) ([]topoclient.DirEntry, error) {
-	nodePath := path.Join(s.root, dirPath) + "/"
-	if nodePath == "//" {
-		// Special case where s.root is "/", dirPath is empty,
-		// we would end up with "//". in that case, we want "/".
-		nodePath = "/"
-	}
-	resp, err := s.cli.Get(ctx, nodePath,
-		clientv3.WithPrefix(),
-		clientv3.WithSort(clientv3.SortByKey, clientv3.SortAscend),
-		clientv3.WithKeysOnly())
-	if err != nil {
-		return nil, convertError(err, dirPath)
-	}
-	if len(resp.Kvs) == 0 {
-		// No key starts with this prefix, means the directory
-		// doesn't exist.
-		return nil, topoclient.NewError(topoclient.NoNode, nodePath)
-	}
-
-	prefixLen := len(nodePath)
-	var result []topoclient.DirEntry
-	for _, ev := range resp.Kvs {
-		p := string(ev.Key)
-
-		// Remove the prefix, base path.
-		if !strings.HasPrefix(p, nodePath) {
-			return nil, ErrBadResponse
-		}
-		p = p[prefixLen:]
-
-		// Keep only the part until the first '/'.
-		t := topoclient.TypeFile
-		if i := strings.Index(p, "/"); i >= 0 {
-			p = p[:i]
-			t = topoclient.TypeDirectory
-		}
-
-		// Remove duplicates, add to list.
-		if len(result) == 0 || result[len(result)-1].Name != p {
-			e := topoclient.DirEntry{
-				Name: p,
-			}
-			if full {
-				e.Type = t
-				if ev.Lease != 0 {
-					// Only locks have a lease associated with them.
-					e.Ephemeral = true
-				}
-			}
-			result = append(result, e)
-		}
-	}
-
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Special case where s.root is "/", dirPath is empty,
+// we would end up with "//". in that case, we want "/".
+
+// No key starts with this prefix, means the directory
+// doesn't exist.
+
+// Remove the prefix, base path.
+
+// Keep only the part until the first '/'.
+
+// Remove duplicates, add to list.
+
+// Only locks have a lease associated with them.

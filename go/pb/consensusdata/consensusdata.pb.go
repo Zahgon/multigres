@@ -21,13 +21,12 @@
 package consensusdata
 
 import (
+	sync "sync"
+
 	clustermetadata "github.com/multigres/multigres/go/pb/clustermetadata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -65,32 +64,27 @@ var (
 	}
 )
 
-func (x BeginTermAction) Enum() *BeginTermAction {
-	p := new(BeginTermAction)
-	*p = x
-	return p
-}
+func (x BeginTermAction) Enum() *BeginTermAction { _ = "STUB: not implemented"; return nil }
 
-func (x BeginTermAction) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x BeginTermAction) String() string { _ = "STUB: not implemented"; return "" }
 
 func (BeginTermAction) Descriptor() protoreflect.EnumDescriptor {
-	return file_consensusdata_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (BeginTermAction) Type() protoreflect.EnumType {
-	return &file_consensusdata_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x BeginTermAction) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use BeginTermAction.Descriptor instead.
-func (BeginTermAction) EnumDescriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{0}
-}
+func (BeginTermAction) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // WAL position for tracking replication state
 type WALPosition struct {
@@ -126,84 +120,33 @@ type WALPosition struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *WALPosition) Reset() {
-	*x = WALPosition{}
-	mi := &file_consensusdata_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *WALPosition) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *WALPosition) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *WALPosition) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*WALPosition) ProtoMessage() {}
+func (*WALPosition) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *WALPosition) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use WALPosition.ProtoReflect.Descriptor instead.
-func (*WALPosition) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{0}
-}
+func (*WALPosition) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *WALPosition) GetCurrentLsn() string {
-	if x != nil {
-		return x.CurrentLsn
-	}
-	return ""
-}
+func (x *WALPosition) GetCurrentLsn() string { _ = "STUB: not implemented"; return "" }
 
-func (x *WALPosition) GetLastReceiveLsn() string {
-	if x != nil {
-		return x.LastReceiveLsn
-	}
-	return ""
-}
+func (x *WALPosition) GetLastReceiveLsn() string { _ = "STUB: not implemented"; return "" }
 
-func (x *WALPosition) GetLastReplayLsn() string {
-	if x != nil {
-		return x.LastReplayLsn
-	}
-	return ""
-}
+func (x *WALPosition) GetLastReplayLsn() string { _ = "STUB: not implemented"; return "" }
 
-func (x *WALPosition) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
+func (x *WALPosition) GetTimestamp() *timestamppb.Timestamp { _ = "STUB: not implemented"; return nil }
 
-func (x *WALPosition) GetTimelineId() int64 {
-	if x != nil {
-		return x.TimelineId
-	}
-	return 0
-}
+func (x *WALPosition) GetTimelineId() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *WALPosition) GetLeadershipTerm() int64 {
-	if x != nil {
-		return x.LeadershipTerm
-	}
-	return 0
-}
+func (x *WALPosition) GetLeadershipTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *WALPosition) GetCohortMembers() []string {
-	if x != nil {
-		return x.CohortMembers
-	}
-	return nil
-}
+func (x *WALPosition) GetCohortMembers() []string { _ = "STUB: not implemented"; return nil }
 
 // BeginTerm is sent by coordinators during leader appointments
 type BeginTermRequest struct {
@@ -223,69 +166,34 @@ type BeginTermRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BeginTermRequest) Reset() {
-	*x = BeginTermRequest{}
-	mi := &file_consensusdata_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *BeginTermRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *BeginTermRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *BeginTermRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*BeginTermRequest) ProtoMessage() {}
+func (*BeginTermRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *BeginTermRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use BeginTermRequest.ProtoReflect.Descriptor instead.
-func (*BeginTermRequest) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{1}
-}
+func (*BeginTermRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *BeginTermRequest) GetTerm() int64 {
-	if x != nil {
-		return x.Term
-	}
-	return 0
-}
+func (x *BeginTermRequest) GetTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *BeginTermRequest) GetCandidateId() *clustermetadata.ID {
-	if x != nil {
-		return x.CandidateId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *BeginTermRequest) GetShardId() string {
-	if x != nil {
-		return x.ShardId
-	}
-	return ""
-}
+func (x *BeginTermRequest) GetShardId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *BeginTermRequest) GetPolicyVersion() int64 {
-	if x != nil {
-		return x.PolicyVersion
-	}
-	return 0
-}
+func (x *BeginTermRequest) GetPolicyVersion() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *BeginTermRequest) GetAction() BeginTermAction {
-	if x != nil {
-		return x.Action
-	}
-	return BeginTermAction_BEGIN_TERM_ACTION_UNSPECIFIED
+	_ = "STUB: not implemented"
+	return *new(BeginTermAction)
 }
 
 type BeginTermResponse struct {
@@ -306,68 +214,30 @@ type BeginTermResponse struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *BeginTermResponse) Reset() {
-	*x = BeginTermResponse{}
-	mi := &file_consensusdata_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *BeginTermResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *BeginTermResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *BeginTermResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*BeginTermResponse) ProtoMessage() {}
+func (*BeginTermResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *BeginTermResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use BeginTermResponse.ProtoReflect.Descriptor instead.
-func (*BeginTermResponse) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{2}
-}
+func (*BeginTermResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *BeginTermResponse) GetTerm() int64 {
-	if x != nil {
-		return x.Term
-	}
-	return 0
-}
+func (x *BeginTermResponse) GetTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *BeginTermResponse) GetAccepted() bool {
-	if x != nil {
-		return x.Accepted
-	}
-	return false
-}
+func (x *BeginTermResponse) GetAccepted() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BeginTermResponse) GetPoolerId() string {
-	if x != nil {
-		return x.PoolerId
-	}
-	return ""
-}
+func (x *BeginTermResponse) GetPoolerId() string { _ = "STUB: not implemented"; return "" }
 
-func (x *BeginTermResponse) GetWalPosition() *WALPosition {
-	if x != nil {
-		return x.WalPosition
-	}
-	return nil
-}
+func (x *BeginTermResponse) GetWalPosition() *WALPosition { _ = "STUB: not implemented"; return nil }
 
 func (x *BeginTermResponse) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -382,49 +252,23 @@ type StatusRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StatusRequest) Reset() {
-	*x = StatusRequest{}
-	mi := &file_consensusdata_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StatusRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StatusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StatusRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StatusRequest) ProtoMessage() {}
+func (*StatusRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
-func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{3}
-}
+func (*StatusRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StatusRequest) GetTerm() int64 {
-	if x != nil {
-		return x.Term
-	}
-	return 0
-}
+func (x *StatusRequest) GetTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *StatusRequest) GetShardId() string {
-	if x != nil {
-		return x.ShardId
-	}
-	return ""
-}
+func (x *StatusRequest) GetShardId() string { _ = "STUB: not implemented"; return "" }
 
 type StatusResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -443,54 +287,29 @@ type StatusResponse struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *StatusResponse) Reset() {
-	*x = StatusResponse{}
-	mi := &file_consensusdata_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StatusResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StatusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StatusResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StatusResponse) ProtoMessage() {}
+func (*StatusResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
-func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{4}
-}
+func (*StatusResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StatusResponse) GetId() *clustermetadata.ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *StatusResponse) GetId() *clustermetadata.ID { _ = "STUB: not implemented"; return nil }
 
 func (x *StatusResponse) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StatusResponse) GetAvailabilityStatus() *clustermetadata.AvailabilityStatus {
-	if x != nil {
-		return x.AvailabilityStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -516,63 +335,39 @@ type CoordinatorProposal struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *CoordinatorProposal) Reset() {
-	*x = CoordinatorProposal{}
-	mi := &file_consensusdata_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *CoordinatorProposal) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *CoordinatorProposal) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *CoordinatorProposal) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*CoordinatorProposal) ProtoMessage() {}
+func (*CoordinatorProposal) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *CoordinatorProposal) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use CoordinatorProposal.ProtoReflect.Descriptor instead.
 func (*CoordinatorProposal) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{5}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *CoordinatorProposal) GetTermRevocation() *clustermetadata.TermRevocation {
-	if x != nil {
-		return x.TermRevocation
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *CoordinatorProposal) GetProposalLeader() *clustermetadata.PoolerAddress {
-	if x != nil {
-		return x.ProposalLeader
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *CoordinatorProposal) GetProposedRule() *clustermetadata.ShardRule {
-	if x != nil {
-		return x.ProposedRule
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *CoordinatorProposal) GetSkipOutgoingQuorum() bool {
-	if x != nil {
-		return x.SkipOutgoingQuorum
-	}
-	return false
-}
+func (x *CoordinatorProposal) GetSkipOutgoingQuorum() bool { _ = "STUB: not implemented"; return false }
 
 // RecruitRequest asks a pooler to revoke all terms below the one in the
 // enclosed term_revocation and record the coordinator's exclusive right to
@@ -586,40 +381,22 @@ type RecruitRequest struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *RecruitRequest) Reset() {
-	*x = RecruitRequest{}
-	mi := &file_consensusdata_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RecruitRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RecruitRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RecruitRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RecruitRequest) ProtoMessage() {}
+func (*RecruitRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RecruitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RecruitRequest.ProtoReflect.Descriptor instead.
-func (*RecruitRequest) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{6}
-}
+func (*RecruitRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *RecruitRequest) GetTermRevocation() *clustermetadata.TermRevocation {
-	if x != nil {
-		return x.TermRevocation
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -633,40 +410,22 @@ type RecruitResponse struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *RecruitResponse) Reset() {
-	*x = RecruitResponse{}
-	mi := &file_consensusdata_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RecruitResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RecruitResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RecruitResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RecruitResponse) ProtoMessage() {}
+func (*RecruitResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RecruitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RecruitResponse.ProtoReflect.Descriptor instead.
-func (*RecruitResponse) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{7}
-}
+func (*RecruitResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *RecruitResponse) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -685,54 +444,26 @@ type ProposeRequest struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *ProposeRequest) Reset() {
-	*x = ProposeRequest{}
-	mi := &file_consensusdata_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ProposeRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ProposeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ProposeRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ProposeRequest) ProtoMessage() {}
+func (*ProposeRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ProposeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ProposeRequest.ProtoReflect.Descriptor instead.
-func (*ProposeRequest) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{8}
-}
+func (*ProposeRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ProposeRequest) GetProposal() *CoordinatorProposal {
-	if x != nil {
-		return x.Proposal
-	}
-	return nil
-}
+func (x *ProposeRequest) GetProposal() *CoordinatorProposal { _ = "STUB: not implemented"; return nil }
 
-func (x *ProposeRequest) GetReason() string {
-	if x != nil {
-		return x.Reason
-	}
-	return ""
-}
+func (x *ProposeRequest) GetReason() string { _ = "STUB: not implemented"; return "" }
 
 func (x *ProposeRequest) GetAcceptedNodeIds() []*clustermetadata.ID {
-	if x != nil {
-		return x.AcceptedNodeIds
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -744,40 +475,22 @@ type ProposeResponse struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *ProposeResponse) Reset() {
-	*x = ProposeResponse{}
-	mi := &file_consensusdata_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ProposeResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ProposeResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ProposeResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ProposeResponse) ProtoMessage() {}
+func (*ProposeResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ProposeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ProposeResponse.ProtoReflect.Descriptor instead.
-func (*ProposeResponse) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{9}
-}
+func (*ProposeResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *ProposeResponse) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -805,47 +518,30 @@ type SetTermPrimaryRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SetTermPrimaryRequest) Reset() {
-	*x = SetTermPrimaryRequest{}
-	mi := &file_consensusdata_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *SetTermPrimaryRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *SetTermPrimaryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *SetTermPrimaryRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*SetTermPrimaryRequest) ProtoMessage() {}
+func (*SetTermPrimaryRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *SetTermPrimaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use SetTermPrimaryRequest.ProtoReflect.Descriptor instead.
 func (*SetTermPrimaryRequest) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{10}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *SetTermPrimaryRequest) GetLeader() *clustermetadata.PoolerAddress {
-	if x != nil {
-		return x.Leader
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *SetTermPrimaryRequest) GetRule() *clustermetadata.ShardRule {
-	if x != nil {
-		return x.Rule
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -858,40 +554,25 @@ type SetTermPrimaryResponse struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *SetTermPrimaryResponse) Reset() {
-	*x = SetTermPrimaryResponse{}
-	mi := &file_consensusdata_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *SetTermPrimaryResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *SetTermPrimaryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *SetTermPrimaryResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*SetTermPrimaryResponse) ProtoMessage() {}
+func (*SetTermPrimaryResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *SetTermPrimaryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_consensusdata_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use SetTermPrimaryResponse.ProtoReflect.Descriptor instead.
 func (*SetTermPrimaryResponse) Descriptor() ([]byte, []int) {
-	return file_consensusdata_proto_rawDescGZIP(), []int{11}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *SetTermPrimaryResponse) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -959,12 +640,7 @@ var (
 	file_consensusdata_proto_rawDescData []byte
 )
 
-func file_consensusdata_proto_rawDescGZIP() []byte {
-	file_consensusdata_proto_rawDescOnce.Do(func() {
-		file_consensusdata_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_consensusdata_proto_rawDesc), len(file_consensusdata_proto_rawDesc)))
-	})
-	return file_consensusdata_proto_rawDescData
-}
+func file_consensusdata_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_consensusdata_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_consensusdata_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
@@ -1017,27 +693,5 @@ var file_consensusdata_proto_depIdxs = []int32{
 	0,  // [0:19] is the sub-list for field type_name
 }
 
-func init() { file_consensusdata_proto_init() }
-func file_consensusdata_proto_init() {
-	if File_consensusdata_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_consensusdata_proto_rawDesc), len(file_consensusdata_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   12,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_consensusdata_proto_goTypes,
-		DependencyIndexes: file_consensusdata_proto_depIdxs,
-		EnumInfos:         file_consensusdata_proto_enumTypes,
-		MessageInfos:      file_consensusdata_proto_msgTypes,
-	}.Build()
-	File_consensusdata_proto = out.File
-	file_consensusdata_proto_goTypes = nil
-	file_consensusdata_proto_depIdxs = nil
-}
+func init()                          { file_consensusdata_proto_init() }
+func file_consensusdata_proto_init() { _ = "STUB: not implemented"; return }

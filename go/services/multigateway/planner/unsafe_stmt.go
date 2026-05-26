@@ -15,7 +15,6 @@
 package planner
 
 import (
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 )
 
@@ -37,43 +36,6 @@ import (
 //
 // Returns a *mterrors.PgDiagnostic with SQLSTATE 0A000 (feature_not_supported)
 // if the statement is Tier 2, or nil otherwise.
-func planUnsupportedStmt(stmt ast.Stmt) error {
-	switch stmt.NodeTag() {
-	// -- Tier 2: unsafe for hosted infrastructure --
+func planUnsupportedStmt(stmt ast.Stmt) error { _ = "STUB: not implemented"; return nil }
 
-	case ast.T_LoadStmt:
-		return mterrors.NewFeatureNotSupported(
-			"LOAD is not supported: loading shared libraries is not permitted through the connection pooler")
-
-	case ast.T_AlterSystemStmt:
-		return mterrors.NewFeatureNotSupported(
-			"ALTER SYSTEM is not supported: modifying server configuration is not permitted through the connection pooler")
-
-	case ast.T_CreatedbStmt:
-		return mterrors.NewFeatureNotSupported(
-			"CREATE DATABASE is not supported through the connection pooler")
-
-	case ast.T_DropdbStmt:
-		return mterrors.NewFeatureNotSupported(
-			"DROP DATABASE is not supported through the connection pooler")
-
-	case ast.T_CreatePLangStmt:
-		return mterrors.NewFeatureNotSupported(
-			"CREATE LANGUAGE is not supported: installing procedural languages is not permitted through the connection pooler")
-
-	case ast.T_CreateSubscriptionStmt:
-		return mterrors.NewFeatureNotSupported(
-			"CREATE SUBSCRIPTION is not supported: creating replication subscriptions is not permitted through the connection pooler")
-
-	case ast.T_CreateFdwStmt:
-		return mterrors.NewFeatureNotSupported(
-			"CREATE FOREIGN DATA WRAPPER is not supported through the connection pooler")
-
-	case ast.T_CreateForeignServerStmt:
-		return mterrors.NewFeatureNotSupported(
-			"CREATE SERVER is not supported: creating foreign server connections is not permitted through the connection pooler")
-
-	default:
-		return nil
-	}
-}
+// -- Tier 2: unsafe for hosted infrastructure --

@@ -24,8 +24,6 @@ import (
 	multipoolermanagerdata "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	unsafe "unsafe"
 )
 
 const (
@@ -109,25 +107,5 @@ var file_multipoolermanagerservice_proto_depIdxs = []int32{
 	0,  // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_multipoolermanagerservice_proto_init() }
-func file_multipoolermanagerservice_proto_init() {
-	if File_multipoolermanagerservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multipoolermanagerservice_proto_rawDesc), len(file_multipoolermanagerservice_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   0,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_multipoolermanagerservice_proto_goTypes,
-		DependencyIndexes: file_multipoolermanagerservice_proto_depIdxs,
-	}.Build()
-	File_multipoolermanagerservice_proto = out.File
-	file_multipoolermanagerservice_proto_goTypes = nil
-	file_multipoolermanagerservice_proto_depIdxs = nil
-}
+func init()                                      { file_multipoolermanagerservice_proto_init() }
+func file_multipoolermanagerservice_proto_init() { _ = "STUB: not implemented"; return }

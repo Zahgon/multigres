@@ -16,8 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -34,9 +32,7 @@ type Sequence struct {
 }
 
 // NewSequence creates a new Sequence primitive.
-func NewSequence(primitives []Primitive) *Sequence {
-	return &Sequence{Primitives: primitives}
-}
+func NewSequence(primitives []Primitive) *Sequence { _ = "STUB: not implemented"; return nil }
 
 // StreamExecute executes each primitive in order, stopping on first error.
 //
@@ -56,11 +52,7 @@ func (s *Sequence) StreamExecute(
 	bindVars []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	for i, p := range s.Primitives {
-		if err := p.StreamExecute(ctx, exec, conn, state, bindVars, callback); err != nil {
-			return fmt.Errorf("primitive %d (%s) failed: %w", i, p.String(), err)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -80,44 +72,26 @@ func (s *Sequence) PortalStreamExecute(
 	includeDescribe bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	for i, p := range s.Primitives {
-		if err := p.PortalStreamExecute(ctx, exec, conn, state, portalInfo, maxRows, includeDescribe, callback); err != nil {
-			return fmt.Errorf("primitive %d (%s) failed: %w", i, p.String(), err)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // GetTableGroup returns the tablegroup from the first primitive that has one.
 func (s *Sequence) GetTableGroup() string {
+	_ = "STUB: not implemented"
 	// Return tablegroup from first primitive that has one
-	for _, p := range s.Primitives {
-		if tg := p.GetTableGroup(); tg != "" {
-			return tg
-		}
-	}
 	return ""
 }
 
 // GetQuery returns the query from the first primitive that has one.
 func (s *Sequence) GetQuery() string {
+	_ = "STUB: not implemented"
 	// Return query from first primitive that has one
-	for _, p := range s.Primitives {
-		if q := p.GetQuery(); q != "" {
-			return q
-		}
-	}
 	return ""
 }
 
 // String returns a string representation of the sequence for debugging.
-func (s *Sequence) String() string {
-	parts := make([]string, len(s.Primitives))
-	for i, p := range s.Primitives {
-		parts[i] = p.String()
-	}
-	return fmt.Sprintf("Sequence[%s]", strings.Join(parts, ", "))
-}
+func (s *Sequence) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure Sequence implements Primitive interface.
 var _ Primitive = (*Sequence)(nil)

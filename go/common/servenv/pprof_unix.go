@@ -20,47 +20,10 @@ Modifications Copyright 2025 Supabase, Inc.
 
 package servenv
 
-import (
-	"fmt"
-	"log/slog"
-	"os"
-	"os/signal"
-	"syscall"
-)
+func (sv *ServEnv) pprofInit() error { _ = "STUB: not implemented"; return nil }
 
-func (sv *ServEnv) pprofInit() error {
-	prof, err := sv.parseProfileFlag(sv.pprofFlag.Get())
-	if err != nil {
-		return fmt.Errorf("parsing pprof flags: %w", err)
-	}
-	if prof != nil {
-		start, stop := prof.init()
+// Start profiling immediately if waitSig is false
 
-		// Start profiling immediately if waitSig is false
-		if !prof.waitSig {
-			if err := start(); err != nil {
-				return fmt.Errorf("starting profile: %w", err)
-			}
-		}
+// Check current state and toggle
 
-		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, syscall.SIGUSR1)
-
-		go func() {
-			for range sigChan {
-				// Check current state and toggle
-				if isProfileStarted() {
-					stop()
-				} else {
-					// Log error from signal handler - can't return error from goroutine
-					if err := start(); err != nil {
-						slog.Error("pprof: failed to start profiling via signal", "err", err)
-					}
-				}
-			}
-		}()
-
-		sv.OnTerm(stop)
-	}
-	return nil
-}
+// Log error from signal handler - can't return error from goroutine

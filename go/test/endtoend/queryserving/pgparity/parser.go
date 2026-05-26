@@ -30,13 +30,6 @@
 // misspelled directive fails loudly rather than silently disabling tests.
 package pgparity
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-)
-
 // DirectiveKind identifies the directive type on a parsed record.
 type DirectiveKind int
 
@@ -67,104 +60,18 @@ type TestFile struct {
 // ParseFile reads a .slt file from disk and returns parsed records. Any
 // unsupported directive causes a parse error rather than a silent skip so
 // misspelled directives fail loudly at parse time.
-func ParseFile(path string) (*TestFile, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("open %s: %w", path, err)
-	}
-	defer f.Close()
+func ParseFile(path string) (*TestFile, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	tf := &TestFile{Path: path}
-	scanner := bufio.NewScanner(f)
-	// Some lines (query strings, expected rows) can be long. Raise the limit
-	// to 1 MiB per line.
-	scanner.Buffer(make([]byte, 64*1024), 1024*1024)
-
-	lineNo := 0
-	readLine := func() (string, bool) {
-		if !scanner.Scan() {
-			return "", false
-		}
-		lineNo++
-		return scanner.Text(), true
-	}
-
-	for {
-		line, ok := readLine()
-		if !ok {
-			break
-		}
-		trimmed := strings.TrimSpace(line)
-
-		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
-			continue
-		}
-
-		if strings.HasPrefix(trimmed, "statement ") {
-			rec, err := parseStatement(trimmed, lineNo, readLine)
-			if err != nil {
-				return nil, err
-			}
-			tf.Records = append(tf.Records, rec)
-			continue
-		}
-		if strings.HasPrefix(trimmed, "query ") {
-			rec, err := parseQuery(trimmed, lineNo, readLine)
-			if err != nil {
-				return nil, err
-			}
-			tf.Records = append(tf.Records, rec)
-			continue
-		}
-
-		return nil, fmt.Errorf("%s:%d: unsupported directive %q (only `statement` and `query` are allowed)", path, lineNo, trimmed)
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("scan %s: %w", path, err)
-	}
-	return tf, nil
-}
+// Some lines (query strings, expected rows) can be long. Raise the limit
+// to 1 MiB per line.
 
 // parseStatement parses a `statement ok` or `statement error [regex]` block.
 //
 // The SQL body runs from the first line after the directive until a blank
 // line or EOF.
 func parseStatement(header string, startLine int, readLine func() (string, bool)) (Record, error) {
-	rec := Record{Kind: DirectiveStatement, LineNo: startLine}
-
-	fields := strings.Fields(header)
-	if len(fields) < 2 {
-		return rec, fmt.Errorf("line %d: malformed statement directive: %q", startLine, header)
-	}
-	switch fields[1] {
-	case "ok":
-		rec.ExpectError = false
-	case "error":
-		rec.ExpectError = true
-		if len(fields) > 2 {
-			rec.ErrorPattern = strings.Join(fields[2:], " ")
-		}
-	default:
-		return rec, fmt.Errorf("line %d: unknown statement kind %q (want `ok` or `error`)", startLine, fields[1])
-	}
-
-	var sql strings.Builder
-	for {
-		line, ok := readLine()
-		if !ok {
-			break
-		}
-		if strings.TrimSpace(line) == "" {
-			break
-		}
-		if sql.Len() > 0 {
-			sql.WriteByte('\n')
-		}
-		sql.WriteString(line)
-	}
-	rec.SQL = sql.String()
-	return rec, nil
+	_ = "STUB: not implemented"
+	return *new(Record), nil
 }
 
 // parseQuery parses a `query <types> [rowsort]` block:
@@ -182,68 +89,15 @@ func parseStatement(header string, startLine int, readLine func() (string, bool)
 // The parser flattens rows into a single list of values so the runner can
 // compare cell-by-cell.
 func parseQuery(header string, startLine int, readLine func() (string, bool)) (Record, error) {
-	rec := Record{Kind: DirectiveQuery, LineNo: startLine, SortMode: "nosort"}
-
-	fields := strings.Fields(header)
-	if len(fields) < 2 {
-		return rec, fmt.Errorf("line %d: malformed query directive: %q", startLine, header)
-	}
-	rec.TypeString = fields[1]
-	if len(fields) >= 3 {
-		switch fields[2] {
-		case "nosort", "rowsort":
-			rec.SortMode = fields[2]
-		default:
-			return rec, fmt.Errorf("line %d: unsupported sort mode %q (want `nosort` or `rowsort`)", startLine, fields[2])
-		}
-	}
-	if len(fields) > 3 {
-		return rec, fmt.Errorf("line %d: too many fields on query directive: %q", startLine, header)
-	}
-
-	// Read SQL until `----` or blank line.
-	var sql strings.Builder
-	sawSeparator := false
-	for {
-		line, ok := readLine()
-		if !ok {
-			break
-		}
-		if line == "----" {
-			sawSeparator = true
-			break
-		}
-		if strings.TrimSpace(line) == "" {
-			// Blank line before `----` ends the record without expected rows.
-			break
-		}
-		if sql.Len() > 0 {
-			sql.WriteByte('\n')
-		}
-		sql.WriteString(line)
-	}
-	rec.SQL = sql.String()
-
-	if !sawSeparator {
-		return rec, nil
-	}
-
-	// Read expected values until blank line / EOF. Heuristics like "stop at
-	// the next directive-looking line" are avoided on purpose: a query whose
-	// expected output contains a literal `statement ok` (e.g. `SELECT
-	// 'statement ok'`) would be truncated. Blank lines are authoritative.
-	for {
-		line, ok := readLine()
-		if !ok {
-			break
-		}
-		if strings.TrimSpace(line) == "" {
-			break
-		}
-		for v := range strings.SplitSeq(line, "\t") {
-			rec.ExpectedRows = append(rec.ExpectedRows, v)
-		}
-	}
-	rec.ExpectedCount = len(rec.ExpectedRows)
-	return rec, nil
+	_ = "STUB: not implemented"
+	return *new(Record), nil
 }
+
+// Read SQL until `----` or blank line.
+
+// Blank line before `----` ends the record without expected rows.
+
+// Read expected values until blank line / EOF. Heuristics like "stop at
+// the next directive-looking line" are avoided on purpose: a query whose
+// expected output contains a literal `statement ok` (e.g. `SELECT
+// 'statement ok'`) would be truncated. Blank lines are authoritative.

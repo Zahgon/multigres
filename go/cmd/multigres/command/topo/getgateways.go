@@ -15,71 +15,23 @@
 package topo
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // runGetGateways handles the getgateways command
 func runGetGateways(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Get flag values
-	cellsFlag, err := cmd.Flags().GetString("cells")
-	if err != nil {
-		return fmt.Errorf("failed to read cells flag: %w", err)
-	}
-
-	// Parse cells flag
-	var cells []string
-	if cellsFlag != "" {
-		cells = strings.Split(cellsFlag, ",")
-		// Trim whitespace from each cell name
-		for i, cell := range cells {
-			cells[i] = strings.TrimSpace(cell)
-		}
-	}
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	request := &multiadminpb.GetGatewaysRequest{
-		Cells: cells,
-	}
-
-	response, err := client.GetGateways(cmd.Context(), request)
-	if err != nil {
-		return fmt.Errorf("failed to get gateways: %w", err)
-	}
-
-	// Convert to JSON and output
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
 
+// Parse cells flag
+
+// Trim whitespace from each cell name
+
+// Create admin client
+
+// Convert to JSON and output
+
 // AddGetGatewaysCommand adds the getgateways subcommand
-func AddGetGatewaysCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getgateways",
-		Short: "Get gateways filtered by cells",
-		Long:  "Retrieve gateways from specified cells. If no cells are specified, all cells will be queried.",
-		RunE:  runGetGateways,
-	}
-
-	cmd.Flags().String("admin-server", "", "Address of the multiadmin server (overrides config)")
-	cmd.Flags().String("cells", "", "Comma-separated list of cell names to query (optional)")
-
-	return cmd
-}
+func AddGetGatewaysCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }

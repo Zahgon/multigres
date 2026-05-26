@@ -16,90 +16,24 @@
 
 package servenv
 
-import (
-	"context"
-	"fmt"
-	"log/slog"
-	"net"
-	"net/url"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
 // Run starts listening for RPC and HTTP requests,
 // and blocks until it the process gets a signal.
 func (sv *ServEnv) Run(bindAddress string, port int, grpcServer *GrpcServer) error {
-	sv.PopulateListeningURL(int32(port))
-
-	// Start the HTTP server early so liveness/startup probes respond
-	// before potentially-blocking run hooks (e.g., waiting for topology
-	// or manager readiness). This prevents a deadlock on K8s 1.33+ where
-	// native sidecar startup probes must pass before main containers start.
-	l, err := net.Listen("tcp", net.JoinHostPort(bindAddress, strconv.Itoa(port)))
-	if err != nil {
-		return fmt.Errorf("failed to listen on HTTP port %d: %w", port, err)
-	}
-
-	// If port was 0, log the actual allocated port
-	if port == 0 {
-		if addr, ok := l.Addr().(*net.TCPAddr); ok {
-			actualPort := addr.Port
-			slog.Info("HTTP port was dynamically allocated", "requested_port", port, "actual_port", actualPort)
-			// Update the ListeningURL with the actual port
-			sv.PopulateListeningURL(int32(actualPort))
-		}
-	}
-	go func() {
-		err := sv.HTTPServe(l)
-		if err != nil {
-			slog.Error("http serve returned unexpected error", "err", err)
-		}
-	}()
-
-	if err := grpcServer.Create(); err != nil {
-		return fmt.Errorf("grpc server create: %w", err)
-	}
-	if err := sv.FireRunHooks(); err != nil {
-		return fmt.Errorf("run hooks: %w", err)
-	}
-	if err := grpcServer.Serve(sv); err != nil {
-		return fmt.Errorf("grpc server serve: %w", err)
-	}
-	if err := grpcServer.serveSocketFile(); err != nil {
-		return fmt.Errorf("grpc socket file: %w", err)
-	}
-
-	signal.Notify(sv.exitChan, syscall.SIGTERM, syscall.SIGINT)
-	slog.Info("service successfully started", "port", port)
-	// Wait for signal
-	<-sv.exitChan
-
-	startTime := time.Now()
-	slog.Info("entering lameduck mode", "period", sv.lameduckPeriod.Get())
-	slog.Info("firing asynchronous OnTerm hooks")
-	go sv.onTermHooks.Fire()
-
-	sv.fireOnTermSyncHooks(sv.onTermTimeout.Get())
-	if remain := sv.lameduckPeriod.Get() - time.Since(startTime); remain > 0 {
-		slog.Info(fmt.Sprintf("sleeping an extra %v after OnTermSync to finish lameduck period", remain))
-		time.Sleep(remain)
-	}
-	_ = l.Close()
-
-	slog.Info("shutting down gracefully")
-	sv.fireOnCloseHooks(sv.onCloseTimeout.Get())
-
-	// Shutdown telemetry last to ensure all spans from cleanup are captured.
-	// TODO(dweitzman): Propagate the cobra.Command() context into ServEnv instead of using context.Background()
-	//nolint:gocritic // shutdown requires fresh context; see TODO above
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := sv.telemetry.ShutdownTelemetry(ctx); err != nil {
-		slog.Error("failed to shutdown telemetry", "error", err)
-	}
-
-	sv.SetListeningURL(url.URL{})
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Start the HTTP server early so liveness/startup probes respond
+// before potentially-blocking run hooks (e.g., waiting for topology
+// or manager readiness). This prevents a deadlock on K8s 1.33+ where
+// native sidecar startup probes must pass before main containers start.
+
+// If port was 0, log the actual allocated port
+
+// Update the ListeningURL with the actual port
+
+// Wait for signal
+
+// Shutdown telemetry last to ensure all spans from cleanup are captured.
+// TODO(dweitzman): Propagate the cobra.Command() context into ServEnv instead of using context.Background()
+//nolint:gocritic // shutdown requires fresh context; see TODO above

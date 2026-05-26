@@ -18,9 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
-	"github.com/multigres/multigres/go/common/parser/replparser"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 )
 
@@ -35,51 +33,18 @@ func (h *MultiGatewayHandler) handleReplicationCommand(
 	queryStr string,
 	queryStart time.Time,
 ) (bool, error) {
-	parseStart := time.Now()
-	stmt, err := replparser.ParseReplicationCommand(queryStr)
-	parseDuration := time.Since(parseStart)
-	if err != nil {
-		h.recordQueryCompletion(ctx, conn, "REPLICATION", "simple",
-			parseDuration, 0, time.Since(queryStart), 0, nil, err)
-		return true, err
-	}
-
-	op, stubErr := replicationStubError(stmt)
-	if stubErr == nil {
-		// VariableShowStmt — the SQL grammar handles SHOW, so let the
-		// caller continue down the regular path.
-		return false, nil
-	}
-	h.recordQueryCompletion(ctx, conn, op, "simple",
-		parseDuration, 0, time.Since(queryStart), 0, nil, stubErr)
-	return true, stubErr
+	_ = "STUB: not implemented"
+	return false, nil
 }
+
+// VariableShowStmt — the SQL grammar handles SHOW, so let the
+// caller continue down the regular path.
 
 // replicationStubError maps a replication-command AST node to an op name
 // and a `feature_not_supported` (SQLSTATE 0A000) error.
 //
 // Returns (opName, nil) for *ast.VariableShowStmt — SHOW is delegated to the
 // normal SQL path by the caller and is not a stub failure case.
-func replicationStubError(stmt ast.Stmt) (string, error) {
-	switch stmt.(type) {
-	case *ast.IdentifySystemCmd:
-		return notSupported("IDENTIFY_SYSTEM")
-	case *ast.CreateReplicationSlotCmd:
-		return notSupported("CREATE_REPLICATION_SLOT")
-	case *ast.DropReplicationSlotCmd:
-		return notSupported("DROP_REPLICATION_SLOT")
-	case *ast.AlterReplicationSlotCmd:
-		return notSupported("ALTER_REPLICATION_SLOT")
-	case *ast.ReadReplicationSlotCmd:
-		return notSupported("READ_REPLICATION_SLOT")
-	case *ast.StartReplicationCmd:
-		return notSupported("START_REPLICATION")
-	case *ast.VariableShowStmt:
-		return "SHOW", nil
-	}
-	return "REPLICATION", mterrors.NewFeatureNotSupported("replication command is not yet supported")
-}
+func replicationStubError(stmt ast.Stmt) (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-func notSupported(op string) (string, error) {
-	return op, mterrors.NewFeatureNotSupported(op + " is not yet supported")
-}
+func notSupported(op string) (string, error) { _ = "STUB: not implemented"; return "", nil }

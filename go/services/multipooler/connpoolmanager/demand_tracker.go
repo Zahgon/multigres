@@ -15,7 +15,6 @@
 package connpoolmanager
 
 import (
-	"errors"
 	"sync/atomic"
 	"time"
 )
@@ -112,24 +111,11 @@ type DemandTracker struct {
 //   - RebalanceInterval <= 0
 //   - Sampler is nil
 func NewDemandTracker(config *DemandTrackerConfig) (*DemandTracker, error) {
-	if config.DemandWindow <= 0 {
-		return nil, errors.New("DemandTrackerConfig.DemandWindow must be positive")
-	}
-	if config.RebalanceInterval <= 0 {
-		return nil, errors.New("DemandTrackerConfig.RebalanceInterval must be positive")
-	}
-	if config.Sampler == nil {
-		return nil, errors.New("DemandTrackerConfig.Sampler must not be nil")
-	}
-
-	// Calculate number of buckets from time durations
-	numBuckets := max(int(config.DemandWindow/config.RebalanceInterval), 1)
-
-	return &DemandTracker{
-		buckets: make([]atomic.Int64, numBuckets),
-		sampler: config.Sampler,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Calculate number of buckets from time durations
 
 // GetPeakAndRotate samples the current demand, returns the peak across the entire
 // sliding window, and rotates to the next bucket.
@@ -148,55 +134,23 @@ func NewDemandTracker(config *DemandTrackerConfig) (*DemandTracker, error) {
 //   - Rotates: current becomes 0, bucket 0 is reset to 0
 //   - Next call will overwrite the old "15" with new data
 func (d *DemandTracker) GetPeakAndRotate() int64 {
+	_ = "STUB: not implemented"
 	// Sample the current peak and store in current bucket
-	if d.sampler != nil {
-		currentIdx := d.current.Load()
-		sampled := d.sampler()
-		// Update current bucket with sampled value (take max in case of concurrent calls)
-		for {
-			old := d.buckets[currentIdx].Load()
-			if sampled <= old {
-				break
-			}
-			if d.buckets[currentIdx].CompareAndSwap(old, sampled) {
-				break
-			}
-		}
-	}
-
-	// Find max across all buckets (the "window peak")
-	var peak int64
-	for i := range d.buckets {
-		if val := d.buckets[i].Load(); val > peak {
-			peak = val
-		}
-	}
-
-	// Rotate to next bucket
-	numBuckets := int32(len(d.buckets))
-	nextIdx := (d.current.Load() + 1) % numBuckets
-	d.current.Store(nextIdx)
-
-	// Reset the new current bucket to 0 (it will accumulate data for the next interval)
-	d.buckets[nextIdx].Store(0)
-
-	return peak
+	return 0
 }
+
+// Update current bucket with sampled value (take max in case of concurrent calls)
+
+// Find max across all buckets (the "window peak")
+
+// Rotate to next bucket
+
+// Reset the new current bucket to 0 (it will accumulate data for the next interval)
 
 // Peak returns the current peak demand across all buckets without rotating.
 // This is useful for stats/monitoring.
-func (d *DemandTracker) Peak() int64 {
-	var peak int64
-	for i := range d.buckets {
-		if val := d.buckets[i].Load(); val > peak {
-			peak = val
-		}
-	}
-	return peak
-}
+func (d *DemandTracker) Peak() int64 { _ = "STUB: not implemented"; return 0 }
 
 // NumBuckets returns the number of buckets in the sliding window.
 // This is DemandWindow / RebalanceInterval.
-func (d *DemandTracker) NumBuckets() int {
-	return len(d.buckets)
-}
+func (d *DemandTracker) NumBuckets() int { _ = "STUB: not implemented"; return 0 }

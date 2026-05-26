@@ -16,15 +16,9 @@ package actions
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
-	"time"
 
-	"google.golang.org/protobuf/proto"
-
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/topoclient"
-	commontypes "github.com/multigres/multigres/go/common/types"
 	"github.com/multigres/multigres/go/services/multiorch/config"
 	"github.com/multigres/multigres/go/services/multiorch/consensus"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
@@ -58,119 +52,68 @@ func NewAppointLeaderAction(
 	topoStore topoclient.Store,
 	logger *slog.Logger,
 ) *AppointLeaderAction {
-	return &AppointLeaderAction{
-		config:      cfg,
-		consensus:   consensus,
-		poolerStore: poolerStore,
-		topoStore:   topoStore,
-		logger:      logger,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Execute performs leader appointment by running the coordinator's consensus protocol
 func (a *AppointLeaderAction) Execute(ctx context.Context, problem types.Problem) error {
-	a.logger.InfoContext(ctx, "executing appoint leader action",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-
-	// Fetch cohort and recheck the problem
-	cohort := a.getCohort(problem.ShardKey)
-	if len(cohort) == 0 {
-		return fmt.Errorf("no poolers found for shard %s", commontypes.FormatShardKey(problem.ShardKey))
-	}
-
-	// Check if a primary already exists and is healthy (problem resolved).
-	// We must verify both that the pooler is reachable (IsLastCheckValid) AND that
-	// PostgreSQL is ready (IsPostgresReady). If the pooler is up but Postgres
-	// is not ready, or if the primary has signalled it needs replacement, we still
-	// need to trigger failover.
-	//
-	// Note: this relies on the resign flow maintaining PoolerType_PRIMARY until
-	// DemoteStalePrimary completes. If a node somehow becomes the consensus leader
-	// while reporting PoolerType_REPLICA (e.g. a crash-restart as standby without
-	// going through the normal resign → appoint → demote flow), this check would
-	// miss it and proceed with an appointment unnecessarily.
-	for _, pooler := range cohort {
-		if pooler.MultiPooler == nil ||
-			pooler.GetStatus().GetPoolerType() != clustermetadatapb.PoolerType_PRIMARY ||
-			!pooler.IsLastCheckValid ||
-			!pooler.GetStatus().GetPostgresReady() {
-			continue
-		}
-		if types.LeaderNeedsReplacement(pooler) {
-			a.logger.InfoContext(ctx, "primary has requested replacement, proceeding with election",
-				"primary", pooler.MultiPooler.Id.Name,
-				"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-			continue
-		}
-		a.logger.InfoContext(ctx, "primary already exists, skipping leader appointment",
-			"primary", pooler.MultiPooler.Id.Name,
-			"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-		return nil
-	}
-
-	a.logger.InfoContext(ctx, "verified shard still needs leader appointment, proceeding",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey),
-		"cohort_size", len(cohort))
-
-	// Use the coordinator's AppointLeader to handle the election
-	// It will select the most advanced node based on WAL position
-	// and run the full consensus protocol (term discovery, candidate selection,
-	// node recruitment, quorum validation, promotion, and replication setup)
-	//
-	// Use the problem code as the reason for the election
-	reason := string(problem.Code)
-	if err := a.consensus.AppointLeader(ctx, problem.ShardKey.Shard, cohort, problem.ShardKey.Database, reason); err != nil {
-		return mterrors.Wrap(err, "failed to appoint leader")
-	}
-
-	a.logger.InfoContext(ctx, "appoint leader action completed successfully",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Fetch cohort and recheck the problem
+
+// Check if a primary already exists and is healthy (problem resolved).
+// We must verify both that the pooler is reachable (IsLastCheckValid) AND that
+// PostgreSQL is ready (IsPostgresReady). If the pooler is up but Postgres
+// is not ready, or if the primary has signalled it needs replacement, we still
+// need to trigger failover.
+//
+// Note: this relies on the resign flow maintaining PoolerType_PRIMARY until
+// DemoteStalePrimary completes. If a node somehow becomes the consensus leader
+// while reporting PoolerType_REPLICA (e.g. a crash-restart as standby without
+// going through the normal resign → appoint → demote flow), this check would
+// miss it and proceed with an appointment unnecessarily.
+
+// Use the coordinator's AppointLeader to handle the election
+// It will select the most advanced node based on WAL position
+// and run the full consensus protocol (term discovery, candidate selection,
+// node recruitment, quorum validation, promotion, and replication setup)
+//
+// Use the problem code as the reason for the election
+
 // getCohort fetches all poolers in the shard from the pooler store.
 func (a *AppointLeaderAction) getCohort(shardKey *clustermetadatapb.ShardKey) []*multiorchdatapb.PoolerHealthState {
-	var cohort []*multiorchdatapb.PoolerHealthState
-
-	a.poolerStore.Range(func(key string, pooler *multiorchdatapb.PoolerHealthState) bool {
-		if pooler == nil || pooler.MultiPooler == nil || pooler.MultiPooler.Id == nil {
-			return true // continue
-		}
-
-		if proto.Equal(pooler.MultiPooler.GetShardKey(), shardKey) {
-			cohort = append(cohort, pooler)
-		}
-
-		return true // continue
-	})
-
-	return cohort
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// continue
+
+// continue
 
 // RecoveryAction interface implementation
 
 func (a *AppointLeaderAction) RequiresHealthyLeader() bool {
-	return false // leader appointment doesn't need existing primary
+	_ = "STUB: not implemented"
+	// leader appointment doesn't need existing primary
+	return false
 }
 
 func (a *AppointLeaderAction) Metadata() types.RecoveryMetadata {
-	return types.RecoveryMetadata{
-		Name:        "AppointLeader",
-		Description: "Elect a new primary for the shard using consensus",
-		Timeout:     60 * time.Second,
-		LockTimeout: 15 * time.Second,
-		Retryable:   true, // can retry if it fails
-	}
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryMetadata)
 }
 
+// can retry if it fails
+
 func (a *AppointLeaderAction) Priority() types.Priority {
-	return types.PriorityShardBootstrap
+	_ = "STUB: not implemented"
+	return *new(types.Priority)
 }
 
 func (a *AppointLeaderAction) GracePeriod() *types.GracePeriodConfig {
-	return &types.GracePeriodConfig{
-		BaseDelay: a.config.GetLeaderFailoverGracePeriodBase(),
-		MaxJitter: a.config.GetLeaderFailoverGracePeriodMaxJitter(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

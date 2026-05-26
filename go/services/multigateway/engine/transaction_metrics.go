@@ -16,13 +16,8 @@ package engine
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // Transaction outcome constants for metric attribution.
@@ -46,11 +41,8 @@ type TxnDuration struct {
 
 // Record records a transaction duration with the database and outcome attributes.
 func (m TxnDuration) Record(ctx context.Context, durationSec float64, dbNamespace, outcome string) {
-	m.Float64Histogram.Record(ctx, durationSec,
-		metric.WithAttributes(
-			attribute.String("db.namespace", dbNamespace),
-			attribute.String("outcome", outcome),
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // TxnCount wraps an Int64Counter for counting completed transactions.
@@ -60,57 +52,20 @@ type TxnCount struct {
 
 // Add increments the transaction counter with the database and outcome attributes.
 func (m TxnCount) Add(ctx context.Context, dbNamespace, outcome string) {
-	m.Int64Counter.Add(ctx, 1,
-		metric.WithAttributes(
-			attribute.String("db.namespace", dbNamespace),
-			attribute.String("outcome", outcome),
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // RecordCompletion records both duration and count for a completed transaction.
 func (m *TransactionMetrics) RecordCompletion(ctx context.Context, durationSec float64, dbNamespace, outcome string) {
-	if m == nil {
-		return
-	}
-	m.duration.Record(ctx, durationSec, dbNamespace, outcome)
-	m.count.Add(ctx, dbNamespace, outcome)
+	_ = "STUB: not implemented"
+	return
 }
 
 // NewTransactionMetrics initialises OTel metrics for transaction tracking.
 // Individual metrics that fail to initialise use noop implementations
 // and are included in the returned error.
 func NewTransactionMetrics() (*TransactionMetrics, error) {
-	meter := otel.Meter("github.com/multigres/multigres/go/services/multigateway/engine")
-	m := &TransactionMetrics{}
-	var errs []error
-
-	dur, err := meter.Float64Histogram(
-		"mg.gateway.transaction.duration",
-		metric.WithDescription("Duration of transactions from BEGIN to COMMIT/ROLLBACK"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(0.001, 0.01, 0.1, 0.5, 1, 5, 10, 30, 60, 300, 600),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.transaction.duration histogram: %w", err))
-		m.duration = TxnDuration{noop.Float64Histogram{}}
-	} else {
-		m.duration = TxnDuration{dur}
-	}
-
-	cnt, err := meter.Int64Counter(
-		"mg.gateway.transaction.count",
-		metric.WithDescription("Total number of completed transactions"),
-		metric.WithUnit("{transaction}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.transaction.count counter: %w", err))
-		m.count = TxnCount{noop.Int64Counter{}}
-	} else {
-		m.count = TxnCount{cnt}
-	}
-
-	if len(errs) > 0 {
-		return m, errors.Join(errs...)
-	}
-	return m, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

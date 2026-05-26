@@ -265,5 +265,6 @@ type MultiPoolerClient interface {
 // For multiorch deployments monitoring many poolers, a capacity of 1000 is recommended.
 // For smaller deployments or testing, 100 may be sufficient.
 func NewMultiPoolerClient(capacity int, transportCreds grpc.DialOption) MultiPoolerClient {
-	return NewClient(capacity, transportCreds)
+	_ = "STUB: not implemented"
+	return *new(MultiPoolerClient)
 }

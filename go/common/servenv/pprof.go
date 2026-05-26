@@ -17,19 +17,12 @@
 package servenv
 
 import (
-	"errors"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
-	"os"
-	"path/filepath"
 	"runtime"
 	"runtime/pprof"
 	"runtime/trace"
-	"strconv"
-	"strings"
-	"sync/atomic"
 )
 
 type profmode string
@@ -45,9 +38,7 @@ const (
 	profileGoroutine profmode = "goroutine"
 )
 
-func (p profmode) filename() string {
-	return string(p) + ".pprof"
-}
+func (p profmode) filename() string { _ = "STUB: not implemented"; return "" }
 
 type profile struct {
 	mode    profmode
@@ -58,138 +49,23 @@ type profile struct {
 }
 
 func (sv *ServEnv) parseProfileFlag(pf []string) (*profile, error) {
-	if len(pf) == 0 {
-		return nil, nil
-	}
-
-	var p profile
-
-	switch pf[0] {
-	case "cpu":
-		p.mode = profileCPU
-	case "mem", "mem=heap":
-		p.mode = profileMemHeap
-		p.rate = 4096
-	case "mem=allocs":
-		p.mode = profileMemAllocs
-		p.rate = 4096
-	case "mutex":
-		p.mode = profileMutex
-		p.rate = 1
-	case "block":
-		p.mode = profileBlock
-		p.rate = 1
-	case "trace":
-		p.mode = profileTrace
-	case "threads":
-		p.mode = profileThreads
-	case "goroutine":
-		p.mode = profileGoroutine
-	default:
-		return nil, fmt.Errorf("unknown profile mode: %q", pf[0])
-	}
-
-	for _, kv := range pf[1:] {
-		var err error
-		fields := strings.SplitN(kv, "=", 2)
-
-		switch fields[0] {
-		case "rate":
-			if len(fields) == 1 {
-				return nil, errors.New("missing value for 'rate'")
-			}
-			p.rate, err = strconv.Atoi(fields[1])
-			if err != nil {
-				return nil, fmt.Errorf("invalid profile rate %q: %w", fields[1], err)
-			}
-
-		case "path":
-			if len(fields) == 1 {
-				return nil, errors.New("missing value for 'path'")
-			}
-			p.path = fields[1]
-
-		case "quiet":
-			if len(fields) == 1 {
-				p.quiet = true
-				continue
-			}
-
-			p.quiet, err = strconv.ParseBool(fields[1])
-			if err != nil {
-				return nil, fmt.Errorf("invalid quiet flag %q: %w", fields[1], err)
-			}
-		case "waitSig":
-			if len(fields) == 1 {
-				p.waitSig = true
-				continue
-			}
-			p.waitSig, err = strconv.ParseBool(fields[1])
-			if err != nil {
-				return nil, fmt.Errorf("invalid waitSig flag %q: %w", fields[1], err)
-			}
-		default:
-			return nil, fmt.Errorf("unknown flag: %q", fields[0])
-		}
-	}
-
-	return &p, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 var profileStarted uint32
 
 // isProfileStarted returns true if profiling is currently active.
 // This function uses atomic.LoadUint32 to safely read the profile state.
-func isProfileStarted() bool {
-	return atomic.LoadUint32(&profileStarted) == 1
-}
+func isProfileStarted() bool { _ = "STUB: not implemented"; return false }
 
-func startCallback(start func() error) func() error {
-	return func() error {
-		if atomic.CompareAndSwapUint32(&profileStarted, 0, 1) {
-			return start()
-		}
-		return errors.New("profile: Start() already called")
-	}
-}
+func startCallback(start func() error) func() error { _ = "STUB: not implemented"; return nil }
 
-func stopCallback(stop func()) func() {
-	return func() {
-		if atomic.CompareAndSwapUint32(&profileStarted, 1, 0) {
-			stop()
-		}
-	}
-}
+func stopCallback(stop func()) func() { _ = "STUB: not implemented"; return nil }
 
 func (prof *profile) mkprofile() (io.WriteCloser, error) {
-	var (
-		path string
-		err  error
-		logf = func(format string, args ...any) {}
-	)
-
-	if prof.path != "" {
-		path = prof.path
-		err = os.MkdirAll(path, 0o777)
-	} else {
-		path, err = os.MkdirTemp("", "profile")
-	}
-	if err != nil {
-		return nil, fmt.Errorf("pprof: could not create output directory: %w", err)
-	}
-
-	if !prof.quiet {
-		logf = log.Printf
-	}
-
-	fn := filepath.Join(path, prof.mode.filename())
-	f, err := os.Create(fn)
-	if err != nil {
-		return nil, fmt.Errorf("pprof: could not create profile %q: %w", fn, err)
-	}
-	logf("pprof: %s profiling enabled, %s", string(prof.mode), fn)
-
-	return f, nil
+	_ = "STUB: not implemented"
+	return *new(io.WriteCloser), nil
 }
 
 // init returns a start function that begins the configured profiling process and

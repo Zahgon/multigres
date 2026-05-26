@@ -50,21 +50,9 @@ type Registry struct {
 //	    Default: "",
 //	    FlagName: "pooler-dir",
 //	})
-func NewRegistry() *Registry {
-	return &Registry{
-		static:  viper.New(),
-		dynamic: sync.New(),
-	}
-}
+func NewRegistry() *Registry { _ = "STUB: not implemented"; return nil }
 
 // Combined returns a viper instance combining the static and dynamic registries.
 // This is useful for debug handlers and other utilities that need to access
 // all configuration values.
-func (reg *Registry) Combined() *viper.Viper {
-	v := viper.New()
-	_ = v.MergeConfigMap(reg.static.AllSettings())
-	_ = v.MergeConfigMap(reg.dynamic.AllSettings())
-
-	v.SetConfigFile(reg.static.ConfigFileUsed())
-	return v
-}
+func (reg *Registry) Combined() *viper.Viper { _ = "STUB: not implemented"; return nil }

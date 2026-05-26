@@ -15,17 +15,10 @@
 package sqllogictest
 
 import (
-	"bytes"
 	"context"
-	"errors"
-	"fmt"
-	"os/exec"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/multigres/multigres/go/test/endtoend/suiteutil"
-	"github.com/multigres/multigres/go/tools/executil"
 )
 
 // runResult captures the outcome of running one .test/.slt file against one
@@ -76,94 +69,28 @@ type runResult struct {
 // wire protocol and "postgres-extended" for the extended one. An empty string
 // defaults to "postgres".
 func runSqllogictest(ctx context.Context, t suiteutil.Target, resetter *suiteutil.SchemaResetter, engine, file string) *runResult {
-	bin, lookErr := exec.LookPath("sqllogictest")
-	if lookErr != nil {
-		return &runResult{
-			File:    file,
-			ExecErr: fmt.Errorf("sqllogictest not found on PATH (install via `make tools`): %w", lookErr),
-		}
-	}
-
-	if err := resetter.ResetIfDirty(ctx); err != nil {
-		return &runResult{
-			File:    file,
-			ExecErr: fmt.Errorf("reset target %s: %w", t.Name, err),
-		}
-	}
-
-	if engine == "" {
-		engine = "postgres"
-	}
-
-	args := []string{
-		"-e", engine,
-		"-h", t.Host,
-		"-p", strconv.Itoa(t.Port),
-		"-u", t.User,
-		"-w", t.Pass,
-		"-d", t.DB,
-		"--color", "never",
-		file,
-	}
-
-	cmd := executil.Command(ctx, bin, args...)
-	var buf bytes.Buffer
-	cmd.Stdout = &buf
-	cmd.Stderr = &buf
-
-	start := time.Now()
-	err := cmd.Run()
-	elapsed := time.Since(start)
-
-	output := buf.String()
-
-	// Mark the resetter dirty unless this run never reached the database.
-	// sqllogictest exits with "failed to parse" before opening any
-	// connection when a .test file uses syntax it doesn't recognise (e.g.
-	// `onlyif mysql # …`); those files leave the schema untouched, so the
-	// next file can reuse the prior reset. Skipping those resets keeps the
-	// pg_namespace/pg_class invalidation queue from piling up against
-	// pooled multipooler backends — see SchemaResetter for the failure
-	// mode this prevents (slt_good_125's simple-protocol
-	// statement_timeout in CI).
-	if !strings.Contains(output, "failed to parse") {
-		resetter.MarkDirty()
-	}
-
-	res := &runResult{
-		File:     file,
-		Duration: elapsed,
-		Output:   truncateOutput(output, maxOutputBytes),
-	}
-
-	switch {
-	case err == nil:
-		res.Passed = true
-	case ctx.Err() == context.DeadlineExceeded:
-		res.TimedOut = true
-	case isExitError(err):
-		// Non-zero exit: test failure — the captured output names the
-		// offending record. Treat as expected "not passed".
-	default:
-		res.ExecErr = err
-	}
-
-	return res
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Mark the resetter dirty unless this run never reached the database.
+// sqllogictest exits with "failed to parse" before opening any
+// connection when a .test file uses syntax it doesn't recognise (e.g.
+// `onlyif mysql # …`); those files leave the schema untouched, so the
+// next file can reuse the prior reset. Skipping those resets keeps the
+// pg_namespace/pg_class invalidation queue from piling up against
+// pooled multipooler backends — see SchemaResetter for the failure
+// mode this prevents (slt_good_125's simple-protocol
+// statement_timeout in CI).
+
+// Non-zero exit: test failure — the captured output names the
+// offending record. Treat as expected "not passed".
 
 // maxOutputBytes bounds how much captured runner output we keep per file in
 // the final report. Failing files often print enough context to diagnose;
 // huge walls of diff text serve no one.
 const maxOutputBytes = 4 * 1024
 
-func truncateOutput(s string, limit int) string {
-	if len(s) <= limit {
-		return s
-	}
-	return s[:limit] + "\n... (output truncated)"
-}
+func truncateOutput(s string, limit int) string { _ = "STUB: not implemented"; return "" }
 
-func isExitError(err error) bool {
-	var ee *exec.ExitError
-	return errors.As(err, &ee)
-}
+func isExitError(err error) bool { _ = "STUB: not implemented"; return false }

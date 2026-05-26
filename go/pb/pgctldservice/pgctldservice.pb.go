@@ -21,13 +21,12 @@
 package pgctldservice
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -69,32 +68,27 @@ var (
 	}
 )
 
-func (x ServerStatus) Enum() *ServerStatus {
-	p := new(ServerStatus)
-	*p = x
-	return p
-}
+func (x ServerStatus) Enum() *ServerStatus { _ = "STUB: not implemented"; return nil }
 
-func (x ServerStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x ServerStatus) String() string { _ = "STUB: not implemented"; return "" }
 
 func (ServerStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_pgctldservice_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (ServerStatus) Type() protoreflect.EnumType {
-	return &file_pgctldservice_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x ServerStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use ServerStatus.Descriptor instead.
-func (ServerStatus) EnumDescriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{0}
-}
+func (ServerStatus) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // Start PostgreSQL server
 type StartRequest struct {
@@ -107,49 +101,23 @@ type StartRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StartRequest) Reset() {
-	*x = StartRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StartRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StartRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StartRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StartRequest) ProtoMessage() {}
+func (*StartRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StartRequest.ProtoReflect.Descriptor instead.
-func (*StartRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{0}
-}
+func (*StartRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StartRequest) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
+func (x *StartRequest) GetPort() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *StartRequest) GetExtraArgs() []string {
-	if x != nil {
-		return x.ExtraArgs
-	}
-	return nil
-}
+func (x *StartRequest) GetExtraArgs() []string { _ = "STUB: not implemented"; return nil }
 
 type StartResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -161,49 +129,23 @@ type StartResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StartResponse) Reset() {
-	*x = StartResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StartResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StartResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StartResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StartResponse) ProtoMessage() {}
+func (*StartResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StartResponse.ProtoReflect.Descriptor instead.
-func (*StartResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{1}
-}
+func (*StartResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StartResponse) GetPid() int32 {
-	if x != nil {
-		return x.Pid
-	}
-	return 0
-}
+func (x *StartResponse) GetPid() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *StartResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *StartResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // Stop PostgreSQL server
 type StopRequest struct {
@@ -216,49 +158,23 @@ type StopRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StopRequest) Reset() {
-	*x = StopRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StopRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StopRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StopRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StopRequest) ProtoMessage() {}
+func (*StopRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StopRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StopRequest.ProtoReflect.Descriptor instead.
-func (*StopRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{2}
-}
+func (*StopRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StopRequest) GetMode() string {
-	if x != nil {
-		return x.Mode
-	}
-	return ""
-}
+func (x *StopRequest) GetMode() string { _ = "STUB: not implemented"; return "" }
 
-func (x *StopRequest) GetTimeout() *durationpb.Duration {
-	if x != nil {
-		return x.Timeout
-	}
-	return nil
-}
+func (x *StopRequest) GetTimeout() *durationpb.Duration { _ = "STUB: not implemented"; return nil }
 
 type StopResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -268,42 +184,21 @@ type StopResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StopResponse) Reset() {
-	*x = StopResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StopResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StopResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StopResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StopResponse) ProtoMessage() {}
+func (*StopResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StopResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StopResponse.ProtoReflect.Descriptor instead.
-func (*StopResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{3}
-}
+func (*StopResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *StopResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *StopResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // Restart PostgreSQL server
 type RestartRequest struct {
@@ -321,70 +216,29 @@ type RestartRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RestartRequest) Reset() {
-	*x = RestartRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RestartRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RestartRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RestartRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RestartRequest) ProtoMessage() {}
+func (*RestartRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RestartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RestartRequest.ProtoReflect.Descriptor instead.
-func (*RestartRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{4}
-}
+func (*RestartRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *RestartRequest) GetMode() string {
-	if x != nil {
-		return x.Mode
-	}
-	return ""
-}
+func (x *RestartRequest) GetMode() string { _ = "STUB: not implemented"; return "" }
 
-func (x *RestartRequest) GetTimeout() *durationpb.Duration {
-	if x != nil {
-		return x.Timeout
-	}
-	return nil
-}
+func (x *RestartRequest) GetTimeout() *durationpb.Duration { _ = "STUB: not implemented"; return nil }
 
-func (x *RestartRequest) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
+func (x *RestartRequest) GetPort() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RestartRequest) GetExtraArgs() []string {
-	if x != nil {
-		return x.ExtraArgs
-	}
-	return nil
-}
+func (x *RestartRequest) GetExtraArgs() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *RestartRequest) GetAsStandby() bool {
-	if x != nil {
-		return x.AsStandby
-	}
-	return false
-}
+func (x *RestartRequest) GetAsStandby() bool { _ = "STUB: not implemented"; return false }
 
 type RestartResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -396,49 +250,23 @@ type RestartResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RestartResponse) Reset() {
-	*x = RestartResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RestartResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RestartResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RestartResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RestartResponse) ProtoMessage() {}
+func (*RestartResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RestartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RestartResponse.ProtoReflect.Descriptor instead.
-func (*RestartResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{5}
-}
+func (*RestartResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *RestartResponse) GetPid() int32 {
-	if x != nil {
-		return x.Pid
-	}
-	return 0
-}
+func (x *RestartResponse) GetPid() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RestartResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *RestartResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // Reload PostgreSQL configuration
 type ReloadConfigRequest struct {
@@ -447,34 +275,21 @@ type ReloadConfigRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReloadConfigRequest) Reset() {
-	*x = ReloadConfigRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReloadConfigRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReloadConfigRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReloadConfigRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReloadConfigRequest) ProtoMessage() {}
+func (*ReloadConfigRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReloadConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReloadConfigRequest.ProtoReflect.Descriptor instead.
 func (*ReloadConfigRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{6}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type ReloadConfigResponse struct {
@@ -485,42 +300,24 @@ type ReloadConfigResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReloadConfigResponse) Reset() {
-	*x = ReloadConfigResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReloadConfigResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReloadConfigResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReloadConfigResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReloadConfigResponse) ProtoMessage() {}
+func (*ReloadConfigResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReloadConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReloadConfigResponse.ProtoReflect.Descriptor instead.
 func (*ReloadConfigResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{7}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *ReloadConfigResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *ReloadConfigResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // Get PostgreSQL server status
 type StatusRequest struct {
@@ -529,35 +326,19 @@ type StatusRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StatusRequest) Reset() {
-	*x = StatusRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StatusRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StatusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StatusRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StatusRequest) ProtoMessage() {}
+func (*StatusRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
-func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{8}
-}
+func (*StatusRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 type StatusResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -585,103 +366,43 @@ type StatusResponse struct {
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *StatusResponse) Reset() {
-	*x = StatusResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StatusResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StatusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StatusResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StatusResponse) ProtoMessage() {}
+func (*StatusResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
-func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{9}
-}
+func (*StatusResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *StatusResponse) GetStatus() ServerStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ServerStatus_UNKNOWN
+	_ = "STUB: not implemented"
+	return *new(ServerStatus)
 }
 
-func (x *StatusResponse) GetPid() int32 {
-	if x != nil {
-		return x.Pid
-	}
-	return 0
-}
+func (x *StatusResponse) GetPid() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *StatusResponse) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	return ""
-}
+func (x *StatusResponse) GetVersion() string { _ = "STUB: not implemented"; return "" }
 
-func (x *StatusResponse) GetUptime() *durationpb.Duration {
-	if x != nil {
-		return x.Uptime
-	}
-	return nil
-}
+func (x *StatusResponse) GetUptime() *durationpb.Duration { _ = "STUB: not implemented"; return nil }
 
-func (x *StatusResponse) GetDataDir() string {
-	if x != nil {
-		return x.DataDir
-	}
-	return ""
-}
+func (x *StatusResponse) GetDataDir() string { _ = "STUB: not implemented"; return "" }
 
-func (x *StatusResponse) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
+func (x *StatusResponse) GetPort() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *StatusResponse) GetHost() string {
-	if x != nil {
-		return x.Host
-	}
-	return ""
-}
+func (x *StatusResponse) GetHost() string { _ = "STUB: not implemented"; return "" }
 
-func (x *StatusResponse) GetReady() bool {
-	if x != nil {
-		return x.Ready
-	}
-	return false
-}
+func (x *StatusResponse) GetReady() bool { _ = "STUB: not implemented"; return false }
 
-func (x *StatusResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *StatusResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 func (x *StatusResponse) GetPgbackrestStatus() *PgBackRestStatus {
-	if x != nil {
-		return x.PgbackrestStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -700,61 +421,28 @@ type PgBackRestStatus struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PgBackRestStatus) Reset() {
-	*x = PgBackRestStatus{}
-	mi := &file_pgctldservice_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PgBackRestStatus) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PgBackRestStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PgBackRestStatus) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PgBackRestStatus) ProtoMessage() {}
+func (*PgBackRestStatus) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PgBackRestStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PgBackRestStatus.ProtoReflect.Descriptor instead.
-func (*PgBackRestStatus) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{10}
-}
+func (*PgBackRestStatus) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PgBackRestStatus) GetRunning() bool {
-	if x != nil {
-		return x.Running
-	}
-	return false
-}
+func (x *PgBackRestStatus) GetRunning() bool { _ = "STUB: not implemented"; return false }
 
-func (x *PgBackRestStatus) GetErrorMessage() string {
-	if x != nil {
-		return x.ErrorMessage
-	}
-	return ""
-}
+func (x *PgBackRestStatus) GetErrorMessage() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgBackRestStatus) GetRestartCount() int32 {
-	if x != nil {
-		return x.RestartCount
-	}
-	return 0
-}
+func (x *PgBackRestStatus) GetRestartCount() int32 { _ = "STUB: not implemented"; return 0 }
 
 func (x *PgBackRestStatus) GetLastStarted() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastStarted
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -770,63 +458,27 @@ type VersionRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *VersionRequest) Reset() {
-	*x = VersionRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *VersionRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *VersionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *VersionRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*VersionRequest) ProtoMessage() {}
+func (*VersionRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
-func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{11}
-}
+func (*VersionRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *VersionRequest) GetHost() string {
-	if x != nil {
-		return x.Host
-	}
-	return ""
-}
+func (x *VersionRequest) GetHost() string { _ = "STUB: not implemented"; return "" }
 
-func (x *VersionRequest) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
+func (x *VersionRequest) GetPort() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *VersionRequest) GetDatabase() string {
-	if x != nil {
-		return x.Database
-	}
-	return ""
-}
+func (x *VersionRequest) GetDatabase() string { _ = "STUB: not implemented"; return "" }
 
-func (x *VersionRequest) GetUser() string {
-	if x != nil {
-		return x.User
-	}
-	return ""
-}
+func (x *VersionRequest) GetUser() string { _ = "STUB: not implemented"; return "" }
 
 type VersionResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -838,49 +490,23 @@ type VersionResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *VersionResponse) Reset() {
-	*x = VersionResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *VersionResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *VersionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *VersionResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*VersionResponse) ProtoMessage() {}
+func (*VersionResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use VersionResponse.ProtoReflect.Descriptor instead.
-func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{12}
-}
+func (*VersionResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *VersionResponse) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	return ""
-}
+func (x *VersionResponse) GetVersion() string { _ = "STUB: not implemented"; return "" }
 
-func (x *VersionResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *VersionResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // Initialize data directory
 type InitDataDirRequest struct {
@@ -895,56 +521,25 @@ type InitDataDirRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InitDataDirRequest) Reset() {
-	*x = InitDataDirRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *InitDataDirRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *InitDataDirRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *InitDataDirRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*InitDataDirRequest) ProtoMessage() {}
+func (*InitDataDirRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *InitDataDirRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use InitDataDirRequest.ProtoReflect.Descriptor instead.
-func (*InitDataDirRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{13}
-}
+func (*InitDataDirRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *InitDataDirRequest) GetAuthLocal() string {
-	if x != nil {
-		return x.AuthLocal
-	}
-	return ""
-}
+func (x *InitDataDirRequest) GetAuthLocal() string { _ = "STUB: not implemented"; return "" }
 
-func (x *InitDataDirRequest) GetAuthHost() string {
-	if x != nil {
-		return x.AuthHost
-	}
-	return ""
-}
+func (x *InitDataDirRequest) GetAuthHost() string { _ = "STUB: not implemented"; return "" }
 
-func (x *InitDataDirRequest) GetExtraArgs() []string {
-	if x != nil {
-		return x.ExtraArgs
-	}
-	return nil
-}
+func (x *InitDataDirRequest) GetExtraArgs() []string { _ = "STUB: not implemented"; return nil }
 
 type InitDataDirResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -954,42 +549,24 @@ type InitDataDirResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InitDataDirResponse) Reset() {
-	*x = InitDataDirResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *InitDataDirResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *InitDataDirResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *InitDataDirResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*InitDataDirResponse) ProtoMessage() {}
+func (*InitDataDirResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *InitDataDirResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use InitDataDirResponse.ProtoReflect.Descriptor instead.
 func (*InitDataDirResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{14}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *InitDataDirResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *InitDataDirResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 // PgRewind rewinds a PostgreSQL data directory to an earlier point in the timeline
 type PgRewindRequest struct {
@@ -1009,70 +586,29 @@ type PgRewindRequest struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *PgRewindRequest) Reset() {
-	*x = PgRewindRequest{}
-	mi := &file_pgctldservice_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PgRewindRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PgRewindRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PgRewindRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PgRewindRequest) ProtoMessage() {}
+func (*PgRewindRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PgRewindRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PgRewindRequest.ProtoReflect.Descriptor instead.
-func (*PgRewindRequest) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{15}
-}
+func (*PgRewindRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PgRewindRequest) GetSourceHost() string {
-	if x != nil {
-		return x.SourceHost
-	}
-	return ""
-}
+func (x *PgRewindRequest) GetSourceHost() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgRewindRequest) GetSourcePort() int32 {
-	if x != nil {
-		return x.SourcePort
-	}
-	return 0
-}
+func (x *PgRewindRequest) GetSourcePort() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PgRewindRequest) GetDryRun() bool {
-	if x != nil {
-		return x.DryRun
-	}
-	return false
-}
+func (x *PgRewindRequest) GetDryRun() bool { _ = "STUB: not implemented"; return false }
 
-func (x *PgRewindRequest) GetExtraArgs() []string {
-	if x != nil {
-		return x.ExtraArgs
-	}
-	return nil
-}
+func (x *PgRewindRequest) GetExtraArgs() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *PgRewindRequest) GetApplicationName() string {
-	if x != nil {
-		return x.ApplicationName
-	}
-	return ""
-}
+func (x *PgRewindRequest) GetApplicationName() string { _ = "STUB: not implemented"; return "" }
 
 type PgRewindResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1083,49 +619,23 @@ type PgRewindResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PgRewindResponse) Reset() {
-	*x = PgRewindResponse{}
-	mi := &file_pgctldservice_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PgRewindResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PgRewindResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PgRewindResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PgRewindResponse) ProtoMessage() {}
+func (*PgRewindResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PgRewindResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pgctldservice_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PgRewindResponse.ProtoReflect.Descriptor instead.
-func (*PgRewindResponse) Descriptor() ([]byte, []int) {
-	return file_pgctldservice_proto_rawDescGZIP(), []int{16}
-}
+func (*PgRewindResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PgRewindResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *PgRewindResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgRewindResponse) GetOutput() string {
-	if x != nil {
-		return x.Output
-	}
-	return ""
-}
+func (x *PgRewindResponse) GetOutput() string { _ = "STUB: not implemented"; return "" }
 
 var File_pgctldservice_proto protoreflect.FileDescriptor
 
@@ -1226,12 +736,7 @@ var (
 	file_pgctldservice_proto_rawDescData []byte
 )
 
-func file_pgctldservice_proto_rawDescGZIP() []byte {
-	file_pgctldservice_proto_rawDescOnce.Do(func() {
-		file_pgctldservice_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_pgctldservice_proto_rawDesc), len(file_pgctldservice_proto_rawDesc)))
-	})
-	return file_pgctldservice_proto_rawDescData
-}
+func file_pgctldservice_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_pgctldservice_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_pgctldservice_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
@@ -1287,27 +792,5 @@ var file_pgctldservice_proto_depIdxs = []int32{
 	0,  // [0:6] is the sub-list for field type_name
 }
 
-func init() { file_pgctldservice_proto_init() }
-func file_pgctldservice_proto_init() {
-	if File_pgctldservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pgctldservice_proto_rawDesc), len(file_pgctldservice_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   17,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_pgctldservice_proto_goTypes,
-		DependencyIndexes: file_pgctldservice_proto_depIdxs,
-		EnumInfos:         file_pgctldservice_proto_enumTypes,
-		MessageInfos:      file_pgctldservice_proto_msgTypes,
-	}.Build()
-	File_pgctldservice_proto = out.File
-	file_pgctldservice_proto_goTypes = nil
-	file_pgctldservice_proto_depIdxs = nil
-}
+func init()                          { file_pgctldservice_proto_init() }
+func file_pgctldservice_proto_init() { _ = "STUB: not implemented"; return }

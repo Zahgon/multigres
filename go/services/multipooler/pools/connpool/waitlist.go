@@ -16,7 +16,6 @@ package connpool
 
 import (
 	"context"
-	"runtime"
 	"sync"
 
 	"github.com/multigres/multigres/go/services/multipooler/connstate"
@@ -46,142 +45,66 @@ type waitlist[C Connection] struct {
 // also return a `nil` connection even if our context has expired, if the pool has
 // forced an expiration of all waiters in the waitlist.
 func (wl *waitlist[C]) waitForConn(ctx context.Context, settings *connstate.Settings, closeChan <-chan struct{}) (*Pooled[C], error) {
-	elem := wl.nodes.Get().(*list.Element[waiter[C]])
-	defer wl.nodes.Put(elem)
-
-	elem.Value = waiter[C]{conn: elem.Value.conn, settings: settings}
-
-	wl.mu.Lock()
-	// add ourselves as a waiter at the end of the waitlist
-	wl.list.PushBackValue(elem)
-	wl.mu.Unlock()
-
-	select {
-	case <-closeChan:
-		// Pool was closed while we were waiting.
-		removed := false
-
-		wl.mu.Lock()
-		// Try to find and remove ourselves from the list.
-		for e := wl.list.Front(); e != nil; e = e.Next() {
-			if e == elem {
-				wl.list.Remove(elem)
-				removed = true
-				break
-			}
-		}
-		wl.mu.Unlock()
-
-		if removed {
-			return nil, ErrPoolClosed
-		}
-
-		// if we weren't able to remove ourselves from the waitlist, it means
-		// another goroutine is trying to hand us a connection
-		return <-elem.Value.conn, nil
-
-	case <-ctx.Done():
-		// Context expired. We need to try to remove ourselves from the waitlist to
-		// prevent another goroutine from trying to hand us a connection later on.
-		removed := false
-
-		wl.mu.Lock()
-		// Try to find and remove ourselves from the list.
-		for e := wl.list.Front(); e != nil; e = e.Next() {
-			if e == elem {
-				wl.list.Remove(elem)
-				removed = true
-				break
-			}
-		}
-		wl.mu.Unlock()
-
-		if removed {
-			return nil, context.Cause(ctx)
-		}
-
-		// if we weren't able to remove ourselves from the waitlist, it means
-		// another goroutine is trying to hand us a connection
-		return <-elem.Value.conn, nil
-
-	case conn := <-elem.Value.conn:
-		return conn, nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// add ourselves as a waiter at the end of the waitlist
+
+// Pool was closed while we were waiting.
+
+// Try to find and remove ourselves from the list.
+
+// if we weren't able to remove ourselves from the waitlist, it means
+// another goroutine is trying to hand us a connection
+
+// Context expired. We need to try to remove ourselves from the waitlist to
+// prevent another goroutine from trying to hand us a connection later on.
+
+// Try to find and remove ourselves from the list.
+
+// if we weren't able to remove ourselves from the waitlist, it means
+// another goroutine is trying to hand us a connection
 
 func (wl *waitlist[C]) maybeStarvingCount() (maybeStarving int) {
-	if wl.list.Len() == 0 {
-		return maybeStarving
-	}
-
-	wl.mu.Lock()
-	defer wl.mu.Unlock()
-
-	// iterate the waitlist looking for waiters that haven't been aged yet
-	for e := wl.list.Front(); e != nil; e = e.Next() {
-		if e.Value.age == 0 {
-			maybeStarving++
-		}
-	}
-
-	return maybeStarving
+	_ = "STUB: not implemented"
+	return 0
 }
+
+// iterate the waitlist looking for waiters that haven't been aged yet
 
 // tryReturnConn tries handing over a connection to one of the waiters in the pool.
 func (wl *waitlist[D]) tryReturnConn(conn *Pooled[D]) bool {
+	_ = "STUB: not implemented"
 	// fast path: if there's nobody waiting there's nothing to do
-	if wl.list.Len() == 0 {
-		return false
-	}
-	// split the slow path into a separate function to enable inlining
-	return wl.tryReturnConnSlow(conn)
+	return false
 }
+
+// split the slow path into a separate function to enable inlining
 
 func (wl *waitlist[D]) tryReturnConnSlow(conn *Pooled[D]) bool {
-	const maxAge = 8
-	var (
-		target       *list.Element[waiter[D]]
-		connSettings = conn.Settings()
-	)
-
-	wl.mu.Lock()
-	target = wl.list.Front()
-	// iterate through the waitlist looking for either waiters that have been
-	// here too long, or a waiter that is looking exactly for the same settings
-	// as the one we have in our connection.
-	for e := target; e != nil; e = e.Next() {
-		// Check if settings match using pointer equality.
-		// With interned settings from SettingsCache, same settings = same pointer.
-		settingsMatch := e.Value.settings == connSettings
-
-		if e.Value.age > maxAge || settingsMatch {
-			target = e
-			break
-		}
-		// this only ages the waiters that are being skipped over: we'll start
-		// aging the waiters in the back once they get to the front of the pool.
-		// the maxAge of 8 has been set empirically: smaller values cause clients
-		// with a specific settings to slightly starve, and aging all the clients
-		// in the list every time leads to unfairness when the system is at capacity
-		e.Value.age++
-	}
-	if target != nil {
-		wl.list.Remove(target)
-	}
-	wl.mu.Unlock()
-
-	// maybe there isn't anybody to hand over the connection to, because we've
-	// raced with another client returning another connection
-	if target == nil {
-		return false
-	}
-
-	// if we have a target to return the connection to, simply send the connection
-	// on the waiter's channel. they'll wake up to pick up the connection.
-	target.Value.conn <- conn
-	runtime.Gosched()
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
+
+// iterate through the waitlist looking for either waiters that have been
+// here too long, or a waiter that is looking exactly for the same settings
+// as the one we have in our connection.
+
+// Check if settings match using pointer equality.
+// With interned settings from SettingsCache, same settings = same pointer.
+
+// this only ages the waiters that are being skipped over: we'll start
+// aging the waiters in the back once they get to the front of the pool.
+// the maxAge of 8 has been set empirically: smaller values cause clients
+// with a specific settings to slightly starve, and aging all the clients
+// in the list every time leads to unfairness when the system is at capacity
+
+// maybe there isn't anybody to hand over the connection to, because we've
+// raced with another client returning another connection
+
+// if we have a target to return the connection to, simply send the connection
+// on the waiter's channel. they'll wake up to pick up the connection.
 
 func (wl *waitlist[C]) init() {
 	wl.nodes.New = func() any {
@@ -192,6 +115,4 @@ func (wl *waitlist[C]) init() {
 	wl.list.Init()
 }
 
-func (wl *waitlist[C]) waiting() int {
-	return wl.list.Len()
-}
+func (wl *waitlist[C]) waiting() int { _ = "STUB: not implemented"; return 0 }

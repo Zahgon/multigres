@@ -15,12 +15,10 @@
 package handler
 
 import (
-	"maps"
 	"sync"
 	"time"
 
 	"github.com/multigres/multigres/go/common/preparedstatement"
-	"github.com/multigres/multigres/go/common/protoutil"
 	"github.com/multigres/multigres/go/common/sqltypes"
 	"github.com/multigres/multigres/go/pb/query"
 )
@@ -192,74 +190,48 @@ type ShardState struct {
 
 // NewMultiGatewayConnectionState creates a new MultiGatewayConnectionState.
 func NewMultiGatewayConnectionState() *MultiGatewayConnectionState {
-	return &MultiGatewayConnectionState{
-		mu:              sync.Mutex{},
-		Portals:         make(map[string]*preparedstatement.PortalInfo),
-		OpenHoldCursors: make(map[string]bool),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddOpenHoldCursor records a `DECLARE ... WITH HOLD` cursor as currently open
 // on this gateway session. Idempotent.
 func (m *MultiGatewayConnectionState) AddOpenHoldCursor(name string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.OpenHoldCursors == nil {
-		m.OpenHoldCursors = make(map[string]bool)
-	}
-	m.OpenHoldCursors[name] = true
+	_ = "STUB: not implemented"
+	return
 }
 
 // RemoveOpenHoldCursor drops the named HOLD cursor from the open set.
 // Returns true if the entry existed.
 func (m *MultiGatewayConnectionState) RemoveOpenHoldCursor(name string) bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if _, ok := m.OpenHoldCursors[name]; !ok {
-		return false
-	}
-	delete(m.OpenHoldCursors, name)
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
 // HasOpenHoldCursor reports whether the named HOLD cursor is open.
 func (m *MultiGatewayConnectionState) HasOpenHoldCursor(name string) bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return m.OpenHoldCursors[name]
+	_ = "STUB: not implemented"
+	return false
 }
 
 // OpenHoldCursorNames returns a snapshot of the open HOLD cursor names.
 // Used to materialise the target list for `CLOSE ALL`.
 func (m *MultiGatewayConnectionState) OpenHoldCursorNames() []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.OpenHoldCursors) == 0 {
-		return nil
-	}
-	names := make([]string, 0, len(m.OpenHoldCursors))
-	for name := range m.OpenHoldCursors {
-		names = append(names, name)
-	}
-	return names
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HasAnyOpenHoldCursor reports whether the session is holding at least one
 // `DECLARE ... WITH HOLD` cursor open. Used by ScatterConn to keep
 // ReasonPortal applied on follow-up queries while any HOLD cursor remains.
 func (m *MultiGatewayConnectionState) HasAnyOpenHoldCursor() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return len(m.OpenHoldCursors) > 0
+	_ = "STUB: not implemented"
+	return false
 }
 
 // ClearOpenHoldCursors drops every tracked HOLD cursor. Called at ROLLBACK,
 // when PostgreSQL closes all open cursors regardless of WITH HOLD.
-func (m *MultiGatewayConnectionState) ClearOpenHoldCursors() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.OpenHoldCursors = make(map[string]bool)
-}
+func (m *MultiGatewayConnectionState) ClearOpenHoldCursors() { _ = "STUB: not implemented"; return }
 
 // HoldCursorsDeclaredInTxn returns the names of HOLD cursors that were
 // declared after the BEGIN-level frame was pushed — i.e., the cursors
@@ -271,23 +243,13 @@ func (m *MultiGatewayConnectionState) ClearOpenHoldCursors() {
 // Returns nil if no BEGIN-level frame is present (no active txn) or the
 // set is empty. State is not mutated.
 func (m *MultiGatewayConnectionState) HoldCursorsDeclaredInTxn() []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.savepoints) == 0 || m.savepoints[0].name != "" {
-		// No explicit transaction in progress — every open HOLD cursor
-		// pre-dates this code path. Caller must not rely on the result
-		// to drive a ROLLBACK release.
-		return nil
-	}
-	snapshot := m.savepoints[0].openHoldCursors
-	var inTxn []string
-	for cur := range m.OpenHoldCursors {
-		if !snapshot[cur] {
-			inTxn = append(inTxn, cur)
-		}
-	}
-	return inTxn
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// No explicit transaction in progress — every open HOLD cursor
+// pre-dates this code path. Caller must not rely on the result
+// to drive a ROLLBACK release.
 
 // RestoreOpenHoldCursorsToBeginSnapshot restores the OpenHoldCursors set
 // to the snapshot captured by BeginTransaction at the depth-0 frame.
@@ -298,116 +260,72 @@ func (m *MultiGatewayConnectionState) HoldCursorsDeclaredInTxn() []string {
 // frame on the stack — matches the previous ClearOpenHoldCursors behavior
 // for the no-txn path.
 func (m *MultiGatewayConnectionState) RestoreOpenHoldCursorsToBeginSnapshot() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.savepoints) == 0 || m.savepoints[0].name != "" {
-		m.OpenHoldCursors = make(map[string]bool)
-		return
-	}
-	snapshot := m.savepoints[0].openHoldCursors
-	restored := make(map[string]bool, len(snapshot))
-	for cur := range snapshot {
-		restored[cur] = true
-	}
-	m.OpenHoldCursors = restored
+	_ = "STUB: not implemented"
+	return
 }
 
 // AppendPendingPinPortals adds one cursor name to the pending-pin queue.
 // Used by HoldCursorRoute to register the cursor for the next StreamExecute
 // call without touching the field directly.
 func (m *MultiGatewayConnectionState) AppendPendingPinPortals(names ...string) {
-	if len(names) == 0 {
-		return
-	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.PendingPinPortals = append(m.PendingPinPortals, names...)
+	_ = "STUB: not implemented"
+	return
 }
 
 // TakePendingPinPortals returns the current pending-pin list and clears it
 // atomically. Called by ScatterConn at the moment it builds the
 // ReservationOptions for an outbound RPC.
 func (m *MultiGatewayConnectionState) TakePendingPinPortals() []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.PendingPinPortals) == 0 {
-		return nil
-	}
-	out := m.PendingPinPortals
-	m.PendingPinPortals = nil
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HasPendingPinPortals reports whether the pending-pin queue is non-empty.
 // Used by ScatterConn to decide whether to take the reserve-creating path
 // for a session whose only reservation reason is a new HOLD cursor.
 func (m *MultiGatewayConnectionState) HasPendingPinPortals() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return len(m.PendingPinPortals) > 0
+	_ = "STUB: not implemented"
+	return false
 }
 
 // AppendPendingReleasePortals queues cursor names for unpinning on the next
 // StreamExecute.
 func (m *MultiGatewayConnectionState) AppendPendingReleasePortals(names ...string) {
-	if len(names) == 0 {
-		return
-	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.PendingReleasePortals = append(m.PendingReleasePortals, names...)
+	_ = "STUB: not implemented"
+	return
 }
 
 // TakePendingReleasePortals returns the current pending-release list and
 // clears it atomically.
 func (m *MultiGatewayConnectionState) TakePendingReleasePortals() []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.PendingReleasePortals) == 0 {
-		return nil
-	}
-	out := m.PendingReleasePortals
-	m.PendingReleasePortals = nil
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StorePortalInfo stores the portal information.
 func (m *MultiGatewayConnectionState) StorePortalInfo(portal *query.Portal, psi *preparedstatement.PreparedStatementInfo) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.Portals[portal.Name] = preparedstatement.NewPortalInfo(psi, portal)
+	_ = "STUB: not implemented"
+	return
 }
 
 // GetPortalInfo gets the portal information for a previously stored portal.
 func (m *MultiGatewayConnectionState) GetPortalInfo(portalName string) *preparedstatement.PortalInfo {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return m.Portals[portalName]
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // DeletePortalInfo deletes the portal information
 func (m *MultiGatewayConnectionState) DeletePortalInfo(portalName string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	delete(m.Portals, portalName)
+	_ = "STUB: not implemented"
+	return
 }
 
 // NewShardState creates a new shard state.
-func NewShardState(target *query.Target) *ShardState {
-	return &ShardState{
-		Target: target,
-	}
-}
+func NewShardState(target *query.Target) *ShardState { _ = "STUB: not implemented"; return nil }
 
 // GetMatchingShardState gets the shardState (if any) that matches the target specified.
 func (m *MultiGatewayConnectionState) GetMatchingShardState(target *query.Target) *ShardState {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for _, ss := range m.ShardStates {
-		if protoutil.TargetEquals(ss.Target, target) {
-			return ss
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -415,94 +333,60 @@ func (m *MultiGatewayConnectionState) GetMatchingShardState(target *query.Target
 // The reasons in rs.ReservationReasons are set exactly as provided (not OR'd).
 // Creates a new entry if none exists for the target.
 func (m *MultiGatewayConnectionState) SetReservedConnection(target *query.Target, rs *query.ReservedState) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for _, ss := range m.ShardStates {
-		if protoutil.TargetEquals(ss.Target, target) {
-			ss.ReservedState = rs
-			return
-		}
-	}
-	ss := NewShardState(target)
-	ss.ReservedState = rs
-	m.ShardStates = append(m.ShardStates, ss)
+	_ = "STUB: not implemented"
+	return
 }
 
 // ClearReservedConnection removes a reserved connection for a given target.
 // This should be called when a reserved connection is released (e.g., after COPY completes).
 func (m *MultiGatewayConnectionState) ClearReservedConnection(target *query.Target) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for i, ss := range m.ShardStates {
-		if protoutil.TargetEquals(ss.Target, target) {
-			// Remove by swapping with last element and truncating
-			lastIdx := len(m.ShardStates) - 1
-			if i != lastIdx {
-				m.ShardStates[i] = m.ShardStates[lastIdx]
-			}
-			m.ShardStates = m.ShardStates[:lastIdx]
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Remove by swapping with last element and truncating
 
 // ClearAllReservedConnections removes all reserved connection entries.
 // Called after COMMIT or ROLLBACK to clean up stale shard state.
 func (m *MultiGatewayConnectionState) ClearAllReservedConnections() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.ShardStates = nil
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetSessionVariable sets a session variable (from SET command).
 // The variable name and value are stored to be propagated to multipooler.
 func (m *MultiGatewayConnectionState) SetSessionVariable(name, value string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.SessionSettings == nil {
-		m.SessionSettings = make(map[string]string)
-	}
-	m.SessionSettings[name] = value
+	_ = "STUB: not implemented"
+	return
 }
 
 // ResetSessionVariable removes a session variable (from RESET command).
 func (m *MultiGatewayConnectionState) ResetSessionVariable(name string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	delete(m.SessionSettings, name)
+	_ = "STUB: not implemented"
+	return
 }
 
 // ResetAllSessionVariables clears all session variables (from RESET ALL command).
-func (m *MultiGatewayConnectionState) ResetAllSessionVariables() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.SessionSettings = nil
-}
+func (m *MultiGatewayConnectionState) ResetAllSessionVariables() { _ = "STUB: not implemented"; return }
 
 // SetStatementTimeout sets the session-level statement timeout override.
 func (m *MultiGatewayConnectionState) SetStatementTimeout(d time.Duration) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout.Set(d)
+	_ = "STUB: not implemented"
+	return
 }
 
 // ResetStatementTimeout clears both the session-level override and any
 // active transaction-local override, reverting to the default (from startup
 // params or flag). Matches PostgreSQL: RESET inside a transaction with a
 // prior SET LOCAL supersedes the LOCAL — effective value becomes the default.
-func (m *MultiGatewayConnectionState) ResetStatementTimeout() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout.Reset()
-}
+func (m *MultiGatewayConnectionState) ResetStatementTimeout() { _ = "STUB: not implemented"; return }
 
 // SetLocalStatementTimeout stores a transaction-local statement timeout
 // override (from SET LOCAL statement_timeout). Cleared on COMMIT/ROLLBACK
 // via ResetAllLocalGUCs.
 func (m *MultiGatewayConnectionState) SetLocalStatementTimeout(d time.Duration) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout.SetLocal(d)
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetLocalStatementTimeoutToDefault sets the transaction-local override to
@@ -511,29 +395,20 @@ func (m *MultiGatewayConnectionState) SetLocalStatementTimeout(d time.Duration) 
 // without destroying it; the session value is restored on COMMIT/ROLLBACK
 // via ResetAllLocalGUCs.
 func (m *MultiGatewayConnectionState) SetLocalStatementTimeoutToDefault() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout.SetLocalToDefault()
+	_ = "STUB: not implemented"
+	return
 }
 
 // ResetAllLocalGUCs clears all transaction-local overrides for gateway-managed
 // variables. Called at transaction end (COMMIT/ROLLBACK) so the next statement
 // observes the session-level (or default) value.
-func (m *MultiGatewayConnectionState) ResetAllLocalGUCs() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout.ResetLocal()
-}
+func (m *MultiGatewayConnectionState) ResetAllLocalGUCs() { _ = "STUB: not implemented"; return }
 
 // snapshotSessionSettingsLocked returns a copy of SessionSettings (or nil if
 // empty) for storing on a savepoint frame. Caller must hold m.mu.
 func (m *MultiGatewayConnectionState) snapshotSessionSettingsLocked() map[string]string {
-	if len(m.SessionSettings) == 0 {
-		return nil
-	}
-	cp := make(map[string]string, len(m.SessionSettings))
-	maps.Copy(cp, m.SessionSettings)
-	return cp
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // findSavepointLocked returns the index of the most recent savepoint with the
@@ -541,37 +416,23 @@ func (m *MultiGatewayConnectionState) snapshotSessionSettingsLocked() map[string
 // case-folded identifiers, which the parser already canonicalizes). Returns
 // -1 if not found. Caller must hold m.mu.
 func (m *MultiGatewayConnectionState) findSavepointLocked(name string) int {
-	for i := len(m.savepoints) - 1; i >= 0; i-- {
-		if m.savepoints[i].name == name {
-			return i
-		}
-	}
-	return -1
+	_ = "STUB: not implemented"
+	return 0
 }
 
 // pushFrameLocked snapshots SessionSettings and every gateway-managed variable
 // onto their respective stacks under the given savepoint name. Caller must hold m.mu.
 func (m *MultiGatewayConnectionState) pushFrameLocked(name string) {
-	m.savepoints = append(m.savepoints, savepointFrame{
-		name:            name,
-		sessionSettings: m.snapshotSessionSettingsLocked(),
-		openHoldCursors: m.snapshotOpenHoldCursorsLocked(),
-	})
-	m.statementTimeout.Snapshot()
+	_ = "STUB: not implemented"
+	return
 }
 
 // snapshotOpenHoldCursorsLocked returns a copy of the current OpenHoldCursors
 // set. Caller must hold m.mu. Used by pushFrameLocked / BeginTransaction so a
 // later ROLLBACK TO can compute the cursors declared after the savepoint.
 func (m *MultiGatewayConnectionState) snapshotOpenHoldCursorsLocked() map[string]bool {
-	if len(m.OpenHoldCursors) == 0 {
-		return nil
-	}
-	out := make(map[string]bool, len(m.OpenHoldCursors))
-	for name := range m.OpenHoldCursors {
-		out[name] = true
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // BeginTransaction pushes a BEGIN-level snapshot frame so that a subsequent
@@ -581,24 +442,11 @@ func (m *MultiGatewayConnectionState) snapshotOpenHoldCursorsLocked() map[string
 // Any other pre-existing frames are stale (e.g. a SAVEPOINT that somehow ran
 // outside a txn block); discard them and start a fresh BEGIN-level frame so
 // rollback semantics match the new transaction, not leftover state.
-func (m *MultiGatewayConnectionState) BeginTransaction() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.savepoints) > 0 && m.savepoints[0].name == "" {
-		return
-	}
-	m.savepoints = m.savepoints[:0]
-	m.statementTimeout.ClearSnapshots()
-	m.pushFrameLocked("")
-}
+func (m *MultiGatewayConnectionState) BeginTransaction() { _ = "STUB: not implemented"; return }
 
 // PushSavepoint snapshots state under the given savepoint name. Called after
 // the backend has accepted the SAVEPOINT command.
-func (m *MultiGatewayConnectionState) PushSavepoint(name string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.pushFrameLocked(name)
-}
+func (m *MultiGatewayConnectionState) PushSavepoint(name string) { _ = "STUB: not implemented"; return }
 
 // ReleaseSavepoint drops the named savepoint frame and any frames above it,
 // keeping the current (in-memory) values. PostgreSQL's RELEASE merges any
@@ -606,14 +454,8 @@ func (m *MultiGatewayConnectionState) PushSavepoint(name string) {
 // If `name` is not on the stack, this is a no-op (the backend would have
 // already rejected the RELEASE).
 func (m *MultiGatewayConnectionState) ReleaseSavepoint(name string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	idx := m.findSavepointLocked(name)
-	if idx < 0 {
-		return
-	}
-	m.savepoints = m.savepoints[:idx]
-	m.statementTimeout.PopFrom(idx)
+	_ = "STUB: not implemented"
+	return
 }
 
 // HoldCursorsDeclaredAfterSavepoint returns the names of `DECLARE … WITH HOLD`
@@ -625,20 +467,8 @@ func (m *MultiGatewayConnectionState) ReleaseSavepoint(name string) {
 // forwarding the ROLLBACK TO statement to the multipooler — PG closes those
 // cursors server-side and the reservation pin set must follow suit.
 func (m *MultiGatewayConnectionState) HoldCursorsDeclaredAfterSavepoint(name string) []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	idx := m.findSavepointLocked(name)
-	if idx < 0 {
-		return nil
-	}
-	snapshot := m.savepoints[idx].openHoldCursors
-	var lost []string
-	for cur := range m.OpenHoldCursors {
-		if !snapshot[cur] {
-			lost = append(lost, cur)
-		}
-	}
-	return lost
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RollbackToSavepoint restores SessionSettings and every gateway-managed
@@ -660,101 +490,51 @@ func (m *MultiGatewayConnectionState) HoldCursorsDeclaredAfterSavepoint(name str
 // release_portal_names; the multipooler-side portal pin for the second
 // case was already dropped by the original CLOSE.
 func (m *MultiGatewayConnectionState) RollbackToSavepoint(name string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	idx := m.findSavepointLocked(name)
-	if idx < 0 {
-		return
-	}
-	m.SessionSettings = nil
-	if m.savepoints[idx].sessionSettings != nil {
-		m.SessionSettings = make(map[string]string, len(m.savepoints[idx].sessionSettings))
-		maps.Copy(m.SessionSettings, m.savepoints[idx].sessionSettings)
-	}
-	snapshot := m.savepoints[idx].openHoldCursors
-	surviving := make(map[string]bool, len(snapshot))
-	for cur := range snapshot {
-		if m.OpenHoldCursors[cur] {
-			surviving[cur] = true
-		}
-	}
-	m.OpenHoldCursors = surviving
-	m.savepoints = m.savepoints[:idx+1]
-	m.statementTimeout.RestoreFromDepth(idx)
+	_ = "STUB: not implemented"
+	return
 }
 
 // CommitTransaction drops all savepoint frames (current values become
 // persistent session state) and clears any SET LOCAL overrides on
 // gateway-managed variables — SET LOCAL doesn't survive transaction boundaries.
-func (m *MultiGatewayConnectionState) CommitTransaction() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.savepoints = nil
-	m.statementTimeout.ClearSnapshots()
-	m.statementTimeout.ResetLocal()
-}
+func (m *MultiGatewayConnectionState) CommitTransaction() { _ = "STUB: not implemented"; return }
 
 // RollbackTransaction reverts all SET / RESET commands issued inside the
 // transaction by restoring SessionSettings and every gateway-managed variable
 // from the BEGIN-level (depth 0) snapshot. If no transaction is in progress
 // (savepoints empty), this falls back to clearing local overrides only.
-func (m *MultiGatewayConnectionState) RollbackTransaction() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.savepoints) == 0 {
-		m.statementTimeout.ResetLocal()
-		return
-	}
-	m.SessionSettings = nil
-	if m.savepoints[0].sessionSettings != nil {
-		m.SessionSettings = make(map[string]string, len(m.savepoints[0].sessionSettings))
-		maps.Copy(m.SessionSettings, m.savepoints[0].sessionSettings)
-	}
-	m.statementTimeout.RestoreFromDepth(0)
-	m.statementTimeout.ClearSnapshots()
-	m.statementTimeout.ResetLocal()
-	m.savepoints = nil
-}
+func (m *MultiGatewayConnectionState) RollbackTransaction() { _ = "STUB: not implemented"; return }
 
 // SavepointDepth returns the current size of the savepoint stack. Exposed for
 // tests; in production code, transaction state should be queried via
 // conn.IsInTransaction() / conn.TxnStatus().
-func (m *MultiGatewayConnectionState) SavepointDepth() int {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return len(m.savepoints)
-}
+func (m *MultiGatewayConnectionState) SavepointDepth() int { _ = "STUB: not implemented"; return 0 }
 
 // GetStatementTimeout returns the effective statement timeout:
 // the session override if set, otherwise the default.
 func (m *MultiGatewayConnectionState) GetStatementTimeout() time.Duration {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return m.statementTimeout.GetEffective()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // ShowStatementTimeout returns the effective statement timeout formatted
 // using PostgreSQL's GUC_UNIT_MS display convention for SHOW output.
 func (m *MultiGatewayConnectionState) ShowStatementTimeout() string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return formatDurationPg(m.statementTimeout.GetEffective())
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // InitStatementTimeout sets the default for the statement timeout variable.
 // Called once during connection initialization with the value from startup params
 // (if present) or the --statement-timeout flag.
 func (m *MultiGatewayConnectionState) InitStatementTimeout(defaultValue time.Duration) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.statementTimeout = NewGatewayManagedVariable(defaultValue)
+	_ = "STUB: not implemented"
+	return
 }
 
 // TargetReplica returns true if this connection targets a replica.
 // Set once at connection initialization based on which port the connection arrived on.
-func (m *MultiGatewayConnectionState) TargetReplica() bool {
-	return m.targetReplica
-}
+func (m *MultiGatewayConnectionState) TargetReplica() bool { _ = "STUB: not implemented"; return false }
 
 // GetSessionSettings returns a merged view of startup parameters and session settings.
 // Session settings (from SET commands) take precedence over startup params for the same key.
@@ -762,181 +542,101 @@ func (m *MultiGatewayConnectionState) TargetReplica() bool {
 // Returns nil if neither startup params nor session settings exist.
 // The copy prevents external mutation of the internal state.
 func (m *MultiGatewayConnectionState) GetSessionSettings() map[string]string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.StartupParams) == 0 && len(m.SessionSettings) == 0 {
-		return nil
-	}
-	// Start with startup params, then overlay session settings (which take precedence)
-	merged := make(map[string]string, len(m.StartupParams)+len(m.SessionSettings))
-	maps.Copy(merged, m.StartupParams)
-	maps.Copy(merged, m.SessionSettings)
-	return merged
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Start with startup params, then overlay session settings (which take precedence)
 
 // GetSessionVariable returns the value of a specific session variable.
 // Returns (value, true) if exists, ("", false) if not.
 func (m *MultiGatewayConnectionState) GetSessionVariable(name string) (string, bool) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	value, exists := m.SessionSettings[name]
-	return value, exists
+	_ = "STUB: not implemented"
+	return "", false
 }
 
 // HasTempTableReservation returns true if any shard state has a reserved
 // connection with the temp table reason set.
 func (m *MultiGatewayConnectionState) HasTempTableReservation() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for _, ss := range m.ShardStates {
-		if ss.ReservedState != nil && protoutil.HasTempTableReason(ss.ReservedState.GetReservationReasons()) {
-			return true
-		}
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
 // GetStartupParams returns a copy of the startup parameters.
 // Returns nil if no startup params were set.
 func (m *MultiGatewayConnectionState) GetStartupParams() map[string]string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.StartupParams) == 0 {
-		return nil
-	}
-	params := make(map[string]string, len(m.StartupParams))
-	maps.Copy(params, m.StartupParams)
-	return params
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // --- LISTEN/NOTIFY state tracking ---
 
 // IsListening returns true if the channel is actively listened.
 func (m *MultiGatewayConnectionState) IsListening(channel string) bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return m.ListenChannels[channel]
+	_ = "STUB: not implemented"
+	return false
 }
 
 // AddListenChannel registers a channel as actively listened.
 func (m *MultiGatewayConnectionState) AddListenChannel(channel string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.ListenChannels == nil {
-		m.ListenChannels = make(map[string]bool)
-	}
-	m.ListenChannels[channel] = true
+	_ = "STUB: not implemented"
+	return
 }
 
 // RemoveListenChannel removes a channel from active listeners.
 func (m *MultiGatewayConnectionState) RemoveListenChannel(channel string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	delete(m.ListenChannels, channel)
+	_ = "STUB: not implemented"
+	return
 }
 
 // ClearListenChannels removes all listen channels (UNLISTEN *).
-func (m *MultiGatewayConnectionState) ClearListenChannels() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.ListenChannels = nil
-}
+func (m *MultiGatewayConnectionState) ClearListenChannels() { _ = "STUB: not implemented"; return }
 
 // GetListenChannels returns a copy of the active listen channels.
 func (m *MultiGatewayConnectionState) GetListenChannels() map[string]bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if len(m.ListenChannels) == 0 {
-		return nil
-	}
-	channels := make(map[string]bool, len(m.ListenChannels))
-	maps.Copy(channels, m.ListenChannels)
-	return channels
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddPendingListen adds a LISTEN to the pending actions list (applied at COMMIT).
 func (m *MultiGatewayConnectionState) AddPendingListen(channel string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.pendingActions = append(m.pendingActions, pendingListenAction{actionType: pendingListen, channel: channel})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddPendingUnlisten adds an UNLISTEN to the pending actions list.
 func (m *MultiGatewayConnectionState) AddPendingUnlisten(channel string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.pendingActions = append(m.pendingActions, pendingListenAction{actionType: pendingUnlisten, channel: channel})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddPendingUnlistenAll adds an UNLISTEN * to the pending actions list.
-func (m *MultiGatewayConnectionState) AddPendingUnlistenAll() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.pendingActions = append(m.pendingActions, pendingListenAction{actionType: pendingUnlistenAll})
-}
+func (m *MultiGatewayConnectionState) AddPendingUnlistenAll() { _ = "STUB: not implemented"; return }
 
 // CommitPendingListens applies pending listen/unlisten actions on transaction commit.
 // Actions are processed in the order they were issued (matching PostgreSQL's
 // AtCommit_Notify behavior), then a net diff is computed against the pre-transaction
 // state to produce the subscribe/unsubscribe lists for the notification manager.
 func (m *MultiGatewayConnectionState) CommitPendingListens() (subscribes []string, unsubscribes []string, unsubscribeAll bool) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	_ = "STUB: not implemented"
+	return nil, nil,
 
-	// Snapshot starting state for net diff computation.
-	startChannels := make(map[string]bool, len(m.ListenChannels))
-	maps.Copy(startChannels, m.ListenChannels)
-
-	// Process actions in order, updating ListenChannels to the final state.
-	for _, action := range m.pendingActions {
-		switch action.actionType {
-		case pendingListen:
-			if m.ListenChannels == nil {
-				m.ListenChannels = make(map[string]bool)
-			}
-			m.ListenChannels[action.channel] = true
-		case pendingUnlisten:
-			delete(m.ListenChannels, action.channel)
-		case pendingUnlistenAll:
-			unsubscribeAll = true
-			m.ListenChannels = nil
-		}
-	}
-	m.pendingActions = nil
-
-	// Compute net diff between starting and final state.
-	if unsubscribeAll {
-		// UNLISTEN * clears everything — only report channels in the final state
-		// as new subscribes (they were added after UNLISTEN *).
-		for ch := range m.ListenChannels {
-			subscribes = append(subscribes, ch)
-		}
-	} else {
-		for ch := range m.ListenChannels {
-			if !startChannels[ch] {
-				subscribes = append(subscribes, ch)
-			}
-		}
-		for ch := range startChannels {
-			if !m.ListenChannels[ch] {
-				unsubscribes = append(unsubscribes, ch)
-			}
-		}
-	}
-
-	return subscribes, unsubscribes, unsubscribeAll
+		// Snapshot starting state for net diff computation.
+		false
 }
+
+// Process actions in order, updating ListenChannels to the final state.
+
+// Compute net diff between starting and final state.
+
+// UNLISTEN * clears everything — only report channels in the final state
+// as new subscribes (they were added after UNLISTEN *).
 
 // DiscardPendingListens discards pending listen/unlisten state on rollback.
-func (m *MultiGatewayConnectionState) DiscardPendingListens() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.pendingActions = nil
-}
+func (m *MultiGatewayConnectionState) DiscardPendingListens() { _ = "STUB: not implemented"; return }
 
 // HasPendingListens returns true if there are pending listen/unlisten changes.
 func (m *MultiGatewayConnectionState) HasPendingListens() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return len(m.pendingActions) > 0
+	_ = "STUB: not implemented"
+	return false
 }

@@ -21,7 +21,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/services/multiadmin"
 
 	"github.com/spf13/cobra"
@@ -29,24 +28,8 @@ import (
 
 // CreateMultiAdminCommand creates a cobra command with a MultiAdmin instance and registers its flags
 func CreateMultiAdminCommand() (*cobra.Command, *multiadmin.MultiAdmin) {
-	ma := multiadmin.NewMultiAdmin()
-
-	cmd := &cobra.Command{
-		Use:   constants.ServiceMultiadmin,
-		Short: "Multiadmin provides administrative services for the multigres cluster, exposing both HTTP and gRPC endpoints for cluster management operations.",
-		Long:  "Multiadmin provides administrative services for the multigres cluster, exposing both HTTP and gRPC endpoints for cluster management operations.",
-		Args:  cobra.NoArgs,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return ma.CobraPreRunE(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return run(cmd.Context(), ma)
-		},
-	}
-
-	ma.RegisterFlags(cmd.Flags())
-
-	return cmd, ma
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func main() {
@@ -59,8 +42,6 @@ func main() {
 }
 
 func run(ctx context.Context, ma *multiadmin.MultiAdmin) error {
-	if err := ma.Init(ctx); err != nil {
-		return err
-	}
-	return ma.RunDefault()
+	_ = "STUB: not implemented"
+	return nil
 }

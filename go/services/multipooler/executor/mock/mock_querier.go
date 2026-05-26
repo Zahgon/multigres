@@ -17,12 +17,10 @@ package mock
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"sync"
 
 	"github.com/multigres/multigres/go/common/sqltypes"
-	"github.com/multigres/multigres/go/pb/query"
 	"github.com/multigres/multigres/go/services/multipooler/executor"
 )
 
@@ -42,169 +40,80 @@ type queryPattern struct {
 }
 
 // NewQueryService creates a new mock query service for testing.
-func NewQueryService() *QueryService {
-	return &QueryService{}
-}
+func NewQueryService() *QueryService { _ = "STUB: not implemented"; return nil }
 
 // Compile-time check that QueryService implements InternalQueryService.
 var _ executor.InternalQueryService = (*QueryService)(nil)
 
 // AddQueryPattern adds a query pattern with an expected result.
 func (m *QueryService) AddQueryPattern(pattern string, result *sqltypes.Result) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern: regexp.MustCompile(pattern),
-		result:  result,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddQueryPatternWithCallback adds a query pattern with a callback.
 func (m *QueryService) AddQueryPatternWithCallback(pattern string, result *sqltypes.Result, callback func(string)) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern:  regexp.MustCompile(pattern),
-		result:   result,
-		callback: callback,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddQueryPatternWithError adds a query pattern that returns an error.
 func (m *QueryService) AddQueryPatternWithError(pattern string, err error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern: regexp.MustCompile(pattern),
-		err:     err,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddQueryPatternWithContextCallback adds a query pattern with a context-aware callback.
 // This is useful for testing blocking queries that should respond to context cancellation.
 func (m *QueryService) AddQueryPatternWithContextCallback(pattern string, result *sqltypes.Result, callback func(context.Context, string)) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern:     regexp.MustCompile(pattern),
-		result:      result,
-		ctxCallback: callback,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddQueryPatternOnce adds a query pattern that is consumed after the first match.
 // This is useful when you need different results for subsequent calls to the same query.
 func (m *QueryService) AddQueryPatternOnce(pattern string, result *sqltypes.Result) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern:     regexp.MustCompile(pattern),
-		result:      result,
-		consumeOnce: true,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddQueryPatternOnceWithError adds a query pattern that returns an error and is consumed after the first match.
 func (m *QueryService) AddQueryPatternOnceWithError(pattern string, err error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.patterns = append(m.patterns, queryPattern{
-		pattern:     regexp.MustCompile(pattern),
-		err:         err,
-		consumeOnce: true,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 // ExpectationsWereMet returns an error if any consumeOnce patterns were not matched.
 // This is useful for verifying that all expected queries were executed.
-func (m *QueryService) ExpectationsWereMet() error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	var unmet []string
-	for _, p := range m.patterns {
-		if p.consumeOnce {
-			unmet = append(unmet, p.pattern.String())
-		}
-	}
-	if len(unmet) > 0 {
-		return fmt.Errorf("expected queries were not executed: %v", unmet)
-	}
-	return nil
-}
+func (m *QueryService) ExpectationsWereMet() error { _ = "STUB: not implemented"; return nil }
 
 // Query implements executor.InternalQueryService.
 func (m *QueryService) Query(ctx context.Context, queryStr string) (*sqltypes.Result, error) {
-	m.mu.Lock()
-	matchedIndex := -1
-	for i := range m.patterns {
-		if m.patterns[i].pattern.MatchString(queryStr) {
-			matchedIndex = i
-			break
-		}
-	}
-
-	if matchedIndex == -1 {
-		m.mu.Unlock()
-		return nil, fmt.Errorf("no matching query pattern for: %s", queryStr)
-	}
-
-	// Copy the matched pattern's data before potentially modifying the slice
-	matched := m.patterns[matchedIndex]
-
-	// Remove the pattern if it should only be used once
-	if matched.consumeOnce {
-		m.patterns = append(m.patterns[:matchedIndex], m.patterns[matchedIndex+1:]...)
-	}
-	m.mu.Unlock()
-
-	if matched.callback != nil {
-		matched.callback(queryStr)
-	}
-	if matched.ctxCallback != nil {
-		matched.ctxCallback(ctx, queryStr)
-	}
-	if matched.err != nil {
-		return nil, matched.err
-	}
-	return matched.result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Copy the matched pattern's data before potentially modifying the slice
+
+// Remove the pattern if it should only be used once
 
 // QueryMultiStatement implements executor.InternalQueryService.
 // For the mock, this delegates to Query (result is discarded).
 func (m *QueryService) QueryMultiStatement(ctx context.Context, queryStr string) error {
-	_, err := m.Query(ctx, queryStr)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // QueryArgs implements executor.InternalQueryService.
 // For the mock, arguments are ignored and matching is done solely on the query string.
 func (m *QueryService) QueryArgs(ctx context.Context, queryStr string, args ...any) (*sqltypes.Result, error) {
-	return m.Query(ctx, queryStr)
+	_ = "STUB: not implemented"
+	return nil, nil
+
+	// MakeQueryResult creates a sqltypes.Result from columns and rows.
 }
 
-// MakeQueryResult creates a sqltypes.Result from columns and rows.
 func MakeQueryResult(columns []string, rows [][]any) *sqltypes.Result {
-	result := &sqltypes.Result{
-		Fields: make([]*query.Field, len(columns)),
-		Rows:   make([]*sqltypes.Row, len(rows)),
-	}
-
-	for i, col := range columns {
-		result.Fields[i] = &query.Field{Name: col}
-	}
-
-	for i, row := range rows {
-		values := make([]sqltypes.Value, len(row))
-		for j, val := range row {
-			if val == nil {
-				values[j] = nil
-			} else {
-				values[j] = fmt.Appendf(nil, "%v", val)
-			}
-		}
-		result.Rows[i] = &sqltypes.Row{Values: values}
-	}
-
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	serviceinfopb "github.com/multigres/multigres/go/pb/serviceinfo"
 )
@@ -31,21 +30,10 @@ type serviceInfoServer struct {
 }
 
 func (s *serviceInfoServer) GetBuildInfo(_ context.Context, _ *serviceinfopb.GetBuildInfoRequest) (*serviceinfopb.GetBuildInfoResponse, error) {
-	snap := readBuildSnapshot()
-	bi := &serviceinfopb.BuildInfo{
-		Revision:  snap.revision,
-		Modified:  snap.modified,
-		GoVersion: snap.goVersion,
-		MainPath:  snap.mainPath,
-	}
-	if !snap.commitTime.IsZero() {
-		bi.CommitTime = timestamppb.New(snap.commitTime)
-	}
-	return &serviceinfopb.GetBuildInfoResponse{BuildInfo: bi}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // registerServiceInfo wires the ServiceInfo gRPC service onto a server.
 // Called from GrpcServer.Serve so every multigres process exposes it.
-func registerServiceInfo(s *grpc.Server) {
-	serviceinfopb.RegisterServiceInfoServer(s, &serviceInfoServer{})
-}
+func registerServiceInfo(s *grpc.Server) { _ = "STUB: not implemented"; return }

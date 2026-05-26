@@ -25,9 +25,8 @@ package multipoolerservice
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -117,153 +116,75 @@ type multiPoolerServiceClient struct {
 }
 
 func NewMultiPoolerServiceClient(cc grpc.ClientConnInterface) MultiPoolerServiceClient {
-	return &multiPoolerServiceClient{cc}
+	_ = "STUB: not implemented"
+	return *new(MultiPoolerServiceClient)
 }
 
 func (c *multiPoolerServiceClient) ExecuteQuery(ctx context.Context, in *ExecuteQueryRequest, opts ...grpc.CallOption) (*ExecuteQueryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ExecuteQueryResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_ExecuteQuery_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) StreamExecute(ctx context.Context, in *StreamExecuteRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamExecuteResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MultiPoolerService_ServiceDesc.Streams[0], MultiPoolerService_StreamExecute_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[StreamExecuteRequest, StreamExecuteResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_StreamExecuteClient = grpc.ServerStreamingClient[StreamExecuteResponse]
 
 func (c *multiPoolerServiceClient) PortalStreamExecute(ctx context.Context, in *PortalStreamExecuteRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PortalStreamExecuteResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MultiPoolerService_ServiceDesc.Streams[1], MultiPoolerService_PortalStreamExecute_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[PortalStreamExecuteRequest, PortalStreamExecuteResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_PortalStreamExecuteClient = grpc.ServerStreamingClient[PortalStreamExecuteResponse]
 
 func (c *multiPoolerServiceClient) Describe(ctx context.Context, in *DescribeRequest, opts ...grpc.CallOption) (*DescribeResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DescribeResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_Describe_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) GetAuthCredentials(ctx context.Context, in *GetAuthCredentialsRequest, opts ...grpc.CallOption) (*GetAuthCredentialsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAuthCredentialsResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_GetAuthCredentials_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) CopyBidiExecute(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CopyBidiExecuteRequest, CopyBidiExecuteResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MultiPoolerService_ServiceDesc.Streams[2], MultiPoolerService_CopyBidiExecute_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[CopyBidiExecuteRequest, CopyBidiExecuteResponse]{ClientStream: stream}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_CopyBidiExecuteClient = grpc.BidiStreamingClient[CopyBidiExecuteRequest, CopyBidiExecuteResponse]
 
 func (c *multiPoolerServiceClient) ConcludeTransaction(ctx context.Context, in *ConcludeTransactionRequest, opts ...grpc.CallOption) (*ConcludeTransactionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ConcludeTransactionResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_ConcludeTransaction_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) DiscardTempTables(ctx context.Context, in *DiscardTempTablesRequest, opts ...grpc.CallOption) (*DiscardTempTablesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DiscardTempTablesResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_DiscardTempTables_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) ReleaseReservedConnection(ctx context.Context, in *ReleaseReservedConnectionRequest, opts ...grpc.CallOption) (*ReleaseReservedConnectionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ReleaseReservedConnectionResponse)
-	err := c.cc.Invoke(ctx, MultiPoolerService_ReleaseReservedConnection_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiPoolerServiceClient) StreamPoolerHealth(ctx context.Context, in *StreamPoolerHealthRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamPoolerHealthResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MultiPoolerService_ServiceDesc.Streams[3], MultiPoolerService_StreamPoolerHealth_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[StreamPoolerHealthRequest, StreamPoolerHealthResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_StreamPoolerHealthClient = grpc.ServerStreamingClient[StreamPoolerHealthResponse]
 
 func (c *multiPoolerServiceClient) StreamNotifications(ctx context.Context, in *StreamNotificationsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamNotificationsResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MultiPoolerService_ServiceDesc.Streams[4], MultiPoolerService_StreamNotifications_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[StreamNotificationsRequest, StreamNotificationsResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
@@ -341,40 +262,68 @@ type MultiPoolerServiceServer interface {
 type UnimplementedMultiPoolerServiceServer struct{}
 
 func (UnimplementedMultiPoolerServiceServer) ExecuteQuery(context.Context, *ExecuteQueryRequest) (*ExecuteQueryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExecuteQuery not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) StreamExecute(*StreamExecuteRequest, grpc.ServerStreamingServer[StreamExecuteResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method StreamExecute not implemented")
+	_ = "STUB: not implemented"
+	return nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) PortalStreamExecute(*PortalStreamExecuteRequest, grpc.ServerStreamingServer[PortalStreamExecuteResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method PortalStreamExecute not implemented")
+	_ = "STUB: not implemented"
+	return nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) Describe(context.Context, *DescribeRequest) (*DescribeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Describe not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) GetAuthCredentials(context.Context, *GetAuthCredentialsRequest) (*GetAuthCredentialsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAuthCredentials not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) CopyBidiExecute(grpc.BidiStreamingServer[CopyBidiExecuteRequest, CopyBidiExecuteResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method CopyBidiExecute not implemented")
+	_ = "STUB: not implemented"
+	return nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) ConcludeTransaction(context.Context, *ConcludeTransactionRequest) (*ConcludeTransactionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConcludeTransaction not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) DiscardTempTables(context.Context, *DiscardTempTablesRequest) (*DiscardTempTablesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DiscardTempTables not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) ReleaseReservedConnection(context.Context, *ReleaseReservedConnectionRequest) (*ReleaseReservedConnectionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReleaseReservedConnection not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) StreamPoolerHealth(*StreamPoolerHealthRequest, grpc.ServerStreamingServer[StreamPoolerHealthResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method StreamPoolerHealth not implemented")
+	_ = "STUB: not implemented"
+	return nil
 }
+
 func (UnimplementedMultiPoolerServiceServer) StreamNotifications(*StreamNotificationsRequest, grpc.ServerStreamingServer[StreamNotificationsResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method StreamNotifications not implemented")
+	_ = "STUB: not implemented"
+	return nil
 }
-func (UnimplementedMultiPoolerServiceServer) mustEmbedUnimplementedMultiPoolerServiceServer() {}
-func (UnimplementedMultiPoolerServiceServer) testEmbeddedByValue()                            {}
+
+func (UnimplementedMultiPoolerServiceServer) mustEmbedUnimplementedMultiPoolerServiceServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedMultiPoolerServiceServer) testEmbeddedByValue() {
+	_ = "STUB: not implemented"
+	return
+}
 
 // UnsafeMultiPoolerServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to MultiPoolerServiceServer will
@@ -384,170 +333,79 @@ type UnsafeMultiPoolerServiceServer interface {
 }
 
 func RegisterMultiPoolerServiceServer(s grpc.ServiceRegistrar, srv MultiPoolerServiceServer) {
+	_ = "STUB: not implemented"
 	// If the following call pancis, it indicates UnimplementedMultiPoolerServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MultiPoolerService_ServiceDesc, srv)
+	return
 }
 
 func _MultiPoolerService_ExecuteQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExecuteQueryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).ExecuteQuery(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_ExecuteQuery_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).ExecuteQuery(ctx, req.(*ExecuteQueryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_StreamExecute_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StreamExecuteRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(MultiPoolerServiceServer).StreamExecute(m, &grpc.GenericServerStream[StreamExecuteRequest, StreamExecuteResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_StreamExecuteServer = grpc.ServerStreamingServer[StreamExecuteResponse]
 
 func _MultiPoolerService_PortalStreamExecute_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(PortalStreamExecuteRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(MultiPoolerServiceServer).PortalStreamExecute(m, &grpc.GenericServerStream[PortalStreamExecuteRequest, PortalStreamExecuteResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_PortalStreamExecuteServer = grpc.ServerStreamingServer[PortalStreamExecuteResponse]
 
 func _MultiPoolerService_Describe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DescribeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).Describe(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_Describe_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).Describe(ctx, req.(*DescribeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_GetAuthCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAuthCredentialsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).GetAuthCredentials(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_GetAuthCredentials_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).GetAuthCredentials(ctx, req.(*GetAuthCredentialsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_CopyBidiExecute_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(MultiPoolerServiceServer).CopyBidiExecute(&grpc.GenericServerStream[CopyBidiExecuteRequest, CopyBidiExecuteResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_CopyBidiExecuteServer = grpc.BidiStreamingServer[CopyBidiExecuteRequest, CopyBidiExecuteResponse]
 
 func _MultiPoolerService_ConcludeTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConcludeTransactionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).ConcludeTransaction(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_ConcludeTransaction_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).ConcludeTransaction(ctx, req.(*ConcludeTransactionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_DiscardTempTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DiscardTempTablesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).DiscardTempTables(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_DiscardTempTables_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).DiscardTempTables(ctx, req.(*DiscardTempTablesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_ReleaseReservedConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReleaseReservedConnectionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiPoolerServiceServer).ReleaseReservedConnection(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiPoolerService_ReleaseReservedConnection_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiPoolerServiceServer).ReleaseReservedConnection(ctx, req.(*ReleaseReservedConnectionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiPoolerService_StreamPoolerHealth_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StreamPoolerHealthRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(MultiPoolerServiceServer).StreamPoolerHealth(m, &grpc.GenericServerStream[StreamPoolerHealthRequest, StreamPoolerHealthResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MultiPoolerService_StreamPoolerHealthServer = grpc.ServerStreamingServer[StreamPoolerHealthResponse]
 
 func _MultiPoolerService_StreamNotifications_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StreamNotificationsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(MultiPoolerServiceServer).StreamNotifications(m, &grpc.GenericServerStream[StreamNotificationsRequest, StreamNotificationsResponse]{ServerStream: stream})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.

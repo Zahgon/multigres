@@ -15,10 +15,7 @@
 package shardsetup
 
 import (
-	"path/filepath"
 	"testing"
-
-	"github.com/multigres/multigres/go/provisioner/local"
 )
 
 // MultigatewayTLSCertPaths holds the paths to the generated multigateway TLS certificates.
@@ -30,28 +27,4 @@ type MultigatewayTLSCertPaths struct {
 
 // generateMultigatewayTLSCerts creates TLS certificates for the multigateway PostgreSQL listener.
 // Generates a CA and server cert with CN=localhost, SANs=[localhost] for test connections.
-func (s *ShardSetup) generateMultigatewayTLSCerts(t *testing.T) {
-	t.Helper()
-
-	certDir := filepath.Join(s.TempDir, "multigateway-tls")
-
-	caCertFile := filepath.Join(certDir, "ca.crt")
-	caKeyFile := filepath.Join(certDir, "ca.key")
-	if err := local.GenerateCA(caCertFile, caKeyFile); err != nil {
-		t.Fatalf("failed to generate CA for multigateway TLS: %v", err)
-	}
-
-	certFile := filepath.Join(certDir, "server.crt")
-	keyFile := filepath.Join(certDir, "server.key")
-	if err := local.GenerateCert(caCertFile, caKeyFile, certFile, keyFile, "localhost", []string{"localhost"}); err != nil {
-		t.Fatalf("failed to generate certificate for multigateway TLS: %v", err)
-	}
-
-	s.MultigatewayTLSCertPaths = &MultigatewayTLSCertPaths{
-		CACertFile:     caCertFile,
-		ServerCertFile: certFile,
-		ServerKeyFile:  keyFile,
-	}
-
-	t.Logf("Generated multigateway TLS certificates in %s", certDir)
-}
+func (s *ShardSetup) generateMultigatewayTLSCerts(t *testing.T) { _ = "STUB: not implemented"; return }

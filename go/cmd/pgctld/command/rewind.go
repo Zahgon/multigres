@@ -16,11 +16,7 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
-
-	"github.com/multigres/multigres/go/services/pgctld"
-	"github.com/multigres/multigres/go/tools/executil"
 )
 
 type PgRewindResult struct {
@@ -30,46 +26,11 @@ type PgRewindResult struct {
 }
 
 func PgRewindWithResult(ctx context.Context, logger *slog.Logger, sourceServer, password string, dryRun bool, extraArgs []string) (*PgRewindResult, error) {
-	result := &PgRewindResult{}
-	dataDir := pgctld.PostgresDataDir()
-
-	args := []string{
-		"--source-server", sourceServer,
-		"--target-pgdata", dataDir,
-	}
-	if dryRun {
-		args = append(args, "--dry-run")
-	}
-	args = append(args, extraArgs...)
-
-	logger.InfoContext(ctx, "executing pg_rewind command",
-		"command", "pg_rewind",
-		"args", args,
-		"source_server", sourceServer,
-		"target_pgdata", dataDir,
-		"dry_run", dryRun)
-
-	cmd := executil.Command(ctx, "pg_rewind", args...)
-
-	// Set PGPASSWORD environment variable for pg_rewind to use
-	// pg_rewind doesn't reliably use passwords from connection strings
-	if password != "" {
-		cmd.AddEnv("PGPASSWORD=" + password)
-	}
-
-	// Capture both Stdout and Stderr
-	output, err := cmd.CombinedOutput()
-	result.Output = string(output)
-	if err != nil {
-		result.Message = "Rewind failed"
-		logger.ErrorContext(ctx, "pg_rewind command failed",
-			"error", err,
-			"output", string(output))
-		return result, fmt.Errorf("pg_rewind failed: %w", err)
-	}
-
-	result.Message = "Rewind completed successfully"
-	logger.InfoContext(ctx, "pg_rewind command completed successfully",
-		"output", string(output))
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Set PGPASSWORD environment variable for pg_rewind to use
+// pg_rewind doesn't reliably use passwords from connection strings
+
+// Capture both Stdout and Stderr

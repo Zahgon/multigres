@@ -15,8 +15,6 @@
 package types
 
 import (
-	"fmt"
-
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -26,8 +24,6 @@ type ShardKeyString string
 
 // FormatShardKey returns the ShardKeyString for a proto ShardKey.
 func FormatShardKey(k *clustermetadatapb.ShardKey) ShardKeyString {
-	if k == nil {
-		return ""
-	}
-	return ShardKeyString(fmt.Sprintf("%s/%s/%s", k.Database, k.TableGroup, k.Shard))
+	_ = "STUB: not implemented"
+	return *new(ShardKeyString)
 }

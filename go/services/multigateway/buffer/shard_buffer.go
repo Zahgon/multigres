@@ -20,7 +20,6 @@ import (
 	"sync"
 	"time"
 
-	commontypes "github.com/multigres/multigres/go/common/types"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -33,18 +32,7 @@ const (
 	stateDraining                     // Draining buffered requests via retry
 )
 
-func (s bufferState) String() string {
-	switch s {
-	case stateIdle:
-		return "IDLE"
-	case stateBuffering:
-		return "BUFFERING"
-	case stateDraining:
-		return "DRAINING"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (s bufferState) String() string { _ = "STUB: not implemented"; return "" }
 
 // shardBuffer manages the buffering state machine for a single shard.
 // State transitions: IDLE -> BUFFERING -> DRAINING -> IDLE
@@ -63,208 +51,90 @@ type shardBuffer struct {
 }
 
 func newShardBuffer(buf *Buffer, key *clustermetadatapb.ShardKey) *shardBuffer {
-	return &shardBuffer{
-		buf:      buf,
-		shardKey: key,
-		logger:   buf.logger.With("tablegroup", key.TableGroup, "shard", key.Shard),
-		state:    stateIdle,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // waitIfAlreadyBuffering joins an existing buffer if the shard is already
 // BUFFERING, but does NOT transition IDLE -> BUFFERING. Used for proactive
 // buffering before sending a query.
 func (sb *shardBuffer) waitIfAlreadyBuffering(ctx context.Context) (RetryDoneFunc, error) {
-	sb.mu.Lock()
-	switch sb.state {
-	case stateBuffering:
-		sb.mu.Unlock()
-		e, err := sb.buf.enqueue(sb.shardKey)
-		if err != nil {
-			return nil, err
-		}
-		return sb.waitOnEntry(ctx, e)
-	case stateDraining:
-		sb.mu.Unlock()
-		return func() {}, nil
-	default:
-		sb.mu.Unlock()
-		return nil, nil
-	}
+	_ = "STUB: not implemented"
+	return *new(RetryDoneFunc), nil
 }
 
 // waitForFailoverEnd either starts buffering (IDLE -> BUFFERING) or joins
 // an existing buffer (already BUFFERING). Returns (nil, nil) if buffering
 // is not applicable for this request.
 func (sb *shardBuffer) waitForFailoverEnd(ctx context.Context) (RetryDoneFunc, error) {
+	_ = "STUB: not implemented"
 	// Fast path: if draining or idle with recent failover, skip.
-	sb.mu.Lock()
-	switch sb.state {
-	case stateDraining:
-		// Already draining — the new PRIMARY is available. Signal the caller
-		// to retry immediately. A recursive retry loop is unlikely because
-		// the LoadBalancer updates its cached primary before invoking the
-		// onPrimaryServing callback that triggers StopBuffering, so the new
-		// PRIMARY is already routable by the time we reach here. It is
-		// bounded by context timeout in any case.
-		sb.mu.Unlock()
-		return func() {}, nil
-	case stateIdle:
-		// Check timing guard: don't start buffering again too soon.
-		if !sb.lastEnd.IsZero() {
-			minGap := sb.buf.config.MinTimeBetweenFailovers.Get()
-			if sb.buf.now().Sub(sb.lastEnd) < minGap {
-				sb.mu.Unlock()
-				sb.buf.stats.recordSkipped(ctx, "min_time_between_failovers")
-				sb.logger.DebugContext(ctx, "skipping buffering: too soon since last failover",
-					"last_end", sb.lastEnd, "min_gap", minGap)
-				return nil, nil
-			}
-		}
-
-		// Transition IDLE -> BUFFERING.
-		sb.state = stateBuffering
-		sb.generation++
-		gen := sb.generation
-		sb.lastStart = sb.buf.now()
-		sb.logger.InfoContext(ctx, "failover detected, starting buffering")
-		sb.buf.stats.recordFailover(ctx, string(commontypes.FormatShardKey(sb.shardKey)))
-
-		// Start max-duration timer. The generation is captured so that if
-		// the timer fires after this failover has already ended and a new
-		// one has started, the stale callback is ignored.
-		sb.maxDurationTimer = time.AfterFunc(sb.buf.config.MaxFailoverDuration.Get(), func() {
-			sb.logger.Warn("max failover duration exceeded, stopping buffering")
-			sb.stopBuffering("max duration exceeded", gen)
-		})
-		sb.mu.Unlock()
-
-	case stateBuffering:
-		// Already buffering, just enqueue below.
-		sb.mu.Unlock()
-
-	default:
-		sb.mu.Unlock()
-		return nil, nil
-	}
-
-	// Enqueue into the global queue.
-	e, err := sb.buf.enqueue(sb.shardKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return sb.waitOnEntry(ctx, e)
+	return *new(RetryDoneFunc), nil
 }
+
+// Already draining — the new PRIMARY is available. Signal the caller
+// to retry immediately. A recursive retry loop is unlikely because
+// the LoadBalancer updates its cached primary before invoking the
+// onPrimaryServing callback that triggers StopBuffering, so the new
+// PRIMARY is already routable by the time we reach here. It is
+// bounded by context timeout in any case.
+
+// Check timing guard: don't start buffering again too soon.
+
+// Transition IDLE -> BUFFERING.
+
+// Start max-duration timer. The generation is captured so that if
+// the timer fires after this failover has already ended and a new
+// one has started, the stale callback is ignored.
+
+// Already buffering, just enqueue below.
+
+// Enqueue into the global queue.
 
 // waitOnEntry blocks until the entry's done channel is closed or the context is canceled.
 func (sb *shardBuffer) waitOnEntry(ctx context.Context, e *entry) (RetryDoneFunc, error) {
-	start := sb.buf.now()
-	select {
-	case <-ctx.Done():
-		// Request context canceled (client disconnected, deadline, etc.).
-		sb.buf.removeEntry(e)
-		// Signal retry completion so that if drainEntry already extracted
-		// this entry from the queue, it won't block forever on
-		// <-e.bufferCtx.Done(). If the entry was still in the queue,
-		// this is harmless (nobody is watching bufferCtx).
-		e.bufferCancel()
-		sb.buf.stats.recordEvicted(sb.buf.ctx, string(commontypes.FormatShardKey(sb.shardKey)), "context_canceled")
-		sb.buf.stats.recordWaitDuration(sb.buf.ctx, sb.buf.now().Sub(start).Seconds())
-		return nil, ctx.Err()
-	case <-e.done:
-		sb.buf.stats.recordWaitDuration(sb.buf.ctx, sb.buf.now().Sub(start).Seconds())
-		if e.err != nil {
-			// Entry was evicted (buffer full, window timeout, max duration, shutdown).
-			return nil, e.err
-		}
-		// Failover ended successfully — caller should retry.
-		return RetryDoneFunc(e.bufferCancel), nil
-	}
+	_ = "STUB: not implemented"
+	return *new(RetryDoneFunc), nil
 }
+
+// Request context canceled (client disconnected, deadline, etc.).
+
+// Signal retry completion so that if drainEntry already extracted
+// this entry from the queue, it won't block forever on
+// <-e.bufferCtx.Done(). If the entry was still in the queue,
+// this is harmless (nobody is watching bufferCtx).
+
+// Entry was evicted (buffer full, window timeout, max duration, shutdown).
+
+// Failover ended successfully — caller should retry.
 
 // stopBuffering transitions from BUFFERING to DRAINING and drains all entries.
 // If gen is non-zero, the call is only valid for that specific generation
 // (used by maxDurationTimer to avoid killing a subsequent failover's buffering).
 // Pass gen=0 to stop unconditionally (used by external callers like StopBuffering).
-func (sb *shardBuffer) stopBuffering(reason string, gen uint64) {
-	sb.mu.Lock()
-	if sb.state != stateBuffering {
-		sb.mu.Unlock()
-		return
-	}
-	if gen != 0 && sb.generation != gen {
-		sb.mu.Unlock()
-		sb.logger.Debug("ignoring stale stopBuffering", "reason", reason,
-			"timer_gen", gen, "current_gen", sb.generation)
-		return
-	}
+func (sb *shardBuffer) stopBuffering(reason string, gen uint64) { _ = "STUB: not implemented"; return }
 
-	sb.state = stateDraining
-	sb.lastEnd = sb.buf.now()
-	if sb.maxDurationTimer != nil {
-		sb.maxDurationTimer.Stop()
-		sb.maxDurationTimer = nil
-	}
-	sb.logger.Info("stopping buffering, draining entries", "reason", reason)
-	sb.buf.stats.recordFailoverDuration(
-		sb.buf.ctx,
-		string(commontypes.FormatShardKey(sb.shardKey)),
-		sb.lastEnd.Sub(sb.lastStart).Seconds(),
-	)
-	sb.mu.Unlock()
+// Extract all entries for this shard from the global queue.
 
-	// Extract all entries for this shard from the global queue.
-	entries := sb.buf.drainEntriesForShard(sb.shardKey)
-	sb.logger.Info("draining entries", "count", len(entries))
+// Drain entries with configured concurrency. Each entry gets its own
+// goroutine; the semaphore limits how many run in parallel.
 
-	if len(entries) == 0 {
-		sb.mu.Lock()
-		sb.state = stateIdle
-		sb.mu.Unlock()
-		return
-	}
+// Acquire drain slot.
 
-	// Drain entries with configured concurrency. Each entry gets its own
-	// goroutine; the semaphore limits how many run in parallel.
-	concurrency := sb.buf.config.DrainConcurrency.Get()
-	sem := make(chan struct{}, concurrency)
+// Release drain slot.
 
-	sb.drainWg.Go(func() {
-		var wg sync.WaitGroup
-		for _, e := range entries {
-			sem <- struct{}{} // Acquire drain slot.
-			wg.Add(1)
-			go func() {
-				defer func() {
-					<-sem // Release drain slot.
-					wg.Done()
-				}()
-				sb.drainEntry(e)
-			}()
-		}
-		wg.Wait()
-
-		// All entries drained, transition back to IDLE.
-		sb.mu.Lock()
-		sb.state = stateIdle
-		sb.mu.Unlock()
-		sb.logger.Info("drain complete, returning to idle")
-	})
-}
+// All entries drained, transition back to IDLE.
 
 // drainEntry signals a single entry to retry and waits for its completion.
 func (sb *shardBuffer) drainEntry(e *entry) {
+	_ = "STUB: not implemented"
 	// Decrement before close so waiters never see a stale gauge.
-	sb.buf.stats.addQueueDepth(sb.buf.ctx, -1)
-	// Signal the entry to retry by closing its done channel.
-	close(e.done)
-	sb.buf.stats.recordDrained(sb.buf.ctx, string(commontypes.FormatShardKey(sb.shardKey)))
-
-	// Wait for the retry to complete (caller invokes RetryDoneFunc which
-	// calls bufferCancel).
-	<-e.bufferCtx.Done()
-
-	// Release the semaphore slot.
-	sb.buf.bufferSizeSema.Release(1)
+	return
 }
+
+// Signal the entry to retry by closing its done channel.
+
+// Wait for the retry to complete (caller invokes RetryDoneFunc which
+// calls bufferCancel).
+
+// Release the semaphore slot.

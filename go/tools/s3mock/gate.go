@@ -44,101 +44,47 @@ type Gate struct {
 }
 
 // NewGate returns a disarmed Gate.
-func NewGate(m Matcher) *Gate {
-	return &Gate{
-		matcher: m,
-		hitCh:   make(chan Hit, 1),
-		relCh:   make(chan struct{}),
-	}
-}
+func NewGate(m Matcher) *Gate { _ = "STUB: not implemented"; return nil }
 
 // Arm enables the gate. Before arming, all operations pass through.
-func (g *Gate) Arm() { g.armed.Store(true) }
+func (g *Gate) Arm() {
+	_ = "STUB: not implemented"
 
-// Wait blocks until a matching operation arrives, or ctx is done.
-// Returns the Hit on success, or ctx.Err() on cancellation.
+	// Wait blocks until a matching operation arrives, or ctx is done.
+	// Returns the Hit on success, or ctx.Err() on cancellation.
+	return
+}
+
 func (g *Gate) Wait(ctx context.Context) (Hit, error) {
-	g.mu.Lock()
-	hitCh := g.hitCh
-	g.mu.Unlock()
-	select {
-	case h := <-hitCh:
-		return h, nil
-	case <-ctx.Done():
-		return Hit{}, ctx.Err()
-	}
+	_ = "STUB: not implemented"
+	return *new(Hit), nil
 }
 
 // Release unblocks the held operation. Safe to call multiple times; the
 // first call wins, subsequent calls are no-ops.
-func (g *Gate) Release() {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	select {
-	case <-g.relCh:
-		// already closed
-	default:
-		close(g.relCh)
-	}
-}
+func (g *Gate) Release() { _ = "STUB: not implemented"; return }
+
+// already closed
 
 // Rearm disarms, then re-enables the gate for the next match. Resets the
 // release channel and the one-shot hit. Caller is responsible for not
 // racing this with in-flight Wait/Release on the same Gate.
-func (g *Gate) Rearm() {
-	g.mu.Lock()
-	g.relCh = make(chan struct{})
-	g.hitCh = make(chan Hit, 1)
-	g.hitOnce = sync.Once{}
-	g.mu.Unlock()
-	g.armed.Store(true)
-}
+func (g *Gate) Rearm() { _ = "STUB: not implemented"; return }
 
 // callback returns a PutCallback that consults the gate.
-func (g *Gate) callback() PutCallback {
-	return func(ctx context.Context, bucket, key string) error {
-		if !g.armed.Load() {
-			return nil
-		}
-		if !g.matcher(bucket, key) {
-			return nil
-		}
-		g.mu.Lock()
-		hitCh := g.hitCh
-		relCh := g.relCh
-		hitOnce := &g.hitOnce
-		g.mu.Unlock()
+func (g *Gate) callback() PutCallback { _ = "STUB: not implemented"; return *new(PutCallback) }
 
-		// Single-shot send so multiple matching PUTs do not stall behind a closed Wait.
-		hitOnce.Do(func() {
-			hitCh <- Hit{Method: "PUT", Bucket: bucket, Key: key}
-		})
-		select {
-		case <-relCh:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-}
+// Single-shot send so multiple matching PUTs do not stall behind a closed Wait.
 
 // WithGate returns a ServerOption that installs g's callback. If a previous
 // PutCallback was installed via WithPutCallback, it is replaced.
-func WithGate(g *Gate) ServerOption {
-	return func(s *Server) { s.putCallback = g.callback() }
-}
+func WithGate(g *Gate) ServerOption { _ = "STUB: not implemented"; return *new(ServerOption) }
 
 // MatchPut returns a Matcher that fires when the key contains substr.
-func MatchPut(substr string) Matcher {
-	return func(_ string, key string) bool {
-		return strings.Contains(key, substr)
-	}
-}
+func MatchPut(substr string) Matcher { _ = "STUB: not implemented"; return *new(Matcher) }
 
 // MatchPutRegex returns a Matcher that fires when the key matches re.
-func MatchPutRegex(re *regexp.Regexp) Matcher {
-	return func(_, key string) bool { return re.MatchString(key) }
-}
+func MatchPutRegex(re *regexp.Regexp) Matcher { _ = "STUB: not implemented"; return *new(Matcher) }
 
 // Phase is a goroutine-safe string label that tests use to drive
 // PhaseMatcher. Use descriptive labels ("bootstrap", "first-backup",
@@ -148,15 +94,14 @@ type Phase struct {
 }
 
 // Set updates the current phase.
-func (p *Phase) Set(s string) { p.v.Store(s) }
+func (p *Phase) Set(s string) {
+	_ = "STUB: not implemented"
 
-// Get returns the current phase, or "" if Set has never been called.
-func (p *Phase) Get() string {
-	if v := p.v.Load(); v != nil {
-		return v.(string)
-	}
-	return ""
+	// Get returns the current phase, or "" if Set has never been called.
+	return
 }
+
+func (p *Phase) Get() string { _ = "STUB: not implemented"; return "" }
 
 // PhaseMatcher returns a Matcher that delegates to base only while
 // phase.Get() == want. It is the standard way to use a Gate in tests
@@ -166,12 +111,8 @@ func (p *Phase) Get() string {
 // value to stop matching new requests; goroutines already parked
 // inside gate.callback stay parked until ctx cancellation.
 func PhaseMatcher(phase *Phase, want string, base Matcher) Matcher {
-	return func(bucket, key string) bool {
-		if phase.Get() != want {
-			return false
-		}
-		return base(bucket, key)
-	}
+	_ = "STUB: not implemented"
+	return *new(Matcher)
 }
 
 // MatchDataUpload fires on data-file PUTs inside a backup set's pg_data/

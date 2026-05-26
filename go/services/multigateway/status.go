@@ -18,12 +18,9 @@
 package multigateway
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
-
-	"github.com/multigres/multigres/go/common/web"
 )
 
 // PoolerStatus represents the status of a multipooler instance.
@@ -65,35 +62,6 @@ type Status struct {
 
 // handleIndex serves the index page
 func (mg *MultiGateway) handleIndex(w http.ResponseWriter, r *http.Request) {
-	ts := mg.ts.Status()
-	cellStatuses := mg.poolerDiscovery.GetCellStatusesForAdmin()
-
-	mg.serverStatus.mu.Lock()
-	defer mg.serverStatus.mu.Unlock()
-
-	mg.serverStatus.LocalCell = mg.cell.Get()
-	mg.serverStatus.ServiceID = mg.serviceID.Get()
-	mg.serverStatus.TopoStatus = ts
-	mg.serverStatus.Cells = make([]CellStatus, 0, len(cellStatuses))
-	for _, cs := range cellStatuses {
-		cellStatus := CellStatus{
-			Cell:        cs.Cell,
-			LastRefresh: cs.LastRefresh,
-			Poolers:     make([]PoolerStatus, 0, len(cs.Poolers)),
-		}
-		for _, pooler := range cs.Poolers {
-			cellStatus.Poolers = append(cellStatus.Poolers, PoolerStatus{
-				Name:     pooler.Id.GetName(),
-				Database: pooler.GetShardKey().GetDatabase(),
-				Type:     pooler.GetType().String(),
-			})
-		}
-		mg.serverStatus.Cells = append(mg.serverStatus.Cells, cellStatus)
-	}
-
-	err := web.Templates.ExecuteTemplate(w, "gateway_index.html", &mg.serverStatus)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to execute template: %v", err), http.StatusInternalServerError)
-		return
-	}
+	_ = "STUB: not implemented"
+	return
 }

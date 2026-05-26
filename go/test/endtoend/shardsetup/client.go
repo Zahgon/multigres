@@ -16,18 +16,13 @@ package shardsetup
 
 import (
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	consensuspb "github.com/multigres/multigres/go/pb/consensus"
 	multiorchpb "github.com/multigres/multigres/go/pb/multiorch"
 	multipoolermanagerpb "github.com/multigres/multigres/go/pb/multipoolermanager"
-	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 	pgctldpb "github.com/multigres/multigres/go/pb/pgctldservice"
 )
 
@@ -45,89 +40,32 @@ type MultipoolerClient struct {
 // It establishes a single gRPC connection and creates clients for all multipooler services.
 // Follows the pattern from multipooler/setup_test.go:newMultipoolerClient.
 func NewMultipoolerClient(grpcPort int) (*MultipoolerClient, error) {
-	addr := fmt.Sprintf("localhost:%d", grpcPort)
-
-	conn, err := grpc.NewClient(
-		"passthrough:///"+addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect: %w", err)
-	}
-
-	// Create pooler test client (uses its own connection internally)
-	poolerClient, err := NewMultiPoolerTestClient(addr)
-	if err != nil {
-		conn.Close()
-		return nil, fmt.Errorf("failed to create pooler client: %w", err)
-	}
-
-	return &MultipoolerClient{
-		conn:      conn,
-		Manager:   multipoolermanagerpb.NewMultiPoolerManagerClient(conn),
-		Consensus: consensuspb.NewMultiPoolerConsensusClient(conn),
-		Pooler:    poolerClient,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Create pooler test client (uses its own connection internally)
 
 // Close closes all underlying connections.
-func (c *MultipoolerClient) Close() error {
-	var errs []error
-	if err := c.Pooler.Close(); err != nil {
-		errs = append(errs, err)
-	}
-	if err := c.conn.Close(); err != nil {
-		errs = append(errs, err)
-	}
-	if len(errs) > 0 {
-		return errs[0]
-	}
-	return nil
-}
+func (c *MultipoolerClient) Close() error { _ = "STUB: not implemented"; return nil }
 
 // WaitForManagerReady waits for the manager to be in ready state.
 // Follows the pattern from multipooler/setup_test.go:waitForManagerReady.
 func WaitForManagerReady(t *testing.T, manager *ProcessInstance) {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Connect to the manager
-	addr := fmt.Sprintf("localhost:%d", manager.GrpcPort)
-	conn, err := grpc.NewClient(
-		"passthrough:///"+addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	require.NoError(t, err)
-	defer conn.Close()
-
-	client := multipoolermanagerpb.NewMultiPoolerManagerClient(conn)
-
-	// Use require.Eventually to wait for manager to be ready
-	require.Eventually(t, func() bool {
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		defer cancel()
-
-		resp, err := client.Status(ctx, &multipoolermanagerdatapb.StatusRequest{})
-		if err != nil {
-			return false
-		}
-		return resp.Status != nil && resp.Status.PostgresReady
-	}, 30*time.Second, 100*time.Millisecond, "Manager should become ready within 30 seconds")
-
-	t.Logf("Manager %s is ready", manager.Name)
+	return
 }
+
+// Use require.Eventually to wait for manager to be ready
 
 // QueryStringValue executes a query and extracts the first column of the first row as a string.
 // Returns empty string and error if query fails or returns no rows.
 // Follows the pattern from multipooler/setup_test.go:queryStringValue.
 func QueryStringValue(ctx context.Context, client *MultiPoolerTestClient, query string) (string, error) {
-	resp, err := client.ExecuteQuery(ctx, query, 1)
-	if err != nil {
-		return "", err
-	}
-	if len(resp.Rows) == 0 || len(resp.Rows[0].Values) == 0 {
-		return "", nil
-	}
-	return string(resp.Rows[0].Values[0]), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // PgctldClient wraps the pgctld gRPC client.
@@ -138,26 +76,12 @@ type PgctldClient struct {
 
 // NewPgctldClient creates a new PgctldClient connected to the given gRPC port.
 func NewPgctldClient(grpcPort int) (*PgctldClient, error) {
-	addr := fmt.Sprintf("localhost:%d", grpcPort)
-
-	conn, err := grpc.NewClient(
-		"passthrough:///"+addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to pgctld: %w", err)
-	}
-
-	return &PgctldClient{
-		conn:         conn,
-		PgCtldClient: pgctldpb.NewPgCtldClient(conn),
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Close closes the underlying connection.
-func (c *PgctldClient) Close() error {
-	return c.conn.Close()
-}
+func (c *PgctldClient) Close() error { _ = "STUB: not implemented"; return nil }
 
 // MultiOrchClient wraps the multiorch gRPC client.
 type MultiOrchClient struct {
@@ -167,23 +91,9 @@ type MultiOrchClient struct {
 
 // NewMultiOrchClient creates a new MultiOrchClient connected to the given gRPC port.
 func NewMultiOrchClient(grpcPort int) (*MultiOrchClient, error) {
-	addr := fmt.Sprintf("localhost:%d", grpcPort)
-
-	conn, err := grpc.NewClient(
-		addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to multiorch: %w", err)
-	}
-
-	return &MultiOrchClient{
-		conn:                   conn,
-		MultiOrchServiceClient: multiorchpb.NewMultiOrchServiceClient(conn),
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Close closes the underlying connection.
-func (c *MultiOrchClient) Close() error {
-	return c.conn.Close()
-}
+func (c *MultiOrchClient) Close() error { _ = "STUB: not implemented"; return nil }

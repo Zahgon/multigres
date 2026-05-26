@@ -15,16 +15,8 @@
 package consensus
 
 import (
-	"errors"
-	"fmt"
-	"sort"
-
-	"google.golang.org/protobuf/proto"
-
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	consensusdatapb "github.com/multigres/multigres/go/pb/consensusdata"
-	"github.com/multigres/multigres/go/tools/pgutil"
 )
 
 // RecruitmentResult holds the interpreted outcome of a successful recruitment
@@ -123,11 +115,8 @@ func BuildSafeProposal(
 	statuses []*clustermetadatapb.ConsensusStatus,
 	buildProposal func(RecruitmentResult) (*consensusdatapb.CoordinatorProposal, error),
 ) (*consensusdatapb.CoordinatorProposal, error) {
-	recruited := filterByRevocation(revocation, statuses)
-	if len(recruited) == 0 {
-		return nil, errors.New("no nodes accepted the requested term revocation")
-	}
-	return buildProposalCore(revocation, recruited, requireOutgoingQuorum, discoverMostAdvancedTimeline, buildProposal)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CheckProposalPossible checks whether a safe leadership proposal is possible
@@ -145,12 +134,8 @@ func CheckProposalPossible(
 	statuses []*clustermetadatapb.ConsensusStatus,
 	buildProposal func(RecruitmentResult) (*consensusdatapb.CoordinatorProposal, error),
 ) error {
-	candidates := filterByPotentialRevocation(revocation, statuses)
-	if len(candidates) == 0 {
-		return errors.New("no nodes could accept the proposed revocation")
-	}
-	_, err := buildProposalCore(revocation, candidates, requireOutgoingQuorum, discoverMostAdvancedTimeline, buildProposal)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // CheckExternallyCertifiedProposalPossible checks whether an externally certified
@@ -169,17 +154,8 @@ func CheckExternallyCertifiedProposalPossible(
 	statuses []*clustermetadatapb.ConsensusStatus,
 	buildProposal func(RecruitmentResult) (*consensusdatapb.CoordinatorProposal, error),
 ) error {
-	revocation := cert.GetTermRevocation()
-	candidates := filterByPotentialRevocation(revocation, statuses)
-	if len(candidates) == 0 {
-		return errors.New("no nodes could accept the proposed revocation")
-	}
-	discover, err := newExternallyCertifiedDiscoverer(cert, candidates)
-	if err != nil {
-		return err
-	}
-	_, err = buildProposalCore(revocation, candidates, skipOutgoingQuorum, discover, buildProposal)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // BuildExternallyCertifiedProposal constructs a proposal for scenarios where
@@ -208,16 +184,8 @@ func BuildExternallyCertifiedProposal(
 	statuses []*clustermetadatapb.ConsensusStatus,
 	buildProposal func(RecruitmentResult) (*consensusdatapb.CoordinatorProposal, error),
 ) (*consensusdatapb.CoordinatorProposal, error) {
-	revocation := cert.GetTermRevocation()
-	recruited := filterByRevocation(revocation, statuses)
-	if len(recruited) == 0 {
-		return nil, errors.New("no nodes accepted the requested term revocation")
-	}
-	discover, err := newExternallyCertifiedDiscoverer(cert, recruited)
-	if err != nil {
-		return nil, err
-	}
-	return buildProposalCore(revocation, recruited, skipOutgoingQuorum, discover, buildProposal)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // newExternallyCertifiedDiscoverer validates cert against the given nodes and returns a
@@ -241,34 +209,11 @@ func newExternallyCertifiedDiscoverer(
 	cert *clustermetadatapb.ExternallyCertifiedRevocation,
 	nodes []*clustermetadatapb.ConsensusStatus,
 ) (discoverer, error) {
-	if cert.GetTermRevocation().GetOutgoingRule() == nil {
-		return nil, errors.New("cert.term_revocation.outgoing_rule is required")
-	}
-	if cert.GetFrozenLsn() == "" {
-		return nil, errors.New("cert is missing frozen_lsn")
-	}
-	for _, cs := range nodes {
-		if cs.GetCurrentPosition().GetRule() == nil {
-			// Recruited nodes should always carry a rule.
-			return nil, fmt.Errorf("node %s has no recorded rule; consensus state may be uninitialized",
-				topoclient.ClusterIDString(cs.GetId()))
-		}
-	}
-	minLSN, err := pgutil.ParseLSN(cert.GetFrozenLsn())
-	if err != nil {
-		return nil, fmt.Errorf("invalid frozen_lsn in cert: %w", err)
-	}
-	return func(recruited []*clustermetadatapb.ConsensusStatus, outgoingRule *clustermetadatapb.ShardRule) []*clustermetadatapb.ConsensusStatus {
-		qualified := make([]*clustermetadatapb.ConsensusStatus, 0, len(recruited))
-		for _, cs := range recruited {
-			lsn, err := pgutil.ParseLSN(cs.GetCurrentPosition().GetLsn())
-			if err == nil && lsn >= minLSN {
-				qualified = append(qualified, cs)
-			}
-		}
-		return discoverMostAdvancedTimeline(qualified, outgoingRule)
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(discoverer), nil
 }
+
+// Recruited nodes should always carry a rule.
 
 // buildProposalCore is the shared implementation for BuildSafeProposal,
 // CheckProposalPossible, and BuildExternallyCertifiedProposal. Callers are responsible
@@ -285,100 +230,28 @@ func buildProposalCore(
 	discover discoverer,
 	buildProposal func(RecruitmentResult) (*consensusdatapb.CoordinatorProposal, error),
 ) (*consensusdatapb.CoordinatorProposal, error) {
-	if len(recruitedStatuses) == 0 {
-		return nil, errors.New("empty list of statuses")
-	}
-
-	recruitedStatuses = deduplicateStatuses(recruitedStatuses)
-	recruitedStatuses = filterByValidPosition(recruitedStatuses)
-	if len(recruitedStatuses) == 0 {
-		return nil, errors.New("all recruited nodes reported an invalid or missing WAL position")
-	}
-
-	// The revocation's outgoing_rule is the rule the coordinator committed to
-	// transitioning from when it authored the revocation. Bind this proposal
-	// to that view: no recruit may report a strictly newer rule, and we look
-	// up the full ShardRule (cohort_members + durability_policy) by matching
-	// a recruit whose rule number equals it.
-	expectedOutgoing := revocation.GetOutgoingRule()
-	if expectedOutgoing == nil {
-		return nil, errors.New("revocation.outgoing_rule is required (use NewTermRevocation to construct revocations)")
-	}
-	var outgoingRule *clustermetadatapb.ShardRule
-	for _, cs := range recruitedStatuses {
-		rule := cs.GetCurrentPosition().GetRule()
-		if rule == nil {
-			continue
-		}
-		cmp := CompareRuleNumbers(rule.GetRuleNumber(), expectedOutgoing)
-		if cmp > 0 {
-			return nil, fmt.Errorf(
-				"recruit %s reports rule %v strictly greater than revocation.outgoing_rule %v; coordinator view is stale, re-discover",
-				topoclient.ClusterIDString(cs.GetId()),
-				rule.GetRuleNumber(),
-				expectedOutgoing,
-			)
-		}
-		if cmp == 0 && outgoingRule == nil {
-			outgoingRule = rule
-		}
-	}
-
-	switch mode {
-	case requireOutgoingQuorum:
-		// Validate revocation of the outgoing cohort: no parallel quorum can still
-		// form among the non-recruited nodes. outgoingRule must be known to identify
-		// the cohort. A nil here means no recruit reported a rule matching the
-		// coordinator's expected outgoing rule — the cohort has progressed past
-		// our view (or never reached it), and we need to re-discover.
-		if outgoingRule == nil {
-			return nil, fmt.Errorf(
-				"no recruit reports the expected outgoing rule %v; cannot determine cohort for quorum check",
-				expectedOutgoing,
-			)
-		}
-		outgoingPolicy, err := NewPolicyFromProto(outgoingRule.GetDurabilityPolicy())
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse durability policy from rule: %w", err)
-		}
-		cohort := outgoingRule.GetCohortMembers()
-		if err := outgoingPolicy.CheckSufficientRecruitment(cohort, statusesToIDs(filterCohortStatuses(cohort, recruitedStatuses))); err != nil {
-			return nil, fmt.Errorf("insufficient outgoing cohort recruitment: %w", err)
-		}
-	case skipOutgoingQuorum:
-		// Outgoing-cohort quorum is not required. The incoming cohort is checked
-		// below after the proposal is built.
-	}
-
-	eligibleLeaders := discover(recruitedStatuses, outgoingRule)
-	if len(eligibleLeaders) == 0 {
-		// Unreachable: filterByValidPosition ensures at least one status survives
-		// with a parseable LSN, and outgoingRule (if set) is always derived from one of
-		// those statuses, so eligibleLeaders is always non-empty here.
-		return nil, errors.New("no eligible leaders found among recruited nodes")
-	}
-
-	result := RecruitmentResult{
-		TermRevocation:  revocation,
-		OutgoingRule:    outgoingRule,
-		EligibleLeaders: eligibleLeaders,
-	}
-
-	proposal, err := buildProposal(result)
-	if err != nil {
-		return nil, fmt.Errorf("buildProposal: %w", err)
-	}
-	if proposal == nil {
-		return nil, errors.New("buildProposal returned nil proposal")
-	}
-
-	recruitedIncomingCohortMembers := statusesToIDs(filterCohortStatuses(proposal.GetProposedRule().GetCohortMembers(), recruitedStatuses))
-	if err := validateProposal(proposal, result, recruitedIncomingCohortMembers, mode); err != nil {
-		return nil, fmt.Errorf("proposal validation: %w", err)
-	}
-
-	return proposal, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// The revocation's outgoing_rule is the rule the coordinator committed to
+// transitioning from when it authored the revocation. Bind this proposal
+// to that view: no recruit may report a strictly newer rule, and we look
+// up the full ShardRule (cohort_members + durability_policy) by matching
+// a recruit whose rule number equals it.
+
+// Validate revocation of the outgoing cohort: no parallel quorum can still
+// form among the non-recruited nodes. outgoingRule must be known to identify
+// the cohort. A nil here means no recruit reported a rule matching the
+// coordinator's expected outgoing rule — the cohort has progressed past
+// our view (or never reached it), and we need to re-discover.
+
+// Outgoing-cohort quorum is not required. The incoming cohort is checked
+// below after the proposal is built.
+
+// Unreachable: filterByValidPosition ensures at least one status survives
+// with a parseable LSN, and outgoingRule (if set) is always derived from one of
+// those statuses, so eligibleLeaders is always non-empty here.
 
 // discoverMostAdvancedTimeline is the default discoverer for safe proposals.
 // It returns the recruited nodes tied at the highest LSN — at outgoingRule's
@@ -396,32 +269,14 @@ func discoverMostAdvancedTimeline(
 	recruitedStatuses []*clustermetadatapb.ConsensusStatus,
 	outgoingRule *clustermetadatapb.ShardRule,
 ) []*clustermetadatapb.ConsensusStatus {
-	var bestLSN pgutil.LSN
-	var eligibleLeaders []*clustermetadatapb.ConsensusStatus
-	for _, cs := range recruitedStatuses {
-		if outgoingRule != nil {
-			ruleNum := cs.GetCurrentPosition().GetRule().GetRuleNumber()
-			if CompareRuleNumbers(ruleNum, outgoingRule.GetRuleNumber()) != 0 {
-				continue
-			}
-		}
-		lsn, err := pgutil.ParseLSN(cs.GetCurrentPosition().GetLsn())
-		if err != nil {
-			// The caller's filterByValidPosition guarantees all surviving statuses
-			// have parseable LSNs, so this branch is unreachable in practice.
-			continue
-		}
-		if lsn > bestLSN {
-			bestLSN = lsn
-			eligibleLeaders = eligibleLeaders[:0]
-		}
-		if lsn >= bestLSN {
-			// There may be multiple poolers that have the most advanced LSN.
-			eligibleLeaders = append(eligibleLeaders, cs)
-		}
-	}
-	return eligibleLeaders
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// The caller's filterByValidPosition guarantees all surviving statuses
+// have parseable LSNs, so this branch is unreachable in practice.
+
+// There may be multiple poolers that have the most advanced LSN.
 
 // validateProposal checks structural validity and cohort quorum for the proposal.
 // The proposed leader must be among the eligible leaders, the proposed rule and
@@ -433,107 +288,43 @@ func validateProposal(
 	recruitedInProposedCohort []*clustermetadatapb.ID,
 	mode quorumMode,
 ) error {
-	if !proto.Equal(proposal.GetTermRevocation(), result.TermRevocation) {
-		return errors.New("proposal term revocation does not match the recruitment revocation")
-	}
-
-	// skip_outgoing_quorum may only be set by the externally-certified path:
-	// regular safe proposals always have a known outgoing cohort to drain.
-	if proposal.GetSkipOutgoingQuorum() && mode != skipOutgoingQuorum {
-		return errors.New("skip_outgoing_quorum is only valid for externally-certified proposals")
-	}
-
-	leaderID := proposal.GetProposalLeader().GetId()
-	if leaderID == nil {
-		return errors.New("proposal has no leader ID")
-	}
-	leaderKey := topoclient.ClusterIDString(leaderID)
-	foundLeader := false
-	for _, cs := range result.EligibleLeaders {
-		if topoclient.ClusterIDString(cs.GetId()) == leaderKey {
-			foundLeader = true
-			break
-		}
-	}
-	if !foundLeader {
-		return fmt.Errorf("proposed leader %s is not among eligible leaders", leaderKey)
-	}
-
-	r := proposal.GetProposedRule()
-	if r == nil {
-		return errors.New("no proposed rule")
-	}
-
-	// Identity and timing fields are caller-supplied attestations. We refuse
-	// to install a rule that drops them: a downstream consumer (rule_history,
-	// audit log, time-based ordering against external systems) would have no
-	// way to tell a missing field from a deliberate zero value.
-	if r.GetCoordinatorId() == nil {
-		return errors.New("proposed rule has no coordinator_id")
-	}
-	if r.GetCreationTime() == nil {
-		return errors.New("proposed rule has no creation_time")
-	}
-
-	// TODO: relax this to support re-proposing/propagating stuck rule changes.
-	// In that case a coordinator must recruit at a higher term and re-propagate
-	// a potentially lower-numbered pre-existing rule.
-	if proposedTerm := r.GetRuleNumber().GetCoordinatorTerm(); proposedTerm < result.TermRevocation.GetRevokedBelowTerm() {
-		return fmt.Errorf("proposed rule term %d is below the recruitment revocation term %d",
-			proposedTerm, result.TermRevocation.GetRevokedBelowTerm())
-	}
-	if proposedTerm := r.GetRuleNumber().GetCoordinatorTerm(); proposedTerm > result.TermRevocation.GetRevokedBelowTerm() {
-		return fmt.Errorf("proposed rule term %d is above the recruitment revocation term %d",
-			proposedTerm, result.TermRevocation.GetRevokedBelowTerm())
-	}
-
-	p, err := NewPolicyFromProto(r.GetDurabilityPolicy())
-	if err != nil {
-		return fmt.Errorf("invalid durability policy in proposal: %w", err)
-	}
-
-	if err := p.CheckAchievable(recruitedInProposedCohort); err != nil {
-		return fmt.Errorf("recruited proposed cohort cannot achieve durability: %w", err)
-	}
-	if mode == skipOutgoingQuorum {
-		// Coordinator-retry safety: multiple coordinators may attempt externally
-		// certified proposals (e.g. repeated bootstrap attempts with different proposed
-		// leaders). Sufficient recruitment (majority overlap) ensures any two
-		// concurrent recruitments of the same cohort and durability policy must
-		// overlap and therefore cannot both independently succeed or cause split brain.
-		if err := p.CheckSufficientRecruitment(r.GetCohortMembers(), recruitedInProposedCohort); err != nil {
-			return fmt.Errorf("insufficient proposed cohort recruitment: %w", err)
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// skip_outgoing_quorum may only be set by the externally-certified path:
+// regular safe proposals always have a known outgoing cohort to drain.
+
+// Identity and timing fields are caller-supplied attestations. We refuse
+// to install a rule that drops them: a downstream consumer (rule_history,
+// audit log, time-based ordering against external systems) would have no
+// way to tell a missing field from a deliberate zero value.
+
+// TODO: relax this to support re-proposing/propagating stuck rule changes.
+// In that case a coordinator must recruit at a higher term and re-propagate
+// a potentially lower-numbered pre-existing rule.
+
+// Coordinator-retry safety: multiple coordinators may attempt externally
+// certified proposals (e.g. repeated bootstrap attempts with different proposed
+// leaders). Sufficient recruitment (majority overlap) ensures any two
+// concurrent recruitments of the same cohort and durability policy must
+// overlap and therefore cannot both independently succeed or cause split brain.
 
 // filterByValidPosition returns only the statuses whose current_position
 // carries a parseable LSN. A node that cannot report a valid WAL position
 // cannot contribute to quorum or leader discovery: we have no way to verify
 // its timeline is consistent with the rest of the cohort.
 func filterByValidPosition(statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ConsensusStatus {
-	result := make([]*clustermetadatapb.ConsensusStatus, 0, len(statuses))
-	for _, cs := range statuses {
-		if _, err := pgutil.ParseLSN(cs.GetCurrentPosition().GetLsn()); err == nil {
-			result = append(result, cs)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // filterByRevocation returns only the statuses whose TermRevocation exactly
 // matches revocation. Nodes at a higher term or pledged to a different
 // coordinator are excluded because they did not accept this recruitment.
 func filterByRevocation(revocation *clustermetadatapb.TermRevocation, statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ConsensusStatus {
-	result := make([]*clustermetadatapb.ConsensusStatus, 0, len(statuses))
-	for _, cs := range statuses {
-		if proto.Equal(cs.GetTermRevocation(), revocation) {
-			result = append(result, cs)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // filterByPotentialRevocation returns only the statuses that could accept the
@@ -541,64 +332,31 @@ func filterByRevocation(revocation *clustermetadatapb.TermRevocation, statuses [
 // CheckProposalPossible and CheckExternallyCertifiedProposalPossible for
 // pre-vote feasibility checks where nodes have not yet been recruited.
 func filterByPotentialRevocation(revocation *clustermetadatapb.TermRevocation, statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ConsensusStatus {
-	result := make([]*clustermetadatapb.ConsensusStatus, 0, len(statuses))
-	for _, cs := range statuses {
-		if ValidateRevocation(cs, revocation) == nil {
-			result = append(result, cs)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // deduplicateStatuses returns a deduplicated, ID-sorted copy of statuses.
 // When the same node ID appears more than once, the entry with the highest
 // current_position (rule number, then LSN) is kept.
 func deduplicateStatuses(statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ConsensusStatus {
-	best := make(map[string]*clustermetadatapb.ConsensusStatus, len(statuses))
-	for _, cs := range statuses {
-		if cs.GetId() == nil {
-			continue
-		}
-		key := topoclient.ClusterIDString(cs.GetId())
-		if prev, exists := best[key]; !exists || ComparePosition(cs.GetCurrentPosition(), prev.GetCurrentPosition()) > 0 {
-			best[key] = cs
-		}
-	}
-	result := make([]*clustermetadatapb.ConsensusStatus, 0, len(best))
-	for _, cs := range best {
-		result = append(result, cs)
-	}
-	sort.Slice(result, func(i, j int) bool {
-		return topoclient.ClusterIDString(result[i].GetId()) < topoclient.ClusterIDString(result[j].GetId())
-	})
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // filterCohortStatuses returns the subset of statuses whose node ID is a
 // member of cohort.
 func filterCohortStatuses(cohort []*clustermetadatapb.ID, statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ConsensusStatus {
-	cohortKeys := poolerKeysOf(cohort)
-	result := make([]*clustermetadatapb.ConsensusStatus, 0, len(cohort))
-	for _, cs := range statuses {
-		id := cs.GetId()
-		if id == nil {
-			// Defensive: deduplicateStatuses drops nil-ID entries before any
-			// caller passes statuses here, so this branch is unreachable in
-			// practice. Guards against future callers that don't dedupe first.
-			continue
-		}
-		if _, inCohort := cohortKeys[topoclient.ClusterIDString(id)]; inCohort {
-			result = append(result, cs)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Defensive: deduplicateStatuses drops nil-ID entries before any
+// caller passes statuses here, so this branch is unreachable in
+// practice. Guards against future callers that don't dedupe first.
 
 // statusesToIDs extracts the ID from each status.
 func statusesToIDs(statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ID {
-	ids := make([]*clustermetadatapb.ID, 0, len(statuses))
-	for _, cs := range statuses {
-		ids = append(ids, cs.GetId())
-	}
-	return ids
+	_ = "STUB: not implemented"
+	return nil
 }

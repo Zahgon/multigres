@@ -57,60 +57,9 @@ func emitQueryLog(
 	samplingCursor *atomic.Uint64,
 	emitsMetric QueryLogEmits,
 ) {
-	isWarn := entry.Error != nil || entry.TotalDuration >= slowThreshold
-
-	if !isWarn {
-		// Check sampling before logger.Enabled so the disabled-handler path
-		// also benefits from sampling skipping work.
-		if sampleRate > 1 {
-			n := samplingCursor.Add(1)
-			if n%sampleRate != 0 {
-				return
-			}
-		}
-		if !logger.Enabled(ctx, slog.LevelDebug) {
-			return
-		}
-	}
-
-	level := slog.LevelDebug
-	levelLabel := "debug"
-	if isWarn {
-		level = slog.LevelWarn
-		levelLabel = "warn"
-	}
-
-	attrs := []slog.Attr{
-		slog.String("db.namespace", entry.Database),
-		slog.String("db.operation.name", entry.OperationName),
-		slog.String("db.query.protocol", entry.Protocol),
-		slog.String("db.user", entry.User),
-		slog.Float64("duration.total", entry.TotalDuration.Seconds()),
-		slog.Float64("duration.parse", entry.ParseDuration.Seconds()),
-		slog.Float64("duration.plan", entry.PlanDuration.Seconds()),
-		slog.Float64("duration.execute", entry.ExecDuration.Seconds()),
-		slog.Int64("rows_returned", entry.RowCount),
-	}
-
-	if entry.PlanType != "" {
-		attrs = append(attrs, slog.String("db.plan.type", entry.PlanType))
-	}
-	if len(entry.TablesUsed) > 0 {
-		attrs = append(attrs, slog.Any("db.tables_used", entry.TablesUsed))
-	}
-
-	if entry.Error != nil {
-		attrs = append(attrs,
-			slog.String("error", entry.Error.Error()),
-			slog.String("sqlstate", entry.SQLSTATE),
-			slog.String("error.source", entry.ErrorSource),
-		)
-	}
-
-	if entry.TotalDuration >= slowThreshold {
-		attrs = append(attrs, slog.Bool("slow_query", true))
-	}
-
-	logger.LogAttrs(ctx, level, "query completed", attrs...)
-	emitsMetric.Add(ctx, levelLabel)
+	_ = "STUB: not implemented"
+	return
 }
+
+// Check sampling before logger.Enabled so the disabled-handler path
+// also benefits from sampling skipping work.

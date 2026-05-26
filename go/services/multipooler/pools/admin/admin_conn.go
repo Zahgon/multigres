@@ -18,11 +18,8 @@ package admin
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/client"
 	"github.com/multigres/multigres/go/common/sqltypes"
 	"github.com/multigres/multigres/go/services/multipooler/connstate"
@@ -64,41 +61,37 @@ type Conn struct {
 }
 
 // NewConn creates a new AdminConn wrapping the given client connection.
-func NewConn(conn *client.Conn) *Conn {
-	return &Conn{
-		conn: conn,
-	}
-}
+func NewConn(conn *client.Conn) *Conn { _ = "STUB: not implemented"; return nil }
 
 // --- connpool.Connection interface ---
 
 // Settings returns nil because admin connections don't use settings-based routing.
 func (c *Conn) Settings() *connstate.Settings {
+	_ = "STUB: not implemented"
+
+	// IsClosed returns true if the connection has been closed.
 	return nil
 }
 
-// IsClosed returns true if the connection has been closed.
-func (c *Conn) IsClosed() bool {
-	return c.conn.IsClosed()
-}
+func (c *Conn) IsClosed() bool { _ = "STUB: not implemented"; return false }
 
 // Close closes the underlying connection.
-func (c *Conn) Close() error {
-	return c.conn.Close()
-}
+func (c *Conn) Close() error { _ = "STUB: not implemented"; return nil }
 
 // ApplySettings panics because admin connections don't support settings.
 // This should never be called - admin connections are always "clean".
 func (c *Conn) ApplySettings(_ context.Context, _ *connstate.Settings) error {
-	panic("admin connections do not support ApplySettings")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ResetAllSettings is a no-op because admin connections don't have settings.
 func (c *Conn) ResetAllSettings(_ context.Context) error {
+	_ = "STUB: not implemented"
+
+	// --- Admin operations ---
 	return nil
 }
-
-// --- Admin operations ---
 
 // RolAuthInfo captures the pg_authid columns multigateway needs to make
 // authentication decisions for a given role.
@@ -129,6 +122,7 @@ type RolAuthInfo struct {
 // Precedence matches PostgreSQL (src/backend/libpq/auth.c CheckPasswordAuth):
 // login-disabled is checked before password validity.
 func (c *Conn) GetRolAuthInfo(ctx context.Context, username string) (*RolAuthInfo, error) {
+	_ = "STUB: not implemented"
 	// Query pg_authid for the password hash, the two login-time predicates PG
 	// itself evaluates, and rolreplication. Expressing validity in SQL avoids
 	// timestamp parsing and matches PG's own `now()` semantics (both are
@@ -143,101 +137,38 @@ func (c *Conn) GetRolAuthInfo(ctx context.Context, username string) (*RolAuthInf
 	// replication is expected to also have rolreplication=true. If a
 	// superuser-only-without-rolreplication ever needs walsender access,
 	// extend RolAuthInfo with IsSuperuser and OR it in at the gateway.
-	sql := fmt.Sprintf(
-		"SELECT rolpassword, rolcanlogin, "+
-			"(rolvaliduntil IS NULL OR rolvaliduntil > now()) AS password_valid, "+
-			"rolreplication "+
-			"FROM pg_catalog.pg_authid WHERE rolname = %s LIMIT 1",
-		ast.QuoteStringLiteral(username))
-
-	results, err := c.queryWithRetry(ctx, sql)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query role auth info: %w", err)
-	}
-
-	// Check if user exists.
-	if len(results) == 0 || len(results[0].Rows) == 0 {
-		return nil, fmt.Errorf("%w: %q", ErrUserNotFound, username)
-	}
-
-	row := results[0].Rows[0].Values
-	if len(row) < 4 {
-		return nil, fmt.Errorf("unexpected pg_authid result shape: %d columns", len(row))
-	}
-
-	// rolcanlogin takes precedence — PG rejects NOLOGIN roles before looking at
-	// the password, so the error class differs (28000 vs 28P01).
-	if !parsePgBool(row[1]) {
-		return nil, fmt.Errorf("%w: %q", ErrLoginDisabled, username)
-	}
-
-	// rolvaliduntil: a non-NULL value in the past invalidates the password for
-	// password-based auth. PG returns the same opaque "password authentication
-	// failed" message as wrong-password in this case.
-	if !parsePgBool(row[2]) {
-		return nil, fmt.Errorf("%w: %q", ErrPasswordExpired, username)
-	}
-
-	info := &RolAuthInfo{
-		IsReplicationRole: parsePgBool(row[3]),
-	}
-	// Extract the password hash (may be NULL/empty if no password set).
-	if !row[0].IsNull() {
-		info.ScramHash = string(row[0])
-	}
-
-	return info, nil
+	return nil, nil
 }
+
+// Check if user exists.
+
+// rolcanlogin takes precedence — PG rejects NOLOGIN roles before looking at
+// the password, so the error class differs (28000 vs 28P01).
+
+// rolvaliduntil: a non-NULL value in the past invalidates the password for
+// password-based auth. PG returns the same opaque "password authentication
+// failed" message as wrong-password in this case.
+
+// Extract the password hash (may be NULL/empty if no password set).
 
 // parsePgBool converts PG's textual boolean representation ("t"/"f") to Go's bool.
 // NULL is treated as false defensively — neither rolcanlogin nor the password_valid
 // expression should ever return NULL, but we don't want a malformed row to appear
 // as "allowed to log in".
-func parsePgBool(v sqltypes.Value) bool {
-	if v.IsNull() {
-		return false
-	}
-	return string(v) == "t"
-}
+func parsePgBool(v sqltypes.Value) bool { _ = "STUB: not implemented"; return false }
 
 // QueryWithRetry executes a query with automatic retry and reconnection on
 // connection error. Safe for stateless internal queries (heartbeat, replication tracking).
 func (c *Conn) QueryWithRetry(ctx context.Context, sql string) ([]*sqltypes.Result, error) {
-	return c.queryWithRetry(ctx, sql)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // QueryArgsWithRetry executes a parameterized query with automatic retry and
 // reconnection on connection error.
 func (c *Conn) QueryArgsWithRetry(ctx context.Context, sql string, args ...any) ([]*sqltypes.Result, error) {
-	for attempt := 1; attempt <= maxQueryAttempts; attempt++ {
-		results, err := execQueryWithContextCancel(ctx, c.conn, func() ([]*sqltypes.Result, error) {
-			return c.conn.QueryArgs(ctx, sql, args...)
-		})
-		switch {
-		case err == nil:
-			return results, nil
-		case !mterrors.IsConnectionError(err):
-			return nil, err
-		case attempt == maxQueryAttempts:
-			c.conn.Close()
-			return nil, err
-		}
-		if ctx.Err() != nil {
-			return nil, context.Cause(ctx)
-		}
-		backoffTimer := time.NewTimer(retryBackoff)
-		select {
-		case <-backoffTimer.C:
-		case <-ctx.Done():
-			backoffTimer.Stop()
-			return nil, context.Cause(ctx)
-		}
-		if reconnectErr := c.conn.Reconnect(ctx); reconnectErr != nil {
-			c.conn.Close()
-			return nil, reconnectErr
-		}
-	}
-	panic("unreachable")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // queryWithRetry executes a query with automatic retry on connection error.
@@ -245,41 +176,16 @@ func (c *Conn) QueryArgsWithRetry(ctx context.Context, sql string, args ...any) 
 // up to maxQueryAttempts total. This handles stale connections that occur when
 // PostgreSQL restarts while the pool holds old socket FDs.
 func (c *Conn) queryWithRetry(ctx context.Context, sql string) ([]*sqltypes.Result, error) {
-	for attempt := 1; attempt <= maxQueryAttempts; attempt++ {
-		results, err := execQueryWithContextCancel(ctx, c.conn, func() ([]*sqltypes.Result, error) {
-			return c.conn.Query(ctx, sql)
-		})
-		switch {
-		case err == nil:
-			return results, nil
-		case !mterrors.IsConnectionError(err):
-			return nil, err
-		case attempt == maxQueryAttempts:
-			c.conn.Close()
-			return nil, err
-		}
-		if ctx.Err() != nil {
-			return nil, context.Cause(ctx)
-		}
-		// Brief backoff before reconnecting to give PostgreSQL time to
-		// finish starting up if the error is due to a restart.
-		backoffTimer := time.NewTimer(retryBackoff)
-		select {
-		case <-backoffTimer.C:
-		case <-ctx.Done():
-			backoffTimer.Stop()
-			return nil, context.Cause(ctx)
-		}
-		// Admin connections are bare superuser connections with no session
-		// state to re-apply (Settings() returns nil, ApplySettings panics).
-		// A raw client.Conn.Reconnect is sufficient here.
-		if reconnectErr := c.conn.Reconnect(ctx); reconnectErr != nil {
-			c.conn.Close()
-			return nil, reconnectErr
-		}
-	}
-	panic("unreachable")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Brief backoff before reconnecting to give PostgreSQL time to
+// finish starting up if the error is due to a restart.
+
+// Admin connections are bare superuser connections with no session
+// state to re-apply (Settings() returns nil, ApplySettings panics).
+// A raw client.Conn.Reconnect is sufficient here.
 
 // execQueryWithContextCancel executes a query operation in a goroutine so that
 // context cancellation can interrupt a blocking network read.
@@ -296,28 +202,13 @@ func (c *Conn) queryWithRetry(ctx context.Context, sql string) ([]*sqltypes.Resu
 // After a force-close, IsClosed() returns true. The caller's Recycle() will
 // then signal the pool to replace the connection rather than returning it.
 func execQueryWithContextCancel(ctx context.Context, conn *client.Conn, op func() ([]*sqltypes.Result, error)) ([]*sqltypes.Result, error) {
-	type result struct {
-		results []*sqltypes.Result
-		err     error
-	}
-
-	ch := make(chan result, 1)
-	go func() {
-		results, err := op()
-		ch <- result{results: results, err: err}
-	}()
-
-	select {
-	case <-ctx.Done():
-		// Force-close the connection to unblock the goroutine's blocking network read.
-		conn.ForceClose()
-		// Wait for the goroutine to finish (it returns quickly after ForceClose).
-		<-ch
-		return nil, context.Cause(ctx)
-	case res := <-ch:
-		return res.results, res.err
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Force-close the connection to unblock the goroutine's blocking network read.
+
+// Wait for the goroutine to finish (it returns quickly after ForceClose).
 
 // TerminateBackend terminates a backend process using pg_terminate_backend().
 // Returns true if the backend was terminated, false if it was not found or
@@ -326,8 +217,8 @@ func execQueryWithContextCancel(ctx context.Context, conn *client.Conn, op func(
 // If the context is cancelled while waiting for the query, the connection is
 // closed to abort the operation, and the context error is returned.
 func (c *Conn) TerminateBackend(ctx context.Context, processID uint32) (bool, error) {
-	sql := fmt.Sprintf("SELECT pg_terminate_backend(%d)", processID)
-	return c.execBackendFunc(ctx, sql, "terminate", processID)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // CancelBackend cancels the current query on a backend process using pg_cancel_backend().
@@ -338,8 +229,8 @@ func (c *Conn) TerminateBackend(ctx context.Context, processID uint32) (bool, er
 // If the context is cancelled while waiting for the query, the connection is
 // closed to abort the operation, and the context error is returned.
 func (c *Conn) CancelBackend(ctx context.Context, processID uint32) (bool, error) {
-	sql := fmt.Sprintf("SELECT pg_cancel_backend(%d)", processID)
-	return c.execBackendFunc(ctx, sql, "cancel", processID)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // queryResult holds the result of a query execution.
@@ -353,35 +244,17 @@ type queryResult struct {
 // to abort the operation. The underlying query uses queryWithRetry for automatic
 // reconnection on stale connections.
 func (c *Conn) execBackendFunc(ctx context.Context, sql, operation string, processID uint32) (bool, error) {
+	_ = "STUB: not implemented"
 	// Run query in goroutine so we can respect context cancellation.
-	ch := make(chan queryResult, 1)
-	go func() {
-		results, err := c.queryWithRetry(ctx, sql)
-		if err != nil {
-			ch <- queryResult{err: fmt.Errorf("failed to %s backend %d: %w", operation, processID, err)}
-			return
-		}
-
-		// pg_*_backend returns a boolean indicating success.
-		success := false
-		if len(results) > 0 && len(results[0].Rows) > 0 && len(results[0].Rows[0].Values) > 0 {
-			// The result is 't' for true, 'f' for false.
-			val := string(results[0].Rows[0].Values[0])
-			success = val == "t"
-		}
-		ch <- queryResult{success: success}
-	}()
-
-	select {
-	case <-ctx.Done():
-		// Context cancelled - close the connection to abort the query.
-		// This ensures we don't leave a hung query on the server.
-		c.conn.Close()
-		return false, context.Cause(ctx)
-	case result := <-ch:
-		return result.success, result.err
-	}
+	return false, nil
 }
+
+// pg_*_backend returns a boolean indicating success.
+
+// The result is 't' for true, 'f' for false.
+
+// Context cancelled - close the connection to abort the query.
+// This ensures we don't leave a hung query on the server.
 
 // Ensure Conn implements connpool.Connection.
 var _ connpool.Connection = (*Conn)(nil)

@@ -37,90 +37,55 @@ type ReplTracker struct {
 
 // NewReplTracker creates a new ReplTracker.
 func NewReplTracker(queryService executor.InternalQueryService, logger *slog.Logger, shardID []byte, poolerID string, intervalMs int) *ReplTracker {
-	return &ReplTracker{
-		hw: NewWriter(queryService, logger, shardID, poolerID, intervalMs),
-		hr: NewReader(queryService, logger, shardID),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newReplTrackerWithReaderInterval creates a ReplTracker with a custom reader interval for testing.
 func newReplTrackerWithReaderInterval(queryService executor.InternalQueryService, logger *slog.Logger, shardID []byte, poolerID string, intervalMs int, readerInterval time.Duration) *ReplTracker {
-	return &ReplTracker{
-		hw: NewWriter(queryService, logger, shardID, poolerID, intervalMs),
-		hr: newReader(queryService, logger, shardID, readerInterval),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HeartbeatWriter returns the heartbeat writer used by this tracker.
 func (rt *ReplTracker) HeartbeatWriter() *Writer {
-	return rt.hw
+	_ = "STUB: not implemented"
+
+	// HeartbeatReader returns the heartbeat reader used by this tracker.
+	return nil
 }
 
-// HeartbeatReader returns the heartbeat reader used by this tracker.
 func (rt *ReplTracker) HeartbeatReader() *Reader {
-	return rt.hr
+	_ = "STUB: not implemented"
+
+	// makePrimary transitions to primary mode: stops reader, starts writer.
+	return nil
 }
 
-// makePrimary transitions to primary mode: stops reader, starts writer.
-func (rt *ReplTracker) makePrimary() {
-	rt.mu.Lock()
-	defer rt.mu.Unlock()
-
-	rt.isPrimary = true
-	rt.hr.Close()
-	rt.hw.Open()
-}
+func (rt *ReplTracker) makePrimary() { _ = "STUB: not implemented"; return }
 
 // makeNonPrimary transitions to standby mode: stops writer, starts reader.
-func (rt *ReplTracker) makeNonPrimary() {
-	rt.mu.Lock()
-	defer rt.mu.Unlock()
-
-	rt.isPrimary = false
-	rt.hw.Close()
-	rt.hr.Open()
-}
+func (rt *ReplTracker) makeNonPrimary() { _ = "STUB: not implemented"; return }
 
 // OnStateChange transitions the heartbeat tracker based on the serving state.
 // Starts the heartbeat writer for (PRIMARY, SERVING), stops it otherwise.
 func (rt *ReplTracker) OnStateChange(_ context.Context, poolerType clustermetadatapb.PoolerType, servingStatus clustermetadatapb.PoolerServingStatus) error {
-	if poolerType == clustermetadatapb.PoolerType_PRIMARY && servingStatus == clustermetadatapb.PoolerServingStatus_SERVING {
-		rt.makePrimary()
-	} else {
-		rt.makeNonPrimary()
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Close closes ReplTracker.
-func (rt *ReplTracker) Close() {
-	rt.hw.Close()
-	rt.hr.Close()
-}
+func (rt *ReplTracker) Close() { _ = "STUB: not implemented"; return }
 
 // IsPrimary returns whether this tracker is in primary mode.
-func (rt *ReplTracker) IsPrimary() bool {
-	rt.mu.Lock()
-	defer rt.mu.Unlock()
-	return rt.isPrimary
-}
+func (rt *ReplTracker) IsPrimary() bool { _ = "STUB: not implemented"; return false }
 
 // EnableHeartbeat enables or disables writes of heartbeat.
 // This functionality is primarily used by tests.
-func (rt *ReplTracker) EnableHeartbeat(enable bool) {
-	if enable {
-		rt.hw.Open()
-	} else {
-		rt.hw.Close()
-	}
-}
+func (rt *ReplTracker) EnableHeartbeat(enable bool) { _ = "STUB: not implemented"; return }
 
 // Writes returns the count of successful heartbeat writes.
-func (rt *ReplTracker) Writes() int64 {
-	return rt.hw.Writes()
-}
+func (rt *ReplTracker) Writes() int64 { _ = "STUB: not implemented"; return 0 }
 
 // WriteErrors returns the count of heartbeat write errors.
-func (rt *ReplTracker) WriteErrors() int64 {
-	return rt.hw.WriteErrors()
-}
+func (rt *ReplTracker) WriteErrors() int64 { _ = "STUB: not implemented"; return 0 }

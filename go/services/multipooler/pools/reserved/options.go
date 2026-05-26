@@ -38,7 +38,6 @@ type reservedConnOpts struct {
 // retry against a replacement socket; returning any other error aborts
 // NewConn and propagates the error to the caller.
 func WithValidate(fn func(context.Context, *regular.Conn) error) ReservedConnOption {
-	return func(o *reservedConnOpts) {
-		o.validate = fn
-	}
+	_ = "STUB: not implemented"
+	return *new(ReservedConnOption)
 }

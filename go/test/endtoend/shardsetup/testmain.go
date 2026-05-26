@@ -90,19 +90,7 @@
 package shardsetup
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/signal"
-	"strconv"
-	"strings"
-	"syscall"
 	"testing"
-	"time"
-
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/tools/pathutil"
-	"github.com/multigres/multigres/go/tools/telemetry"
 )
 
 const (
@@ -113,18 +101,16 @@ const (
 // GetTestUserDSN returns a DSN for connecting to multigateway as a regular
 // test client. Uses DefaultTestUser and TestPostgresPassword.
 func GetTestUserDSN(host string, port int, args ...string) string {
-	return fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=postgres %s",
-		host, port, DefaultTestUser, TestPostgresPassword, strings.Join(args, " "))
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // GetPostgresDSN returns a DSN for connecting directly to PostgreSQL as the
 // cluster owner (DefaultPostgresUser). Used for pgctld-level test connections
 // that bypass multigateway (e.g. backup restore verification).
 func GetPostgresDSN(host string, port int, args ...string) string {
-	return fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=postgres %s",
-		host, port, constants.DefaultPostgresUser, TestPostgresPassword, strings.Join(args, " "))
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // SetupFunc is a function that creates a ShardSetup for testing.
@@ -152,54 +138,26 @@ type SetupFunc func(t *testing.T) *ShardSetup
 //		os.Exit(exitCode)
 //	}
 func RunTestMain(m *testing.M) int {
+	_ = "STUB: not implemented"
 	// Set the PATH so dependencies like etcd and run_in_test.sh can be found
-	if err := pathutil.PrependBinToPath(); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to add bin to PATH: %v\n", err)
-		return 1
-	}
-
-	// Set orphan detection environment variable as baseline protection
-	os.Setenv("MULTIGRES_TEST_PARENT_PID", strconv.Itoa(os.Getpid()))
-
-	// Initialize telemetry (no-op if OTEL environment variables aren't set)
-	tel := telemetry.NewTelemetry()
-	ctx := context.Background()
-	if err := tel.InitTelemetry(ctx, "tests"); err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: Failed to initialize telemetry: %v\n", err)
-	}
-	defer func() {
-		shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-		if err := tel.ShutdownTelemetry(shutdownCtx); err != nil {
-			fmt.Fprintf(os.Stderr, "Warning: Failed to shutdown telemetry: %v\n", err)
-		}
-	}()
-
-	// Set up signal handler for cleanup on interrupt
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-
-	// Run tests in goroutine so we can select on completion or signal
-	exitCodeChan := make(chan int, 1)
-	go func() {
-		exitCodeChan <- m.Run()
-	}()
-
-	// Wait for tests to complete OR signal
-	var exitCode int
-	select {
-	case exitCode = <-exitCodeChan:
-		// Tests finished normally
-	case <-sigChan:
-		// Interrupted - treat as failure
-		exitCode = 1
-	}
-
-	// Cleanup environment variable
-	os.Unsetenv("MULTIGRES_TEST_PARENT_PID")
-
-	return exitCode
+	return 0
 }
+
+// Set orphan detection environment variable as baseline protection
+
+// Initialize telemetry (no-op if OTEL environment variables aren't set)
+
+// Set up signal handler for cleanup on interrupt
+
+// Run tests in goroutine so we can select on completion or signal
+
+// Wait for tests to complete OR signal
+
+// Tests finished normally
+
+// Interrupted - treat as failure
+
+// Cleanup environment variable
 
 // SharedSetupManager manages a shared ShardSetup across tests.
 // Use this when you want to share setup between tests using sync.Once pattern.
@@ -213,44 +171,21 @@ type SharedSetupManager struct {
 
 // NewSharedSetupManager creates a new SharedSetupManager.
 func NewSharedSetupManager(setupFunc SetupFunc) *SharedSetupManager {
-	return &SharedSetupManager{
-		setupFunc: setupFunc,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Get returns the shared setup, creating it if necessary.
 // This is safe to call from multiple tests - the setup is created once.
-func (m *SharedSetupManager) Get(t *testing.T) *ShardSetup {
-	t.Helper()
-
-	if m.setupErr != nil {
-		t.Fatalf("Failed to setup shared test infrastructure: %v", m.setupErr)
-	}
-
-	if !m.setupDone {
-		m.setup = m.setupFunc(t)
-		m.setupDone = true
-	}
-
-	return m.setup
-}
+func (m *SharedSetupManager) Get(t *testing.T) *ShardSetup { _ = "STUB: not implemented"; return nil }
 
 // Cleanup cleans up the shared setup.
 // Call this from TestMain after tests complete.
 // Only deletes temp directory if tests passed (DumpLogs was not called).
-func (m *SharedSetupManager) Cleanup() {
-	if m.setup != nil {
-		m.setup.Cleanup(m.testsFailed)
-	}
-}
+func (m *SharedSetupManager) Cleanup() { _ = "STUB: not implemented"; return }
 
 // DumpLogs marks tests as failed and prints log location.
 // Call this from TestMain on test failure (before cleanup).
 // Logs will be kept on disk and their location printed.
 // Set TEST_PRINT_LOGS env var to also print log contents to stdout.
-func (m *SharedSetupManager) DumpLogs() {
-	m.testsFailed = true
-	if m.setup != nil {
-		m.setup.DumpServiceLogs()
-	}
-}
+func (m *SharedSetupManager) DumpLogs() { _ = "STUB: not implemented"; return }

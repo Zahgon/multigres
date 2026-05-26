@@ -15,13 +15,6 @@
 package analysis
 
 import (
-	"errors"
-	"fmt"
-	"slices"
-	"time"
-
-	commonconsensus "github.com/multigres/multigres/go/common/consensus"
-	"github.com/multigres/multigres/go/common/topoclient"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 )
 
@@ -41,73 +34,37 @@ type StaleLeaderAnalyzer struct {
 }
 
 func (a *StaleLeaderAnalyzer) Name() types.CheckName {
-	return "StaleLeader"
+	_ = "STUB: not implemented"
+	return *new(types.CheckName)
 }
 
 func (a *StaleLeaderAnalyzer) ProblemCode() types.ProblemCode {
-	return types.ProblemStaleLeader
+	_ = "STUB: not implemented"
+	return *new(types.ProblemCode)
 }
 
 func (a *StaleLeaderAnalyzer) RecoveryAction() types.RecoveryAction {
-	return a.factory.NewDemoteStaleLeaderAction()
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 func (a *StaleLeaderAnalyzer) Analyze(sa *ShardAnalysis) ([]types.Problem, error) {
-	if a.factory == nil {
-		return nil, errors.New("recovery action factory not initialized")
-	}
-
-	// Need multiple leaders to detect staleness.
-	if len(sa.Leaders) <= 1 {
-		return nil, nil
-	}
-
-	// A tie in LeaderTerm indicates a consensus bug — skip automatic demotion.
-	if sa.HighestTermReachableLeader == nil {
-		return nil, nil
-	}
-
-	// Collect stale leaders: every topology-PRIMARY pooler that is not the
-	// highest-term leader is stale. This includes poolers whose own rule has
-	// caught up (LeaderTerm == 0 because the rule now names a different
-	// leader) — exactly the post-emergency-demotion state we need to repair.
-	mostAdvancedIDStr := topoclient.MultiPoolerIDString(sa.HighestTermReachableLeader.PoolerID)
-	var staleLeaders []*PoolerAnalysis
-	for _, p := range sa.Leaders {
-		if topoclient.MultiPoolerIDString(p.PoolerID) == mostAdvancedIDStr {
-			continue
-		}
-		staleLeaders = append(staleLeaders, p)
-	}
-
-	if len(staleLeaders) == 0 {
-		return nil, nil
-	}
-
-	// Sort most stale first (lowest rule coordinator term first) so the
-	// recovery system processes the most out-of-date leader at highest
-	// priority.
-	slices.SortFunc(staleLeaders, compareLeaderTimeline)
-
-	// Assign descending priorities so the most stale leader (sorted first)
-	// gets PriorityEmergency, the next gets PriorityEmergency-1, etc.
-	problems := make([]types.Problem, 0, len(staleLeaders))
-	for i, stale := range staleLeaders {
-		problems = append(problems, types.Problem{
-			Code:      types.ProblemStaleLeader,
-			CheckName: "StaleLeader",
-			PoolerID:  stale.PoolerID,
-			ShardKey:  sa.ShardKey,
-			Description: fmt.Sprintf("Stale leader detected: %s (stale_leader_term %d) is stale, most advanced leader %s (most_advanced_leader_term %d)",
-				stale.PoolerID.Name,
-				commonconsensus.LeaderTerm(stale.ConsensusStatus),
-				sa.HighestTermReachableLeader.PoolerID.Name,
-				commonconsensus.LeaderTerm(sa.HighestTermReachableLeader.ConsensusStatus)),
-			Priority:       types.PriorityEmergency - types.Priority(i),
-			Scope:          types.ScopeShard,
-			DetectedAt:     time.Now(),
-			RecoveryAction: a.factory.NewDemoteStaleLeaderAction(),
-		})
-	}
-	return problems, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Need multiple leaders to detect staleness.
+
+// A tie in LeaderTerm indicates a consensus bug — skip automatic demotion.
+
+// Collect stale leaders: every topology-PRIMARY pooler that is not the
+// highest-term leader is stale. This includes poolers whose own rule has
+// caught up (LeaderTerm == 0 because the rule now names a different
+// leader) — exactly the post-emergency-demotion state we need to repair.
+
+// Sort most stale first (lowest rule coordinator term first) so the
+// recovery system processes the most out-of-date leader at highest
+// priority.
+
+// Assign descending priorities so the most stale leader (sorted first)
+// gets PriorityEmergency, the next gets PriorityEmergency-1, etc.

@@ -45,11 +45,6 @@
 
 package parser
 
-import (
-	"fmt"
-	"strings"
-)
-
 // TokenType represents the type of a lexical token
 // This is now just an alias for int to maintain compatibility during transition
 // New code should use the generated parser constants directly
@@ -87,110 +82,66 @@ type Token struct {
 
 // NewToken creates a new token with the given parameters
 func NewToken(tokenType int, position int, text string) *Token {
-	return &Token{
-		Type:     tokenType,
-		Value:    TokenValue{Str: text},
-		Position: position,
-		Text:     text,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewIntToken creates a new integer token
 func NewIntToken(value int, position int, text string) *Token {
-	return &Token{
-		Type:     ICONST,                             // Uses generated parser constant
-		Value:    TokenValue{Ival: value, Str: text}, // Set both for compatibility
-		Position: position,
-		Text:     text,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Uses generated parser constant
+// Set both for compatibility
 
 // NewStringToken creates a new string token
 func NewStringToken(tokenType int, value string, position int, text string) *Token {
-	return &Token{
-		Type:     tokenType,
-		Value:    TokenValue{Str: value},
-		Position: position,
-		Text:     text,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewKeywordToken creates a new keyword token
 func NewKeywordToken(tokenType int, keyword string, position int, text string) *Token {
-	return &Token{
-		Type:     tokenType, // Use the keyword's specific token type
-		Value:    TokenValue{Keyword: keyword, Str: strings.ToLower(keyword)},
-		Position: position,
-		Text:     text,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Use the keyword's specific token type
 
 // NewParamToken creates a new parameter token ($1, $2, etc.)
 func NewParamToken(paramNum int, position int, text string) *Token {
-	return &Token{
-		Type:     PARAM, // Uses generated parser constant
-		Value:    TokenValue{Ival: paramNum},
-		Position: position,
-		Text:     text,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Uses generated parser constant
 
 // IsStringLiteral returns true if the token is a string literal type
-func (t *Token) IsStringLiteral() bool {
-	return t.Type == SCONST || t.Type == USCONST
-}
+func (t *Token) IsStringLiteral() bool { _ = "STUB: not implemented"; return false }
 
 // IsNumericLiteral returns true if the token is a numeric literal type
-func (t *Token) IsNumericLiteral() bool {
-	return t.Type == ICONST || t.Type == FCONST
-}
+func (t *Token) IsNumericLiteral() bool { _ = "STUB: not implemented"; return false }
 
 // IsBitStringLiteral returns true if the token is a bit string literal type
-func (t *Token) IsBitStringLiteral() bool {
-	return t.Type == BCONST || t.Type == XCONST
-}
+func (t *Token) IsBitStringLiteral() bool { _ = "STUB: not implemented"; return false }
 
 // IsOperator returns true if the token is an operator
-func (t *Token) IsOperator() bool {
-	return t.Type == Op ||
-		t.Type == TYPECAST ||
-		t.Type == DOT_DOT ||
-		t.Type == COLON_EQUALS ||
-		t.Type == EQUALS_GREATER ||
-		t.Type == LESS_EQUALS ||
-		t.Type == GREATER_EQUALS ||
-		t.Type == NOT_EQUALS
-}
+func (t *Token) IsOperator() bool { _ = "STUB: not implemented"; return false }
 
 // IsIdentifier returns true if the token is an identifier
-func (t *Token) IsIdentifier() bool {
-	return t.Type == IDENT || t.Type == UIDENT
-}
+func (t *Token) IsIdentifier() bool { _ = "STUB: not implemented"; return false }
 
 // String returns a string representation of the token for debugging
 func (t *Token) String() string {
+	_ = "STUB: not implemented"
 	// tokenTypeNames provides string names for special token types (for debugging)
 	// Most token names are now provided by the generated yyToknames array
-	tokenTypeNames := map[int]string{
-		INVALID: "INVALID",
-		EOF:     "EOF",
-	}
-
-	typeName := tokenTypeNames[t.Type]
-	if typeName == "" {
-		if t.Type <= 126 && t.Type >= 32 {
-			// ASCII character token
-			typeName = string(rune(t.Type))
-		} else {
-			// Try to use parser-generated token names if available
-			if t.Type > 0 && t.Type < len(yyToknames)+3 { // +3 for $end, error, $unk offset
-				typeName = yyToknames[t.Type-4] // -4 for IDENT base offset in generated constants
-			} else {
-				typeName = fmt.Sprintf("UNKNOWN(%d)", t.Type)
-			}
-		}
-	}
-
-	return fmt.Sprintf("Token{Type: %s, Value: %v, Position: %d, Text: %q}",
-		typeName, t.Value, t.Position, t.Text)
+	return ""
 }
+
+// ASCII character token
+
+// Try to use parser-generated token names if available
+// +3 for $end, error, $unk offset
+// -4 for IDENT base offset in generated constants

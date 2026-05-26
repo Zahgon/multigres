@@ -15,189 +15,58 @@
 package local
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"errors"
-	"fmt"
-	"math/big"
-	"net"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 // GenerateCA generates a self-signed CA certificate and private key.
 // The certificate is valid for 10 years with RSA 4096-bit key.
 func GenerateCA(certPath, keyPath string) error {
+	_ = "STUB: not implemented"
 	// Generate RSA private key (4096 bits to match k8s setup)
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		return fmt.Errorf("failed to generate CA private key: %w", err)
-	}
-
-	// Create CA certificate template
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
-	if err != nil {
-		return fmt.Errorf("failed to generate serial number: %w", err)
-	}
-
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			CommonName:   "Multigres Root CA",
-			Organization: []string{"Multigres"},
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0), // Valid for 10 years
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-	}
-
-	// Self-sign the CA certificate
-	certDER, err := x509.CreateCertificate(rand.Reader, &template, &template, privateKey.Public(), privateKey)
-	if err != nil {
-		return fmt.Errorf("failed to create CA certificate: %w", err)
-	}
-
-	// Ensure directories exist
-	if err := os.MkdirAll(filepath.Dir(certPath), 0o755); err != nil {
-		return fmt.Errorf("failed to create cert directory: %w", err)
-	}
-	if err := os.MkdirAll(filepath.Dir(keyPath), 0o755); err != nil {
-		return fmt.Errorf("failed to create key directory: %w", err)
-	}
-
-	// Write CA certificate
-	certFile, err := os.OpenFile(certPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
-	if err != nil {
-		return fmt.Errorf("failed to create cert file: %w", err)
-	}
-	defer certFile.Close()
-	if err := pem.Encode(certFile, &pem.Block{Type: "CERTIFICATE", Bytes: certDER}); err != nil {
-		return fmt.Errorf("failed to write cert: %w", err)
-	}
-
-	// Write CA private key
-	keyFile, err := os.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
-	if err != nil {
-		return fmt.Errorf("failed to create key file: %w", err)
-	}
-	defer keyFile.Close()
-	keyDER := x509.MarshalPKCS1PrivateKey(privateKey)
-	if err := pem.Encode(keyFile, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: keyDER}); err != nil {
-		return fmt.Errorf("failed to write key: %w", err)
-	}
-
 	return nil
 }
+
+// Create CA certificate template
+
+// Valid for 10 years
+
+// Self-sign the CA certificate
+
+// Ensure directories exist
+
+// Write CA certificate
+
+// Write CA private key
 
 // GenerateCert generates a certificate signed by the CA.
 // The cn is used as the certificate's Common Name for identification.
 // SANs are added as DNS Subject Alternative Names. IP SANs for 127.0.0.1 and ::1 are always included.
 func GenerateCert(caCertPath, caKeyPath, certPath, keyPath, cn string, sans []string) error {
+	_ = "STUB: not implemented"
 	// Load CA certificate and key
-	caCert, caKey, err := LoadCA(caCertPath, caKeyPath)
-	if err != nil {
-		return fmt.Errorf("failed to load CA: %w", err)
-	}
-
-	// Generate server private key (2048 bits to match k8s setup)
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return fmt.Errorf("failed to generate server private key: %w", err)
-	}
-
-	// Create server certificate template
-	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
-	if err != nil {
-		return fmt.Errorf("failed to generate serial number: %w", err)
-	}
-
-	template := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			CommonName:   cn,
-			Organization: []string{"Multigres"},
-		},
-		NotBefore:   time.Now(),
-		NotAfter:    time.Now().AddDate(1, 0, 0), // Valid for 1 year
-		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
-		DNSNames:    sans,
-		IPAddresses: []net.IP{net.ParseIP("127.0.0.1"), net.ParseIP("::1")},
-	}
-
-	// Sign the certificate with CA
-	certDER, err := x509.CreateCertificate(rand.Reader, &template, caCert, privateKey.Public(), caKey)
-	if err != nil {
-		return fmt.Errorf("failed to create server certificate: %w", err)
-	}
-
-	// Ensure directories exist
-	if err := os.MkdirAll(filepath.Dir(certPath), 0o755); err != nil {
-		return fmt.Errorf("failed to create cert directory: %w", err)
-	}
-	if err := os.MkdirAll(filepath.Dir(keyPath), 0o755); err != nil {
-		return fmt.Errorf("failed to create key directory: %w", err)
-	}
-
-	// Write server certificate
-	certFile, err := os.OpenFile(certPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
-	if err != nil {
-		return fmt.Errorf("failed to create cert file: %w", err)
-	}
-	defer certFile.Close()
-	if err := pem.Encode(certFile, &pem.Block{Type: "CERTIFICATE", Bytes: certDER}); err != nil {
-		return fmt.Errorf("failed to write cert: %w", err)
-	}
-
-	// Write server private key
-	keyFile, err := os.OpenFile(keyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
-	if err != nil {
-		return fmt.Errorf("failed to create key file: %w", err)
-	}
-	defer keyFile.Close()
-	keyDER := x509.MarshalPKCS1PrivateKey(privateKey)
-	if err := pem.Encode(keyFile, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: keyDER}); err != nil {
-		return fmt.Errorf("failed to write key: %w", err)
-	}
-
 	return nil
 }
 
+// Generate server private key (2048 bits to match k8s setup)
+
+// Create server certificate template
+
+// Valid for 1 year
+
+// Sign the certificate with CA
+
+// Ensure directories exist
+
+// Write server certificate
+
+// Write server private key
+
 // LoadCA loads a CA certificate and private key from disk.
 func LoadCA(certPath, keyPath string) (*x509.Certificate, *rsa.PrivateKey, error) {
+	_ = "STUB: not implemented"
 	// Load CA certificate
-	certPEM, err := os.ReadFile(certPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read CA cert: %w", err)
-	}
-	block, _ := pem.Decode(certPEM)
-	if block == nil {
-		return nil, nil, errors.New("failed to decode CA cert PEM")
-	}
-	caCert, err := x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to parse CA cert: %w", err)
-	}
-
-	// Load CA private key
-	keyPEM, err := os.ReadFile(keyPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read CA key: %w", err)
-	}
-	block, _ = pem.Decode(keyPEM)
-	if block == nil {
-		return nil, nil, errors.New("failed to decode CA key PEM")
-	}
-	caKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to parse CA key: %w", err)
-	}
-
-	return caCert, caKey, nil
+	return nil, nil, nil
 }
+
+// Load CA private key

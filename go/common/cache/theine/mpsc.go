@@ -33,53 +33,23 @@ type Queue[V any] struct {
 	nodePool   sync.Pool
 }
 
-func NewQueue[V any]() *Queue[V] {
-	q := &Queue[V]{nodePool: sync.Pool{New: func() any {
-		return new(node[V])
-	}}}
-	stub := &node[V]{}
-	q.head.Store(stub)
-	q.tail.Store(stub)
-	return q
-}
+func NewQueue[V any]() *Queue[V] { _ = "STUB: not implemented"; return nil }
 
 // Push adds x to the back of the queue.
 //
 // Push can be safely called from multiple goroutines
-func (q *Queue[V]) Push(x V) {
-	n := q.nodePool.Get().(*node[V])
-	n.val = x
+func (q *Queue[V]) Push(x V) { _ = "STUB: not implemented"; return }
 
-	// current producer acquires head node
-	prev := q.head.Swap(n)
+// current producer acquires head node
 
-	// release node to consumer
-	prev.next.Store(n)
-}
+// release node to consumer
 
 // Pop removes the item from the front of the queue or nil if the queue is empty
 //
 // Pop must be called from a single, consumer goroutine
-func (q *Queue[V]) Pop() (V, bool) {
-	tail := q.tail.Load()
-	next := tail.next.Load()
-	if next != nil {
-		var null V
-		q.tail.Store(next)
-		v := next.val
-		next.val = null
-		tail.next.Store(nil)
-		q.nodePool.Put(tail)
-		return v, true
-	}
-	var null V
-	return null, false
-}
+func (q *Queue[V]) Pop() (V, bool) { _ = "STUB: not implemented"; return *new(V), false }
 
 // Empty returns true if the queue is empty
 //
 // Empty must be called from a single, consumer goroutine
-func (q *Queue[V]) Empty() bool {
-	tail := q.tail.Load()
-	return tail.next.Load() == nil
-}
+func (q *Queue[V]) Empty() bool { _ = "STUB: not implemented"; return false }

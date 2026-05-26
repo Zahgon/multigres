@@ -50,13 +50,15 @@ type leaseOptions struct {
 // revoke it, wait this duration for the old holder to clean up, then reacquire.
 // If 0 (default), WithLease fails immediately when the lease is held.
 func WithStealGracePeriod(d time.Duration) LeaseOption {
-	return func(o *leaseOptions) { o.stealGracePeriod = d }
+	_ = "STUB: not implemented"
+	return *new(LeaseOption)
 }
 
 // WithLeaseCheckInterval sets how often to poll the checker to detect lease loss.
 // Defaults to DefaultLeaseCheckInterval (10s).
 func WithLeaseCheckInterval(d time.Duration) LeaseOption {
-	return func(o *leaseOptions) { o.checkInterval = d }
+	_ = "STUB: not implemented"
+	return *new(LeaseOption)
 }
 
 // WithLease acquires a lease, runs fn, and releases the lease when fn returns —
@@ -74,59 +76,14 @@ func WithLease(
 	fn func(context.Context) error,
 	opts ...LeaseOption,
 ) error {
-	var options leaseOptions
-	options.checkInterval = DefaultLeaseCheckInterval
-	for _, opt := range opts {
-		opt(&options)
-	}
-
-	// Try to acquire
-	lockCtx, unlock, err := acquire(ctx, action)
-	if err != nil {
-		if options.stealGracePeriod <= 0 {
-			return err
-		}
-		// Steal: revoke, wait, reacquire
-		if revokeErr := revoke(ctx); revokeErr != nil {
-			return revokeErr
-		}
-		select {
-		case <-time.After(options.stealGracePeriod):
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-		lockCtx, unlock, err = acquire(ctx, action)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Guaranteed release
-	defer func() {
-		var unlockErr error
-		unlock(&unlockErr)
-	}()
-
-	// Monitor lease health and cancel context on loss
-	fnCtx, cancelCause := context.WithCancelCause(lockCtx)
-	defer cancelCause(nil)
-
-	go func() {
-		ticker := time.NewTicker(options.checkInterval)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-fnCtx.Done():
-				return
-			case <-ticker.C:
-				checkCtx := context.WithoutCancel(fnCtx)
-				if err := check(checkCtx); err != nil {
-					cancelCause(ErrLeaseLost)
-					return
-				}
-			}
-		}
-	}()
-
-	return fn(fnCtx)
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Try to acquire
+
+// Steal: revoke, wait, reacquire
+
+// Guaranteed release
+
+// Monitor lease health and cancel context on loss

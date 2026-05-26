@@ -16,31 +16,14 @@ package topoclient
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"path"
-
-	"github.com/multigres/multigres/go/common/mterrors"
-
-	"google.golang.org/protobuf/proto"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
 // NewMultiPooler creates a new MultiPooler record with the given name, cell, hostname, and tableGroup.
 func NewMultiPooler(name string, cell, host, tableGroup string) *clustermetadatapb.MultiPooler {
-	return &clustermetadatapb.MultiPooler{
-		Id: &clustermetadatapb.ID{
-			Component: clustermetadatapb.ID_MULTIPOOLER,
-			Cell:      cell,
-			Name:      name,
-		},
-		Hostname: host,
-		ShardKey: &clustermetadatapb.ShardKey{
-			TableGroup: tableGroup,
-		},
-		PortMap: make(map[string]int32),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // MultiPoolerInfo is the container for a MultiPooler, read from the topology server.
@@ -50,106 +33,56 @@ type MultiPoolerInfo struct {
 }
 
 // String returns a string describing the multipooler.
-func (mpi *MultiPoolerInfo) String() string {
-	return fmt.Sprintf("MultiPooler{%v}", MultiPoolerIDString(mpi.Id))
-}
+func (mpi *MultiPoolerInfo) String() string { _ = "STUB: not implemented"; return "" }
 
 // IDString returns the string representation of the multipooler id
-func (mpi *MultiPoolerInfo) IDString() string {
-	return MultiPoolerIDString(mpi.Id)
-}
+func (mpi *MultiPoolerInfo) IDString() string { _ = "STUB: not implemented"; return "" }
 
 // Addr returns hostname:grpc port.
-func (mpi *MultiPoolerInfo) Addr() string {
-	grpcPort, ok := mpi.PortMap["grpc"]
-	if !ok {
-		return mpi.Hostname
-	}
-	return fmt.Sprintf("%s:%d", mpi.Hostname, grpcPort)
-}
+func (mpi *MultiPoolerInfo) Addr() string { _ = "STUB: not implemented"; return "" }
 
 // Version returns the version of this multipooler from last time it was read or updated.
 func (mpi *MultiPoolerInfo) Version() Version {
-	return mpi.version
+	_ = "STUB: not implemented"
+
+	// NewMultiPoolerInfo returns a MultiPoolerInfo based on multipooler with the
+	// version set. This function should be only used by Server implementations.
+	return *new(Version)
 }
 
-// NewMultiPoolerInfo returns a MultiPoolerInfo based on multipooler with the
-// version set. This function should be only used by Server implementations.
 func NewMultiPoolerInfo(multipooler *clustermetadatapb.MultiPooler, version Version) *MultiPoolerInfo {
-	return &MultiPoolerInfo{version: version, MultiPooler: multipooler}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // MultiPoolerIDString returns the string representation of a MultiPooler ID
-func MultiPoolerIDString(id *clustermetadatapb.ID) string {
-	return fmt.Sprintf("%s-%s-%s", ComponentTypeToString(id.Component), id.Cell, id.Name)
-}
+func MultiPoolerIDString(id *clustermetadatapb.ID) string { _ = "STUB: not implemented"; return "" }
 
 // PoolerAddressFor projects a MultiPooler into the contact-info subset the
 // consensus RPCs (SetTermPrimary, Propose) take. Returns nil if mp is nil.
 func PoolerAddressFor(mp *clustermetadatapb.MultiPooler) *clustermetadatapb.PoolerAddress {
-	if mp == nil {
-		return nil
-	}
-	return &clustermetadatapb.PoolerAddress{
-		Id:           mp.GetId(),
-		Host:         mp.GetHostname(),
-		PostgresPort: mp.GetPortMap()["postgres"],
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetMultiPooler is a high level function to read multipooler data.
 func (ts *store) GetMultiPooler(ctx context.Context, id *clustermetadatapb.ID) (*MultiPoolerInfo, error) {
-	conn, err := ts.ConnForCell(ctx, id.Cell)
-	if err != nil {
-		return nil, mterrors.Wrap(err, fmt.Sprintf("unable to get connection for cell %q", id.Cell))
-	}
-
-	poolerPath := path.Join(PoolersPath, MultiPoolerIDString(id), PoolerFile)
-	data, version, err := conn.Get(ctx, poolerPath)
-	if err != nil {
-		return nil, mterrors.Wrap(err, fmt.Sprintf("unable to get multipooler %q", id))
-	}
-	multipooler := &clustermetadatapb.MultiPooler{}
-	if err := proto.Unmarshal(data, multipooler); err != nil {
-		return nil, mterrors.Wrap(err, "failed to unmarshal multipooler data")
-	}
-
-	return &MultiPoolerInfo{
-		version:     version,
-		MultiPooler: multipooler,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetMultiPoolerIDsByCell returns all the multipooler IDs in a cell.
 // It returns ErrNoNode if the cell doesn't exist.
 // It returns (nil, nil) if the cell exists, but there are no multipoolers in it.
 func (ts *store) GetMultiPoolerIDsByCell(ctx context.Context, cell string) ([]*clustermetadatapb.ID, error) {
+	_ = "STUB: not implemented"
 	// If the cell doesn't exist, this will return ErrNoNode.
-	conn, err := ts.ConnForCell(ctx, cell)
-	if err != nil {
-		return nil, err
-	}
-
-	// List the directory, and parse the IDs
-	children, err := conn.List(ctx, PoolersPath)
-	if err != nil {
-		if errors.Is(err, &TopoError{Code: NoNode}) {
-			// directory doesn't exist, empty list, no error.
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	result := make([]*clustermetadatapb.ID, len(children))
-	for i, child := range children {
-		multipooler := &clustermetadatapb.MultiPooler{}
-		if err := proto.Unmarshal(child.Value, multipooler); err != nil {
-			return nil, err
-		}
-		result[i] = multipooler.Id
-	}
-	return result, nil
+	return nil, nil
 }
+
+// List the directory, and parse the IDs
+
+// directory doesn't exist, empty list, no error.
 
 // GetMultiPoolersByCellOptions controls the behavior of GetMultiPoolersByCell.
 type GetMultiPoolersByCellOptions struct {
@@ -175,81 +108,26 @@ type DatabaseShard struct {
 // It returns ErrPartialResult if some multipoolers couldn't be read. The results in the slice are incomplete.
 // It returns (nil, nil) if the cell exists, but there are no multipoolers in it.
 func (ts *store) GetMultiPoolersByCell(ctx context.Context, cellName string, opt *GetMultiPoolersByCellOptions) ([]*MultiPoolerInfo, error) {
+	_ = "STUB: not implemented"
 	// Validate filtering hierarchy: Database -> TableGroup -> Shard
-	if opt != nil && opt.DatabaseShard != nil {
-		ds := opt.DatabaseShard
-		// If Shard is specified, TableGroup must be specified
-		if ds.Shard != "" && ds.TableGroup == "" {
-			return nil, NewError(BadInput, "cannot filter by Shard without specifying TableGroup")
-		}
-		// If TableGroup is specified, Database must be specified
-		if ds.TableGroup != "" && ds.Database == "" {
-			return nil, NewError(BadInput, "cannot filter by TableGroup without specifying Database")
-		}
-	}
-
-	// If the cell doesn't exist, this will return ErrNoNode.
-	cellConn, err := ts.ConnForCell(ctx, cellName)
-	if err != nil {
-		return nil, err
-	}
-	listResults, err := cellConn.List(ctx, PoolersPath)
-	if err != nil {
-		if errors.Is(err, &TopoError{Code: NoNode}) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	var capHint int
-	if opt != nil && opt.DatabaseShard == nil {
-		capHint = len(listResults)
-	}
-
-	mtpoolers := make([]*MultiPoolerInfo, 0, capHint)
-	for n := range listResults {
-		multipooler := &clustermetadatapb.MultiPooler{}
-		if err := proto.Unmarshal(listResults[n].Value, multipooler); err != nil {
-			return nil, err
-		}
-		if opt != nil && opt.DatabaseShard != nil && opt.DatabaseShard.Database != "" {
-			sk := multipooler.GetShardKey()
-			// Database must match
-			if opt.DatabaseShard.Database != sk.GetDatabase() {
-				continue
-			}
-			// If TableGroup is specified, it must match
-			if opt.DatabaseShard.TableGroup != "" && opt.DatabaseShard.TableGroup != sk.GetTableGroup() {
-				continue
-			}
-			// If Shard is specified, it must match
-			if opt.DatabaseShard.Shard != "" && opt.DatabaseShard.Shard != sk.GetShard() {
-				continue
-			}
-		}
-		mtpoolers = append(mtpoolers, &MultiPoolerInfo{MultiPooler: multipooler, version: listResults[n].Version})
-	}
-	return mtpoolers, nil
+	return nil, nil
 }
+
+// If Shard is specified, TableGroup must be specified
+
+// If TableGroup is specified, Database must be specified
+
+// If the cell doesn't exist, this will return ErrNoNode.
+
+// Database must match
+
+// If TableGroup is specified, it must match
+
+// If Shard is specified, it must match
 
 // UpdateMultiPooler updates the multipooler data only - not associated replication paths.
 func (ts *store) UpdateMultiPooler(ctx context.Context, mpi *MultiPoolerInfo) error {
-	conn, err := ts.ConnForCell(ctx, mpi.Id.Cell)
-	if err != nil {
-		return err
-	}
-
-	data, err := proto.Marshal(mpi.MultiPooler)
-	if err != nil {
-		return err
-	}
-	poolerPath := path.Join(PoolersPath, MultiPoolerIDString(mpi.Id), PoolerFile)
-	newVersion, err := conn.Update(ctx, poolerPath, data, mpi.version)
-	if err != nil {
-		return err
-	}
-	mpi.version = newVersion
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -260,72 +138,27 @@ func (ts *store) UpdateMultiPooler(ctx context.Context, mpi *MultiPoolerInfo) er
 // If the update method returns ErrNoUpdateNeeded, nothing is written,
 // and nil,nil is returned.
 func (ts *store) UpdateMultiPoolerFields(ctx context.Context, id *clustermetadatapb.ID, update func(*clustermetadatapb.MultiPooler) error) (*clustermetadatapb.MultiPooler, error) {
-	for {
-		mpi, err := ts.GetMultiPooler(ctx, id)
-		if err != nil {
-			return nil, err
-		}
-		if err = update(mpi.MultiPooler); err != nil {
-			if errors.Is(err, &TopoError{Code: NoUpdateNeeded}) {
-				return nil, nil
-			}
-			return nil, err
-		}
-		if err = ts.UpdateMultiPooler(ctx, mpi); !errors.Is(err, &TopoError{Code: BadVersion}) {
-			return mpi.MultiPooler, err
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CreateMultiPooler creates a new multipooler and all associated paths.
 func (ts *store) CreateMultiPooler(ctx context.Context, mtpooler *clustermetadatapb.MultiPooler) error {
-	conn, err := ts.ConnForCell(ctx, mtpooler.Id.Cell)
-	if err != nil {
-		return err
-	}
-
-	data, err := proto.Marshal(mtpooler)
-	if err != nil {
-		return err
-	}
-	poolerPath := path.Join(PoolersPath, MultiPoolerIDString(mtpooler.Id), PoolerFile)
-	if _, err := conn.Create(ctx, poolerPath, data); err != nil {
-		return err
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // UnregisterMultiPooler deletes the specified multipooler.
 func (ts *store) UnregisterMultiPooler(ctx context.Context, id *clustermetadatapb.ID) error {
-	conn, err := ts.ConnForCell(ctx, id.Cell)
-	if err != nil {
-		return err
-	}
-
-	poolerPath := path.Join(PoolersPath, MultiPoolerIDString(id), PoolerFile)
-	if err := conn.Delete(ctx, poolerPath, nil); err != nil {
-		return err
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // RegisterMultiPooler creates or updates a multipooler. If allowUpdate is true,
 // and a multipooler with the same ID exists, just update it.
 func (ts *store) RegisterMultiPooler(ctx context.Context, mtpooler *clustermetadatapb.MultiPooler, allowUpdate bool) error {
-	err := ts.CreateMultiPooler(ctx, mtpooler)
-	if errors.Is(err, &TopoError{Code: NodeExists}) && allowUpdate {
-		// Try to update then
-		oldMtPooler, err := ts.GetMultiPooler(ctx, mtpooler.Id)
-		if err != nil {
-			return fmt.Errorf("failed reading existing mtpooler %v: %w", MultiPoolerIDString(mtpooler.Id), err)
-		}
-		oldMtPooler.MultiPooler = proto.Clone(mtpooler).(*clustermetadatapb.MultiPooler)
-		if err := ts.UpdateMultiPooler(ctx, oldMtPooler); err != nil {
-			return fmt.Errorf("failed updating mtpooler %v: %w", MultiPoolerIDString(mtpooler.Id), err)
-		}
-		return nil
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Try to update then

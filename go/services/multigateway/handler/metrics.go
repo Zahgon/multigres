@@ -16,14 +16,9 @@ package handler
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // QueryStatus represents the outcome of a query for metric attribution.
@@ -87,33 +82,13 @@ func (m *QueryDuration) Record(
 	status QueryStatus,
 	queryFingerprint string,
 ) {
-	key := queryDurationKey{
-		db:      dbNamespace,
-		op:      operationName,
-		proto:   protocol,
-		errType: errorType,
-		status:  string(status),
-		fp:      queryFingerprint,
-	}
-	opt := m.optionFor(key)
-	m.Float64Histogram.Record(ctx, val, opt)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *QueryDuration) optionFor(key queryDurationKey) metric.MeasurementOption {
-	if v, ok := m.optsCache.Load(key); ok {
-		return v.(metric.MeasurementOption)
-	}
-	set := attribute.NewSet(
-		attribute.String("db.namespace", key.db),
-		attribute.String("db.operation.name", key.op),
-		attribute.String("db.query.protocol", key.proto),
-		attribute.String("error.type", key.errType),
-		attribute.String("status", key.status),
-		attribute.String("query.fingerprint", key.fp),
-	)
-	opt := metric.WithAttributeSet(set)
-	actual, _ := m.optsCache.LoadOrStore(key, opt)
-	return actual.(metric.MeasurementOption)
+	_ = "STUB: not implemented"
+	return *new(metric.MeasurementOption)
 }
 
 // QueryErrors wraps an Int64Counter for counting query errors.
@@ -131,31 +106,13 @@ func (m *QueryErrors) Add(
 	operationName string,
 	queryFingerprint string,
 ) {
-	key := queryErrorsKey{
-		errType:   errorType,
-		errSource: errorSource,
-		db:        dbNamespace,
-		op:        operationName,
-		fp:        queryFingerprint,
-	}
-	opt := m.optionFor(key)
-	m.Int64Counter.Add(ctx, 1, opt)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *QueryErrors) optionFor(key queryErrorsKey) metric.MeasurementOption {
-	if v, ok := m.optsCache.Load(key); ok {
-		return v.(metric.MeasurementOption)
-	}
-	set := attribute.NewSet(
-		attribute.String("error.type", key.errType),
-		attribute.String("error.source", key.errSource),
-		attribute.String("db.namespace", key.db),
-		attribute.String("db.operation.name", key.op),
-		attribute.String("query.fingerprint", key.fp),
-	)
-	opt := metric.WithAttributeSet(set)
-	actual, _ := m.optsCache.LoadOrStore(key, opt)
-	return actual.(metric.MeasurementOption)
+	_ = "STUB: not implemented"
+	return *new(metric.MeasurementOption)
 }
 
 // RowsReturned wraps a Float64Histogram for recording row counts.
@@ -172,23 +129,13 @@ func (m *RowsReturned) Record(
 	operationName string,
 	queryFingerprint string,
 ) {
-	key := rowsReturnedKey{db: dbNamespace, op: operationName, fp: queryFingerprint}
-	opt := m.optionFor(key)
-	m.Float64Histogram.Record(ctx, val, opt)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *RowsReturned) optionFor(key rowsReturnedKey) metric.MeasurementOption {
-	if v, ok := m.optsCache.Load(key); ok {
-		return v.(metric.MeasurementOption)
-	}
-	set := attribute.NewSet(
-		attribute.String("db.namespace", key.db),
-		attribute.String("db.operation.name", key.op),
-		attribute.String("query.fingerprint", key.fp),
-	)
-	opt := metric.WithAttributeSet(set)
-	actual, _ := m.optsCache.LoadOrStore(key, opt)
-	return actual.(metric.MeasurementOption)
+	_ = "STUB: not implemented"
+	return *new(metric.MeasurementOption)
 }
 
 // QueryLogEmits wraps an Int64Counter for counting per-query log records
@@ -201,9 +148,7 @@ type QueryLogEmits struct {
 }
 
 // Add increments the per-query-log emission counter with a `level` attribute.
-func (m QueryLogEmits) Add(ctx context.Context, level string) {
-	m.Int64Counter.Add(ctx, 1, metric.WithAttributes(attribute.String("level", level)))
-}
+func (m QueryLogEmits) Add(ctx context.Context, level string) { _ = "STUB: not implemented"; return }
 
 // TableQueries wraps an Int64Counter for counting queries per table.
 type TableQueries struct {
@@ -218,102 +163,16 @@ func (m *TableQueries) Add(
 	tableName string,
 	operationName string,
 ) {
-	key := tableQueriesKey{db: dbNamespace, table: tableName, op: operationName}
-	opt := m.optionFor(key)
-	m.Int64Counter.Add(ctx, 1, opt)
+	_ = "STUB: not implemented"
+	return
 }
 
 func (m *TableQueries) optionFor(key tableQueriesKey) metric.MeasurementOption {
-	if v, ok := m.optsCache.Load(key); ok {
-		return v.(metric.MeasurementOption)
-	}
-	set := attribute.NewSet(
-		attribute.String("db.namespace", key.db),
-		attribute.String("db.collection.name", key.table),
-		attribute.String("db.operation.name", key.op),
-	)
-	opt := metric.WithAttributeSet(set)
-	actual, _ := m.optsCache.LoadOrStore(key, opt)
-	return actual.(metric.MeasurementOption)
+	_ = "STUB: not implemented"
+	return *new(metric.MeasurementOption)
 }
 
 // NewHandlerMetrics initialises OTel metrics for the handler.
 // Individual metrics that fail to initialise use noop implementations
 // and are included in the returned error.
-func NewHandlerMetrics() (*HandlerMetrics, error) {
-	meter := otel.Meter("github.com/multigres/multigres/go/services/multigateway/handler")
-	m := &HandlerMetrics{
-		queryDuration: &QueryDuration{},
-		queryErrors:   &QueryErrors{},
-		rowsReturned:  &RowsReturned{},
-		tableQueries:  &TableQueries{},
-	}
-	var errs []error
-
-	dur, err := meter.Float64Histogram(
-		"mg.gateway.query.duration",
-		metric.WithDescription("Duration of gateway query execution"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.query.duration histogram: %w", err))
-		m.queryDuration.Float64Histogram = noop.Float64Histogram{}
-	} else {
-		m.queryDuration.Float64Histogram = dur
-	}
-
-	errCounter, err := meter.Int64Counter(
-		"mg.gateway.query.errors",
-		metric.WithDescription("Total number of query errors at the gateway"),
-		metric.WithUnit("{error}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.query.errors counter: %w", err))
-		m.queryErrors.Int64Counter = noop.Int64Counter{}
-	} else {
-		m.queryErrors.Int64Counter = errCounter
-	}
-
-	rows, err := meter.Float64Histogram(
-		"mg.gateway.query.rows_returned",
-		metric.WithDescription("Number of rows returned by queries"),
-		metric.WithUnit("{row}"),
-		metric.WithExplicitBucketBoundaries(0, 1, 5, 10, 50, 100, 500, 1000, 5000, 10000),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.query.rows_returned histogram: %w", err))
-		m.rowsReturned.Float64Histogram = noop.Float64Histogram{}
-	} else {
-		m.rowsReturned.Float64Histogram = rows
-	}
-
-	tq, err := meter.Int64Counter(
-		"mg.gateway.query.table_queries",
-		metric.WithDescription("Query count per table"),
-		metric.WithUnit("{query}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.query.table_queries counter: %w", err))
-		m.tableQueries.Int64Counter = noop.Int64Counter{}
-	} else {
-		m.tableQueries.Int64Counter = tq
-	}
-
-	qle, err := meter.Int64Counter(
-		"mg.gateway.query.log.emits",
-		metric.WithDescription("Per-query log records emitted, labeled by slog level"),
-		metric.WithUnit("{record}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.gateway.query.log.emits counter: %w", err))
-		m.queryLogEmits = QueryLogEmits{noop.Int64Counter{}}
-	} else {
-		m.queryLogEmits = QueryLogEmits{qle}
-	}
-
-	if len(errs) > 0 {
-		return m, errors.Join(errs...)
-	}
-	return m, nil
-}
+func NewHandlerMetrics() (*HandlerMetrics, error) { _ = "STUB: not implemented"; return nil, nil }

@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -42,10 +41,8 @@ type DiscardTempPrimitive struct {
 
 // NewDiscardTempPrimitive creates a new DiscardTempPrimitive.
 func NewDiscardTempPrimitive(sql, tableGroup string) *DiscardTempPrimitive {
-	return &DiscardTempPrimitive{
-		Query:      sql,
-		TableGroup: tableGroup,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute executes the discard temp primitive.
@@ -57,20 +54,18 @@ func (d *DiscardTempPrimitive) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
+	_ = "STUB: not implemented"
 	// If the session has a temp table reservation, use the dedicated RPC
 	// to remove the temp table reason on the multipooler side.
-	if state.HasTempTableReservation() {
-		// Clear any deferred BEGIN — DISCARD TEMP cannot run inside a
-		// transaction (PG rejects it), so a pending BEGIN that was never
-		// sent to PG should be discarded.
-		state.PendingBeginQuery = ""
-		return exec.DiscardTempTables(ctx, conn, state, callback)
-	}
-
-	// No temp table reservation — return synthetic result.
-	// DISCARD TEMP on a session with no temp tables is a no-op in PG.
-	return callback(ctx, &sqltypes.Result{CommandTag: "DISCARD"})
+	return nil
 }
+
+// Clear any deferred BEGIN — DISCARD TEMP cannot run inside a
+// transaction (PG rejects it), so a pending BEGIN that was never
+// sent to PG should be discarded.
+
+// No temp table reservation — return synthetic result.
+// DISCARD TEMP on a session with no temp tables is a no-op in PG.
 
 // PortalStreamExecute satisfies the Primitive interface for the
 // extended-protocol path. DISCARD TEMP carries no parameter binds — the
@@ -86,23 +81,22 @@ func (d *DiscardTempPrimitive) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return d.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns the target tablegroup.
-func (d *DiscardTempPrimitive) GetTableGroup() string {
-	return d.TableGroup
-}
+func (d *DiscardTempPrimitive) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
 // GetQuery returns the SQL query.
 func (d *DiscardTempPrimitive) GetQuery() string {
-	return d.Query
+	_ = "STUB: not implemented"
+
+	// String returns a description of the primitive for debugging.
+	return ""
 }
 
-// String returns a description of the primitive for debugging.
-func (d *DiscardTempPrimitive) String() string {
-	return fmt.Sprintf("DiscardTemp(%s)", d.Query)
-}
+func (d *DiscardTempPrimitive) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure DiscardTempPrimitive implements Primitive interface.
 var _ Primitive = (*DiscardTempPrimitive)(nil)

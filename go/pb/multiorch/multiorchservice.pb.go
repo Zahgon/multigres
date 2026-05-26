@@ -21,13 +21,12 @@
 package multiorch
 
 import (
+	sync "sync"
+
 	clustermetadata "github.com/multigres/multigres/go/pb/clustermetadata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -45,40 +44,22 @@ type ShardStatusRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ShardStatusRequest) Reset() {
-	*x = ShardStatusRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ShardStatusRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ShardStatusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ShardStatusRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ShardStatusRequest) ProtoMessage() {}
+func (*ShardStatusRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ShardStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ShardStatusRequest.ProtoReflect.Descriptor instead.
-func (*ShardStatusRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{0}
-}
+func (*ShardStatusRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *ShardStatusRequest) GetShardKey() *clustermetadata.ShardKey {
-	if x != nil {
-		return x.ShardKey
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -92,47 +73,30 @@ type ShardStatusResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ShardStatusResponse) Reset() {
-	*x = ShardStatusResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ShardStatusResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ShardStatusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ShardStatusResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ShardStatusResponse) ProtoMessage() {}
+func (*ShardStatusResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ShardStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ShardStatusResponse.ProtoReflect.Descriptor instead.
 func (*ShardStatusResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ShardStatusResponse) GetProblems() []*DetectedProblem {
-	if x != nil {
-		return x.Problems
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ShardStatusResponse) GetPoolerHealths() []*PoolerHealth {
-	if x != nil {
-		return x.PoolerHealths
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -150,89 +114,39 @@ type DetectedProblem struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DetectedProblem) Reset() {
-	*x = DetectedProblem{}
-	mi := &file_multiorchservice_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DetectedProblem) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DetectedProblem) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DetectedProblem) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DetectedProblem) ProtoMessage() {}
+func (*DetectedProblem) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DetectedProblem) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DetectedProblem.ProtoReflect.Descriptor instead.
-func (*DetectedProblem) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{2}
-}
+func (*DetectedProblem) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *DetectedProblem) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
+func (x *DetectedProblem) GetCode() string { _ = "STUB: not implemented"; return "" }
 
-func (x *DetectedProblem) GetCheckName() string {
-	if x != nil {
-		return x.CheckName
-	}
-	return ""
-}
+func (x *DetectedProblem) GetCheckName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *DetectedProblem) GetPoolerId() *clustermetadata.ID {
-	if x != nil {
-		return x.PoolerId
-	}
-	return nil
-}
+func (x *DetectedProblem) GetPoolerId() *clustermetadata.ID { _ = "STUB: not implemented"; return nil }
 
 func (x *DetectedProblem) GetShardKey() *clustermetadata.ShardKey {
-	if x != nil {
-		return x.ShardKey
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *DetectedProblem) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
+func (x *DetectedProblem) GetDescription() string { _ = "STUB: not implemented"; return "" }
 
-func (x *DetectedProblem) GetPriority() int32 {
-	if x != nil {
-		return x.Priority
-	}
-	return 0
-}
+func (x *DetectedProblem) GetPriority() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *DetectedProblem) GetScope() string {
-	if x != nil {
-		return x.Scope
-	}
-	return ""
-}
+func (x *DetectedProblem) GetScope() string { _ = "STUB: not implemented"; return "" }
 
 func (x *DetectedProblem) GetDetectedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.DetectedAt
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -248,77 +162,31 @@ type PoolerHealth struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *PoolerHealth) Reset() {
-	*x = PoolerHealth{}
-	mi := &file_multiorchservice_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PoolerHealth) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PoolerHealth) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PoolerHealth) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PoolerHealth) ProtoMessage() {}
+func (*PoolerHealth) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PoolerHealth) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PoolerHealth.ProtoReflect.Descriptor instead.
-func (*PoolerHealth) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{3}
-}
+func (*PoolerHealth) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PoolerHealth) GetPoolerId() *clustermetadata.ID {
-	if x != nil {
-		return x.PoolerId
-	}
-	return nil
-}
+func (x *PoolerHealth) GetPoolerId() *clustermetadata.ID { _ = "STUB: not implemented"; return nil }
 
-func (x *PoolerHealth) GetReachable() bool {
-	if x != nil {
-		return x.Reachable
-	}
-	return false
-}
+func (x *PoolerHealth) GetReachable() bool { _ = "STUB: not implemented"; return false }
 
-func (x *PoolerHealth) GetPostgresRunning() bool {
-	if x != nil {
-		return x.PostgresRunning
-	}
-	return false
-}
+func (x *PoolerHealth) GetPostgresRunning() bool { _ = "STUB: not implemented"; return false }
 
-func (x *PoolerHealth) GetPoolerType() string {
-	if x != nil {
-		return x.PoolerType
-	}
-	return ""
-}
+func (x *PoolerHealth) GetPoolerType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PoolerHealth) GetLastCheck() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastCheck
-	}
-	return nil
-}
+func (x *PoolerHealth) GetLastCheck() *timestamppb.Timestamp { _ = "STUB: not implemented"; return nil }
 
-func (x *PoolerHealth) GetPostgresReady() bool {
-	if x != nil {
-		return x.PostgresReady
-	}
-	return false
-}
+func (x *PoolerHealth) GetPostgresReady() bool { _ = "STUB: not implemented"; return false }
 
 type DisableRecoveryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -326,34 +194,21 @@ type DisableRecoveryRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DisableRecoveryRequest) Reset() {
-	*x = DisableRecoveryRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DisableRecoveryRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DisableRecoveryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DisableRecoveryRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DisableRecoveryRequest) ProtoMessage() {}
+func (*DisableRecoveryRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DisableRecoveryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DisableRecoveryRequest.ProtoReflect.Descriptor instead.
 func (*DisableRecoveryRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{4}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type DisableRecoveryResponse struct {
@@ -366,49 +221,26 @@ type DisableRecoveryResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DisableRecoveryResponse) Reset() {
-	*x = DisableRecoveryResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DisableRecoveryResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DisableRecoveryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DisableRecoveryResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DisableRecoveryResponse) ProtoMessage() {}
+func (*DisableRecoveryResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DisableRecoveryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DisableRecoveryResponse.ProtoReflect.Descriptor instead.
 func (*DisableRecoveryResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{5}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *DisableRecoveryResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
+func (x *DisableRecoveryResponse) GetSuccess() bool { _ = "STUB: not implemented"; return false }
 
-func (x *DisableRecoveryResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *DisableRecoveryResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 type EnableRecoveryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -416,34 +248,21 @@ type EnableRecoveryRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *EnableRecoveryRequest) Reset() {
-	*x = EnableRecoveryRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *EnableRecoveryRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *EnableRecoveryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *EnableRecoveryRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*EnableRecoveryRequest) ProtoMessage() {}
+func (*EnableRecoveryRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *EnableRecoveryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use EnableRecoveryRequest.ProtoReflect.Descriptor instead.
 func (*EnableRecoveryRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{6}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type EnableRecoveryResponse struct {
@@ -456,49 +275,26 @@ type EnableRecoveryResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *EnableRecoveryResponse) Reset() {
-	*x = EnableRecoveryResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *EnableRecoveryResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *EnableRecoveryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *EnableRecoveryResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*EnableRecoveryResponse) ProtoMessage() {}
+func (*EnableRecoveryResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *EnableRecoveryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use EnableRecoveryResponse.ProtoReflect.Descriptor instead.
 func (*EnableRecoveryResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{7}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *EnableRecoveryResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
+func (x *EnableRecoveryResponse) GetSuccess() bool { _ = "STUB: not implemented"; return false }
 
-func (x *EnableRecoveryResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *EnableRecoveryResponse) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
 type GetRecoveryStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -506,34 +302,21 @@ type GetRecoveryStatusRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetRecoveryStatusRequest) Reset() {
-	*x = GetRecoveryStatusRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetRecoveryStatusRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetRecoveryStatusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetRecoveryStatusRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetRecoveryStatusRequest) ProtoMessage() {}
+func (*GetRecoveryStatusRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetRecoveryStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetRecoveryStatusRequest.ProtoReflect.Descriptor instead.
 func (*GetRecoveryStatusRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{8}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type GetRecoveryStatusResponse struct {
@@ -544,42 +327,24 @@ type GetRecoveryStatusResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetRecoveryStatusResponse) Reset() {
-	*x = GetRecoveryStatusResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetRecoveryStatusResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetRecoveryStatusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetRecoveryStatusResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetRecoveryStatusResponse) ProtoMessage() {}
+func (*GetRecoveryStatusResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetRecoveryStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetRecoveryStatusResponse.ProtoReflect.Descriptor instead.
 func (*GetRecoveryStatusResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{9}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetRecoveryStatusResponse) GetEnabled() bool {
-	if x != nil {
-		return x.Enabled
-	}
-	return false
-}
+func (x *GetRecoveryStatusResponse) GetEnabled() bool { _ = "STUB: not implemented"; return false }
 
 type TriggerRecoveryNowRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -592,42 +357,24 @@ type TriggerRecoveryNowRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TriggerRecoveryNowRequest) Reset() {
-	*x = TriggerRecoveryNowRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *TriggerRecoveryNowRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *TriggerRecoveryNowRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *TriggerRecoveryNowRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*TriggerRecoveryNowRequest) ProtoMessage() {}
+func (*TriggerRecoveryNowRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *TriggerRecoveryNowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use TriggerRecoveryNowRequest.ProtoReflect.Descriptor instead.
 func (*TriggerRecoveryNowRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{10}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *TriggerRecoveryNowRequest) GetMaxCycles() uint32 {
-	if x != nil {
-		return x.MaxCycles
-	}
-	return 0
-}
+func (x *TriggerRecoveryNowRequest) GetMaxCycles() uint32 { _ = "STUB: not implemented"; return 0 }
 
 type TriggerRecoveryNowResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -637,40 +384,25 @@ type TriggerRecoveryNowResponse struct {
 	sizeCache             protoimpl.SizeCache
 }
 
-func (x *TriggerRecoveryNowResponse) Reset() {
-	*x = TriggerRecoveryNowResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *TriggerRecoveryNowResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *TriggerRecoveryNowResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *TriggerRecoveryNowResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*TriggerRecoveryNowResponse) ProtoMessage() {}
+func (*TriggerRecoveryNowResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *TriggerRecoveryNowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use TriggerRecoveryNowResponse.ProtoReflect.Descriptor instead.
 func (*TriggerRecoveryNowResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{11}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *TriggerRecoveryNowResponse) GetRemainingProblemCodes() []string {
-	if x != nil {
-		return x.RemainingProblemCodes
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -710,63 +442,39 @@ type ApplyCertifiedRuleChangeRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ApplyCertifiedRuleChangeRequest) Reset() {
-	*x = ApplyCertifiedRuleChangeRequest{}
-	mi := &file_multiorchservice_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ApplyCertifiedRuleChangeRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ApplyCertifiedRuleChangeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ApplyCertifiedRuleChangeRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ApplyCertifiedRuleChangeRequest) ProtoMessage() {}
+func (*ApplyCertifiedRuleChangeRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ApplyCertifiedRuleChangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ApplyCertifiedRuleChangeRequest.ProtoReflect.Descriptor instead.
 func (*ApplyCertifiedRuleChangeRequest) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{12}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ApplyCertifiedRuleChangeRequest) GetShardKey() *clustermetadata.ShardKey {
-	if x != nil {
-		return x.ShardKey
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ApplyCertifiedRuleChangeRequest) GetProposedRule() *clustermetadata.ShardRule {
-	if x != nil {
-		return x.ProposedRule
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ApplyCertifiedRuleChangeRequest) GetCert() *clustermetadata.ExternallyCertifiedRevocation {
-	if x != nil {
-		return x.Cert
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *ApplyCertifiedRuleChangeRequest) GetReason() string {
-	if x != nil {
-		return x.Reason
-	}
-	return ""
-}
+func (x *ApplyCertifiedRuleChangeRequest) GetReason() string { _ = "STUB: not implemented"; return "" }
 
 type ApplyCertifiedRuleChangeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -774,34 +482,21 @@ type ApplyCertifiedRuleChangeResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ApplyCertifiedRuleChangeResponse) Reset() {
-	*x = ApplyCertifiedRuleChangeResponse{}
-	mi := &file_multiorchservice_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ApplyCertifiedRuleChangeResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ApplyCertifiedRuleChangeResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ApplyCertifiedRuleChangeResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ApplyCertifiedRuleChangeResponse) ProtoMessage() {}
+func (*ApplyCertifiedRuleChangeResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ApplyCertifiedRuleChangeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchservice_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ApplyCertifiedRuleChangeResponse.ProtoReflect.Descriptor instead.
 func (*ApplyCertifiedRuleChangeResponse) Descriptor() ([]byte, []int) {
-	return file_multiorchservice_proto_rawDescGZIP(), []int{13}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 var File_multiorchservice_proto protoreflect.FileDescriptor
@@ -869,12 +564,7 @@ var (
 	file_multiorchservice_proto_rawDescData []byte
 )
 
-func file_multiorchservice_proto_rawDescGZIP() []byte {
-	file_multiorchservice_proto_rawDescOnce.Do(func() {
-		file_multiorchservice_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_multiorchservice_proto_rawDesc), len(file_multiorchservice_proto_rawDesc)))
-	})
-	return file_multiorchservice_proto_rawDescData
-}
+func file_multiorchservice_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_multiorchservice_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_multiorchservice_proto_goTypes = []any{
@@ -929,26 +619,5 @@ var file_multiorchservice_proto_depIdxs = []int32{
 	0,  // [0:11] is the sub-list for field type_name
 }
 
-func init() { file_multiorchservice_proto_init() }
-func file_multiorchservice_proto_init() {
-	if File_multiorchservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multiorchservice_proto_rawDesc), len(file_multiorchservice_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   14,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_multiorchservice_proto_goTypes,
-		DependencyIndexes: file_multiorchservice_proto_depIdxs,
-		MessageInfos:      file_multiorchservice_proto_msgTypes,
-	}.Build()
-	File_multiorchservice_proto = out.File
-	file_multiorchservice_proto_goTypes = nil
-	file_multiorchservice_proto_depIdxs = nil
-}
+func init()                             { file_multiorchservice_proto_init() }
+func file_multiorchservice_proto_init() { _ = "STUB: not implemented"; return }

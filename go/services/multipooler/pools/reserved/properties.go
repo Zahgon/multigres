@@ -16,8 +16,6 @@ package reserved
 
 import (
 	"time"
-
-	"github.com/multigres/multigres/go/common/protoutil"
 )
 
 // ReservationProperties tracks why a connection is reserved.
@@ -39,85 +37,57 @@ type ReservationProperties struct {
 
 // NewReservationProperties creates new reservation properties with the given reasons bitmask.
 func NewReservationProperties(reasons uint32) *ReservationProperties {
-	return &ReservationProperties{
-		StartTime: time.Now(),
-		Reasons:   reasons,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddReason adds a reason to the reservation bitmask.
-func (p *ReservationProperties) AddReason(reason uint32) {
-	p.Reasons = protoutil.AddReason(p.Reasons, reason)
-}
+func (p *ReservationProperties) AddReason(reason uint32) { _ = "STUB: not implemented"; return }
 
 // RemoveReason removes a reason from the reservation bitmask.
-func (p *ReservationProperties) RemoveReason(reason uint32) {
-	p.Reasons = protoutil.RemoveReason(p.Reasons, reason)
-}
+func (p *ReservationProperties) RemoveReason(reason uint32) { _ = "STUB: not implemented"; return }
 
 // HasReason returns true if the reservation includes the specified reason.
 func (p *ReservationProperties) HasReason(reason uint32) bool {
-	return protoutil.HasReason(p.Reasons, reason)
+	_ = "STUB: not implemented"
+	return false
 }
 
 // IsEmpty returns true if no reservation reasons remain.
-func (p *ReservationProperties) IsEmpty() bool {
-	return protoutil.IsEmpty(p.Reasons)
-}
+func (p *ReservationProperties) IsEmpty() bool { _ = "STUB: not implemented"; return false }
 
 // ReasonsString returns a human-readable string of the reasons bitmask.
-func (p *ReservationProperties) ReasonsString() string {
-	return protoutil.ReasonsString(p.Reasons)
-}
+func (p *ReservationProperties) ReasonsString() string { _ = "STUB: not implemented"; return "" }
 
 // Duration returns how long the connection has been reserved.
 func (p *ReservationProperties) Duration() time.Duration {
-	return time.Since(p.StartTime)
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // IsForPortal returns true if the reservation includes a portal reason.
-func (p *ReservationProperties) IsForPortal() bool {
-	return p.HasReason(protoutil.ReasonPortal)
-}
+func (p *ReservationProperties) IsForPortal() bool { _ = "STUB: not implemented"; return false }
 
 // IsForTransaction returns true if the reservation includes a transaction reason.
-func (p *ReservationProperties) IsForTransaction() bool {
-	return p.HasReason(protoutil.ReasonTransaction)
-}
+func (p *ReservationProperties) IsForTransaction() bool { _ = "STUB: not implemented"; return false }
 
 // AddPortal adds a portal to the reservation.
-func (p *ReservationProperties) AddPortal(name string) {
-	if p.Portals == nil {
-		p.Portals = make(map[string]struct{})
-	}
-	p.Portals[name] = struct{}{}
-}
+func (p *ReservationProperties) AddPortal(name string) { _ = "STUB: not implemented"; return }
 
 // RemovePortal removes a portal from the reservation.
 // Returns true if the portal was present and removed.
 func (p *ReservationProperties) RemovePortal(name string) bool {
-	if p.Portals == nil {
-		return false
-	}
-	_, ok := p.Portals[name]
-	if ok {
-		delete(p.Portals, name)
-	}
-	return ok
+	_ = "STUB: not implemented"
+	return false
 }
 
 // HasPortals returns true if there are any portals in the reservation.
-func (p *ReservationProperties) HasPortals() bool {
-	return len(p.Portals) > 0
-}
+func (p *ReservationProperties) HasPortals() bool { _ = "STUB: not implemented"; return false }
 
 // HasPortal returns true if the specified portal is in the reservation.
 func (p *ReservationProperties) HasPortal(name string) bool {
-	if p.Portals == nil {
-		return false
-	}
-	_, ok := p.Portals[name]
-	return ok
+	_ = "STUB: not implemented"
+	return false
 }
 
 // ReleaseReason indicates why a reserved connection is being released.
@@ -144,21 +114,4 @@ const (
 )
 
 // String returns a string representation of the release reason.
-func (r ReleaseReason) String() string {
-	switch r {
-	case ReleaseCommit:
-		return "commit"
-	case ReleaseRollback:
-		return "rollback"
-	case ReleasePortalComplete:
-		return "portal_complete"
-	case ReleaseTimeout:
-		return "timeout"
-	case ReleaseKill:
-		return "kill"
-	case ReleaseError:
-		return "error"
-	default:
-		return "unknown"
-	}
-}
+func (r ReleaseReason) String() string { _ = "STUB: not implemented"; return "" }

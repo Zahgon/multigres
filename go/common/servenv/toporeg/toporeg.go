@@ -21,14 +21,8 @@ package toporeg
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
-	"time"
-
-	"github.com/multigres/multigres/go/common/servenv"
-	"github.com/multigres/multigres/go/tools/retry"
 )
 
 // TopoReg contains the metadata of the component being registered.
@@ -46,46 +40,17 @@ type TopoReg struct {
 // The alarm will be invoked with the latest error message during retries. If the
 // registration succeeds, the alarm will be invoked with an empty string.
 func Register(register func(ctx context.Context) error, unregister func(ctx context.Context) error, alarm func(string)) *TopoReg {
-	tp := &TopoReg{}
-	tp.ctx, tp.cancel = context.WithCancel(context.TODO())
-	tp.logger = servenv.GetLogger()
-	tp.unregister = unregister
-
-	// Use tp's ctx to abort retries if Unregister gets called.
-	ctx, cancel := context.WithTimeout(tp.ctx, time.Second)
-	defer cancel()
-
-	if err := register(ctx); err == nil {
-		tp.logger.Info("Successfully registered component with topology")
-		return tp
-	} else {
-		alarm(fmt.Sprintf("Failed to register component with topology: %v", err))
-		tp.logger.Error("Failed to register component with topology", "error", err)
-	}
-	tp.wg.Go(func() {
-		// We've already tried once. Use WithInitialDelay to wait before retrying.
-		r := retry.New(10*time.Millisecond, 30*time.Second, retry.WithInitialDelay())
-		for _, err := range r.Attempts(tp.ctx) {
-			if err != nil {
-				// Context cancelled
-				return
-			}
-
-			ctx, cancel := context.WithTimeout(tp.ctx, time.Second)
-			if err := register(ctx); err == nil {
-				tp.logger.Info("Successfully registered component with topology")
-				alarm("")
-				cancel()
-				return
-			} else {
-				// Just call alarm. No need to spam logs.
-				alarm(fmt.Sprintf("Failed to register component with topology: %v", err))
-			}
-			cancel()
-		}
-	})
-	return tp
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Use tp's ctx to abort retries if Unregister gets called.
+
+// We've already tried once. Use WithInitialDelay to wait before retrying.
+
+// Context cancelled
+
+// Just call alarm. No need to spam logs.
 
 // RegisterSynchronous registers the component synchronously, retrying with
 // exponential backoff and jitter until successful or the context expires.
@@ -95,48 +60,17 @@ func Register(register func(ctx context.Context) error, unregister func(ctx cont
 // Use this when the caller must know registration succeeded before proceeding
 // (e.g., claiming a PID prefix that other components depend on).
 func RegisterSynchronous(ctx context.Context, register func(ctx context.Context) error, unregister func(ctx context.Context) error) (*TopoReg, error) {
-	tp := &TopoReg{}
-	tp.ctx, tp.cancel = context.WithCancel(context.TODO())
-	tp.logger = servenv.GetLogger()
-	tp.unregister = unregister
-
-	r := retry.New(50*time.Millisecond, 1*time.Second)
-	for _, err := range r.Attempts(ctx) {
-		if err != nil {
-			return nil, fmt.Errorf("registration failed: %w", err)
-		}
-
-		regCtx, cancel := context.WithTimeout(ctx, time.Second)
-		err = register(regCtx)
-		cancel()
-		if err == nil {
-			tp.logger.InfoContext(ctx, "Successfully registered component with topology")
-			return tp, nil
-		}
-	}
-
-	return nil, errors.New("registration failed")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Unregister unregisters the component from topology.
 // It will terminate any retry goroutines that are still running.
 // It is safe to call Unregister with a nil TopoReg.
 func (tp *TopoReg) Unregister() {
+	_ = "STUB: not implemented"
 	// Safety
-	if tp == nil {
-		return
-	}
-
-	tp.cancel()
-	tp.wg.Wait()
-
-	// Use standalone ctx because tp.ctx is already canceled.
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second)
-	defer cancel()
-
-	if err := tp.unregister(ctx); err != nil {
-		tp.logger.Error("Failed to deregister component from topology", "error", err)
-	} else {
-		tp.logger.Info("Successfully deregistered component from topology")
-	}
+	return
 }
+
+// Use standalone ctx because tp.ctx is already canceled.

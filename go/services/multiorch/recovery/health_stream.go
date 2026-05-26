@@ -16,24 +16,15 @@ package recovery
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/multigres/multigres/go/common/rpcclient"
-	"github.com/multigres/multigres/go/common/timeouts"
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	multiorchdatapb "github.com/multigres/multigres/go/pb/multiorchdata"
 	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 	"github.com/multigres/multigres/go/services/multiorch/store"
-	"github.com/multigres/multigres/go/tools/retry"
 )
 
 const (
@@ -97,19 +88,11 @@ type Option func(*HealthStream)
 
 // WithSnapshotInterval sets the proactive snapshot interval sent to the server
 // in the start message.
-func WithSnapshotInterval(d time.Duration) Option {
-	return func(hs *HealthStream) {
-		hs.snapshotInterval = d
-	}
-}
+func WithSnapshotInterval(d time.Duration) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithStalenessTimeout sets the staleness timeout sent to the server and used
 // to arm the client-side staleness watchdog. Intended for tests.
-func WithStalenessTimeout(d time.Duration) Option {
-	return func(hs *HealthStream) {
-		hs.stalenessTimeout = d
-	}
-}
+func WithStalenessTimeout(d time.Duration) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // NewHealthStream creates a HealthStream.
 //
@@ -121,55 +104,18 @@ func NewHealthStream(
 	logger *slog.Logger,
 	options ...Option,
 ) *HealthStream {
-	smCtx, cancel := context.WithCancel(ctx)
-	hs := &HealthStream{
-		logger:    logger,
-		rpcClient: rpcClient,
-		store:     poolerStore,
-		streams:   make(map[string]*streamEntry),
-		ctx:       smCtx,
-		cancel:    cancel,
-	}
-
-	for _, opt := range options {
-		opt(hs)
-	}
-
-	return hs
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Shutdown cancels all active streams and waits for their goroutines to exit.
-func (hs *HealthStream) Shutdown() {
-	hs.cancel()
-	hs.wg.Wait()
-}
+func (hs *HealthStream) Shutdown() { _ = "STUB: not implemented"; return }
 
 // Start starts a health stream for id.
 // If a stream is already running for this pooler the call is a no-op.
 // The pooler's MultiPooler metadata is read from the store on each
 // reconnect attempt so topology updates are automatically picked up.
-func (hs *HealthStream) Start(id *clustermetadatapb.ID) {
-	poolerID := topoclient.MultiPoolerIDString(id)
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	if _, exists := hs.streams[poolerID]; exists {
-		return
-	}
-
-	ctx, cancel := context.WithCancel(hs.ctx)
-	entry := &streamEntry{cancel: cancel}
-	hs.streams[poolerID] = entry
-
-	hs.wg.Go(func() {
-		defer func() {
-			hs.mu.Lock()
-			delete(hs.streams, poolerID)
-			hs.mu.Unlock()
-		}()
-		hs.runStream(ctx, poolerID, entry)
-	})
-}
+func (hs *HealthStream) Start(id *clustermetadatapb.ID) { _ = "STUB: not implemented"; return }
 
 // Stop the health stream for a pooler.
 //
@@ -178,299 +124,86 @@ func (hs *HealthStream) Start(id *clustermetadatapb.ID) {
 // in the store for the stream to reconnect if Start() is called again.
 //
 // If no stream is running for this pooler the call is a no-op.
-func (hs *HealthStream) Stop(id *clustermetadatapb.ID) {
-	poolerID := topoclient.MultiPoolerIDString(id)
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
+func (hs *HealthStream) Stop(id *clustermetadatapb.ID) { _ = "STUB: not implemented"; return }
 
-	// The goroutine removes itself from hs.streams via its defer so we
-	// don't need to delete the entry here; just cancel it and let the
-	// goroutine clean up.
-	if entry, exists := hs.streams[poolerID]; exists {
-		entry.cancel()
-	}
-}
+// The goroutine removes itself from hs.streams via its defer so we
+// don't need to delete the entry here; just cancel it and let the
+// goroutine clean up.
 
 // runStream manages the lifecycle of one stream, reconnecting with backoff on failure.
 // It reads the latest MultiPooler metadata from the store on each reconnect attempt
 // so hostname/port changes are picked up automatically.
 func (hs *HealthStream) runStream(ctx context.Context, poolerID string, entry *streamEntry) {
-	r := retry.New(streamReconnectInitialBackoff, streamReconnectMaxBackoff, retry.WithInitialDelay())
-	for _, err := range r.Attempts(ctx) {
-		if err != nil {
-			return
-		}
-
-		// Read current pooler metadata from store on every attempt.
-		poolerHealth, ok := hs.store.Get(poolerID)
-		if !ok || poolerHealth.MultiPooler == nil {
-			hs.logger.WarnContext(ctx, "pooler not found in store, stopping health stream",
-				"pooler_id", poolerID)
-			return
-		}
-
-		connected, streamErr := hs.streamOnce(ctx, poolerID, poolerHealth, entry)
-		if ctx.Err() != nil {
-			return
-		}
-
-		if connected {
-			// Stream was successfully established before failing — reset backoff.
-			r.Reset()
-		}
-
-		hs.markDisconnected(poolerID)
-
-		if streamErr != nil {
-			hs.logger.WarnContext(ctx, "health stream disconnected",
-				"pooler_id", poolerID,
-				"error", streamErr,
-			)
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Read current pooler metadata from store on every attempt.
+
+// Stream was successfully established before failing — reset backoff.
 
 // streamOnce opens one ManagerHealthStream and reads until the stream fails or
 // the context is cancelled. Returns (connected, err): connected is true if the
 // stream was established before any error occurred.
 func (hs *HealthStream) streamOnce(ctx context.Context, poolerID string, poolerHealth *multiorchdatapb.PoolerHealthState, entry *streamEntry) (connected bool, _ error) {
+	_ = "STUB: not implemented"
 	// Build the start request, sending the orchestrator's preferred timing.
 	// Zero values are omitted so the server uses its own defaults.
-	startReq := &multipoolermanagerdatapb.ManagerHealthStreamStartRequest{}
-	if hs.snapshotInterval > 0 {
-		startReq.SnapshotInterval = durationpb.New(hs.snapshotInterval)
-	}
-	if hs.stalenessTimeout > 0 {
-		startReq.StalenessTimeout = durationpb.New(hs.stalenessTimeout)
-	}
-
-	// Seed the staleness watchdog before any message is received. This is the
-	// value we sent; the server will confirm (or adjust) it in the start response,
-	// at which point we reset the watchdog to the echoed value.
-	initialStaleness := timeouts.DefaultHealthStreamStalenessTimeout
-	if hs.stalenessTimeout > 0 {
-		initialStaleness = hs.stalenessTimeout
-	}
-
-	// Staleness watchdog: cancel the stream if no message arrives within the
-	// timeout. This catches the "server goroutine stuck but TCP alive" failure
-	// mode that gRPC keepalive does not cover.
-	//
-	// The watchdog context is passed to ManagerHealthStream so cancelling it
-	// terminates the gRPC stream and causes stream.Recv() to return an error.
-	watchdogCtx, cancelWatchdog := context.WithCancel(ctx)
-	defer cancelWatchdog()
-
-	// resetCh carries the new timer duration whenever a message is received.
-	// Buffered so the recv loop never blocks on the watchdog goroutine.
-	resetCh := make(chan time.Duration, 1)
-	go func() {
-		current := initialStaleness
-		timer := time.NewTimer(current)
-		defer timer.Stop()
-		for {
-			select {
-			case d := <-resetCh:
-				current = d
-				if !timer.Stop() {
-					select {
-					case <-timer.C:
-					default:
-					}
-				}
-				timer.Reset(current)
-			case <-timer.C:
-				hs.logger.WarnContext(ctx, "health stream stale: no message received within timeout, reconnecting",
-					"pooler_id", poolerID,
-					"timeout", current,
-				)
-				cancelWatchdog()
-				return
-			case <-watchdogCtx.Done():
-				return
-			}
-		}
-	}()
-
-	stream, err := hs.rpcClient.ManagerHealthStream(watchdogCtx, poolerHealth.MultiPooler)
-	if err != nil {
-		return false, fmt.Errorf("open stream: %w", err)
-	}
-
-	// Send the start message with the negotiated timing preferences.
-	if err := stream.Send(&multipoolermanagerdatapb.ManagerHealthStreamClientMessage{
-		Message: &multipoolermanagerdatapb.ManagerHealthStreamClientMessage_Start{
-			Start: startReq,
-		},
-	}); err != nil {
-		return false, fmt.Errorf("send start: %w", err)
-	}
-
-	// Read the start response — the first server message confirms the actual
-	// timing values the server will use.
-	firstMsg, err := stream.Recv()
-	if err != nil {
-		if watchdogCtx.Err() != nil && ctx.Err() == nil {
-			return false, errors.New("staleness timeout waiting for start response")
-		}
-		return false, fmt.Errorf("recv start response: %w", err)
-	}
-	startResp := firstMsg.GetStart()
-	if startResp == nil {
-		return false, fmt.Errorf("expected start response, got %T", firstMsg.GetMessage())
-	}
-	// Determine the effective staleness for the watchdog:
-	//   - If a local override is set (WithStalenessTimeout), use it directly.
-	//     This preserves sub-second precision used in tests.
-	//   - Otherwise, use the server-confirmed value from the start response.
-	confirmedStaleness := initialStaleness
-	if hs.stalenessTimeout == 0 {
-		if s := startResp.StalenessTimeout.AsDuration(); s > 0 {
-			confirmedStaleness = s
-		}
-	}
-	select {
-	case resetCh <- confirmedStaleness:
-	default:
-	}
-
-	// Expose the live stream so Poll() can send requests.
-	entry.mu.Lock()
-	entry.stream = stream
-	entry.mu.Unlock()
-	defer func() {
-		entry.mu.Lock()
-		entry.stream = nil
-		entry.mu.Unlock()
-	}()
-
-	hs.markConnected(poolerID)
-
-	for {
-		resp, err := stream.Recv()
-		if err != nil {
-			// Distinguish a staleness-triggered cancellation from an external one
-			// so the caller can log a useful error message.
-			if watchdogCtx.Err() != nil && ctx.Err() == nil {
-				return true, fmt.Errorf("staleness timeout: no snapshot received within %s", confirmedStaleness)
-			}
-			return true, fmt.Errorf("recv: %w", err)
-		}
-		if snap := resp.GetSnapshot(); snap != nil {
-			// Reset the staleness watchdog. Prefer the local override (which
-			// preserves sub-second precision); fall back to the server-echoed value.
-			timeout := confirmedStaleness
-			if hs.stalenessTimeout == 0 {
-				if s := snap.Timeout.AsDuration(); s > 0 {
-					timeout = s
-				}
-			}
-			select {
-			case resetCh <- timeout:
-			default:
-				// A reset is already pending; the watchdog will pick it up.
-			}
-			hs.applySnapshot(ctx, poolerID, poolerHealth, snap)
-		}
-	}
+	return false, nil
 }
+
+// Seed the staleness watchdog before any message is received. This is the
+// value we sent; the server will confirm (or adjust) it in the start response,
+// at which point we reset the watchdog to the echoed value.
+
+// Staleness watchdog: cancel the stream if no message arrives within the
+// timeout. This catches the "server goroutine stuck but TCP alive" failure
+// mode that gRPC keepalive does not cover.
+//
+// The watchdog context is passed to ManagerHealthStream so cancelling it
+// terminates the gRPC stream and causes stream.Recv() to return an error.
+
+// resetCh carries the new timer duration whenever a message is received.
+// Buffered so the recv loop never blocks on the watchdog goroutine.
+
+// Send the start message with the negotiated timing preferences.
+
+// Read the start response — the first server message confirms the actual
+// timing values the server will use.
+
+// Determine the effective staleness for the watchdog:
+//   - If a local override is set (WithStalenessTimeout), use it directly.
+//     This preserves sub-second precision used in tests.
+//   - Otherwise, use the server-confirmed value from the start response.
+
+// Expose the live stream so Poll() can send requests.
+
+// Distinguish a staleness-triggered cancellation from an external one
+// so the caller can log a useful error message.
+
+// Reset the staleness watchdog. Prefer the local override (which
+// preserves sub-second precision); fall back to the server-echoed value.
+
+// A reset is already pending; the watchdog will pick it up.
 
 // Poll sends a poll request on the active stream for poolerID, triggering an
 // immediate health snapshot from the pooler. Returns an error if no stream is
 // active or the send fails.
-func (hs *HealthStream) Poll(id *clustermetadatapb.ID) error {
-	poolerID := topoclient.MultiPoolerIDString(id)
-	hs.mu.Lock()
-	entry, exists := hs.streams[poolerID]
-	hs.mu.Unlock()
-	if !exists {
-		return fmt.Errorf("no active stream for pooler %s", poolerID)
-	}
-
-	entry.mu.Lock()
-	stream := entry.stream
-	entry.mu.Unlock()
-	if stream == nil {
-		return fmt.Errorf("stream not yet established for pooler %s", poolerID)
-	}
-
-	return stream.Send(&multipoolermanagerdatapb.ManagerHealthStreamClientMessage{
-		Message: &multipoolermanagerdatapb.ManagerHealthStreamClientMessage_Poll{
-			Poll: &multipoolermanagerdatapb.ManagerHealthStreamPollRequest{},
-		},
-	})
-}
+func (hs *HealthStream) Poll(id *clustermetadatapb.ID) error { _ = "STUB: not implemented"; return nil }
 
 // applySnapshot writes health fields from a snapshot into the pooler store.
 // This mirrors the field writes performed by the old pollPooler function on success.
 func (hs *HealthStream) applySnapshot(ctx context.Context, poolerID string, poolerHealth *multiorchdatapb.PoolerHealthState, snapshot *multipoolermanagerdatapb.ManagerHealthSnapshot) {
-	if snapshot.Status == nil || snapshot.Status.Status == nil {
-		hs.logger.WarnContext(ctx, "received snapshot with nil status, skipping",
-			"pooler_id", poolerID)
-		return
-	}
-
-	status := snapshot.Status.Status
-	now := timestamppb.Now()
-
-	poolerIDStr := topoclient.MultiPoolerIDString(poolerHealth.MultiPooler.Id)
-	update := func(existing *multiorchdatapb.PoolerHealthState) *multiorchdatapb.PoolerHealthState {
-		existing.LastCheckSuccessful = now
-		existing.LastSeen = now
-		existing.IsUpToDate = true
-		existing.IsLastCheckValid = true
-		existing.Status = proto.Clone(status).(*multipoolermanagerdatapb.Status)
-		if snapshot.Status.AvailabilityStatus != nil {
-			existing.AvailabilityStatus = proto.Clone(snapshot.Status.AvailabilityStatus).(*clustermetadatapb.AvailabilityStatus)
-		} else {
-			existing.AvailabilityStatus = nil
-		}
-		if snapshot.Status.ConsensusStatus != nil {
-			existing.ConsensusStatus = proto.Clone(snapshot.Status.ConsensusStatus).(*clustermetadatapb.ConsensusStatus)
-		} else {
-			existing.ConsensusStatus = nil
-		}
-		if status.PostgresReady {
-			existing.LastPostgresReadyTime = now
-		}
-		// NOTE: when PostgresReady is false, LastPostgresReadyTime is intentionally
-		// left at its previous value so callers can reason about "last known good" time.
-		existing.StreamSnapshotsReceived++
-		return existing
-	}
-
-	hs.store.DoUpdate(poolerIDStr, update)
-
-	hs.logger.DebugContext(ctx, "health snapshot applied",
-		"pooler_id", poolerID,
-		"pooler_type", status.PoolerType,
-		"postgres_ready", status.PostgresReady,
-		"postgres_running", status.PostgresRunning,
-	)
+	_ = "STUB: not implemented"
+	return
 }
+
+// NOTE: when PostgresReady is false, LastPostgresReadyTime is intentionally
+// left at its previous value so callers can reason about "last known good" time.
 
 // markConnected records that the stream is connected in the pooler store.
-func (hs *HealthStream) markConnected(poolerID string) {
-	now := timestamppb.Now()
-	cb := func(existing *multiorchdatapb.PoolerHealthState) *multiorchdatapb.PoolerHealthState {
-		existing.StreamConnected = true
-		existing.StreamConnectedSince = now
-		return existing
-	}
-	hs.store.DoUpdate(poolerID, cb)
-}
+func (hs *HealthStream) markConnected(poolerID string) { _ = "STUB: not implemented"; return }
 
 // markDisconnected records that the stream is disconnected and the pooler
 // should be treated as unreachable.
-func (hs *HealthStream) markDisconnected(poolerID string) {
-	cb := func(existing *multiorchdatapb.PoolerHealthState) *multiorchdatapb.PoolerHealthState {
-		existing.IsLastCheckValid = false
-		if existing.Status != nil {
-			existing.Status.PostgresReady = false
-			existing.Status.PostgresRunning = false
-		}
-		existing.StreamConnected = false
-		return existing
-	}
-	hs.store.DoUpdate(poolerID, cb)
-}
+func (hs *HealthStream) markDisconnected(poolerID string) { _ = "STUB: not implemented"; return }

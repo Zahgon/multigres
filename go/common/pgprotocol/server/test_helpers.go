@@ -15,14 +15,9 @@
 package server
 
 import (
-	"bufio"
 	"bytes"
-	"context"
-	"encoding/binary"
 	"net"
 	"time"
-
-	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
 )
 
 // TestConn is a test-only wrapper around Conn that provides access to the write buffer.
@@ -38,89 +33,81 @@ type exportedTestNetConn struct {
 }
 
 func (m *exportedTestNetConn) Read(b []byte) (n int, err error) {
-	return m.readBuf.Read(b)
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *exportedTestNetConn) Write(b []byte) (n int, err error) {
-	return m.writeBuf.Write(b)
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *exportedTestNetConn) Close() error                       { return nil }
-func (m *exportedTestNetConn) LocalAddr() net.Addr                { return nil }
-func (m *exportedTestNetConn) RemoteAddr() net.Addr               { return nil }
-func (m *exportedTestNetConn) SetDeadline(t time.Time) error      { return nil }
-func (m *exportedTestNetConn) SetReadDeadline(t time.Time) error  { return nil }
-func (m *exportedTestNetConn) SetWriteDeadline(t time.Time) error { return nil }
+func (m *exportedTestNetConn) Close() error { _ = "STUB: not implemented"; return nil }
+func (m *exportedTestNetConn) LocalAddr() net.Addr {
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
+}
+func (m *exportedTestNetConn) RemoteAddr() net.Addr {
+	_ = "STUB: not implemented"
+	return *new(net.Addr)
+}
+func (m *exportedTestNetConn) SetDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
+func (m *exportedTestNetConn) SetReadDeadline(t time.Time) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+func (m *exportedTestNetConn) SetWriteDeadline(t time.Time) error {
+	_ = "STUB: not implemented"
 
-// TestConnOption configures a TestConn.
+	// TestConnOption configures a TestConn.
+	return nil
+}
+
 type TestConnOption func(*Conn)
 
 // WithTestHandler sets the handler on a test connection.
 func WithTestHandler(h Handler) TestConnOption {
-	return func(c *Conn) { c.handler = h }
+	_ = "STUB: not implemented"
+	return *new(TestConnOption)
 }
 
 // WithTestDatabase sets the database name on a test connection.
 func WithTestDatabase(db string) TestConnOption {
-	return func(c *Conn) { c.database = db }
+	_ = "STUB: not implemented"
+	return *new(TestConnOption)
 }
 
 // WithTestReplicationMode sets the replication mode on a test connection.
 func WithTestReplicationMode(mode ReplicationMode) TestConnOption {
-	return func(c *Conn) { c.replicationMode = mode }
+	_ = "STUB: not implemented"
+	return *new(TestConnOption)
 }
 
 // NewTestConn creates a Conn suitable for testing.
 // readBuf contains data that will be read by the Conn (simulating client input).
 // The returned TestConn includes WriteBuf to inspect what was written.
 func NewTestConn(readBuf *bytes.Buffer, opts ...TestConnOption) *TestConn {
-	writeBuf := &bytes.Buffer{}
-	netConn := &exportedTestNetConn{readBuf: readBuf, writeBuf: writeBuf}
-
-	ctx, cancel := context.WithCancel(context.TODO())
-	_ = cancel // caller can cancel via conn.Close() if needed
-
-	conn := &Conn{
-		conn:           netConn,
-		bufferedReader: bufio.NewReader(readBuf),
-		bufferedWriter: bufio.NewWriter(writeBuf),
-		txnStatus:      protocol.TxnStatusIdle,
-		ctx:            ctx,
-		cancel:         cancel,
-	}
-	for _, opt := range opts {
-		opt(conn)
-	}
-
-	return &TestConn{
-		Conn:     conn,
-		WriteBuf: writeBuf,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// caller can cancel via conn.Close() if needed
 
 // WriteCopyDataMessage writes a CopyData message to the buffer.
 // This simulates a client sending COPY data.
-func WriteCopyDataMessage(buf *bytes.Buffer, data []byte) {
-	buf.WriteByte(protocol.MsgCopyData)
-	length := uint32(4 + len(data)) // length includes itself
-	_ = binary.Write(buf, binary.BigEndian, length)
-	buf.Write(data)
-}
+func WriteCopyDataMessage(buf *bytes.Buffer, data []byte) { _ = "STUB: not implemented"; return }
+
+// length includes itself
 
 // WriteCopyDoneMessage writes a CopyDone message to the buffer.
 // This simulates a client signaling end of COPY data.
-func WriteCopyDoneMessage(buf *bytes.Buffer) {
-	buf.WriteByte(protocol.MsgCopyDone)
-	length := uint32(4) // length includes itself, no body
-	_ = binary.Write(buf, binary.BigEndian, length)
-}
+func WriteCopyDoneMessage(buf *bytes.Buffer) { _ = "STUB: not implemented"; return }
+
+// length includes itself, no body
 
 // WriteCopyFailMessage writes a CopyFail message to the buffer.
 // This simulates a client aborting a COPY operation with an error message.
-func WriteCopyFailMessage(buf *bytes.Buffer, errMsg string) {
-	buf.WriteByte(protocol.MsgCopyFail)
-	msgBytes := append([]byte(errMsg), 0) // null-terminated
-	length := uint32(4 + len(msgBytes))   // length includes itself
-	_ = binary.Write(buf, binary.BigEndian, length)
-	buf.Write(msgBytes)
-}
+func WriteCopyFailMessage(buf *bytes.Buffer, errMsg string) { _ = "STUB: not implemented"; return }
+
+// null-terminated
+// length includes itself

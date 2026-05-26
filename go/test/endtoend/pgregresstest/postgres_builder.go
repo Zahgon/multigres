@@ -15,23 +15,11 @@
 package pgregresstest
 
 import (
-	"bytes"
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-	"regexp"
-	"runtime"
-	"strconv"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/multigres/multigres/go/test/endtoend/pgbuilder"
-	"github.com/multigres/multigres/go/test/endtoend/suiteutil"
 	"github.com/multigres/multigres/go/tools/executil"
 
 	// PostgreSQL driver for the diagnostic / shim install path.
@@ -94,15 +82,10 @@ type TestFailure struct {
 }
 
 // NewPostgresBuilder creates a new PostgresBuilder with unique build directories.
-func NewPostgresBuilder(t *testing.T) *PostgresBuilder {
-	t.Helper()
-	return &PostgresBuilder{Builder: pgbuilder.New(t)}
-}
+func NewPostgresBuilder(t *testing.T) *PostgresBuilder { _ = "STUB: not implemented"; return nil }
 
 // CheckBuildDependencies verifies that required build tools are available.
-func CheckBuildDependencies(t *testing.T) error {
-	return pgbuilder.CheckBuildDependencies(t)
-}
+func CheckBuildDependencies(t *testing.T) error { _ = "STUB: not implemented"; return nil }
 
 // testSuiteConfig holds configuration for running a PostgreSQL test suite
 // via the shared runTestSuite helper.
@@ -116,122 +99,33 @@ type testSuiteConfig struct {
 // artifact copying, and failure reporting. Both RunRegressionTests and
 // RunIsolationTests delegate to this after constructing their command.
 func (pb *PostgresBuilder) runTestSuite(t *testing.T, ctx context.Context, cmd *executil.Cmd, cfg testSuiteConfig, multigatewayPort int, password string) (*TestResults, error) {
-	t.Helper()
-
-	if err := os.MkdirAll(cfg.outputDir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create %s output directory: %w", cfg.suiteName, err)
-	}
-
-	t.Logf("%s test results will be saved to: %s", cfg.suiteName, cfg.outputDir)
-
-	// Cap how long Run() waits for I/O after the process exits. Without this,
-	// grandchildren (e.g. psql) holding pipes open would cause a hang.
-	cmd.SetWaitDelay(10 * time.Second)
-
-	// pg_regress expected .out files were captured against vanilla PostgreSQL
-	// defaults, so the planner picks different shapes (e.g. Hash↔Merge,
-	// Bitmap↔Index) when pgctld's tuned GUCs are in effect. Override to
-	// PostgreSQL defaults per session via PGOPTIONS so the harness matches
-	// upstream fixtures without changing pgctld defaults.
-	pgOptions := "-c work_mem=4MB" +
-		" -c random_page_cost=4.0" +
-		" -c effective_cache_size=4GB" +
-		" -c max_parallel_workers_per_gather=2"
-
-	cmd.AddEnv(
-		"PGHOST=localhost",
-		fmt.Sprintf("PGPORT=%d", multigatewayPort),
-		"PGUSER=postgres",
-		"PGPASSWORD="+password,
-		"PGDATABASE=postgres",
-		"PGCONNECT_TIMEOUT=10",
-		"PGOPTIONS="+pgOptions,
-		// PG_TEST_TIMEOUT_DEFAULT (in seconds) caps how long isolationtester
-		// waits per step before cancelling. Upstream default is 180 →
-		// max_step_wait = 360 s with hard-exit at 720 s, which lets a
-		// single compat-incompatible spec burn ~12 minutes of the suite
-		// ctx and starve the rest of the schedule. The cap applies per
-		// step and a multi-permutation spec where every permutation
-		// hangs scales linearly. 5 s gives 10 s cancel / 20 s hard-exit
-		// per step, ~500x headroom over the 10 ms poll interval used to
-		// detect legitimate blocking.
-		"PG_TEST_TIMEOUT_DEFAULT=5",
-	)
-
-	// Capture stdout for result parsing while still printing to the terminal.
-	// pg_regress deletes regression.out when all tests pass, so stdout is our
-	// reliable source for TAP output. We still try the on-disk file first
-	// because it contains partial results if the process is killed mid-run.
-	var stdoutBuf bytes.Buffer
-	cmd.Stdout = io.MultiWriter(os.Stdout, &stdoutBuf)
-	cmd.Stderr = os.Stderr
-
-	srcOut := filepath.Join(cfg.srcOutDir, "regression.out")
-
-	startTime := time.Now()
-	err := cmd.Run()
-	duration := time.Since(startTime)
-
-	t.Logf("%s test execution completed in %v (err=%v)", cfg.suiteName, duration, err)
-
-	outData, readErr := os.ReadFile(srcOut)
-	if readErr != nil {
-		outData = stdoutBuf.Bytes()
-	}
-	if len(outData) == 0 {
-		return nil, fmt.Errorf("no %s TAP output: regression.out missing and stdout empty", cfg.suiteName)
-	}
-	results, parseErr := pb.ParseTestResults(string(outData))
-	if parseErr != nil {
-		return nil, fmt.Errorf("failed to parse %s regression.out: %w", cfg.suiteName, parseErr)
-	}
-	results.Duration = duration
-	results.TimedOut = ctx.Err() == context.DeadlineExceeded
-
-	srcDiffs := filepath.Join(cfg.srcOutDir, "regression.diffs")
-	dstDiffs := filepath.Join(cfg.outputDir, "regression.diffs")
-	dstOut := filepath.Join(cfg.outputDir, "regression.out")
-
-	if diffsData, err := os.ReadFile(srcDiffs); err == nil {
-		if err := os.WriteFile(dstDiffs, diffsData, 0o644); err != nil {
-			t.Logf("Warning: Failed to copy %s regression.diffs: %v", cfg.suiteName, err)
-		}
-	}
-
-	if err := os.WriteFile(dstOut, outData, 0o644); err != nil {
-		t.Logf("Warning: Failed to copy %s regression.out: %v", cfg.suiteName, err)
-	}
-
-	t.Logf("")
-	t.Logf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	t.Logf("%s test results saved to: %s", cfg.suiteName, cfg.outputDir)
-	t.Logf("  • Summary:     %s", dstOut)
-	t.Logf("  • Differences: %s", dstDiffs)
-	t.Logf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	t.Logf("")
-
-	if results.FailedTests > 0 {
-		if diffsContent, err := os.ReadFile(dstDiffs); err == nil {
-			t.Logf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-			t.Logf("%s Differences (from %s):", cfg.suiteName, dstDiffs)
-			t.Logf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-			t.Logf("%s", string(diffsContent))
-			t.Logf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-		} else {
-			t.Logf("Warning: Could not read %s regression.diffs: %v", cfg.suiteName, err)
-		}
-	}
-
-	if results.TotalTests > 0 {
-		return results, err
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("%s test harness failed to execute: %w", cfg.suiteName, err)
-	}
-
-	return results, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Cap how long Run() waits for I/O after the process exits. Without this,
+// grandchildren (e.g. psql) holding pipes open would cause a hang.
+
+// pg_regress expected .out files were captured against vanilla PostgreSQL
+// defaults, so the planner picks different shapes (e.g. Hash↔Merge,
+// Bitmap↔Index) when pgctld's tuned GUCs are in effect. Override to
+// PostgreSQL defaults per session via PGOPTIONS so the harness matches
+// upstream fixtures without changing pgctld defaults.
+
+// PG_TEST_TIMEOUT_DEFAULT (in seconds) caps how long isolationtester
+// waits per step before cancelling. Upstream default is 180 →
+// max_step_wait = 360 s with hard-exit at 720 s, which lets a
+// single compat-incompatible spec burn ~12 minutes of the suite
+// ctx and starve the rest of the schedule. The cap applies per
+// step and a multi-permutation spec where every permutation
+// hangs scales linearly. 5 s gives 10 s cancel / 20 s hard-exit
+// per step, ~500x headroom over the 10 ms poll interval used to
+// detect legitimate blocking.
+
+// Capture stdout for result parsing while still printing to the terminal.
+// pg_regress deletes regression.out when all tests pass, so stdout is our
+// reliable source for TAP output. We still try the on-disk file first
+// because it contains partial results if the process is killed mid-run.
 
 // RunRegressionTests runs PostgreSQL regression tests against multigateway.
 //
@@ -252,160 +146,60 @@ func (pb *PostgresBuilder) runTestSuite(t *testing.T, ctx context.Context, cmd *
 //
 // Reference: https://github.com/postgres/postgres/blob/master/src/test/regress/GNUmakefile
 func (pb *PostgresBuilder) RunRegressionTests(t *testing.T, ctx context.Context, multigatewayPort int, password string) (*TestResults, error) {
-	t.Helper()
-
-	t.Logf("Running PostgreSQL regression tests against multigateway on port %d...", multigatewayPort)
-
-	regressDir := filepath.Join(pb.BuildDir, "src", "test", "regress")
-	makeArgs := []string{"-C", regressDir}
-
-	// --use-existing: skip pg_regress's automatic DROP + CREATE of the
-	// "regression" database. Multigateway rejects DROP DATABASE (see the
-	// unsafe-statement list in go/services/multigateway/planner/unsafe_stmt.go),
-	// so we can't let pg_regress manage the database. Instead we run against
-	// the existing "postgres" database for the whole suite.
-	//
-	// --dbname=postgres: point pg_regress at that existing database. pg_regress
-	// will create/drop the expected schema objects per test; cross-test state
-	// leakage is still possible but has not surfaced in practice.
-	makeArgs = append(makeArgs, "EXTRA_REGRESS_OPTS=--use-existing --dbname=postgres")
-
-	if testsEnv := os.Getenv("PGREGRESS_TESTS"); testsEnv != "" {
-		makeArgs = append(makeArgs, "installcheck-tests", "TESTS="+testsEnv)
-		t.Logf("Running selective regression tests: %s", testsEnv)
-	} else {
-		makeArgs = append(makeArgs, "installcheck")
-		t.Logf("Running full PostgreSQL regression test suite (installcheck)")
-	}
-
-	cmd := executil.Command(ctx, "make", makeArgs...).WithProcessGroup()
-
-	return pb.runTestSuite(t, ctx, cmd, testSuiteConfig{
-		suiteName: "Regression",
-		outputDir: pb.OutputDir,
-		srcOutDir: regressDir,
-	}, multigatewayPort, password)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// --use-existing: skip pg_regress's automatic DROP + CREATE of the
+// "regression" database. Multigateway rejects DROP DATABASE (see the
+// unsafe-statement list in go/services/multigateway/planner/unsafe_stmt.go),
+// so we can't let pg_regress manage the database. Instead we run against
+// the existing "postgres" database for the whole suite.
+//
+// --dbname=postgres: point pg_regress at that existing database. pg_regress
+// will create/drop the expected schema objects per test; cross-test state
+// leakage is still possible but has not surfaced in practice.
 
 // ParseTestResults parses pg_regress TAP output to extract test results.
 // Returns an error if no TAP-formatted lines are found in the output.
 func (pb *PostgresBuilder) ParseTestResults(output string) (*TestResults, error) {
-	results := &TestResults{
-		FailureDetails: []TestFailure{},
-		Tests:          []IndividualTestResult{},
-	}
-
-	// Parse TAP format output from pg_regress
-	// Example lines:
-	//   ok 1         - test_setup                                178 ms  (serial)
-	//   ok 2         + boolean                                    61 ms  (parallel)
-	//   not ok 3     + char                                       39 ms  (parallel)
-	tapLine := regexp.MustCompile(`(?m)^(ok|not ok)\s+(\d+)\s+[-+]\s+(\S+)\s+(\d+)\s+ms`)
-	for _, match := range tapLine.FindAllStringSubmatch(output, -1) {
-		status := "pass"
-		if match[1] == "not ok" {
-			status = "fail"
-		}
-		results.Tests = append(results.Tests, IndividualTestResult{
-			Name:     match[3],
-			Status:   status,
-			Duration: match[4] + "ms",
-		})
-		if status == "pass" {
-			results.PassedTests++
-		} else {
-			results.FailedTests++
-			results.FailureDetails = append(results.FailureDetails, TestFailure{
-				TestName: match[3],
-				Error:    "Test failed (see regression.diffs for details)",
-			})
-		}
-	}
-
-	if len(results.Tests) == 0 {
-		return nil, errors.New("no TAP-formatted test output found in pg_regress output")
-	}
-
-	summaryPassPattern := regexp.MustCompile(`All (\d+) tests? passed`)
-	summaryFailPattern := regexp.MustCompile(`(\d+) of (\d+) tests? failed`)
-
-	if matches := summaryPassPattern.FindStringSubmatch(output); len(matches) > 1 {
-		total, _ := strconv.Atoi(matches[1])
-		results.TotalTests = total
-		results.PassedTests = total
-		results.FailedTests = 0
-	} else if matches := summaryFailPattern.FindStringSubmatch(output); len(matches) > 2 {
-		failed, _ := strconv.Atoi(matches[1])
-		total, _ := strconv.Atoi(matches[2])
-		results.TotalTests = total
-		results.FailedTests = failed
-		results.PassedTests = total - failed
-	}
-
-	if results.TotalTests == 0 && (results.PassedTests > 0 || results.FailedTests > 0) {
-		results.TotalTests = results.PassedTests + results.FailedTests + results.SkippedTests
-	}
-
-	return results, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Parse TAP format output from pg_regress
+// Example lines:
+//   ok 1         - test_setup                                178 ms  (serial)
+//   ok 2         + boolean                                    61 ms  (parallel)
+//   not ok 3     + char                                       39 ms  (parallel)
 
 // PatchesDir returns the absolute path to the per-test patch directory for
 // the PostgreSQL major version this builder is pinned to. Patches live under
 // testdata/pg<major>/patches/ next to this file.
-func PatchesDir() string {
-	_, file, _, _ := runtime.Caller(0)
-	pkgDir := filepath.Dir(file)
-	return filepath.Join(pkgDir, "testdata", pgMajorDir(), "patches")
-}
+func PatchesDir() string { _ = "STUB: not implemented"; return "" }
 
 // pgMajorDir returns the directory name under testdata/ that holds patches for
 // the PostgreSQL version this test targets. Pinned to pg17 today; add a case
 // when PostgresVersion advances.
 func pgMajorDir() string {
+	_ = "STUB: not implemented"
 	// "REL_17_6" → "pg17"
-	if strings.HasPrefix(PostgresVersion, "REL_17") {
-		return "pg17"
-	}
-	// Unknown version: fall back to pg17 and let the test fail if patches
-	// are missing.
-	return "pg17"
+	return ""
 }
+
+// Unknown version: fall back to pg17 and let the test fail if patches
+// are missing.
 
 // findRepoRoot walks up from this source file until it finds a directory
 // containing go.mod. Returns empty string if not found — callers degrade to
 // absolute paths in that case.
-func findRepoRoot() string {
-	_, file, _, _ := runtime.Caller(0)
-	dir := filepath.Dir(file)
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return ""
-		}
-		dir = parent
-	}
-}
+func findRepoRoot() string { _ = "STUB: not implemented"; return "" }
 
 // findExpectedFile locates the expected-output file pg_regress would use for
 // the given test name. PostgreSQL ships variant files (name_1.out, name_2.out,
 // …) for platform-dependent output. We try the canonical name first, then
 // numbered variants in order. Returns the empty string if none exist.
-func findExpectedFile(regressDir, name string) string {
-	canonical := filepath.Join(regressDir, "expected", name+".out")
-	if fileExists(canonical) {
-		return canonical
-	}
-	for i := 1; i < 10; i++ {
-		p := filepath.Join(regressDir, "expected", fmt.Sprintf("%s_%d.out", name, i))
-		if fileExists(p) {
-			return p
-		}
-	}
-	return ""
-}
+func findExpectedFile(regressDir, name string) string { _ = "STUB: not implemented"; return "" }
 
 // VerifyWithPatches re-evaluates each test's pass/fail status using the
 // patch-based pipeline (see patch_verify.go). After pg_regress runs, this
@@ -419,139 +213,30 @@ func findExpectedFile(regressDir, name string) string {
 // .out files into the build tree). Actual output is written by pg_regress
 // into the build tree's results/ directory.
 func (pb *PostgresBuilder) VerifyWithPatches(t *testing.T, ctx context.Context, results *TestResults, buildRegressDir, outputDir string) error {
-	t.Helper()
-	mode := GetPatchMode()
-	patchDir := PatchesDir()
-	repoRoot := findRepoRoot()
-	sourceRegressDir := filepath.Join(pb.SourceDir, "src", "test", "regress")
-
-	// Ensure patch dir exists in generate mode so writes don't fail.
-	if mode == PatchModeGenerate {
-		if err := os.MkdirAll(patchDir, 0o755); err != nil {
-			return fmt.Errorf("mkdir patches: %w", err)
-		}
-	}
-
-	t.Logf("Patch-based verification: mode=%s patches=%s", mode, patchDir)
-	t.Logf("  expected source: %s", sourceRegressDir)
-	t.Logf("  actual source:   %s", buildRegressDir)
-
-	// Per-test residual diffs are written under outputDir/diffs/ for inclusion
-	// in the CI artifact. Concatenated failures.diffs is written at the end.
-	diffsDir := ""
-	if outputDir != "" {
-		diffsDir = filepath.Join(outputDir, "diffs")
-	}
-	var aggregated bytes.Buffer
-
-	// Recompute aggregates from the per-test results after verification.
-	// We intentionally discard pg_regress's TAP-derived aggregates because
-	// patch-based verification is authoritative.
-	var passed, failed int
-	failures := results.FailureDetails[:0]
-
-	for i := range results.Tests {
-		test := &results.Tests[i]
-		if test.Status == "skip" {
-			// Leave skipped tests alone.
-			continue
-		}
-
-		expPath := findExpectedFile(sourceRegressDir, test.Name)
-		actPath := filepath.Join(buildRegressDir, "results", test.Name+".out")
-		if expPath == "" || !fileExists(actPath) {
-			// Infrastructure problem (test didn't run, expected missing).
-			// Preserve TAP verdict, count accordingly.
-			test.FailReason = "expected or actual output missing; kept TAP verdict"
-			if test.Status == "pass" {
-				passed++
-			} else {
-				failed++
-				failures = append(failures, TestFailure{
-					TestName: test.Name,
-					Error:    test.FailReason,
-				})
-			}
-			continue
-		}
-
-		outcome, err := VerifyTest(ctx, VerifyInput{
-			Name:         test.Name,
-			ExpectedPath: expPath,
-			ActualPath:   actPath,
-			PatchDir:     patchDir,
-			RepoRoot:     repoRoot,
-		}, mode)
-		if err != nil {
-			return fmt.Errorf("verify %s: %w", test.Name, err)
-		}
-
-		test.Status = outcome.Status
-		test.PatchApplied = outcome.PatchApplied
-		test.PatchPath = outcome.PatchPath
-		test.FailReason = outcome.Reason
-
-		if outcome.Status == "pass" {
-			passed++
-			continue
-		}
-		failed++
-		failures = append(failures, TestFailure{
-			TestName: test.Name,
-			Error:    outcome.Reason,
-		})
-
-		if outcome.Diff == "" || diffsDir == "" {
-			continue
-		}
-		if err := os.MkdirAll(diffsDir, 0o755); err != nil {
-			t.Logf("Warning: mkdir %s: %v", diffsDir, err)
-			continue
-		}
-		diffPath := filepath.Join(diffsDir, test.Name+".diff")
-		if err := os.WriteFile(diffPath, []byte(outcome.Diff), 0o644); err != nil {
-			t.Logf("Warning: write %s: %v", diffPath, err)
-			continue
-		}
-		fmt.Fprintf(&aggregated, "=== %s ===\n%s\n", test.Name, outcome.Diff)
-	}
-
-	if outputDir != "" && aggregated.Len() > 0 {
-		aggPath := filepath.Join(outputDir, "failures.diffs")
-		if err := os.WriteFile(aggPath, aggregated.Bytes(), 0o644); err != nil {
-			t.Logf("Warning: write %s: %v", aggPath, err)
-		} else {
-			t.Logf("Residual failure diffs: %s (per-test files in %s)", aggPath, diffsDir)
-		}
-	}
-
-	results.PassedTests = passed
-	results.FailedTests = failed
-	// Preserve SkippedTests + any pre-existing total if it exceeds ran.
-	if results.TotalTests < passed+failed+results.SkippedTests {
-		results.TotalTests = passed + failed + results.SkippedTests
-	}
-	results.FailureDetails = failures
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Ensure patch dir exists in generate mode so writes don't fail.
+
+// Per-test residual diffs are written under outputDir/diffs/ for inclusion
+// in the CI artifact. Concatenated failures.diffs is written at the end.
+
+// Recompute aggregates from the per-test results after verification.
+// We intentionally discard pg_regress's TAP-derived aggregates because
+// patch-based verification is authoritative.
+
+// Leave skipped tests alone.
+
+// Infrastructure problem (test didn't run, expected missing).
+// Preserve TAP verdict, count accordingly.
+
+// Preserve SkippedTests + any pre-existing total if it exceeds ran.
 
 // CountScheduleTests parses a PostgreSQL schedule file and returns the number
 // of tests listed. Each line starting with "test:" contains space-separated
 // test names (parallel groups have multiple tests per line).
-func CountScheduleTests(scheduleFile string) (int, error) {
-	data, err := os.ReadFile(scheduleFile)
-	if err != nil {
-		return 0, err
-	}
-	count := 0
-	for line := range strings.SplitSeq(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if rest, ok := strings.CutPrefix(line, "test:"); ok {
-			count += len(strings.Fields(rest))
-		}
-	}
-	return count, nil
-}
+func CountScheduleTests(scheduleFile string) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // SuiteResult holds results for one test suite.
 type SuiteResult struct {
@@ -565,15 +250,7 @@ type SuiteResult struct {
 // GitHub Actions job, or an empty string otherwise. Repo-relative paths
 // concatenated onto this prefix resolve to the blob view of that file at
 // the exact commit the job is executing against.
-func githubBlobURLPrefix() string {
-	serverURL := os.Getenv("GITHUB_SERVER_URL")
-	repo := os.Getenv("GITHUB_REPOSITORY")
-	sha := os.Getenv("GITHUB_SHA")
-	if serverURL == "" || repo == "" || sha == "" {
-		return ""
-	}
-	return fmt.Sprintf("%s/%s/blob/%s/", serverURL, repo, sha)
-}
+func githubBlobURLPrefix() string { _ = "STUB: not implemented"; return "" }
 
 // WriteMarkdownSummary generates a unified markdown report covering one or more
 // test suites. It writes the report to pb.OutputDir/compatibility-report.md and
@@ -582,83 +259,15 @@ func githubBlobURLPrefix() string {
 // Each suite gets its own badge showing pass rate and timeout status. Full diffs
 // are available in the CI artifact (regression.diffs).
 func (pb *PostgresBuilder) WriteMarkdownSummary(t *testing.T, suites []SuiteResult) (string, error) {
-	t.Helper()
-
-	var sb strings.Builder
-
-	sb.WriteString("## PostgreSQL Compatibility Report\n\n")
-
-	for _, s := range suites {
-		label := strings.TrimSuffix(s.Name, " Tests")
-		sb.WriteString(suiteutil.BadgeMarkdown(
-			label,
-			s.Results.PassedTests,
-			s.Results.TotalTests,
-			s.ExpectedTests,
-			s.Results.TimedOut,
-		))
-		sb.WriteString(" ")
-	}
-	sb.WriteString("\n\n")
-
-	fmt.Fprintf(&sb, "**PostgreSQL Version:** `%s`\n", PostgresVersion)
-	fmt.Fprintf(&sb, "**Timestamp:** %s\n\n", time.Now().UTC().Format(time.RFC3339))
-
-	// Build an absolute URL prefix for patch links when running in CI.
-	// Without this, markdown like [patch](go/test/.../foo.patch) is resolved
-	// relative to the step-summary page (/actions/runs/<id>/) and produces a
-	// 404 URL like .../actions/runs/go/test/.../foo.patch. Falls back to a
-	// relative link when the GitHub Actions env vars aren't set (local runs).
-	patchURLPrefix := githubBlobURLPrefix()
-
-	for _, s := range suites {
-		fmt.Fprintf(&sb, "### %s\n\n", s.Name)
-
-		if s.Results.TimedOut {
-			ran := s.Results.TotalTests
-			if s.ExpectedTests > 0 {
-				fmt.Fprintf(&sb, "> **Timed out** — %d of %d scheduled tests executed before the deadline.\n\n", ran, s.ExpectedTests)
-			} else {
-				fmt.Fprintf(&sb, "> **Timed out** — %d tests executed before the deadline.\n\n", ran)
-			}
-		}
-
-		sb.WriteString("| # | Test | Status | Patch | Duration |\n")
-		sb.WriteString("|---|------|--------|-------|----------|\n")
-
-		for i, test := range s.Results.Tests {
-			status := "✅ ok"
-			switch test.Status {
-			case "fail":
-				status = "❌ FAIL"
-			case "skip":
-				status = "⏭️ skip"
-			}
-			duration := test.Duration
-			if duration == "" {
-				duration = "-"
-			}
-			patchCell := "-"
-			if test.PatchApplied {
-				if test.PatchPath != "" {
-					patchCell = fmt.Sprintf("📎 [patch](%s%s)", patchURLPrefix, test.PatchPath)
-				} else {
-					patchCell = "📎 applied"
-				}
-			}
-			fmt.Fprintf(&sb, "| %d | %s | %s | %s | %s |\n", i+1, test.Name, status, patchCell, duration)
-		}
-		sb.WriteString("\n")
-	}
-
-	summary := sb.String()
-	summaryPath, err := suiteutil.WriteMarkdown(pb.OutputDir, "compatibility-report.md", summary)
-	if err != nil {
-		return summary, err
-	}
-	t.Logf("Markdown summary written to: %s", summaryPath)
-	return summary, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Build an absolute URL prefix for patch links when running in CI.
+// Without this, markdown like [patch](go/test/.../foo.patch) is resolved
+// relative to the step-summary page (/actions/runs/<id>/) and produces a
+// 404 URL like .../actions/runs/go/test/.../foo.patch. Falls back to a
+// relative link when the GitHub Actions env vars aren't set (local runs).
 
 // jsonSuiteResult is the JSON-serializable representation of a single test suite's results.
 type jsonSuiteResult struct {
@@ -669,22 +278,8 @@ type jsonSuiteResult struct {
 // WriteJSONResults serializes suite results to pb.OutputDir/results.json.
 // This file is consumed by CI scripts that compare runs to detect regressions.
 func (pb *PostgresBuilder) WriteJSONResults(t *testing.T, suites []SuiteResult) (string, error) {
-	t.Helper()
-
-	var out []jsonSuiteResult
-	for _, s := range suites {
-		out = append(out, jsonSuiteResult{
-			Name:  s.Name,
-			Tests: s.Results.Tests,
-		})
-	}
-
-	resultsPath, err := suiteutil.WriteJSON(pb.OutputDir, "results.json", out)
-	if err != nil {
-		return "", err
-	}
-	t.Logf("JSON results written to: %s", resultsPath)
-	return resultsPath, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // patchIsolationtester rewrites two pieces of
@@ -714,123 +309,27 @@ func (pb *PostgresBuilder) WriteJSONResults(t *testing.T, suites []SuiteResult) 
 // repeat invocations against the cached checkout produce the same
 // result.
 func (pb *PostgresBuilder) patchIsolationtester(t *testing.T, ctx context.Context) error {
-	t.Helper()
-	rel := filepath.Join("src", "test", "isolation", "isolationtester.c")
-	abs := filepath.Join(pb.SourceDir, rel)
-
-	reset := executil.Command(ctx, "git", "-C", pb.SourceDir, "checkout", "--", rel)
-	if out, err := reset.CombinedOutput(); err != nil {
-		return fmt.Errorf("reset %s: %w\n%s", rel, err, out)
-	}
-
-	src, err := os.ReadFile(abs)
-	if err != nil {
-		return fmt.Errorf("read %s: %w", abs, err)
-	}
-
-	appNameOrig := "\t\tres = PQexecParams(conns[i].conn,\n" +
-		"\t\t\t\t\t\t   \"SELECT set_config('application_name',\\n\"\n" +
-		"\t\t\t\t\t\t   \"  current_setting('application_name') || '/' || $1,\\n\"\n" +
-		"\t\t\t\t\t\t   \"  false)\",\n" +
-		"\t\t\t\t\t\t   1, NULL,\n" +
-		"\t\t\t\t\t\t   &sessionname,\n" +
-		"\t\t\t\t\t\t   NULL, NULL, 0);"
-
-	appNameReplacement := "\t\t/*\n" +
-		"\t\t * multigres patch: build the application_name literal client-side\n" +
-		"\t\t * and send it via the simple protocol. The multigateway planner\n" +
-		"\t\t * rejects set_config() when the value is a non-literal expression\n" +
-		"\t\t * or bound parameter (the pooler tracks the literal value), so we\n" +
-		"\t\t * cannot use PQexecParams + current_setting() here.\n" +
-		"\t\t */\n" +
-		"\t\t{\n" +
-		"\t\t\tconst char *appname_prefix = getenv(\"PGAPPNAME\");\n" +
-		"\t\t\tchar\t   *combined;\n" +
-		"\t\t\tchar\t   *escaped;\n" +
-		"\t\t\tchar\t   *appname_query;\n" +
-		"\n" +
-		"\t\t\tif (appname_prefix == NULL)\n" +
-		"\t\t\t\tappname_prefix = \"\";\n" +
-		"\t\t\tcombined = psprintf(\"%s/%s\", appname_prefix, sessionname);\n" +
-		"\t\t\tescaped = PQescapeLiteral(conns[i].conn, combined, strlen(combined));\n" +
-		"\t\t\tfree(combined);\n" +
-		"\t\t\tif (escaped == NULL)\n" +
-		"\t\t\t{\n" +
-		"\t\t\t\tfprintf(stderr, \"PQescapeLiteral failed: %s\",\n" +
-		"\t\t\t\t\t\tPQerrorMessage(conns[i].conn));\n" +
-		"\t\t\t\texit(1);\n" +
-		"\t\t\t}\n" +
-		"\t\t\tappname_query = psprintf(\n" +
-		"\t\t\t\t\"SELECT set_config('application_name', %s, false)\", escaped);\n" +
-		"\t\t\tPQfreemem(escaped);\n" +
-		"\t\t\tres = PQexec(conns[i].conn, appname_query);\n" +
-		"\t\t\tfree(appname_query);\n" +
-		"\t\t}"
-
-	if !bytes.Contains(src, []byte(appNameOrig)) {
-		return fmt.Errorf("%s: original set_config block not found (PG version drift?)", rel)
-	}
-	patched := bytes.Replace(src, []byte(appNameOrig), []byte(appNameReplacement), 1)
-
-	// Add explicit type casts on both args. isolationtester PQprepares the
-	// wait-query with paramTypes=NULL so $1 enters parse as UNKNOWN, and the
-	// '{...}' literal is also UNKNOWN. PG resolves this for the pg_catalog
-	// C builtin via implicit catalog priority but fails for a public
-	// PL/pgSQL function with "function public.X(unknown, unknown) does not
-	// exist". Casting to int4 / int4[] removes the ambiguity.
-	waitFnOrig := "\"SELECT pg_catalog.pg_isolation_test_session_is_blocked($1, '{\""
-	waitFnReplacement := "\"SELECT public.multigres_test_session_is_blocked($1::int4, '{\""
-	if !bytes.Contains(patched, []byte(waitFnOrig)) {
-		return fmt.Errorf("%s: wait-query function reference not found (PG version drift?)", rel)
-	}
-	patched = bytes.Replace(patched, []byte(waitFnOrig), []byte(waitFnReplacement), 1)
-
-	waitFnSuffixOrig := "appendPQExpBufferStr(&wait_query, \"}')\");"
-	waitFnSuffixReplacement := "appendPQExpBufferStr(&wait_query, \"}'::int4[])\");"
-	if !bytes.Contains(patched, []byte(waitFnSuffixOrig)) {
-		return fmt.Errorf("%s: wait-query suffix not found (PG version drift?)", rel)
-	}
-	patched = bytes.Replace(patched, []byte(waitFnSuffixOrig), []byte(waitFnSuffixReplacement), 1)
-
-	if err := os.WriteFile(abs, patched, 0o644); err != nil {
-		return fmt.Errorf("write %s: %w", abs, err)
-	}
-	t.Logf("Patched %s: literal application_name + public.multigres_test_session_is_blocked", rel)
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Add explicit type casts on both args. isolationtester PQprepares the
+// wait-query with paramTypes=NULL so $1 enters parse as UNKNOWN, and the
+// '{...}' literal is also UNKNOWN. PG resolves this for the pg_catalog
+// C builtin via implicit catalog priority but fails for a public
+// PL/pgSQL function with "function public.X(unknown, unknown) does not
+// exist". Casting to int4 / int4[] removes the ambiguity.
 
 // BuildIsolation builds the PostgreSQL isolation test tools (isolationtester and
 // pg_isolation_regress). Must be called after Build().
 func (pb *PostgresBuilder) BuildIsolation(t *testing.T, ctx context.Context) error {
-	t.Helper()
-
-	if err := pb.patchIsolationtester(t, ctx); err != nil {
-		return fmt.Errorf("patch isolationtester: %w", err)
-	}
-
-	isolationDir := filepath.Join(pb.BuildDir, "src", "test", "isolation")
-
-	t.Logf("Building isolation test tools in %s...", isolationDir)
-	cmd := executil.Command(ctx, "make", "-C", isolationDir, "all")
-	cmd.Cmd.Stdout = os.Stdout
-	cmd.Cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("make isolation tools failed: %w", err)
-	}
-
-	t.Logf("Isolation test tools built successfully")
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // truncateForLog clips s to at most n characters (with an ellipsis suffix when
 // truncation occurs). Used for compact log/error messages.
-func truncateForLog(s string, n int) string {
-	if len(s) <= n {
-		return s
-	}
-	return s[:n] + "..."
-}
+func truncateForLog(s string, n int) string { _ = "STUB: not implemented"; return "" }
 
 // installPIDMappingFunction creates public.multigres_test_session_is_blocked
 // in the target database so the patched isolationtester (see
@@ -857,215 +356,27 @@ func truncateForLog(s string, n int) string {
 // aggregates over every matching backend rather than picking one
 // non-deterministically.
 func (pb *PostgresBuilder) installPIDMappingFunction(t *testing.T, pgPort int, password string) error {
-	t.Helper()
-	connStr := fmt.Sprintf("host=localhost port=%d user=postgres password=%s dbname=postgres sslmode=disable",
-		pgPort, password)
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return fmt.Errorf("failed to connect: %w", err)
-	}
-	defer db.Close()
-	db.SetMaxOpenConns(1)
-	db.SetMaxIdleConns(1)
-
-	stmts := []string{
-		// Debug table: every shim invocation logs its inputs/outputs and a
-		// snapshot of every backend in this DB so failures can be diagnosed
-		// post-hoc by querying isolation_debug_log (see
-		// dumpIsolationDebugLog).
-		`CREATE TABLE IF NOT EXISTS public.isolation_debug_log (
-			id serial PRIMARY KEY,
-			ts timestamptz DEFAULT now(),
-			check_pid int4,
-			blocked_by int4[],
-			real_check_pid int4,
-			real_blocked_by int4[],
-			blocking_pids int4[],
-			vpid_entries text[],
-			all_pg_backends text[],
-			result boolean
-		)`,
-		// Non-destructive add for runs against a pre-existing table from an
-		// earlier shim version that lacked all_pg_backends.
-		`ALTER TABLE public.isolation_debug_log
-		   ADD COLUMN IF NOT EXISTS all_pg_backends text[]`,
-		`TRUNCATE public.isolation_debug_log`,
-		`DROP FUNCTION IF EXISTS public.multigres_test_session_is_blocked(int4, int4[])`,
-		`CREATE FUNCTION public.multigres_test_session_is_blocked(check_pid int4, blocked_by int4[])
-RETURNS boolean
-LANGUAGE plpgsql
-SET search_path = pg_catalog, public
-AS $$
-<<fn>>
-DECLARE
-    v_log_id int4;
-    v_real_check_pid int4;
-    v_real_blocked_by int4[];
-    v_blocking_pids int4[];
-    v_vpid_entries text[];
-    v_all_backends text[];
-    v_stamp_found boolean;
-    v_result boolean;
-BEGIN
-    -- Capture the inserted id directly so the later UPDATE targets THIS
-    -- invocation's row even under concurrent shim calls (parallel groups
-    -- in the isolation schedule, or multiple sessions polling at once).
-    -- max(id) would race against any concurrent INSERT in between.
-    INSERT INTO public.isolation_debug_log
-        (check_pid, blocked_by, result)
-    VALUES
-        (check_pid, blocked_by, NULL)
-    RETURNING id INTO v_log_id;
-
-    SELECT array_agg(sa.application_name || '=' || sa.pid)
-    INTO v_vpid_entries
-    FROM pg_stat_activity sa
-    WHERE sa.application_name LIKE 'multigres_vpid:%';
-
-    SELECT array_agg(sa.pid || ':' || COALESCE(sa.application_name,'<null>') || ':' || COALESCE(sa.state,'<null>'))
-    INTO v_all_backends
-    FROM pg_stat_activity sa
-    WHERE sa.datname = current_database();
-
-    -- A client vpid can map to multiple PG backends (a leftover stamp on
-    -- a pool conn after the client ran a regular query, plus the live
-    -- reserved conn). Picking one non-deterministically risks probing the
-    -- idle one and missing the wait. real_check_pid is kept for
-    -- diagnostic display only; the actual block check below aggregates
-    -- over every matching backend.
-    SELECT sa.pid INTO v_real_check_pid
-    FROM pg_stat_activity sa
-    WHERE sa.application_name = 'multigres_vpid:' || check_pid
-    LIMIT 1;
-
-    SELECT array_agg(sa.pid) INTO v_real_blocked_by
-    FROM pg_stat_activity sa
-    WHERE sa.application_name = ANY(
-        SELECT 'multigres_vpid:' || unnest(blocked_by)
-    );
-
-    -- Direct connections (no multigateway) hand us real pids; preserve them.
-    v_stamp_found := v_real_check_pid IS NOT NULL;
-    v_real_check_pid := COALESCE(v_real_check_pid, check_pid);
-    v_real_blocked_by := COALESCE(v_real_blocked_by, blocked_by);
-
-    -- Aggregate heavyweight lock blockers and SSI safe-snapshot blockers
-    -- across every PG backend currently stamped for this vpid. SSI
-    -- safe-snapshot wait is required for SERIALIZABLE READ ONLY
-    -- DEFERRABLE specs (e.g. read-only-anomaly-3). Aggregation handles
-    -- the duplicate-stamp case where one backend is the live reserved
-    -- conn (potentially blocked) and another is a leaked pool conn
-    -- (idle).
-    --
-    -- The direct-pid fallback only fires when no stamp was found for
-    -- check_pid. vpids occupy the full 31-bit signed int32 space, so a
-    -- vpid value can coincidentally equal an unrelated real PG backend
-    -- PID; probing check_pid as a real pid unconditionally would surface
-    -- that unrelated backend's blockers and risk a false positive.
-    SELECT COALESCE(array_agg(DISTINCT b), '{}'::int4[]) INTO v_blocking_pids
-    FROM (
-        SELECT unnest(pg_blocking_pids(sa.pid)) AS b
-        FROM pg_stat_activity sa
-        WHERE sa.application_name = 'multigres_vpid:' || check_pid
-        UNION ALL
-        SELECT unnest(pg_safe_snapshot_blocking_pids(sa.pid)) AS b
-        FROM pg_stat_activity sa
-        WHERE sa.application_name = 'multigres_vpid:' || check_pid
-        UNION ALL
-        SELECT unnest(pg_blocking_pids(check_pid)) AS b WHERE NOT v_stamp_found
-        UNION ALL
-        SELECT unnest(pg_safe_snapshot_blocking_pids(check_pid)) AS b WHERE NOT v_stamp_found
-    ) sub
-    WHERE b IS NOT NULL;
-
-    v_result := v_blocking_pids && v_real_blocked_by;
-
-    UPDATE public.isolation_debug_log
-    SET real_check_pid = v_real_check_pid,
-        real_blocked_by = v_real_blocked_by,
-        blocking_pids = v_blocking_pids,
-        vpid_entries = v_vpid_entries,
-        all_pg_backends = v_all_backends,
-        result = v_result
-    WHERE id = v_log_id;
-
-    RETURN v_result;
-END fn;
-$$`,
-	}
-	for _, stmt := range stmts {
-		if _, err := db.Exec(stmt); err != nil {
-			return fmt.Errorf("failed to execute statement [%s]: %w", truncateForLog(stmt, 80), err)
-		}
-	}
-
-	// Sanity check: the function exists and is plpgsql.
-	var lang string
-	if err := db.QueryRow(`
-		SELECT l.lanname
-		FROM pg_proc p JOIN pg_language l ON p.prolang = l.oid
-		WHERE p.proname = 'multigres_test_session_is_blocked'
-		  AND p.pronamespace = 'public'::regnamespace`).Scan(&lang); err != nil {
-		return fmt.Errorf("verify multigres_test_session_is_blocked: %w", err)
-	}
-	if lang != "plpgsql" {
-		return fmt.Errorf("multigres_test_session_is_blocked installed with lanname=%q (expected plpgsql)", lang)
-	}
-
-	t.Logf("Installed public.multigres_test_session_is_blocked on database \"postgres\"")
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Debug table: every shim invocation logs its inputs/outputs and a
+// snapshot of every backend in this DB so failures can be diagnosed
+// post-hoc by querying isolation_debug_log (see
+// dumpIsolationDebugLog).
+
+// Non-destructive add for runs against a pre-existing table from an
+// earlier shim version that lacked all_pg_backends.
+
+// Sanity check: the function exists and is plpgsql.
 
 // dumpIsolationDebugLog prints recent entries from
 // public.isolation_debug_log so investigators can see the inputs/outputs
 // of every shim invocation during the isolation run. Best-effort;
 // failures are logged and ignored.
 func (pb *PostgresBuilder) dumpIsolationDebugLog(t *testing.T, pgPort int, password string) {
-	t.Helper()
-	connStr := fmt.Sprintf("host=localhost port=%d user=postgres password=%s dbname=postgres sslmode=disable",
-		pgPort, password)
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		t.Logf("isolation_debug_log dump: connect failed: %v", err)
-		return
-	}
-	defer db.Close()
-
-	var total int
-	if err := db.QueryRow(`SELECT count(*) FROM public.isolation_debug_log WHERE check_pid > 0`).Scan(&total); err != nil {
-		t.Logf("isolation_debug_log dump: count failed: %v", err)
-		return
-	}
-	t.Logf("isolation_debug_log: %d shim invocations recorded during run", total)
-	if total == 0 {
-		t.Logf("isolation_debug_log: shim never executed — wait-query is not reaching public.multigres_test_session_is_blocked")
-		return
-	}
-
-	rows, err := db.Query(`
-		SELECT id, check_pid, blocked_by, real_check_pid, real_blocked_by,
-		       blocking_pids, vpid_entries, all_pg_backends, result
-		FROM public.isolation_debug_log
-		WHERE check_pid > 0
-		ORDER BY id DESC
-		LIMIT 30`)
-	if err != nil {
-		t.Logf("isolation_debug_log dump: select failed: %v", err)
-		return
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var id, checkPid int
-		var blockedBy, realBlockedBy, blockingPids, vpidEntries, allBackends sql.NullString
-		var realCheckPid sql.NullInt32
-		var result sql.NullBool
-		if err := rows.Scan(&id, &checkPid, &blockedBy, &realCheckPid, &realBlockedBy, &blockingPids, &vpidEntries, &allBackends, &result); err != nil {
-			t.Logf("isolation_debug_log dump: scan failed: %v", err)
-			continue
-		}
-		t.Logf("isolation_debug_log id=%d check_pid=%d blocked_by=%s real_check=%v real_blocked=%s blocking=%s vpids=%s all=%s result=%v",
-			id, checkPid, blockedBy.String, realCheckPid, realBlockedBy.String, blockingPids.String, vpidEntries.String, allBackends.String, result)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // RunIsolationTests runs PostgreSQL isolation tests against multigateway.
@@ -1080,70 +391,18 @@ func (pb *PostgresBuilder) dumpIsolationDebugLog(t *testing.T, pgPort int, passw
 // The isolation Makefile has no installcheck-tests target, so for selective tests
 // we invoke pg_isolation_regress directly with test names as positional args.
 func (pb *PostgresBuilder) RunIsolationTests(t *testing.T, ctx context.Context, multigatewayPort, directPgPort int, password string) (*TestResults, error) {
-	t.Helper()
-
-	t.Logf("Running PostgreSQL isolation tests against multigateway on port %d (harness db=postgres)...", multigatewayPort)
-
-	// Install the lock-detection shim on PostgreSQL directly (bypassing
-	// multigateway). Both the selective (PGISOLATION_TESTS) and full-suite
-	// paths force --dbname=postgres on pg_isolation_regress (see the cmd
-	// construction below), and multipooler routes every query to the
-	// postgres DB anyway, so the shim only needs to live there.
-	if err := pb.installPIDMappingFunction(t, directPgPort, password); err != nil {
-		t.Logf("Warning: Failed to install PID mapping function: %v", err)
-		t.Logf("Isolation tests that rely on lock detection (deadlock, etc.) may fail")
-	}
-
-	isolationBuildDir := filepath.Join(pb.BuildDir, "src", "test", "isolation")
-	isolationSourceDir := filepath.Join(pb.SourceDir, "src", "test", "isolation")
-	outputIsoDir := filepath.Join(isolationBuildDir, "output_iso")
-
-	if err := os.MkdirAll(outputIsoDir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create output_iso directory: %w", err)
-	}
-
-	pgIsoRegress := filepath.Join(isolationBuildDir, "pg_isolation_regress")
-	if _, err := os.Stat(pgIsoRegress); os.IsNotExist(err) {
-		t.Logf("Building pg_isolation_regress...")
-		buildCmd := executil.Command(ctx, "make", "-C", isolationBuildDir, "all")
-		if out, err := buildCmd.CombinedOutput(); err != nil {
-			return nil, fmt.Errorf("failed to build pg_isolation_regress: %w\n%s", err, out)
-		}
-	}
-
-	var cmd *executil.Cmd
-	if testsEnv := os.Getenv("PGISOLATION_TESTS"); testsEnv != "" {
-		args := []string{
-			"--inputdir=" + isolationSourceDir,
-			"--outputdir=" + outputIsoDir,
-			"--host=localhost",
-			fmt.Sprintf("--port=%d", multigatewayPort),
-			"--user=postgres",
-			"--dbname=postgres",
-			"--use-existing",
-			"--dlpath=" + isolationBuildDir,
-		}
-		args = append(args, strings.Fields(testsEnv)...)
-		cmd = executil.Command(ctx, pgIsoRegress, args...).WithProcessGroup()
-		t.Logf("Running selective isolation tests: %s", testsEnv)
-	} else {
-		cmd = executil.Command(ctx, "make", "-C", isolationBuildDir, "installcheck",
-			"EXTRA_REGRESS_OPTS=--use-existing --dbname=postgres").WithProcessGroup()
-		t.Logf("Running full PostgreSQL isolation test suite (installcheck)")
-	}
-
-	results, runErr := pb.runTestSuite(t, ctx, cmd, testSuiteConfig{
-		suiteName: "Isolation",
-		outputDir: filepath.Join(pb.OutputDir, "isolation"),
-		srcOutDir: outputIsoDir,
-	}, multigatewayPort, password)
-
-	// Post-suite diagnostic: dump the last entries of isolation_debug_log
-	// so investigators can see what the shim observed (or didn't) for
-	// hung specs. The table lives in the postgres DB on the primary;
-	// query it directly to bypass any multigateway routing that a
-	// failing wait-query would have used.
-	pb.dumpIsolationDebugLog(t, directPgPort, password)
-
-	return results, runErr
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Install the lock-detection shim on PostgreSQL directly (bypassing
+// multigateway). Both the selective (PGISOLATION_TESTS) and full-suite
+// paths force --dbname=postgres on pg_isolation_regress (see the cmd
+// construction below), and multipooler routes every query to the
+// postgres DB anyway, so the shim only needs to live there.
+
+// Post-suite diagnostic: dump the last entries of isolation_debug_log
+// so investigators can see what the shim observed (or didn't) for
+// hung specs. The table lives in the postgres DB on the primary;
+// query it directly to bypass any multigateway routing that a
+// failing wait-query would have used.

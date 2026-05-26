@@ -16,16 +16,11 @@ package reserved
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/protoutil"
 	"github.com/multigres/multigres/go/services/multipooler/connstate"
 	"github.com/multigres/multigres/go/services/multipooler/pools/connpool"
 	"github.com/multigres/multigres/go/services/multipooler/pools/regular"
@@ -99,58 +94,19 @@ type Pool struct {
 // The pool creates and manages its own underlying regular connection pool.
 // Starts a background goroutine to kill idle connections.
 // The provided context is used to derive the pool's lifecycle context.
-func NewPool(ctx context.Context, config *PoolConfig) *Pool {
-	if config.InactivityTimeout <= 0 {
-		config.InactivityTimeout = 30 * time.Second
-	}
+func NewPool(ctx context.Context, config *PoolConfig) *Pool { _ = "STUB: not implemented"; return nil }
 
-	logger := config.Logger
-	if logger == nil {
-		logger = slog.Default()
-	}
+// Create the underlying regular pool.
 
-	poolCtx, cancel := context.WithCancel(ctx)
+// Initialize lastID with current Unix nanoseconds to prevent ID collisions
+// after multipooler restarts. Sequential IDs from this starting point
+// won't collide with IDs from previous pool instances.
 
-	// Create the underlying regular pool.
-	regularPool := regular.NewPool(ctx, config.RegularPoolConfig)
-	regularPool.Open()
-
-	p := &Pool{
-		config: config,
-		logger: logger,
-		conns:  regularPool,
-		active: make(map[int64]*Conn),
-		ctx:    poolCtx,
-		cancel: cancel,
-	}
-
-	// Initialize lastID with current Unix nanoseconds to prevent ID collisions
-	// after multipooler restarts. Sequential IDs from this starting point
-	// won't collide with IDs from previous pool instances.
-	p.lastID.Store(time.Now().UnixNano())
-
-	// Start background killer goroutine.
-	// Ticker interval is 1/10th the idle timeout (like Vitess).
-	interval := p.config.InactivityTimeout / 10
-	go p.idleKiller(interval)
-
-	return p
-}
+// Start background killer goroutine.
+// Ticker interval is 1/10th the idle timeout (like Vitess).
 
 // idleKiller periodically scans for and kills timed out connections.
-func (p *Pool) idleKiller(interval time.Duration) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-p.ctx.Done():
-			return
-		case <-ticker.C:
-			p.KillTimedOut(p.ctx)
-		}
-	}
-}
+func (p *Pool) idleKiller(interval time.Duration) { _ = "STUB: not implemented"; return }
 
 // NewConn acquires a new reserved connection.
 // The connection is assigned a unique ID for client-side tracking.
@@ -162,47 +118,16 @@ func (p *Pool) idleKiller(interval time.Duration) {
 // that PostgreSQL has silently closed), the underlying connection is
 // tainted and a replacement is fetched, up to constants.MaxConnPoolRetryAttempts total.
 func (p *Pool) NewConn(ctx context.Context, settings *connstate.Settings, opts ...ReservedConnOption) (*Conn, error) {
-	p.mu.Lock()
-	if p.closed {
-		p.mu.Unlock()
-		return nil, errors.New("reserved pool is closed")
-	}
-	p.mu.Unlock()
-
-	o := reservedConnOpts{}
-	for _, opt := range opts {
-		opt(&o)
-	}
-
-	pooled, err := p.acquireValidated(ctx, settings, o.validate)
-	if err != nil {
-		return nil, err
-	}
-
-	// Generate unique ID. Since lastID is initialized with Unix nanoseconds,
-	// IDs won't collide with previous pool instances after restarts.
-	connID := p.lastID.Add(1)
-
-	// Create reserved connection.
-	rc := newConn(pooled, connID, p)
-	rc.SetInactivityTimeout(p.config.InactivityTimeout)
-
-	// Register in active map.
-	p.mu.Lock()
-	p.active[connID] = rc
-	p.mu.Unlock()
-
-	p.reserveCount.Add(1)
-	if p.config.OnReserve != nil {
-		p.config.OnReserve()
-	}
-
-	p.logger.DebugContext(ctx, "reserved connection created",
-		"conn_id", connID,
-		"process_id", rc.ProcessID())
-
-	return rc, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Generate unique ID. Since lastID is initialized with Unix nanoseconds,
+// IDs won't collide with previous pool instances after restarts.
+
+// Create reserved connection.
+
+// Register in active map.
 
 // acquireValidated borrows a regular connection from the underlying pool
 // and, if validate is non-nil, runs it against the connection. A
@@ -228,246 +153,92 @@ func (p *Pool) acquireValidated(
 	settings *connstate.Settings,
 	validate func(context.Context, *regular.Conn) error,
 ) (regular.PooledConn, error) {
-	if validate == nil {
-		pooled, err := p.conns.GetWithSettings(ctx, settings)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get connection: %w", err)
-		}
-		return pooled, nil
-	}
-
-	var lastErr error
-	for attempt := 1; attempt <= constants.MaxConnPoolRetryAttempts; attempt++ {
-		pooled, err := p.conns.GetWithSettings(ctx, settings)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get connection: %w", err)
-		}
-
-		validateErr := validate(ctx, pooled.Conn)
-		if validateErr == nil {
-			return pooled, nil
-		}
-
-		// Any validate failure discards the conn. Taint nils out
-		// pooled.pool, so the subsequent Recycle takes the pool==nil
-		// branch and closes the orphaned socket immediately rather than
-		// waiting on the idle killer.
-		pooled.Taint()
-		pooled.Recycle()
-
-		if !mterrors.IsConnectionError(validateErr) {
-			return nil, validateErr
-		}
-		lastErr = validateErr
-
-		if attempt == constants.MaxConnPoolRetryAttempts {
-			break
-		}
-		if ctx.Err() != nil {
-			return nil, context.Cause(ctx)
-		}
-		backoffTimer := time.NewTimer(constants.ConnPoolRetryBackoff)
-		select {
-		case <-backoffTimer.C:
-		case <-ctx.Done():
-			backoffTimer.Stop()
-			return nil, context.Cause(ctx)
-		}
-	}
-	return nil, fmt.Errorf("reserved connection validate failed after %d attempts: %w", constants.MaxConnPoolRetryAttempts, lastErr)
+	_ = "STUB: not implemented"
+	return *new(regular.PooledConn), nil
 }
+
+// Any validate failure discards the conn. Taint nils out
+// pooled.pool, so the subsequent Recycle takes the pool==nil
+// branch and closes the orphaned socket immediately rather than
+// waiting on the idle killer.
 
 // Get retrieves a reserved connection by ID and resets its expiry time.
 // Returns nil, false if the connection is not found or has timed out.
-func (p *Pool) Get(connID int64) (*Conn, bool) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+func (p *Pool) Get(connID int64) (*Conn, bool) { _ = "STUB: not implemented"; return nil, false }
 
-	if p.closed {
-		return nil, false
-	}
+// Check if the connection has timed out.
 
-	rc, ok := p.active[connID]
-	if !ok {
-		return nil, false
-	}
-
-	// Check if the connection has timed out.
-	if rc.IsTimedOut() {
-		p.timeoutCount.Add(1)
-		return nil, false
-	}
-
-	// Reset expiry time since the connection is being used.
-	rc.ResetExpiryTime()
-
-	return rc, true
-}
+// Reset expiry time since the connection is being used.
 
 // KillConnection kills a reserved connection by ID.
 func (p *Pool) KillConnection(ctx context.Context, connID int64) error {
-	p.mu.Lock()
-	rc, ok := p.active[connID]
-	if !ok {
-		p.mu.Unlock()
-		return fmt.Errorf("connection %d not found", connID)
-	}
-	delete(p.active, connID)
-	p.mu.Unlock()
-
-	// Kill the backend process.
-	if err := rc.Kill(ctx); err != nil {
-		p.logger.WarnContext(ctx, "failed to kill connection",
-			"conn_id", connID,
-			"error", err)
-	}
-
-	// Taint the connection - it's dead after kill.
-	rc.pooled.Taint()
-
-	// Release handles OnRelease, Recycle, and metrics. The CAS inside
-	// Release prevents double-release if an in-flight request also calls
-	// Release after Kill causes it to fail.
-	rc.Release(ReleaseKill)
-
-	p.logger.InfoContext(ctx, "connection killed",
-		"conn_id", connID,
-		"process_id", rc.ProcessID())
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Kill the backend process.
+
+// Taint the connection - it's dead after kill.
+
+// Release handles OnRelease, Recycle, and metrics. The CAS inside
+// Release prevents double-release if an in-flight request also calls
+// Release after Kill causes it to fail.
+
 // release is called when a reserved connection is released.
-func (p *Pool) release(rc *Conn, reason ReleaseReason) {
-	p.mu.Lock()
-	delete(p.active, rc.ConnID())
-	p.mu.Unlock()
+func (p *Pool) release(rc *Conn, reason ReleaseReason) { _ = "STUB: not implemented"; return }
 
-	p.releaseCount.Add(1)
-	if p.config.OnRelease != nil {
-		p.config.OnRelease()
-	}
+// Update metrics based on reason.
 
-	// Update metrics based on reason.
-	switch reason {
-	case ReleaseCommit:
-		p.txCommitCount.Add(1)
-	case ReleaseRollback:
-		p.txRollbackCount.Add(1)
-	case ReleaseTimeout:
-		p.timeoutCount.Add(1)
-	case ReleaseKill:
-		p.killCount.Add(1)
-	case ReleaseError:
-		rc.pooled.Taint()
-	}
+// Replication conns cannot be returned to the pool: their socket has
+// replication=database in its startup packet and is bound to a walsender
+// backend that may own a slot. Taint regardless of release reason so the
+// upcoming Recycle frees the cap slot AND closes the socket.
 
-	// Replication conns cannot be returned to the pool: their socket has
-	// replication=database in its startup packet and is bound to a walsender
-	// backend that may own a slot. Taint regardless of release reason so the
-	// upcoming Recycle frees the cap slot AND closes the socket.
-	if rc.reservedProps != nil && protoutil.HasLogicalReplicationReason(rc.reservedProps.Reasons) {
-		rc.pooled.Taint()
-	}
-
-	// Return the underlying connection to the pool.
-	// If the connection is in a bad state, the caller should have tainted it.
-	rc.pooled.Recycle()
-
-	p.logger.Debug("reserved connection released",
-		"conn_id", rc.ConnID(),
-		"reason", reason.String())
-}
+// Return the underlying connection to the pool.
+// If the connection is in a bad state, the caller should have tainted it.
 
 // Close closes all reserved connections, the underlying regular pool, and the pool itself.
-func (p *Pool) Close() {
-	p.mu.Lock()
-	if p.closed {
-		p.mu.Unlock()
-		return
-	}
-	p.closed = true
+func (p *Pool) Close() { _ = "STUB: not implemented"; return }
 
-	// Cancel the pool's context to stop the background killer.
-	p.cancel()
+// Cancel the pool's context to stop the background killer.
 
-	// Collect all connections to taint.
-	conns := make([]*Conn, 0, len(p.active))
-	for _, rc := range p.active {
-		conns = append(conns, rc)
-	}
-	p.active = make(map[int64]*Conn)
-	p.mu.Unlock()
+// Collect all connections to taint.
 
-	// Taint all connections since they may be in an inconsistent state.
-	for _, rc := range conns {
-		rc.pooled.Taint()
-		rc.pooled.Close()
-	}
+// Taint all connections since they may be in an inconsistent state.
 
-	// Close the underlying regular pool.
-	p.conns.Close()
-
-	p.logger.Info("reserved pool closed")
-}
+// Close the underlying regular pool.
 
 // Stats returns current pool statistics.
-func (p *Pool) Stats() PoolStats {
-	p.mu.Lock()
-	active := len(p.active)
-	var replActive int
-	for _, rc := range p.active {
-		if rc.reservedProps != nil && protoutil.HasLogicalReplicationReason(rc.reservedProps.Reasons) {
-			replActive++
-		}
-	}
-	p.mu.Unlock()
-
-	return PoolStats{
-		Active:                   active,
-		LogicalReplicationActive: replActive,
-		ReserveCount:             p.reserveCount.Load(),
-		ReleaseCount:             p.releaseCount.Load(),
-		KillCount:                p.killCount.Load(),
-		TimeoutCount:             p.timeoutCount.Load(),
-		TxCommitCount:            p.txCommitCount.Load(),
-		TxRollbackCount:          p.txRollbackCount.Load(),
-		RegularPool:              p.conns.Stats(),
-	}
-}
+func (p *Pool) Stats() PoolStats { _ = "STUB: not implemented"; return *new(PoolStats) }
 
 // SetCapacity changes the pool's maximum capacity.
 // If reducing capacity, may block waiting for borrowed connections to return.
 func (p *Pool) SetCapacity(ctx context.Context, newcap int64) error {
-	return p.conns.SetCapacity(ctx, newcap)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Requested returns the number of currently requested connections (borrowed + waiters).
 // Used for demand tracking in the rebalancer.
-func (p *Pool) Requested() int64 {
-	return p.conns.Requested()
-}
+func (p *Pool) Requested() int64 { _ = "STUB: not implemented"; return 0 }
 
 // PeakRequestedAndReset returns the peak demand since the last reset and resets the peak.
 // This captures burst demand that point-in-time sampling might miss.
-func (p *Pool) PeakRequestedAndReset() int64 {
-	return p.conns.PeakRequestedAndReset()
-}
+func (p *Pool) PeakRequestedAndReset() int64 { _ = "STUB: not implemented"; return 0 }
 
 // WaitCount returns the total number of times a client had to wait for a connection.
-func (p *Pool) WaitCount() int64 {
-	return p.conns.WaitCount()
-}
+func (p *Pool) WaitCount() int64 { _ = "STUB: not implemented"; return 0 }
 
 // WaitTime returns the total time clients spent waiting for a connection.
 func (p *Pool) WaitTime() time.Duration {
-	return p.conns.WaitTime()
+	_ = "STUB: not implemented"
+	return *
+
+	// GetCount returns the total number of Get() calls (connections borrowed).
+	new(time.Duration)
 }
 
-// GetCount returns the total number of Get() calls (connections borrowed).
-func (p *Pool) GetCount() int64 {
-	return p.conns.GetCount()
-}
+func (p *Pool) GetCount() int64 { _ = "STUB: not implemented"; return 0 }
 
 // PoolStats contains pool statistics for reserved connections.
 type PoolStats struct {
@@ -503,58 +274,18 @@ type PoolStats struct {
 // ForEachActive calls fn for each active reserved connection.
 // This is useful for monitoring and cleanup operations.
 func (p *Pool) ForEachActive(fn func(connID int64, rc *Conn) bool) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	for id, rc := range p.active {
-		if !fn(id, rc) {
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // KillAll kills all active reserved connections.
 // Used during graceful shutdown when the drain grace period has expired.
-func (p *Pool) KillAll(ctx context.Context) int {
-	p.mu.Lock()
-	ids := make([]int64, 0, len(p.active))
-	for id := range p.active {
-		ids = append(ids, id)
-	}
-	p.mu.Unlock()
-
-	for _, connID := range ids {
-		if err := p.KillConnection(ctx, connID); err != nil {
-			p.logger.WarnContext(ctx, "failed to kill connection during drain",
-				"conn_id", connID, "error", err)
-		}
-	}
-
-	return len(ids)
-}
+func (p *Pool) KillAll(ctx context.Context) int { _ = "STUB: not implemented"; return 0 }
 
 // KillTimedOut kills all connections that have exceeded their timeout.
 // This should be called periodically by a background goroutine.
-func (p *Pool) KillTimedOut(ctx context.Context) int {
-	var timedOutIDs []int64
+func (p *Pool) KillTimedOut(ctx context.Context) int { _ = "STUB: not implemented"; return 0 }
 
-	// Find all timed out connections.
-	p.mu.Lock()
-	for id, rc := range p.active {
-		if rc.IsTimedOut() {
-			timedOutIDs = append(timedOutIDs, id)
-		}
-	}
-	p.mu.Unlock()
+// Find all timed out connections.
 
-	// Kill them.
-	for _, connID := range timedOutIDs {
-		if err := p.KillConnection(ctx, connID); err != nil {
-			p.logger.WarnContext(ctx, "failed to kill timed out connection",
-				"conn_id", connID,
-				"error", err)
-		}
-	}
-
-	return len(timedOutIDs)
-}
+// Kill them.

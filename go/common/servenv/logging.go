@@ -15,10 +15,7 @@
 package servenv
 
 import (
-	"io"
 	"log/slog"
-	"os"
-	"strings"
 	"sync"
 
 	"github.com/multigres/multigres/go/tools/telemetry"
@@ -70,363 +67,151 @@ type Logger struct {
 }
 
 func NewLogger(reg *viperutil.Registry, telemetry *telemetry.Telemetry) *Logger {
-	return &Logger{
-		telemetry: telemetry,
-		logLevel: viperutil.Configure(reg, "log-level", viperutil.Options[string]{
-			Default:  "info",
-			FlagName: "log-level",
-			Dynamic:  false,
-		}),
-		logFormat: viperutil.Configure(reg, "log-format", viperutil.Options[string]{
-			Default:  "json",
-			FlagName: "log-format",
-			Dynamic:  false,
-		}),
-		logOutput: viperutil.Configure(reg, "log-output", viperutil.Options[string]{
-			Default:  "stdout",
-			FlagName: "log-output",
-			Dynamic:  false,
-		}),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RegisterFlags registers logging-related command line flags.
 // This must be called before ParseFlags if using the logging system.
-func (lg *Logger) RegisterFlags(fs *pflag.FlagSet) {
-	fs.String("log-level", lg.logLevel.Default(), "Log level (debug, info, warn, error)")
-	fs.String("log-format", lg.logFormat.Default(), "Log format (json, text)")
-	fs.String("log-output", lg.logOutput.Default(), "Log output (stdout, stderr, or file path)")
-	viperutil.BindFlags(fs, lg.logLevel, lg.logFormat, lg.logOutput)
-}
+func (lg *Logger) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // OnLoggingSetup registers a callback function to be called after the logger is created.
 // This allows applications to customize the logger behavior.
-func OnLoggingSetup(f func(*slog.Logger)) {
-	loggingHooksMu.Lock()
-	defer loggingHooksMu.Unlock()
-	loggingSetupHooks = append(loggingSetupHooks, f)
-}
+func OnLoggingSetup(f func(*slog.Logger)) { _ = "STUB: not implemented"; return }
 
 // OnLoggingChange registers a callback function to be called when logging configuration changes.
-func OnLoggingChange(f func(*slog.Logger)) {
-	loggingHooksMu.Lock()
-	defer loggingHooksMu.Unlock()
-	loggingChangeHooks = append(loggingChangeHooks, f)
-}
+func OnLoggingChange(f func(*slog.Logger)) { _ = "STUB: not implemented"; return }
 
 // SetupLogging initializes the logger based on the configured flags.
 // This should be called after flags are parsed but before any logging occurs.
-func SetupLogging() {
-	loggerOnce.Do(func() {
-		// Parse log level with fallback to default
-		var level slog.Level
-		levelStr := logLevel
-		if levelStr == "" {
-			levelStr = "info" // Default fallback
-		}
-		switch strings.ToLower(levelStr) {
-		case "debug":
-			level = slog.LevelDebug
-		case "info":
-			level = slog.LevelInfo
-		case "warn":
-			level = slog.LevelWarn
-		case "error":
-			level = slog.LevelError
-		default:
-			level = slog.LevelInfo
-		}
+func SetupLogging() { _ = "STUB: not implemented"; return }
 
-		// Determine output writer with fallback to stdout
-		var output io.Writer
-		outputStr := logOutput
-		if outputStr == "" {
-			outputStr = logOutputStdout // Default fallback
-		}
-		switch strings.ToLower(outputStr) {
-		case logOutputStdout:
-			output = os.Stdout
-		case logOutputStderr:
-			output = os.Stderr
-		default:
-			// Treat as file path
-			file, err := os.OpenFile(outputStr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
-			if err != nil {
-				// Fallback to stdout if file creation fails
-				output = os.Stdout
-			} else {
-				output = file
-			}
-		}
+// Parse log level with fallback to default
 
-		// Create handler based on format with fallback to json
-		var handler slog.Handler
-		formatStr := logFormat
-		if formatStr == "" {
-			formatStr = "json" // Default fallback
-		}
-		switch strings.ToLower(formatStr) {
-		case "text":
-			handler = slog.NewTextHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		case "json":
-			handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		default:
-			handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		}
+// Default fallback
 
-		// Ensure we have a valid handler
-		if handler == nil {
-			// Ultimate fallback: create a basic JSON handler
-			handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-				Level: slog.LevelInfo,
-			})
-		}
+// Determine output writer with fallback to stdout
 
-		// Create logger
-		newLogger := slog.New(handler)
+// Default fallback
 
-		// Set as default slog logger
-		slog.SetDefault(newLogger)
+// Treat as file path
 
-		// Store logger
-		loggerMu.Lock()
-		logger = newLogger
-		loggerMu.Unlock()
+// Fallback to stdout if file creation fails
 
-		// Fire setup hooks
-		fireLoggingSetupHooks(newLogger)
+// Create handler based on format with fallback to json
 
-		// Log initial configuration
-		newLogger.Info("logging initialized",
-			"level", levelStr,
-			"format", formatStr,
-			"output", outputStr,
-		)
-	})
-}
+// Default fallback
+
+// Ensure we have a valid handler
+
+// Ultimate fallback: create a basic JSON handler
+
+// Create logger
+
+// Set as default slog logger
+
+// Store logger
+
+// Fire setup hooks
+
+// Log initial configuration
 
 // GetLogger returns the configured logger instance.
 // SetupLogging must be called before this function.
-func GetLogger() *slog.Logger {
-	loggerMu.Lock()
-	defer loggerMu.Unlock()
-	if logger == nil {
-		// Return default slog logger if our logger hasn't been set up yet
-		return slog.Default()
-	}
-	return logger
-}
+func GetLogger() *slog.Logger { _ = "STUB: not implemented"; return nil }
+
+// Return default slog logger if our logger hasn't been set up yet
 
 // fireLoggingSetupHooks calls all registered logging setup hooks.
-func fireLoggingSetupHooks(l *slog.Logger) {
-	loggingHooksMu.Lock()
-	hooks := make([]func(*slog.Logger), len(loggingSetupHooks))
-	copy(hooks, loggingSetupHooks)
-	loggingHooksMu.Unlock()
-
-	for _, hook := range hooks {
-		hook(l)
-	}
-}
+func fireLoggingSetupHooks(l *slog.Logger) { _ = "STUB: not implemented"; return }
 
 // GetLogLevel returns the current log level setting.
 func GetLogLevel() string {
-	return logLevel
+	_ = "STUB: not implemented"
+
+	// GetLogFormat returns the current log format setting.
+	return ""
 }
 
-// GetLogFormat returns the current log format setting.
 func GetLogFormat() string {
-	return logFormat
+	_ = "STUB: not implemented"
+
+	// GetLogOutput returns the current log output setting.
+	return ""
 }
 
-// GetLogOutput returns the current log output setting.
 func GetLogOutput() string {
-	return logOutput
+	_ = "STUB: not implemented"
+
+	// OnLoggingSetup registers a callback function to be called after the logger is created.
+	// This allows applications to customize the logger behavior.
+	return ""
 }
 
-// OnLoggingSetup registers a callback function to be called after the logger is created.
-// This allows applications to customize the logger behavior.
-func (lg *Logger) OnLoggingSetup(f func(*slog.Logger)) {
-	lg.loggingHooksMu.Lock()
-	defer lg.loggingHooksMu.Unlock()
-	lg.loggingSetupHooks = append(lg.loggingSetupHooks, f)
-}
+func (lg *Logger) OnLoggingSetup(f func(*slog.Logger)) { _ = "STUB: not implemented"; return }
 
 // OnLoggingChange registers a callback function to be called when logging configuration changes.
-func (lg *Logger) OnLoggingChange(f func(*slog.Logger)) {
-	lg.loggingHooksMu.Lock()
-	defer lg.loggingHooksMu.Unlock()
-	lg.loggingChangeHooks = append(lg.loggingChangeHooks, f)
-}
+func (lg *Logger) OnLoggingChange(f func(*slog.Logger)) { _ = "STUB: not implemented"; return }
 
 // SetupLogging initializes the logger based on the configured flags.
 // This should be called after flags are parsed but before any logging occurs.
-func (lg *Logger) SetupLogging() {
-	lg.loggerOnce.Do(func() {
-		// Parse log level with fallback to default
-		var level slog.Level
-		levelStr := lg.logLevel.Get()
-		if levelStr == "" {
-			levelStr = "info" // Default fallback
-		}
-		switch strings.ToLower(levelStr) {
-		case "debug":
-			level = slog.LevelDebug
-		case "info":
-			level = slog.LevelInfo
-		case "warn":
-			level = slog.LevelWarn
-		case "error":
-			level = slog.LevelError
-		default:
-			level = slog.LevelInfo
-		}
+func (lg *Logger) SetupLogging() { _ = "STUB: not implemented"; return }
 
-		// Determine output writer with fallback to stdout
-		var output io.Writer
-		outputStr := lg.logOutput.Get()
-		if outputStr == "" {
-			outputStr = logOutputStdout // Default fallback
-		}
-		switch strings.ToLower(outputStr) {
-		case logOutputStdout:
-			output = os.Stdout
-		case logOutputStderr:
-			output = os.Stderr
-		default:
-			// Treat as file path
-			file, err := os.OpenFile(outputStr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
-			if err != nil {
-				// Fallback to stdout if file creation fails
-				output = os.Stdout
-			} else {
-				output = file
-			}
-		}
+// Parse log level with fallback to default
 
-		// Create handler based on format with fallback to json
-		var handler slog.Handler
-		formatStr := lg.logFormat.Get()
-		if formatStr == "" {
-			formatStr = "json" // Default fallback
-		}
-		switch strings.ToLower(formatStr) {
-		case "text":
-			handler = slog.NewTextHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		case "json":
-			handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		default:
-			handler = slog.NewJSONHandler(output, &slog.HandlerOptions{
-				Level: level,
-			})
-		}
+// Default fallback
 
-		// Ensure we have a valid handler
-		if handler == nil {
-			// Ultimate fallback: create a basic JSON handler
-			handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-				Level: slog.LevelInfo,
-			})
-		}
+// Determine output writer with fallback to stdout
 
-		// Store base handler before wrapping (for later re-wrapping after telemetry init)
-		lg.loggerMu.Lock()
-		lg.baseHandler = handler
-		lg.loggerMu.Unlock()
+// Default fallback
 
-		// Wrap handler with OpenTelemetry bridge to inject trace context
-		if lg.telemetry != nil {
-			handler = lg.telemetry.WrapSlogHandler(handler)
-		}
+// Treat as file path
 
-		// Create logger
-		newLogger := slog.New(handler)
+// Fallback to stdout if file creation fails
 
-		// Set as default slog logger
-		slog.SetDefault(newLogger)
+// Create handler based on format with fallback to json
 
-		// Store logger
-		lg.loggerMu.Lock()
-		lg.logger = newLogger
-		lg.loggerMu.Unlock()
+// Default fallback
 
-		// Fire setup hooks
-		lg.fireLoggingSetupHooks(newLogger)
+// Ensure we have a valid handler
 
-		// Log initial configuration
-		newLogger.Info("logging initialized",
-			"level", levelStr,
-			"format", formatStr,
-			"output", outputStr,
-		)
-	})
-}
+// Ultimate fallback: create a basic JSON handler
+
+// Store base handler before wrapping (for later re-wrapping after telemetry init)
+
+// Wrap handler with OpenTelemetry bridge to inject trace context
+
+// Create logger
+
+// Set as default slog logger
+
+// Store logger
+
+// Fire setup hooks
+
+// Log initial configuration
 
 // UpdateTelemetryWrapper re-wraps the logger with telemetry after telemetry initialization.
 // Call this after InitTelemetry() to enable OTLP logs export.
-func (lg *Logger) UpdateTelemetryWrapper() {
-	lg.loggerMu.Lock()
-	defer lg.loggerMu.Unlock()
-
-	if lg.baseHandler == nil || lg.telemetry == nil {
-		return
-	}
-
-	handler := lg.telemetry.WrapSlogHandler(lg.baseHandler)
-	lg.logger = slog.New(handler)
-	slog.SetDefault(lg.logger)
-}
+func (lg *Logger) UpdateTelemetryWrapper() { _ = "STUB: not implemented"; return }
 
 // GetLogger returns the configured logger instance.
 // SetupLogging must be called before this function.
-func (lg *Logger) GetLogger() *slog.Logger {
-	lg.loggerMu.Lock()
-	defer lg.loggerMu.Unlock()
-	if lg.logger == nil {
-		// Return default slog logger if our logger hasn't been set up yet
-		return slog.Default()
-	}
-	return lg.logger
-}
+func (lg *Logger) GetLogger() *slog.Logger { _ = "STUB: not implemented"; return nil }
+
+// Return default slog logger if our logger hasn't been set up yet
 
 // GetLogger returns the configured logger instance.
-func (sv *ServEnv) GetLogger() *slog.Logger {
-	return sv.lg.GetLogger()
-}
+func (sv *ServEnv) GetLogger() *slog.Logger { _ = "STUB: not implemented"; return nil }
 
 // fireLoggingSetupHooks calls all registered logging setup hooks.
-func (lg *Logger) fireLoggingSetupHooks(l *slog.Logger) {
-	lg.loggingHooksMu.Lock()
-	hooks := make([]func(*slog.Logger), len(lg.loggingSetupHooks))
-	copy(hooks, lg.loggingSetupHooks)
-	lg.loggingHooksMu.Unlock()
-
-	for _, hook := range hooks {
-		hook(l)
-	}
-}
+func (lg *Logger) fireLoggingSetupHooks(l *slog.Logger) { _ = "STUB: not implemented"; return }
 
 // GetLogLevel returns the current log level setting.
-func (lg *Logger) GetLogLevel() string {
-	return lg.logLevel.Get()
-}
+func (lg *Logger) GetLogLevel() string { _ = "STUB: not implemented"; return "" }
 
 // GetLogFormat returns the current log format setting.
-func (lg *Logger) GetLogFormat() string {
-	return lg.logFormat.Get()
-}
+func (lg *Logger) GetLogFormat() string { _ = "STUB: not implemented"; return "" }
 
 // GetLogOutput returns the current log output setting.
-func (lg *Logger) GetLogOutput() string {
-	return lg.logOutput.Get()
-}
+func (lg *Logger) GetLogOutput() string { _ = "STUB: not implemented"; return "" }

@@ -15,13 +15,12 @@
 package command
 
 import (
-	"github.com/multigres/multigres/go/cmd/multigres/command/pooler"
-
 	"github.com/spf13/cobra"
 )
 
 // AddPoolerCommands adds the pooler subcommands to the root command
 func AddPoolerCommands(root *cobra.Command, mc *MultigresCommand) {
+	_ = "STUB: not implemented"
 	// Register pooler commands with root
-	root.AddCommand(pooler.AddGetPoolerStatusCommand())
+	return
 }

@@ -16,54 +16,19 @@
 package s3mock
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"crypto/tls"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"math/big"
-	"net"
-	"time"
 )
 
 // generateTLSConfig creates an ephemeral self-signed TLS certificate for the mock server.
 // The certificate is valid for 1 hour and supports localhost/127.0.0.1.
 func generateTLSConfig() (*tls.Config, error) {
+	_ = "STUB: not implemented"
 	// Generate 2048-bit RSA private key
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create certificate template
-	template := x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			CommonName: "localhost",
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(1 * time.Hour),
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		IPAddresses:           []net.IP{net.ParseIP("127.0.0.1"), net.ParseIP("::1")},
-		DNSNames:              []string{"localhost"},
-	}
-
-	// Create self-signed certificate
-	certDER, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// Build TLS certificate
-	cert := tls.Certificate{
-		Certificate: [][]byte{certDER},
-		PrivateKey:  privateKey,
-	}
-
-	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
-	}, nil
+	return nil, nil
 }
+
+// Create certificate template
+
+// Create self-signed certificate
+
+// Build TLS certificate

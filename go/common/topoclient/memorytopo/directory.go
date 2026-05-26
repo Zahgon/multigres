@@ -17,59 +17,16 @@ package memorytopo
 import (
 	"context"
 
-	"github.com/multigres/multigres/go/pb/mtrpc"
-
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/topoclient"
 )
 
 // ListDir is part of the topoclient.Conn interface.
 func (c *conn) ListDir(ctx context.Context, dirPath string, full bool) ([]topoclient.DirEntry, error) {
+	_ = "STUB: not implemented"
 	// c.factory.callstats.Add([]string{"ListDir"}, 1)
-
-	if err := c.dial(ctx); err != nil {
-		return nil, err
-	}
-
-	c.factory.mu.Lock()
-	defer c.factory.mu.Unlock()
-
-	if c.factory.err != nil {
-		return nil, c.factory.err
-	}
-	if err := c.factory.getOperationError(ListDir, dirPath); err != nil {
-		return nil, err
-	}
-
-	isRoot := dirPath == "" || dirPath == "/"
-
-	// Get the node to list.
-	n := c.factory.nodeByPath(c.cell, dirPath)
-	if n == nil {
-		return nil, topoclient.NewError(topoclient.NoNode, dirPath)
-	}
-
-	// Check it's a directory.
-	if !n.isDirectory() {
-		return nil, mterrors.Errorf(mtrpc.Code_INVALID_ARGUMENT, "node %v in cell %v is not a directory", dirPath, c.cell)
-	}
-
-	result := make([]topoclient.DirEntry, 0, len(n.children))
-	for name, child := range n.children {
-		e := topoclient.DirEntry{
-			Name: name,
-		}
-		if full {
-			e.Type = topoclient.TypeFile
-			if child.isDirectory() {
-				e.Type = topoclient.TypeDirectory
-			}
-			if isRoot && name == electionsPath {
-				e.Ephemeral = true
-			}
-		}
-		result = append(result, e)
-	}
-	topoclient.DirEntriesSortByName(result)
-	return result, nil
+	return nil, nil
 }
+
+// Get the node to list.
+
+// Check it's a directory.

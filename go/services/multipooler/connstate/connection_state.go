@@ -15,9 +15,6 @@
 package connstate
 
 import (
-	"maps"
-	"sort"
-	"strings"
 	"sync"
 
 	"github.com/multigres/multigres/go/pb/query"
@@ -48,176 +45,72 @@ type ConnectionState struct {
 }
 
 // NewConnectionState creates a new empty ConnectionState with initialized maps.
-func NewConnectionState() *ConnectionState {
-	return &ConnectionState{
-		PreparedStatements: make(map[string]*query.PreparedStatement),
-	}
-}
+func NewConnectionState() *ConnectionState { _ = "STUB: not implemented"; return nil }
 
 // NewConnectionStateWithSettings creates a new ConnectionState with the given settings.
 func NewConnectionStateWithSettings(settings *Settings) *ConnectionState {
-	return &ConnectionState{
-		Settings:           settings,
-		PreparedStatements: make(map[string]*query.PreparedStatement),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Bucket returns the bucket number for this connection state.
 // This is used by the connection pool to distribute connections across stacks.
 // Returns 0 if there are no settings (clean connection).
-func (s *ConnectionState) Bucket() uint32 {
-	if s == nil || s.Settings == nil {
-		return 0
-	}
-	return s.Settings.Bucket()
-}
+func (s *ConnectionState) Bucket() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // IsClean returns true if this state has no settings modifiers applied.
 // Prepared statements and portals are not considered for pool routing.
-func (s *ConnectionState) IsClean() bool {
-	if s == nil {
-		return true
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	return s.Settings == nil || s.Settings.IsEmpty()
-}
+func (s *ConnectionState) IsClean() bool { _ = "STUB: not implemented"; return false }
 
 // Clone creates a deep copy of this state.
-func (s *ConnectionState) Clone() *ConnectionState {
-	if s == nil {
-		return nil
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	clone := &ConnectionState{
-		User:               s.User,
-		PreparedStatements: make(map[string]*query.PreparedStatement, len(s.PreparedStatements)),
-	}
-
-	if s.Settings != nil {
-		clone.Settings = s.Settings.Clone()
-	}
-
-	maps.Copy(clone.PreparedStatements, s.PreparedStatements)
-
-	return clone
-}
+func (s *ConnectionState) Clone() *ConnectionState { _ = "STUB: not implemented"; return nil }
 
 // Close cleans up the connection state.
-func (s *ConnectionState) Close() {
-	if s == nil {
-		return
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.User = ""
-	s.Settings = nil
-	s.PreparedStatements = nil
-}
+func (s *ConnectionState) Close() { _ = "STUB: not implemented"; return }
 
 // GetSettings returns the current settings. Returns nil if no settings.
-func (s *ConnectionState) GetSettings() *Settings {
-	if s == nil {
-		return nil
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.Settings
-}
+func (s *ConnectionState) GetSettings() *Settings { _ = "STUB: not implemented"; return nil }
 
 // SetSettings sets the settings for this connection state.
-func (s *ConnectionState) SetSettings(settings *Settings) {
-	if s == nil {
-		return
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.Settings = settings
-}
+func (s *ConnectionState) SetSettings(settings *Settings) { _ = "STUB: not implemented"; return }
 
 // --- User/Role Methods ---
 
 // GetUser returns the current user role set via SET ROLE.
 // Returns empty string if no role has been set.
-func (s *ConnectionState) GetUser() string {
-	if s == nil {
-		return ""
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.User
-}
+func (s *ConnectionState) GetUser() string { _ = "STUB: not implemented"; return "" }
 
 // SetUser sets the current user role.
 // This should be called after executing SET ROLE on the connection.
-func (s *ConnectionState) SetUser(user string) {
-	if s == nil {
-		return
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.User = user
-}
+func (s *ConnectionState) SetUser(user string) { _ = "STUB: not implemented"; return }
 
 // ClearUser clears the current user role.
 // This should be called after executing RESET ROLE on the connection.
 func (s *ConnectionState) ClearUser() {
-	s.SetUser("")
+	_ = "STUB: not implemented"
+
+	// HasUser returns true if a user role has been set.
+	return
 }
 
-// HasUser returns true if a user role has been set.
-func (s *ConnectionState) HasUser() bool {
-	if s == nil {
-		return false
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.User != ""
-}
+func (s *ConnectionState) HasUser() bool { _ = "STUB: not implemented"; return false }
 
 // --- Prepared Statement Methods ---
 
 // StorePreparedStatement stores a prepared statement.
 func (s *ConnectionState) StorePreparedStatement(stmt *query.PreparedStatement) {
-	if s == nil {
-		return
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.PreparedStatements[stmt.Name] = stmt
+	_ = "STUB: not implemented"
+	return
 }
 
 // GetPreparedStatement retrieves a prepared statement by name.
 func (s *ConnectionState) GetPreparedStatement(name string) *query.PreparedStatement {
-	if s == nil {
-		return nil
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	return s.PreparedStatements[name]
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // DeletePreparedStatement removes a prepared statement by name.
-func (s *ConnectionState) DeletePreparedStatement(name string) {
-	if s == nil {
-		return
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	delete(s.PreparedStatements, name)
-}
+func (s *ConnectionState) DeletePreparedStatement(name string) { _ = "STUB: not implemented"; return }
 
 // =============================================================================
 // Settings - Session variables with Vitess-style bucket management
@@ -246,20 +139,13 @@ type Settings struct {
 // NOTE: For connection pooling, prefer using SettingsCache.GetOrCreate() instead
 // to ensure settings are properly interned (same settings = same pointer).
 func NewSettings(vars map[string]string, bucket uint32) *Settings {
-	return &Settings{
-		Vars:   vars,
-		bucket: bucket,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Bucket returns the bucket number for these settings.
 // This is used by the connection pool for stack distribution.
-func (s *Settings) Bucket() uint32 {
-	if s == nil {
-		return 0
-	}
-	return s.bucket
-}
+func (s *Settings) Bucket() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // ApplyQuery returns the SQL to apply these settings to a connection.
 //
@@ -276,60 +162,21 @@ func (s *Settings) Bucket() uint32 {
 //
 // Single quotes in variable names and values are escaped by doubling them
 // to prevent SQL injection.
-func (s *Settings) ApplyQuery() string {
-	if s == nil || len(s.Vars) == 0 {
-		return ""
-	}
+func (s *Settings) ApplyQuery() string { _ = "STUB: not implemented"; return "" }
 
-	// Sort keys for deterministic output
-	keys := make([]string, 0, len(s.Vars))
-	for k := range s.Vars {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+// Sort keys for deterministic output
 
-	// Build apply query using set_config() for correct list GUC handling.
-	var b strings.Builder
-	for i, k := range keys {
-		if i > 0 {
-			b.WriteString("; ")
-		}
-		b.WriteString("SELECT pg_catalog.set_config('")
-		b.WriteString(strings.ReplaceAll(k, "'", "''"))
-		b.WriteString("', '")
-		b.WriteString(strings.ReplaceAll(s.Vars[k], "'", "''"))
-		b.WriteString("', false)")
-	}
-	return b.String()
-}
+// Build apply query using set_config() for correct list GUC handling.
 
 // ResetQuery returns the SQL to reset these settings on a connection.
 // Includes RESET ROLE and RESET SESSION AUTHORIZATION before RESET ALL
 // because PostgreSQL marks both with GUC_NO_RESET_ALL.
-func (s *Settings) ResetQuery() string {
-	if s == nil || len(s.Vars) == 0 {
-		return ""
-	}
-	return "RESET ROLE; RESET SESSION AUTHORIZATION; RESET ALL"
-}
+func (s *Settings) ResetQuery() string { _ = "STUB: not implemented"; return "" }
 
 // IsEmpty returns true if there are no variables set.
-func (s *Settings) IsEmpty() bool {
-	if s == nil {
-		return true
-	}
-	return len(s.Vars) == 0
-}
+func (s *Settings) IsEmpty() bool { _ = "STUB: not implemented"; return false }
 
 // Clone creates a copy of these settings with the same bucket number.
-func (s *Settings) Clone() *Settings {
-	if s == nil {
-		return nil
-	}
-	clone := &Settings{
-		Vars:   make(map[string]string, len(s.Vars)),
-		bucket: s.bucket, // Keep same bucket
-	}
-	maps.Copy(clone.Vars, s.Vars)
-	return clone
-}
+func (s *Settings) Clone() *Settings { _ = "STUB: not implemented"; return nil }
+
+// Keep same bucket

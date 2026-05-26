@@ -17,7 +17,6 @@ package connpool
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/semconv/v1.37.0/dbconv"
 )
@@ -41,22 +40,13 @@ type ConnectionCount struct {
 // NewConnectionCount creates a ConnectionCount instrument using the standard
 // db.client.connection.count metric name and description from OTel semconv.
 func NewConnectionCount(m metric.Meter) (ConnectionCount, error) {
+	_ = "STUB: not implemented"
 	// Metric name and description from dbconv.ClientConnectionCount
-	counter, err := m.Int64UpDownCounter(
-		"db.client.connection.count",
-		metric.WithDescription("The number of connections that are currently in state described by the state attribute."),
-		metric.WithUnit("{connection}"),
-	)
-	return ConnectionCount{counter: counter}, err
+	return *new(ConnectionCount), nil
 }
 
 // Add records a connection count change for the given pool and state.
 func (c ConnectionCount) Add(ctx context.Context, delta int64, poolName string, state dbconv.ClientConnectionStateAttr) {
-	if c.counter == nil {
-		return
-	}
-	c.counter.Add(ctx, delta, metric.WithAttributes(
-		attribute.String(attrKeyPoolName, poolName),
-		attribute.String(attrKeyState, string(state)),
-	))
+	_ = "STUB: not implemented"
+	return
 }

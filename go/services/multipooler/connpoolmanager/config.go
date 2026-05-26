@@ -16,17 +16,12 @@ package connpoolmanager
 
 import (
 	"crypto/tls"
-	"errors"
-	"fmt"
 	"log/slog"
-	"os"
 	"time"
 
 	"github.com/spf13/pflag"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/pgprotocol/client"
-	"github.com/multigres/multigres/go/common/pgsecret"
 	"github.com/multigres/multigres/go/tools/viperutil"
 )
 
@@ -160,218 +155,79 @@ type Config struct {
 // NewConfig creates a new Config with all connection pool settings
 // registered to the provided registry.
 func NewConfig(reg *viperutil.Registry) *Config {
+	_ = "STUB: not implemented"
 	// Default values for pool configuration.
-	var (
-		adminCapacity int64 = 5
-
-		// Per-user regular pool defaults (for simple queries without transactions)
-		userRegularIdleTimeout = 5 * time.Minute
-		userRegularMaxLifetime = 1 * time.Hour
-
-		// Per-user reserved pool defaults (for transactions)
-		userReservedInactivityTimeout = 30 * time.Second // Aggressive - kills reserved connections if client inactive
-		userReservedIdleTimeout       = 5 * time.Minute  // Less aggressive - for pool size reduction
-		userReservedMaxLifetime       = 1 * time.Hour
-
-		// Settings cache size
-		settingsCacheSize int64 = 1024
-
-		// Fair share allocation defaults
-		globalCapacity int64 = 100
-		reservedRatio        = 0.2
-
-		// Rebalancer defaults
-		rebalanceInterval = 10 * time.Second
-		demandWindow      = 30 * time.Second // 30s window / 10s rebalance = 3 buckets
-		inactiveTimeout   = 5 * time.Minute
-
-		// Fair share allocation - minimum per user
-		// This ensures light users always have enough capacity for burst demand.
-		// Set equal to initialUserPoolCapacity (10) so capacity isn't reduced
-		// below the initial value until there's actual resource pressure.
-		minCapacityPerUser int64 = 10
-
-		// Dial timeout for establishing new PostgreSQL connections.
-		dialTimeout = 5 * time.Second
-
-		// Drain grace period for NOT_SERVING transitions.
-		drainGracePeriod = 3 * time.Second
-	)
-
-	return &Config{
-		// PostgreSQL superuser credentials (also used for internal system queries)
-		pgUser: viperutil.Configure(reg, "connpool.pg.user", viperutil.Options[string]{
-			Default:  constants.DefaultPostgresUser,
-			FlagName: "connpool-admin-user",
-			EnvVars:  []string{"CONNPOOL_ADMIN_USER", constants.PgUserEnvVar},
-		}),
-		pgPassword: viperutil.Configure(reg, "connpool.pg.password", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "connpool-admin-password",
-			EnvVars:  []string{"CONNPOOL_ADMIN_PASSWORD", constants.PgPasswordEnvVar},
-		}),
-		pgPasswordFile: viperutil.Configure(reg, "connpool.pg.password-file", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "connpool-admin-password-file",
-			EnvVars:  []string{"CONNPOOL_ADMIN_PASSWORD_FILE", constants.PgPasswordFileEnvVar},
-		}),
-
-		// PostgreSQL TLS — libpq parity. Default "prefer" mirrors libpq.
-		pgSSLMode: viperutil.Configure(reg, "connpool.pg.sslmode", viperutil.Options[string]{
-			Default:  string(client.SSLModePrefer),
-			FlagName: "pg-client-sslmode",
-		}),
-		pgSSLRootCert: viperutil.Configure(reg, "connpool.pg.sslrootcert", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "pg-client-sslrootcert",
-		}),
-
-		// Admin pool (shared across all users)
-		adminCapacity: viperutil.Configure(reg, "connpool.admin.capacity", viperutil.Options[int64]{
-			Default:  adminCapacity,
-			FlagName: "connpool-admin-capacity",
-		}),
-
-		// Per-user regular pool (for simple queries)
-		userRegularIdleTimeout: viperutil.Configure(reg, "connpool.user.regular.idle-timeout", viperutil.Options[time.Duration]{
-			Default:  userRegularIdleTimeout,
-			FlagName: "connpool-user-regular-idle-timeout",
-		}),
-		userRegularMaxLifetime: viperutil.Configure(reg, "connpool.user.regular.max-lifetime", viperutil.Options[time.Duration]{
-			Default:  userRegularMaxLifetime,
-			FlagName: "connpool-user-regular-max-lifetime",
-		}),
-
-		// Per-user reserved pool (for transactions)
-		userReservedInactivityTimeout: viperutil.Configure(reg, "connpool.user.reserved.inactivity-timeout", viperutil.Options[time.Duration]{
-			Default:  userReservedInactivityTimeout,
-			FlagName: "connpool-user-reserved-inactivity-timeout",
-		}),
-		userReservedIdleTimeout: viperutil.Configure(reg, "connpool.user.reserved.idle-timeout", viperutil.Options[time.Duration]{
-			Default:  userReservedIdleTimeout,
-			FlagName: "connpool-user-reserved-idle-timeout",
-		}),
-		userReservedMaxLifetime: viperutil.Configure(reg, "connpool.user.reserved.max-lifetime", viperutil.Options[time.Duration]{
-			Default:  userReservedMaxLifetime,
-			FlagName: "connpool-user-reserved-max-lifetime",
-		}),
-
-		// Settings cache size
-		settingsCacheSize: viperutil.Configure(reg, "connpool.settings-cache-size", viperutil.Options[int64]{
-			Default:  settingsCacheSize,
-			FlagName: "connpool-settings-cache-size",
-		}),
-
-		// Fair share allocation
-		globalCapacity: viperutil.Configure(reg, "connpool.global-capacity", viperutil.Options[int64]{
-			Default:  globalCapacity,
-			FlagName: "connpool-global-capacity",
-		}),
-		reservedRatio: viperutil.Configure(reg, "connpool.reserved-ratio", viperutil.Options[float64]{
-			Default:  reservedRatio,
-			FlagName: "connpool-reserved-ratio",
-		}),
-
-		// Rebalancer
-		rebalanceInterval: viperutil.Configure(reg, "connpool.rebalance-interval", viperutil.Options[time.Duration]{
-			Default:  rebalanceInterval,
-			FlagName: "connpool-rebalance-interval",
-		}),
-		demandWindow: viperutil.Configure(reg, "connpool.demand-window", viperutil.Options[time.Duration]{
-			Default:  demandWindow,
-			FlagName: "connpool-demand-window",
-		}),
-		inactiveTimeout: viperutil.Configure(reg, "connpool.inactive-timeout", viperutil.Options[time.Duration]{
-			Default:  inactiveTimeout,
-			FlagName: "connpool-inactive-timeout",
-		}),
-		minCapacityPerUser: viperutil.Configure(reg, "connpool.min-capacity-per-user", viperutil.Options[int64]{
-			Default:  minCapacityPerUser,
-			FlagName: "connpool-min-capacity-per-user",
-		}),
-		dialTimeout: viperutil.Configure(reg, "connpool.dial-timeout", viperutil.Options[time.Duration]{
-			Default:  dialTimeout,
-			FlagName: "connpool-dial-timeout",
-		}),
-		drainGracePeriod: viperutil.Configure(reg, "connpool.drain-grace-period", viperutil.Options[time.Duration]{
-			Default:  drainGracePeriod,
-			FlagName: "connpool-drain-grace-period",
-		}),
-	}
+	return nil
 }
+
+// Per-user regular pool defaults (for simple queries without transactions)
+
+// Per-user reserved pool defaults (for transactions)
+// Aggressive - kills reserved connections if client inactive
+// Less aggressive - for pool size reduction
+
+// Settings cache size
+
+// Fair share allocation defaults
+
+// Rebalancer defaults
+
+// 30s window / 10s rebalance = 3 buckets
+
+// Fair share allocation - minimum per user
+// This ensures light users always have enough capacity for burst demand.
+// Set equal to initialUserPoolCapacity (10) so capacity isn't reduced
+// below the initial value until there's actual resource pressure.
+
+// Dial timeout for establishing new PostgreSQL connections.
+
+// Drain grace period for NOT_SERVING transitions.
+
+// PostgreSQL superuser credentials (also used for internal system queries)
+
+// PostgreSQL TLS — libpq parity. Default "prefer" mirrors libpq.
+
+// Admin pool (shared across all users)
+
+// Per-user regular pool (for simple queries)
+
+// Per-user reserved pool (for transactions)
+
+// Settings cache size
+
+// Fair share allocation
+
+// Rebalancer
 
 // RegisterFlags registers all connection pool flags with the given FlagSet.
 func (c *Config) RegisterFlags(fs *pflag.FlagSet) {
+	_ = "STUB: not implemented"
 	// Save the FlagSet so ResolvePgPassword can use pflag.Flag.Changed to
 	// distinguish "flag explicitly set" from "flag at default value".
-	c.flagSet = fs
-	// PostgreSQL superuser credentials
-	fs.String("connpool-admin-user", c.pgUser.Default(), "PostgreSQL superuser for admin and internal operations (env: CONNPOOL_ADMIN_USER or POSTGRES_USER)")
-	fs.String("connpool-admin-password", c.pgPassword.Default(), "PostgreSQL superuser password (env: CONNPOOL_ADMIN_PASSWORD or POSTGRES_PASSWORD). --connpool-admin-password-file takes precedence.")
-	fs.String("connpool-admin-password-file", c.pgPasswordFile.Default(), "Path to a file containing the PostgreSQL superuser password (plaintext, docker-library/postgres convention). Takes precedence over --connpool-admin-password (env: CONNPOOL_ADMIN_PASSWORD_FILE or POSTGRES_PASSWORD_FILE).")
-
-	// PostgreSQL TLS (multipooler → postgres). Mirrors libpq sslmode/sslrootcert.
-	fs.String("pg-client-sslmode", c.pgSSLMode.Default(), "TLS mode for connections to PostgreSQL: disable|prefer|require|verify-ca|verify-full (libpq parity; sslmode=allow is not supported)")
-	fs.String("pg-client-sslrootcert", c.pgSSLRootCert.Default(), "PEM CA bundle used to verify the PostgreSQL server certificate (required for verify-ca and verify-full)")
-
-	// Admin pool flags (shared across all users)
-	fs.Int64("connpool-admin-capacity", c.adminCapacity.Default(), "Maximum number of admin connections for control operations")
-
-	// Per-user regular pool flags (for simple queries)
-	fs.Duration("connpool-user-regular-idle-timeout", c.userRegularIdleTimeout.Default(), "How long a user's regular connection can remain idle before being closed")
-	fs.Duration("connpool-user-regular-max-lifetime", c.userRegularMaxLifetime.Default(), "Maximum lifetime of a user's regular connection before recycling")
-
-	// Per-user reserved pool flags (for transactions)
-	fs.Duration("connpool-user-reserved-inactivity-timeout", c.userReservedInactivityTimeout.Default(), "How long a reserved connection can be inactive (no client activity) before being killed")
-	fs.Duration("connpool-user-reserved-idle-timeout", c.userReservedIdleTimeout.Default(), "How long a connection in the reserved pool can remain idle before being closed")
-	fs.Duration("connpool-user-reserved-max-lifetime", c.userReservedMaxLifetime.Default(), "Maximum lifetime of a user's reserved connection before recycling")
-
-	// Settings cache size flag
-	fs.Int64("connpool-settings-cache-size", c.settingsCacheSize.Default(), "Maximum number of unique settings combinations to cache (0 = use default)")
-
-	// Fair share allocation flags
-	fs.Int64("connpool-global-capacity", c.globalCapacity.Default(), "Total PostgreSQL connections to manage (divided between regular and reserved pools)")
-	fs.Float64("connpool-reserved-ratio", c.reservedRatio.Default(), "Fraction of global capacity allocated to reserved pools (0.0-1.0)")
-
-	// Rebalancer flags
-	fs.Duration("connpool-rebalance-interval", c.rebalanceInterval.Default(), "How often to rebalance pool capacities")
-	fs.Duration("connpool-demand-window", c.demandWindow.Default(), "Sliding window for peak demand tracking (should be multiple of rebalance-interval)")
-	fs.Duration("connpool-inactive-timeout", c.inactiveTimeout.Default(), "How long a user pool can be inactive before garbage collection")
-	fs.Int64("connpool-min-capacity-per-user", c.minCapacityPerUser.Default(), "Minimum connections per user (protects against aggressive capacity reduction for light users)")
-	fs.Duration("connpool-dial-timeout", c.dialTimeout.Default(), "Timeout for establishing new PostgreSQL connections")
-	fs.Duration("connpool-drain-grace-period", c.drainGracePeriod.Default(), "How long to wait for in-flight connections to drain during NOT_SERVING transitions before force-closing reserved connections")
-
-	viperutil.BindFlags(fs,
-		c.pgUser,
-		c.pgPassword,
-		c.pgPasswordFile,
-		c.pgSSLMode,
-		c.pgSSLRootCert,
-		c.adminCapacity,
-		c.userRegularIdleTimeout,
-		c.userRegularMaxLifetime,
-		c.userReservedInactivityTimeout,
-		c.userReservedIdleTimeout,
-		c.userReservedMaxLifetime,
-		c.settingsCacheSize,
-		c.globalCapacity,
-		c.reservedRatio,
-		c.rebalanceInterval,
-		c.demandWindow,
-		c.inactiveTimeout,
-		c.minCapacityPerUser,
-		c.dialTimeout,
-		c.drainGracePeriod,
-	)
+	return
 }
+
+// PostgreSQL superuser credentials
+
+// PostgreSQL TLS (multipooler → postgres). Mirrors libpq sslmode/sslrootcert.
+
+// Admin pool flags (shared across all users)
+
+// Per-user regular pool flags (for simple queries)
+
+// Per-user reserved pool flags (for transactions)
+
+// Settings cache size flag
+
+// Fair share allocation flags
+
+// Rebalancer flags
 
 // --- Getters for individual values ---
 
 // PgUser returns the configured PostgreSQL superuser name.
 // Defaults to POSTGRES_USER environment variable.
-func (c *Config) PgUser() string {
-	return c.pgUser.Get()
-}
+func (c *Config) PgUser() string { _ = "STUB: not implemented"; return "" }
 
 // PgPassword returns the resolved PostgreSQL superuser password and the
 // source it was loaded from ("file" or "env"). Both are empty until
@@ -382,7 +238,8 @@ func (c *Config) PgUser() string {
 // its error, so callers reaching this point can treat an empty source as a
 // programmer-error invariant violation.
 func (c *Config) PgPassword() (string, pgPasswordSource) {
-	return c.pgPasswordCached, c.pgPasswordSource
+	_ = "STUB: not implemented"
+	return "", *new(pgPasswordSource)
 }
 
 // ResolvePgPassword chooses the password source and caches the result so
@@ -409,70 +266,23 @@ func (c *Config) PgPassword() (string, pgPasswordSource) {
 // collapses unset and empty into the same "" via os.Getenv, so we use
 // os.LookupEnv and pflag.Flag.Changed to detect operator intent.
 func (c *Config) ResolvePgPassword() error {
+	_ = "STUB: not implemented"
 	// Row 1, 2a, 2b: file path explicitly set.
-	if path, explicit, isEmpty := c.passwordFileExplicit(); explicit {
-		if isEmpty {
-			c.pgPasswordSource = pwSourceNone
-			return errors.New("password file path is set to the empty string; unset it or provide a path")
-		}
-		pw, err := pgsecret.ReadPasswordFile(path)
-		if err != nil {
-			return err
-		}
-		if pw == "" {
-			c.pgPasswordSource = pwSourceNone
-			return fmt.Errorf("password file %q is empty", path)
-		}
-		c.pgPasswordCached = pw
-		c.pgPasswordSource = pwSourceFile
-		return nil
-	}
-	// Row 3, 4: --connpool-admin-password flag explicitly set.
-	if c.flagSet != nil {
-		if flag := c.flagSet.Lookup("connpool-admin-password"); flag != nil && flag.Changed {
-			v := flag.Value.String()
-			if v == "" {
-				c.pgPasswordSource = pwSourceNone
-				return errors.New("--connpool-admin-password is set to the empty string; unset it or provide a non-empty password")
-			}
-			c.pgPasswordCached = v
-			c.pgPasswordSource = pwSourceOption
-			return nil
-		}
-	}
-	// Row 5, 6: env vars. CONNPOOL_ADMIN_PASSWORD checked before POSTGRES_PASSWORD.
-	for _, name := range []string{"CONNPOOL_ADMIN_PASSWORD", constants.PgPasswordEnvVar} {
-		if v, ok := os.LookupEnv(name); ok {
-			if v == "" {
-				c.pgPasswordSource = pwSourceNone
-				return fmt.Errorf("env var %s is set to the empty string; unset it or provide a non-empty password", name)
-			}
-			c.pgPasswordCached = v
-			c.pgPasswordSource = pwSourceEnv
-			return nil
-		}
-	}
-	// Row 7: no source configured.
-	c.pgPasswordSource = pwSourceNone
-	return errors.New("admin password not configured: set CONNPOOL_ADMIN_PASSWORD or POSTGRES_PASSWORD env var, --connpool-admin-password flag, or --connpool-admin-password-file / CONNPOOL_ADMIN_PASSWORD_FILE / POSTGRES_PASSWORD_FILE to point at a password file")
+	return nil
 }
+
+// Row 3, 4: --connpool-admin-password flag explicitly set.
+
+// Row 5, 6: env vars. CONNPOOL_ADMIN_PASSWORD checked before POSTGRES_PASSWORD.
+
+// Row 7: no source configured.
 
 // passwordFileExplicit reports whether the file-path input was explicitly
 // set (via flag or env var) and whether the resulting path is the empty
 // string. It does NOT consider viperutil defaults — the flag's
 // pflag.Flag.Changed bit and os.LookupEnv are the source of truth.
 func (c *Config) passwordFileExplicit() (path string, explicit, isEmpty bool) {
-	if c.flagSet != nil {
-		if flag := c.flagSet.Lookup("connpool-admin-password-file"); flag != nil && flag.Changed {
-			v := flag.Value.String()
-			return v, true, v == ""
-		}
-	}
-	for _, name := range []string{"CONNPOOL_ADMIN_PASSWORD_FILE", constants.PgPasswordFileEnvVar} {
-		if v, ok := os.LookupEnv(name); ok {
-			return v, true, v == ""
-		}
-	}
+	_ = "STUB: not implemented"
 	return "", false, false
 }
 
@@ -480,14 +290,13 @@ func (c *Config) passwordFileExplicit() (path string, explicit, isEmpty bool) {
 // An invalid value returns the parser error so the caller can fail startup
 // rather than silently downgrading to plaintext.
 func (c *Config) PgSSLMode() (client.SSLMode, error) {
-	return client.ParseSSLMode(c.pgSSLMode.Get())
+	_ = "STUB: not implemented"
+	return *new(client.SSLMode), nil
 }
 
 // PgSSLRootCert returns the configured CA bundle path used to verify the
 // PostgreSQL server certificate. Empty unless the operator set it.
-func (c *Config) PgSSLRootCert() string {
-	return c.pgSSLRootCert.Get()
-}
+func (c *Config) PgSSLRootCert() string { _ = "STUB: not implemented"; return "" }
 
 // ValidatePGSSL checks the libpq-style sslmode + sslrootcert flags at startup
 // so a typo or missing CA bundle aborts the multipooler before the connection
@@ -497,115 +306,89 @@ func (c *Config) PgSSLRootCert() string {
 // validate verify-full). Pass an empty host when the multipooler is configured
 // for a Unix socket; this function only runs the SSL validation when host is
 // non-empty.
-func (c *Config) ValidatePGSSL(host string) error {
-	if host == "" {
-		return nil
-	}
-	mode, err := client.ParseSSLMode(c.pgSSLMode.Get())
-	if err != nil {
-		return fmt.Errorf("--pg-client-sslmode: %w", err)
-	}
-	if _, err := client.BuildTLSConfig(mode, c.pgSSLRootCert.Get(), host); err != nil {
-		return fmt.Errorf("--pg-client-sslmode=%s: %w", mode, err)
-	}
-	return nil
-}
+func (c *Config) ValidatePGSSL(host string) error { _ = "STUB: not implemented"; return nil }
 
 // AdminCapacity returns the configured admin pool capacity.
-func (c *Config) AdminCapacity() int64 {
-	return c.adminCapacity.Get()
-}
+func (c *Config) AdminCapacity() int64 { _ = "STUB: not implemented"; return 0 }
 
 // UserRegularIdleTimeout returns the per-user regular pool idle timeout.
 func (c *Config) UserRegularIdleTimeout() time.Duration {
-	return c.userRegularIdleTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // UserRegularMaxLifetime returns the per-user regular pool max lifetime.
 func (c *Config) UserRegularMaxLifetime() time.Duration {
-	return c.userRegularMaxLifetime.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // UserReservedInactivityTimeout returns the reserved connection inactivity timeout.
 // This is how long a reserved connection can be inactive before being killed.
 func (c *Config) UserReservedInactivityTimeout() time.Duration {
-	return c.userReservedInactivityTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // UserReservedIdleTimeout returns the idle timeout for connections in the reserved pool.
 func (c *Config) UserReservedIdleTimeout() time.Duration {
-	return c.userReservedIdleTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // UserReservedMaxLifetime returns the per-user reserved pool max lifetime.
 func (c *Config) UserReservedMaxLifetime() time.Duration {
-	return c.userReservedMaxLifetime.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // SettingsCacheSize returns the settings cache size.
-func (c *Config) SettingsCacheSize() int {
-	return int(c.settingsCacheSize.Get())
-}
+func (c *Config) SettingsCacheSize() int { _ = "STUB: not implemented"; return 0 }
 
 // GlobalCapacity returns the total PostgreSQL connections to manage.
 // This is divided between regular and reserved pools based on ReservedRatio.
-func (c *Config) GlobalCapacity() int64 {
-	return c.globalCapacity.Get()
-}
+func (c *Config) GlobalCapacity() int64 { _ = "STUB: not implemented"; return 0 }
 
 // ReservedRatio returns the fraction of global capacity allocated to reserved pools (0.0-1.0).
 // Regular pools get (1 - reservedRatio) of the global capacity.
-func (c *Config) ReservedRatio() float64 {
-	return c.reservedRatio.Get()
-}
+func (c *Config) ReservedRatio() float64 { _ = "STUB: not implemented"; return 0 }
 
 // RebalanceInterval returns how often the rebalancer runs to adjust pool capacities.
 func (c *Config) RebalanceInterval() time.Duration {
-	return c.rebalanceInterval.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // DemandWindow returns the sliding window duration for peak demand tracking.
 // The rebalancer considers peak demand over this window when allocating capacity.
 func (c *Config) DemandWindow() time.Duration {
-	return c.demandWindow.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // InactiveTimeout returns how long a user pool can be inactive before garbage collection.
 func (c *Config) InactiveTimeout() time.Duration {
-	return c.inactiveTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // MinCapacityPerUser returns the minimum connections per user.
 // This ensures light users always have enough capacity for burst demand.
-func (c *Config) MinCapacityPerUser() int64 {
-	return c.minCapacityPerUser.Get()
-}
+func (c *Config) MinCapacityPerUser() int64 { _ = "STUB: not implemented"; return 0 }
 
 // DialTimeout returns the timeout for establishing new PostgreSQL connections.
-func (c *Config) DialTimeout() time.Duration {
-	return c.dialTimeout.Get()
-}
+func (c *Config) DialTimeout() time.Duration { _ = "STUB: not implemented"; return *new(time.Duration) }
 
 // DrainGracePeriod returns how long to wait for in-flight connections to drain
 // during NOT_SERVING transitions before force-closing reserved connections.
 func (c *Config) DrainGracePeriod() time.Duration {
-	return c.drainGracePeriod.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // NewManager creates a new connection pool manager from this config.
 // Call this after flags have been parsed and when you're ready to create the manager.
 // The manager starts in a closed state; call Open() before using it.
-func (c *Config) NewManager(logger *slog.Logger) *Manager {
-	metrics, err := NewMetrics()
-	if err != nil {
-		logger.Warn("failed to initialize some connection pool metrics (using noop fallbacks)", "error", err)
-	}
+func (c *Config) NewManager(logger *slog.Logger) *Manager { _ = "STUB: not implemented"; return nil }
 
-	mgr := &Manager{
-		config:  c,
-		logger:  logger,
-		metrics: metrics,
-	}
-	mgr.closed.Store(true) // Manager is closed until Open() is called
-	return mgr
-}
+// Manager is closed until Open() is called

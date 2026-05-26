@@ -16,13 +16,8 @@ package scatterconn
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // ScatterStatus represents the outcome of a shard execution for metric attribution.
@@ -54,13 +49,8 @@ func (m ExecuteDuration) Record(
 	shard string,
 	status ScatterStatus,
 ) {
-	m.Float64Histogram.Record(ctx, val,
-		metric.WithAttributes(
-			attribute.String("db.namespace", dbNamespace),
-			attribute.String("tablegroup", tablegroup),
-			attribute.String("shard", shard),
-			attribute.String("status", string(status)),
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // ExecuteErrors wraps an Int64Counter for counting shard execution errors.
@@ -75,49 +65,11 @@ func (m ExecuteErrors) Add(
 	shard string,
 	errorType string,
 ) {
-	m.Int64Counter.Add(ctx, 1,
-		metric.WithAttributes(
-			attribute.String("tablegroup", tablegroup),
-			attribute.String("shard", shard),
-			attribute.String("error.type", errorType),
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // NewScatterMetrics initialises OTel metrics for scatterconn.
 // Individual metrics that fail to initialise use noop implementations
 // and are included in the returned error.
-func NewScatterMetrics() (*ScatterMetrics, error) {
-	meter := otel.Meter("github.com/multigres/multigres/go/services/multigateway/scatterconn")
-	m := &ScatterMetrics{}
-	var errs []error
-
-	dur, err := meter.Float64Histogram(
-		"mg.scatter.execute.duration",
-		metric.WithDescription("Duration of shard-level query execution"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.scatter.execute.duration histogram: %w", err))
-		m.executeDuration = ExecuteDuration{noop.Float64Histogram{}}
-	} else {
-		m.executeDuration = ExecuteDuration{dur}
-	}
-
-	errCounter, err := meter.Int64Counter(
-		"mg.scatter.execute.errors",
-		metric.WithDescription("Total number of shard-level execution errors"),
-		metric.WithUnit("{error}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.scatter.execute.errors counter: %w", err))
-		m.executeErrors = ExecuteErrors{noop.Int64Counter{}}
-	} else {
-		m.executeErrors = ExecuteErrors{errCounter}
-	}
-
-	if len(errs) > 0 {
-		return m, errors.Join(errs...)
-	}
-	return m, nil
-}
+func NewScatterMetrics() (*ScatterMetrics, error) { _ = "STUB: not implemented"; return nil, nil }

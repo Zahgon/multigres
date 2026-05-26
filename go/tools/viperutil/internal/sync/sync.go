@@ -19,16 +19,12 @@ package sync
 import (
 	"context"
 	"errors"
-	"fmt"
-	"log/slog"
 	"sync"
 	"time"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 // Viper is a wrapper around a pair of viper.Viper instances to provide config-
@@ -56,48 +52,23 @@ type Viper struct {
 	onConfigWrite func()
 }
 
-func (v *Viper) SetFs(fs afero.Fs) {
-	v.fs = fs
-	v.disk.SetFs(fs)
-}
+func (v *Viper) SetFs(fs afero.Fs) { _ = "STUB: not implemented"; return }
 
 // New returns a new synced Viper.
-func New() *Viper {
-	return &Viper{
-		disk:  viper.New(),
-		live:  viper.New(),
-		keys:  map[string]*sync.Mutex{},
-		fs:    afero.NewOsFs(), // default Fs used by viper, but we need this set so loadFromDisk doesn't accidentally nil-out the live fs
-		setCh: make(chan struct{}, 1),
-	}
-}
+func New() *Viper { _ = "STUB: not implemented"; return nil }
+
+// default Fs used by viper, but we need this set so loadFromDisk doesn't accidentally nil-out the live fs
 
 // Set sets the given key to the given value, in both the disk and live vipers.
-func (v *Viper) Set(key string, value any) {
-	m, ok := v.keys[key]
-	if !ok {
-		return
-	}
+func (v *Viper) Set(key string, value any) { _ = "STUB: not implemented"; return }
 
-	m.Lock()
-	defer m.Unlock()
+// We must not update v.disk here; explicit calls to Set will supersede all
+// future config reloads.
 
-	v.m.Lock()
-	defer v.m.Unlock()
-
-	// We must not update v.disk here; explicit calls to Set will supersede all
-	// future config reloads.
-	v.live.Set(key, value)
-
-	// Do a non-blocking signal to persist here. Our channel has a buffer of 1,
-	// so if we've signalled for some other Set call that hasn't been persisted
-	// yet, this Set will get persisted along with that one and any other
-	// pending in-memory changes.
-	select {
-	case v.setCh <- struct{}{}:
-	default:
-	}
-}
+// Do a non-blocking signal to persist here. Our channel has a buffer of 1,
+// so if we've signalled for some other Set call that hasn't been persisted
+// yet, this Set will get persisted along with that one and any other
+// pending in-memory changes.
 
 // ErrDuplicateWatch is returned when Watch is called on a synced Viper which
 // has already started a watch.
@@ -132,120 +103,26 @@ var ErrDuplicateWatch = errors.New("duplicate watch")
 // an ErrDuplicateWatch. Other errors may be returned via underlying viper code
 // to ensure the config file can be read in properly.
 func (v *Viper) Watch(ctx context.Context, static *viper.Viper, minWaitInterval time.Duration) (cancel context.CancelFunc, err error) {
-	if v.watchingConfig {
-		return nil, fmt.Errorf("%w: viper is already watching %s", ErrDuplicateWatch, v.disk.ConfigFileUsed())
-	}
-
-	ctx, cancel = context.WithCancel(ctx)
-
-	cfg := static.ConfigFileUsed()
-	if cfg == "" {
-		// No config file to watch, just merge the settings and return.
-		return cancel, v.live.MergeConfigMap(static.AllSettings())
-	}
-
-	v.disk.SetConfigFile(cfg)
-	if err := v.disk.ReadInConfig(); err != nil {
-		cancel()
-		return nil, err
-	}
-
-	v.watchingConfig = true
-	v.loadFromDisk()
-	v.disk.OnConfigChange(func(in fsnotify.Event) {
-		for _, m := range v.keys {
-			m.Lock()
-			// This won't fire until after the config has been updated on v.live.
-			defer m.Unlock()
-		}
-
-		v.loadFromDisk()
-
-		for _, ch := range v.subscribers {
-			select {
-			case ch <- struct{}{}:
-			default:
-			}
-		}
-	})
-	v.disk.WatchConfig()
-
-	go v.persistChanges(ctx, minWaitInterval)
-
-	return cancel, nil
+	_ = "STUB: not implemented"
+	return *new(context.CancelFunc), nil
 }
+
+// No config file to watch, just merge the settings and return.
+
+// This won't fire until after the config has been updated on v.live.
 
 func (v *Viper) persistChanges(ctx context.Context, minWaitInterval time.Duration) {
-	defer close(v.setCh)
-
-	var timer *time.Timer
-	if minWaitInterval > 0 {
-		timer = time.NewTimer(minWaitInterval)
-	}
-
-	persistOnce := func() {
-		if err := v.WriteConfig(); err != nil {
-			slog.ErrorContext(ctx, "failed to persist config changes back to disk", "err", err)
-			// If we failed to persist, don't wait the entire interval before
-			// writing again, instead writing immediately on the next request.
-			if timer != nil {
-				if !timer.Stop() {
-					<-timer.C
-				}
-
-				timer = nil
-			}
-		}
-
-		switch {
-		case minWaitInterval == 0:
-			return
-		case timer == nil:
-			timer = time.NewTimer(minWaitInterval)
-		default:
-			timer.Reset(minWaitInterval)
-		}
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-v.setCh:
-			if timer == nil {
-				persistOnce()
-				continue
-			}
-
-			select {
-			case <-ctx.Done():
-				return
-			case <-timer.C:
-				persistOnce()
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// If we failed to persist, don't wait the entire interval before
+// writing again, instead writing immediately on the next request.
 
 // WriteConfig writes the live viper config back to disk.
-func (v *Viper) WriteConfig() error {
-	if v.onConfigWrite != nil {
-		defer v.onConfigWrite()
-	}
+func (v *Viper) WriteConfig() error { _ = "STUB: not implemented"; return nil }
 
-	for _, m := range v.keys {
-		m.Lock()
-		// This won't fire until after the config has been written.
-		defer m.Unlock()
-	}
-
-	v.m.Lock()
-	defer v.m.Unlock()
-
-	v.live.SetConfigFile(v.disk.ConfigFileUsed())
-
-	return v.live.WriteConfig()
-}
+// This won't fire until after the config has been written.
 
 // Notify adds a subscription that this synced viper will attempt to notify on
 // config changes, after the updated config has been copied over from disk to
@@ -256,62 +133,32 @@ func (v *Viper) WriteConfig() error {
 //
 // This function must be called prior to setting up a Watch; it will panic if a
 // a watch has already been established on this synced Viper.
-func (v *Viper) Notify(ch chan<- struct{}) {
-	if v.watchingConfig {
-		panic("cannot Notify after starting to watch a config")
-	}
-
-	v.subscribers = append(v.subscribers, ch)
-}
+func (v *Viper) Notify(ch chan<- struct{}) { _ = "STUB: not implemented"; return }
 
 // AllSettings returns the current live settings.
-func (v *Viper) AllSettings() map[string]any {
-	v.m.Lock()
-	defer v.m.Unlock()
+func (v *Viper) AllSettings() map[string]any { _ = "STUB: not implemented"; return nil }
 
-	return v.live.AllSettings()
-}
+func (v *Viper) loadFromDisk() { _ = "STUB: not implemented"; return }
 
-func (v *Viper) loadFromDisk() {
-	v.m.Lock()
-	defer v.m.Unlock()
+// Reset v.live so explicit Set calls don't win over what's just changed on
+// disk.
 
-	// Reset v.live so explicit Set calls don't win over what's just changed on
-	// disk.
-	v.live = viper.New()
-	v.live.SetFs(v.fs)
-
-	// Fun fact! MergeConfigMap actually only ever returns nil. Maybe in an
-	// older version of viper it used to actually handle errors, but now it
-	// decidedly does not. See https://github.com/spf13/viper/blob/v1.8.1/viper.go#L1492-L1499.
-	_ = v.live.MergeConfigMap(v.disk.AllSettings())
-}
+// Fun fact! MergeConfigMap actually only ever returns nil. Maybe in an
+// older version of viper it used to actually handle errors, but now it
+// decidedly does not. See https://github.com/spf13/viper/blob/v1.8.1/viper.go#L1492-L1499.
 
 // begin implementation of registry.Bindable for sync.Viper
 
-func (v *Viper) BindEnv(vars ...string) error {
-	if err := v.disk.BindEnv(vars...); err != nil {
-		return err
-	}
-	return v.live.BindEnv(vars...)
-}
+func (v *Viper) BindEnv(vars ...string) error { _ = "STUB: not implemented"; return nil }
 
 func (v *Viper) BindPFlag(key string, flag *pflag.Flag) error {
-	if err := v.disk.BindPFlag(key, flag); err != nil {
-		return err
-	}
-	return v.live.BindPFlag(key, flag)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (v *Viper) RegisterAlias(alias string, key string) {
-	v.disk.RegisterAlias(alias, key)
-	v.live.RegisterAlias(alias, key)
-}
+func (v *Viper) RegisterAlias(alias string, key string) { _ = "STUB: not implemented"; return }
 
-func (v *Viper) SetDefault(key string, value any) {
-	v.disk.SetDefault(key, value)
-	v.live.SetDefault(key, value)
-}
+func (v *Viper) SetDefault(key string, value any) { _ = "STUB: not implemented"; return }
 
 // end implementation of registry.Bindable for sync.Viper
 
@@ -324,21 +171,6 @@ func (v *Viper) SetDefault(key string, value any) {
 // This function must be called at most once per key; it will panic if attempting
 // to adapt multiple getters for the same key.
 func AdaptGetter[T any](key string, getter func(v *viper.Viper) func(key string) T, v *Viper) func(key string) T {
-	if v.watchingConfig {
-		panic("cannot adapt getter to synchronized viper which is already watching a config")
-	}
-
-	if _, ok := v.keys[key]; ok {
-		panic("already adapted a getter for key " + key)
-	}
-
-	var m sync.Mutex
-	v.keys[key] = &m
-
-	return func(key string) T {
-		m.Lock()
-		defer m.Unlock()
-
-		return getter(v.live)(key)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

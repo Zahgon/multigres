@@ -25,12 +25,11 @@
 package multigatewaymanager
 
 import (
+	sync "sync"
+
 	multigatewaymanagerdata "github.com/multigres/multigres/go/pb/multigatewaymanagerdata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -56,49 +55,26 @@ type GetQueryRegistryRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetQueryRegistryRequest) Reset() {
-	*x = GetQueryRegistryRequest{}
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetQueryRegistryRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetQueryRegistryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetQueryRegistryRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetQueryRegistryRequest) ProtoMessage() {}
+func (*GetQueryRegistryRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetQueryRegistryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetQueryRegistryRequest.ProtoReflect.Descriptor instead.
 func (*GetQueryRegistryRequest) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerservice_proto_rawDescGZIP(), []int{0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetQueryRegistryRequest) GetLimit() uint32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
+func (x *GetQueryRegistryRequest) GetLimit() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *GetQueryRegistryRequest) GetMinCalls() uint64 {
-	if x != nil {
-		return x.MinCalls
-	}
-	return 0
-}
+func (x *GetQueryRegistryRequest) GetMinCalls() uint64 { _ = "STUB: not implemented"; return 0 }
 
 // GetQueryRegistryResponse wraps the registry snapshot.
 type GetQueryRegistryResponse struct {
@@ -108,40 +84,25 @@ type GetQueryRegistryResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetQueryRegistryResponse) Reset() {
-	*x = GetQueryRegistryResponse{}
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetQueryRegistryResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetQueryRegistryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetQueryRegistryResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetQueryRegistryResponse) ProtoMessage() {}
+func (*GetQueryRegistryResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetQueryRegistryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetQueryRegistryResponse.ProtoReflect.Descriptor instead.
 func (*GetQueryRegistryResponse) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerservice_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *GetQueryRegistryResponse) GetSnapshot() *multigatewaymanagerdata.QueryRegistrySnapshot {
-	if x != nil {
-		return x.Snapshot
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -152,34 +113,21 @@ type GetConsolidatorStatsRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetConsolidatorStatsRequest) Reset() {
-	*x = GetConsolidatorStatsRequest{}
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetConsolidatorStatsRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetConsolidatorStatsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetConsolidatorStatsRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetConsolidatorStatsRequest) ProtoMessage() {}
+func (*GetConsolidatorStatsRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetConsolidatorStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetConsolidatorStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetConsolidatorStatsRequest) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerservice_proto_rawDescGZIP(), []int{2}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetConsolidatorStatsResponse wraps the consolidator stats.
@@ -190,40 +138,25 @@ type GetConsolidatorStatsResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetConsolidatorStatsResponse) Reset() {
-	*x = GetConsolidatorStatsResponse{}
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetConsolidatorStatsResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetConsolidatorStatsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetConsolidatorStatsResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetConsolidatorStatsResponse) ProtoMessage() {}
+func (*GetConsolidatorStatsResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetConsolidatorStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerservice_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetConsolidatorStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetConsolidatorStatsResponse) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerservice_proto_rawDescGZIP(), []int{3}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *GetConsolidatorStatsResponse) GetStats() *multigatewaymanagerdata.ConsolidatorStats {
-	if x != nil {
-		return x.Stats
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -250,10 +183,8 @@ var (
 )
 
 func file_multigatewaymanagerservice_proto_rawDescGZIP() []byte {
-	file_multigatewaymanagerservice_proto_rawDescOnce.Do(func() {
-		file_multigatewaymanagerservice_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_multigatewaymanagerservice_proto_rawDesc), len(file_multigatewaymanagerservice_proto_rawDesc)))
-	})
-	return file_multigatewaymanagerservice_proto_rawDescData
+	_ = "STUB: not implemented"
+	return nil
 }
 
 var file_multigatewaymanagerservice_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
@@ -279,26 +210,5 @@ var file_multigatewaymanagerservice_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_multigatewaymanagerservice_proto_init() }
-func file_multigatewaymanagerservice_proto_init() {
-	if File_multigatewaymanagerservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multigatewaymanagerservice_proto_rawDesc), len(file_multigatewaymanagerservice_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   4,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_multigatewaymanagerservice_proto_goTypes,
-		DependencyIndexes: file_multigatewaymanagerservice_proto_depIdxs,
-		MessageInfos:      file_multigatewaymanagerservice_proto_msgTypes,
-	}.Build()
-	File_multigatewaymanagerservice_proto = out.File
-	file_multigatewaymanagerservice_proto_goTypes = nil
-	file_multigatewaymanagerservice_proto_depIdxs = nil
-}
+func init()                                       { file_multigatewaymanagerservice_proto_init() }
+func file_multigatewaymanagerservice_proto_init() { _ = "STUB: not implemented"; return }

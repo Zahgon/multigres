@@ -20,8 +20,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/multigres/multigres/go/common/topoclient"
-	commontypes "github.com/multigres/multigres/go/common/types"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -123,19 +121,12 @@ type Problem struct {
 }
 
 // IsShardWide reports whether this problem affects the entire shard.
-func (p Problem) IsShardWide() bool {
-	return p.Scope == ScopeShard
-}
+func (p Problem) IsShardWide() bool { _ = "STUB: not implemented"; return false }
 
 // EntityID returns a stable string identifying the affected entity.
 // For pooler-scoped problems this is the pooler ID string; for shard-scoped
 // problems it is the shard key string. Safe to call when PoolerID is nil.
-func (p Problem) EntityID() string {
-	if p.Scope == ScopePooler && p.PoolerID != nil {
-		return topoclient.MultiPoolerIDString(p.PoolerID)
-	}
-	return string(commontypes.FormatShardKey(p.ShardKey))
-}
+func (p Problem) EntityID() string { _ = "STUB: not implemented"; return "" }
 
 // GracePeriodConfig holds grace period settings for recovery actions.
 type GracePeriodConfig struct {
@@ -180,8 +171,6 @@ type RecoveryMetadata struct {
 
 // GetLockTimeout returns the lock timeout, defaulting to 15 seconds if not set.
 func (m RecoveryMetadata) GetLockTimeout() time.Duration {
-	if m.LockTimeout == 0 {
-		return 15 * time.Second
-	}
-	return m.LockTimeout
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }

@@ -16,13 +16,10 @@ package reserved
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync/atomic"
 	"time"
 
 	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
-	"github.com/multigres/multigres/go/common/protoutil"
 	"github.com/multigres/multigres/go/common/sqltypes"
 	"github.com/multigres/multigres/go/pb/query"
 	"github.com/multigres/multigres/go/services/multipooler/connstate"
@@ -66,93 +63,53 @@ type Conn struct {
 
 // newConn creates a new reserved connection.
 func newConn(pooled regular.PooledConn, connID int64, pool *Pool) *Conn {
-	return &Conn{
-		pooled: pooled,
-		connID: connID,
-		pool:   pool,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ConnID returns the unique identifier for this reservation.
 func (c *Conn) ConnID() int64 {
-	return c.connID
+	_ = "STUB: not implemented"
+
+	// Conn returns the underlying regular connection.
+	return 0
 }
 
-// Conn returns the underlying regular connection.
-func (c *Conn) Conn() *regular.Conn {
-	return c.pooled.Conn
-}
+func (c *Conn) Conn() *regular.Conn { _ = "STUB: not implemented"; return nil }
 
 // TxnStatus returns the underlying PG protocol transaction status from the
 // most recent ReadyForQuery message.
 func (c *Conn) TxnStatus() protocol.TransactionStatus {
-	return c.pooled.Conn.TxnStatus()
+	_ = "STUB: not implemented"
+	return *new(protocol.TransactionStatus)
 }
 
 // State returns the connection's state.
-func (c *Conn) State() *connstate.ConnectionState {
-	return c.pooled.Conn.State()
-}
+func (c *Conn) State() *connstate.ConnectionState { _ = "STUB: not implemented"; return nil }
 
 // --- Transaction lifecycle ---
 
 // Begin starts a transaction on this connection with a plain "BEGIN".
-func (c *Conn) Begin(ctx context.Context) error {
-	return c.BeginWithQuery(ctx, "BEGIN")
-}
+func (c *Conn) Begin(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // BeginWithQuery starts a transaction using the provided query string.
 // This allows preserving transaction options like isolation level and access mode
 // (e.g., "BEGIN ISOLATION LEVEL SERIALIZABLE" or "START TRANSACTION READ ONLY").
 func (c *Conn) BeginWithQuery(ctx context.Context, beginQuery string) error {
-	if c.IsInTransaction() {
-		return errors.New("transaction already in progress")
-	}
-
-	_, err := c.pooled.Conn.Query(ctx, beginQuery)
-	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
-	}
-
-	c.AddReservationReason(protoutil.ReasonTransaction)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Commit commits the current transaction.
-func (c *Conn) Commit(ctx context.Context) error {
-	if !c.IsInTransaction() {
-		return errors.New("no active transaction")
-	}
-
-	_, err := c.pooled.Conn.Query(ctx, "COMMIT")
-	if err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	c.RemoveReservationReason(protoutil.ReasonTransaction)
-	return nil
-}
+func (c *Conn) Commit(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // Rollback rolls back the current transaction.
-func (c *Conn) Rollback(ctx context.Context) error {
-	if !c.IsInTransaction() {
-		// No active transaction, but that's okay for rollback.
-		return nil
-	}
+func (c *Conn) Rollback(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	_, err := c.pooled.Conn.Query(ctx, "ROLLBACK")
-	if err != nil {
-		return fmt.Errorf("failed to rollback transaction: %w", err)
-	}
-
-	c.RemoveReservationReason(protoutil.ReasonTransaction)
-	return nil
-}
+// No active transaction, but that's okay for rollback.
 
 // IsInTransaction returns true if there's an active transaction.
-func (c *Conn) IsInTransaction() bool {
-	return c.reservedProps != nil && c.reservedProps.IsForTransaction()
-}
+func (c *Conn) IsInTransaction() bool { _ = "STUB: not implemented"; return false }
 
 // --- Portal reservations ---
 
@@ -160,154 +117,82 @@ func (c *Conn) IsInTransaction() bool {
 // This is used when Execute returns suspended (portal not fully consumed).
 // Multiple portals can be reserved on the same connection.
 // Preserves any existing reservation reasons (e.g., transaction).
-func (c *Conn) ReserveForPortal(portalName string) {
-	c.AddReservationReason(protoutil.ReasonPortal)
-	c.reservedProps.AddPortal(portalName)
-}
+func (c *Conn) ReserveForPortal(portalName string) { _ = "STUB: not implemented"; return }
 
 // ReleasePortal removes a specific portal from the reservation.
 // If no portals remain, the portal reason is removed from the bitmask.
 // Returns true if all reservation reasons are gone (connection should be released).
-func (c *Conn) ReleasePortal(portalName string) bool {
-	if c.reservedProps == nil {
-		return false
-	}
-	c.reservedProps.RemovePortal(portalName)
-	if !c.reservedProps.HasPortals() {
-		return c.RemoveReservationReason(protoutil.ReasonPortal)
-	}
-	return false
-}
+func (c *Conn) ReleasePortal(portalName string) bool { _ = "STUB: not implemented"; return false }
 
 // ReleaseAllPortals clears all portal reservations.
 // Removes the portal reason from the bitmask but preserves other reasons.
-func (c *Conn) ReleaseAllPortals() {
-	if c.reservedProps == nil {
-		return
-	}
-	c.reservedProps.Portals = nil
-	c.RemoveReservationReason(protoutil.ReasonPortal)
-}
+func (c *Conn) ReleaseAllPortals() { _ = "STUB: not implemented"; return }
 
 // IsReservedForPortal returns true if reserved for any portal.
-func (c *Conn) IsReservedForPortal() bool {
-	return c.reservedProps != nil && c.reservedProps.IsForPortal()
-}
+func (c *Conn) IsReservedForPortal() bool { _ = "STUB: not implemented"; return false }
 
 // HasPortal returns true if the specified portal is reserved on this connection.
-func (c *Conn) HasPortal(portalName string) bool {
-	return c.reservedProps != nil && c.reservedProps.HasPortal(portalName)
-}
+func (c *Conn) HasPortal(portalName string) bool { _ = "STUB: not implemented"; return false }
 
 // ReservedProps returns the reservation properties.
-func (c *Conn) ReservedProps() *ReservationProperties {
-	return c.reservedProps
-}
+func (c *Conn) ReservedProps() *ReservationProperties { _ = "STUB: not implemented"; return nil }
 
 // --- Reason management ---
 
 // AddReservationReason adds a reason to the reservation bitmask.
 // Creates reservedProps if needed (sets StartTime to now).
-func (c *Conn) AddReservationReason(reason uint32) {
-	if c.reservedProps == nil {
-		c.reservedProps = NewReservationProperties(reason)
-	} else {
-		c.reservedProps.AddReason(reason)
-	}
-}
+func (c *Conn) AddReservationReason(reason uint32) { _ = "STUB: not implemented"; return }
 
 // RemoveReservationReason removes a reason from the reservation bitmask.
 // If all reasons are removed, clears reservedProps.
 // Returns true if all reservation reasons are gone (connection should be released).
-func (c *Conn) RemoveReservationReason(reason uint32) bool {
-	if c.reservedProps == nil {
-		return true
-	}
-	c.reservedProps.RemoveReason(reason)
-	if c.reservedProps.IsEmpty() {
-		c.reservedProps = nil
-		return true
-	}
-	return false
-}
+func (c *Conn) RemoveReservationReason(reason uint32) bool { _ = "STUB: not implemented"; return false }
 
 // RemainingReasons returns the current reasons bitmask, or 0 if not reserved.
-func (c *Conn) RemainingReasons() uint32 {
-	if c.reservedProps == nil {
-		return 0
-	}
-	return c.reservedProps.Reasons
-}
+func (c *Conn) RemainingReasons() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // --- Timeout ---
 
 // SetInactivityTimeout sets the inactivity timeout and resets the expiry time.
-func (c *Conn) SetInactivityTimeout(timeout time.Duration) {
-	c.inactivityTimeout = timeout
-	c.ResetExpiryTime()
-}
+func (c *Conn) SetInactivityTimeout(timeout time.Duration) { _ = "STUB: not implemented"; return }
 
 // ResetExpiryTime resets the expiry time based on the inactivity timeout.
 // Called when the connection is accessed to extend its lifetime.
-func (c *Conn) ResetExpiryTime() {
-	if c.inactivityTimeout > 0 {
-		c.expiryNanos.Store(time.Now().Add(c.inactivityTimeout).UnixNano())
-	}
-}
+func (c *Conn) ResetExpiryTime() { _ = "STUB: not implemented"; return }
 
 // IsTimedOut returns true if the connection has exceeded its inactivity timeout.
-func (c *Conn) IsTimedOut() bool {
-	if c.inactivityTimeout <= 0 {
-		return false
-	}
-	return time.Now().UnixNano() > c.expiryNanos.Load()
-}
+func (c *Conn) IsTimedOut() bool { _ = "STUB: not implemented"; return false }
 
 // InactivityTimeout returns the inactivity timeout duration.
 func (c *Conn) InactivityTimeout() time.Duration {
-	return c.inactivityTimeout
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // --- Lifecycle ---
 
 // Release returns this connection to the pool.
 // The reason indicates why the connection is being released.
-func (c *Conn) Release(reason ReleaseReason) {
-	if !c.released.CompareAndSwap(false, true) {
-		return // Already released.
-	}
+func (c *Conn) Release(reason ReleaseReason) { _ = "STUB: not implemented"; return }
 
-	if c.pool != nil {
-		c.pool.release(c, reason)
-	}
-}
+// Already released.
 
 // IsReleased returns true if the connection has been released.
-func (c *Conn) IsReleased() bool {
-	return c.released.Load()
-}
+func (c *Conn) IsReleased() bool { _ = "STUB: not implemented"; return false }
 
 // Kill cancels the current operation on this connection.
-func (c *Conn) Kill(ctx context.Context) error {
-	return c.pooled.Conn.Kill(ctx)
-}
+func (c *Conn) Kill(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // IsClosed returns true if the underlying connection is closed.
-func (c *Conn) IsClosed() bool {
-	return c.pooled.Conn.IsClosed()
-}
+func (c *Conn) IsClosed() bool { _ = "STUB: not implemented"; return false }
 
 // --- Backend info ---
 
 // ProcessID returns the backend process ID.
-func (c *Conn) ProcessID() uint32 {
-	return c.pooled.Conn.ProcessID()
-}
+func (c *Conn) ProcessID() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // SecretKey returns the backend secret key.
-func (c *Conn) SecretKey() uint32 {
-	return c.pooled.Conn.SecretKey()
-}
+func (c *Conn) SecretKey() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // --- Query execution ---
 
@@ -316,74 +201,84 @@ func (c *Conn) SecretKey() uint32 {
 // lock-detection mapping via pg_stat_activity. Delegates to the underlying
 // regular.Conn so quoting/escaping lives in one place.
 func (c *Conn) SetApplicationName(ctx context.Context, name string) error {
-	return c.pooled.Conn.SetApplicationName(ctx, name)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Query executes a simple query and returns all results.
 func (c *Conn) Query(ctx context.Context, sql string) ([]*sqltypes.Result, error) {
-	return c.pooled.Conn.Query(ctx, sql)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // QueryStreaming executes a query with streaming results via callback.
 func (c *Conn) QueryStreaming(ctx context.Context, sql string, callback func(context.Context, *sqltypes.Result) error) error {
-	return c.pooled.Conn.QueryStreaming(ctx, sql, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // --- Extended query protocol ---
 
 // Parse sends a Parse message to prepare a statement.
 func (c *Conn) Parse(ctx context.Context, name, queryStr string, paramTypes []uint32) error {
-	return c.pooled.Conn.Parse(ctx, name, queryStr, paramTypes)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // BindAndExecute binds parameters and executes atomically.
 // Returns true if the execution completed (CommandComplete), false if suspended (PortalSuspended).
 func (c *Conn) BindAndExecute(ctx context.Context, portalName, stmtName string, params [][]byte, paramFormats, resultFormats []int16, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (completed bool, err error) {
-	return c.pooled.Conn.BindAndExecute(ctx, portalName, stmtName, params, paramFormats, resultFormats, maxRows, callback)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // BindAndDescribe binds parameters and describes the resulting portal.
 func (c *Conn) BindAndDescribe(ctx context.Context, stmtName string, params [][]byte, paramFormats, resultFormats []int16) (*query.StatementDescription, error) {
-	return c.pooled.Conn.BindAndDescribe(ctx, stmtName, params, paramFormats, resultFormats)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // BindDescribeAndExecute fuses Bind+Describe(P)+Execute+Sync into a single
 // backend round trip.
 func (c *Conn) BindDescribeAndExecute(ctx context.Context, portalName, stmtName string, params [][]byte, paramFormats, resultFormats []int16, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (bool, error) {
-	return c.pooled.Conn.BindDescribeAndExecute(ctx, portalName, stmtName, params, paramFormats, resultFormats, maxRows, callback)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // DescribePrepared describes a prepared statement.
 func (c *Conn) DescribePrepared(ctx context.Context, name string) (*query.StatementDescription, error) {
-	return c.pooled.Conn.DescribePrepared(ctx, name)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CloseStatement closes a prepared statement.
 func (c *Conn) CloseStatement(ctx context.Context, name string) error {
-	return c.pooled.Conn.CloseStatement(ctx, name)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ClosePortal closes a portal.
 func (c *Conn) ClosePortal(ctx context.Context, name string) error {
-	return c.pooled.Conn.ClosePortal(ctx, name)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Sync sends a Sync message to synchronize the extended query protocol.
-func (c *Conn) Sync(ctx context.Context) error {
-	return c.pooled.Conn.Sync(ctx)
-}
+func (c *Conn) Sync(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // PrepareAndExecute is a convenience method that prepares and executes in one round trip.
 // name is the statement/portal name (use "" for unnamed, which is cleared after Sync).
 func (c *Conn) PrepareAndExecute(ctx context.Context, name, queryStr string, params [][]byte, callback func(ctx context.Context, result *sqltypes.Result) error) error {
-	return c.pooled.Conn.PrepareAndExecute(ctx, name, queryStr, params, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // QueryArgs executes a parameterized query using the extended query protocol.
 // This is a convenience method that accepts Go values as arguments and converts
 // them to the appropriate text format for PostgreSQL.
 func (c *Conn) QueryArgs(ctx context.Context, queryStr string, args ...any) ([]*sqltypes.Result, error) {
-	return c.pooled.Conn.QueryArgs(ctx, queryStr, args...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Execute continues execution of a previously bound portal.
@@ -391,24 +286,25 @@ func (c *Conn) QueryArgs(ctx context.Context, queryStr string, args ...any) ([]*
 // and returned PortalSuspended.
 // Returns true if the portal completed (CommandComplete), false if suspended (PortalSuspended).
 func (c *Conn) Execute(ctx context.Context, portalName string, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (completed bool, err error) {
-	return c.pooled.Conn.Execute(ctx, portalName, maxRows, callback)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // --- LISTEN/NOTIFY operations ---
 
 // SendQuery writes a simple query message without reading the response.
 // Used for LISTEN/UNLISTEN commands in the split read/write pattern.
-func (c *Conn) SendQuery(sql string) error {
-	return c.pooled.Conn.RawConn().SendQuery(sql)
-}
+func (c *Conn) SendQuery(sql string) error { _ = "STUB: not implemented"; return nil }
 
 // ReadRawMessage reads the next raw PostgreSQL protocol message.
 // Returns the message type byte and body.
 func (c *Conn) ReadRawMessage() (byte, []byte, error) {
-	return c.pooled.Conn.RawConn().ReadRawMessage()
+	_ = "STUB: not implemented"
+	return 0, nil, nil
 }
 
 // ParseNotification parses a NotificationResponse message body.
 func (c *Conn) ParseNotification(body []byte) (*sqltypes.Notification, error) {
-	return c.pooled.Conn.RawConn().ParseNotification(body)
+	_ = "STUB: not implemented"
+	return nil, nil
 }

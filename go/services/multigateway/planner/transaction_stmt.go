@@ -32,17 +32,6 @@ func (p *Planner) planTransactionStmt(
 	sql string,
 	stmt *ast.TransactionStmt,
 ) (*engine.Plan, error) {
-	p.logger.Debug("planning transaction statement",
-		"kind", stmt.Kind.String(),
-		"savepoint", stmt.SavepointName,
-		"sql", sql)
-
-	primitive := engine.NewTransactionPrimitive(stmt.Kind, stmt.SavepointName, sql, p.defaultTableGroup, p.txnMetrics)
-	plan := engine.NewPlan(sql, primitive)
-
-	p.logger.Debug("created transaction plan",
-		"plan", plan.String(),
-		"kind", stmt.Kind.String())
-
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

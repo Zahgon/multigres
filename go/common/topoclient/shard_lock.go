@@ -18,9 +18,7 @@ package topoclient
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/multigres/multigres/go/common/types"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -33,17 +31,11 @@ type shardLock struct {
 
 var _ iTopoLock = (*shardLock)(nil)
 
-func (s *shardLock) Type() string {
-	return "shard"
-}
+func (s *shardLock) Type() string { _ = "STUB: not implemented"; return "" }
 
-func (s *shardLock) ResourceName() string {
-	return string(types.FormatShardKey(s.shardKey))
-}
+func (s *shardLock) ResourceName() string { _ = "STUB: not implemented"; return "" }
 
-func (s *shardLock) Path() string {
-	return fmt.Sprintf("%s/%s/%s/%s", DatabasesPath, s.shardKey.Database, s.shardKey.TableGroup, s.shardKey.Shard)
-}
+func (s *shardLock) Path() string { _ = "STUB: not implemented"; return "" }
 
 // LockShard will lock the shard, and return:
 // - a context with a locksInfo structure for future reference.
@@ -57,9 +49,9 @@ func (s *shardLock) Path() string {
 // if it doesn't exist. If no TTL is specified via WithTTL option, it defaults to
 // NamedLockTTL (24 hours).
 func (ts *store) LockShard(ctx context.Context, shardKey *clustermetadatapb.ShardKey, action string, opts ...LockOption) (context.Context, func(*error), error) {
+	_ = "STUB: not implemented"
 	// Prepend Named lock type - user-provided options can override this
-	opts = append([]LockOption{WithType(Named)}, opts...)
-	return ts.internalLock(ctx, &shardLock{shardKey: shardKey}, action, opts...)
+	return *new(context.Context), nil, nil
 }
 
 // TryLockShard will lock the shard, and return:
@@ -78,11 +70,13 @@ func (ts *store) LockShard(ctx context.Context, shardKey *clustermetadatapb.Shar
 //
 // Note: Uses NamedNonBlocking lock type which creates the lock path if it doesn't exist.
 func (ts *store) TryLockShard(ctx context.Context, shardKey *clustermetadatapb.ShardKey, action string) (context.Context, func(*error), error) {
-	return ts.internalLock(ctx, &shardLock{shardKey: shardKey}, action, WithType(NamedNonBlocking))
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil, nil
 }
 
 // CheckShardLocked can be called on a context to make sure we have the lock
 // for a given shard.
 func CheckShardLocked(ctx context.Context, shardKey *clustermetadatapb.ShardKey) error {
-	return checkLocked(ctx, &shardLock{shardKey: shardKey})
+	_ = "STUB: not implemented"
+	return nil
 }

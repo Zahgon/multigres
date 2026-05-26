@@ -29,11 +29,6 @@
 // Ported from postgres/src/include/nodes/parsenodes.h and primnodes.h
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // RANGE TABLE AND FROM CLAUSE INFRASTRUCTURE - Phase 1D Implementation
 // Essential range table nodes for FROM clause and JOIN support
@@ -65,30 +60,7 @@ const (
 )
 
 // String returns the string representation of RTEKind.
-func (k RTEKind) String() string {
-	switch k {
-	case RTE_RELATION:
-		return "RELATION"
-	case RTE_SUBQUERY:
-		return "SUBQUERY"
-	case RTE_JOIN:
-		return "JOIN"
-	case RTE_FUNCTION:
-		return "FUNCTION"
-	case RTE_TABLEFUNC:
-		return "TABLEFUNC"
-	case RTE_VALUES:
-		return "VALUES"
-	case RTE_CTE:
-		return "CTE"
-	case RTE_NAMEDTUPLESTORE:
-		return "NAMEDTUPLESTORE"
-	case RTE_RESULT:
-		return "RESULT"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (k RTEKind) String() string { _ = "STUB: not implemented"; return "" }
 
 // RangeTblEntry represents a range table entry which describes a table or subquery in the FROM clause.
 // This is a complex structure that supports multiple types of table sources.
@@ -153,20 +125,13 @@ type RangeTblEntry struct {
 
 // NewRangeTblEntry creates a new RangeTblEntry node.
 func NewRangeTblEntry(rteKind RTEKind, alias *Alias) *RangeTblEntry {
-	return &RangeTblEntry{
-		BaseNode: BaseNode{Tag: T_RangeTblEntry},
-		RteKind:  rteKind,
-		Alias:    alias,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeTblEntry) String() string {
-	return fmt.Sprintf("RangeTblEntry{kind=%s}@%d", r.RteKind, r.Location())
-}
+func (r *RangeTblEntry) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeTblEntry) StatementType() string {
-	return "RANGE_TBL_ENTRY"
-}
+func (r *RangeTblEntry) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // RangeSubselect represents a subquery in FROM clause.
 // Ported from postgres/src/include/nodes/parsenodes.h:615-621
@@ -179,49 +144,16 @@ type RangeSubselect struct {
 
 // NewRangeSubselect creates a new RangeSubselect node.
 func NewRangeSubselect(lateral bool, subquery Node, alias *Alias) *RangeSubselect {
-	return &RangeSubselect{
-		BaseNode: BaseNode{Tag: T_RangeSubselect},
-		Lateral:  lateral,
-		Subquery: subquery,
-		Alias:    alias,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeSubselect) String() string {
-	lateral := ""
-	if r.Lateral {
-		lateral = "LATERAL "
-	}
-	return fmt.Sprintf("RangeSubselect{%sSubquery}@%d", lateral, r.Location())
-}
+func (r *RangeSubselect) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeSubselect) StatementType() string {
-	return "RANGE_SUBSELECT"
-}
+func (r *RangeSubselect) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the RangeSubselect.
-func (r *RangeSubselect) SqlString() string {
-	if r.Subquery == nil {
-		return ""
-	}
-
-	var result strings.Builder
-
-	if r.Lateral {
-		result.WriteString("LATERAL ")
-	}
-
-	result.WriteString("(")
-	result.WriteString(r.Subquery.SqlString())
-	result.WriteString(")")
-
-	if r.Alias != nil {
-		result.WriteString(" ")
-		result.WriteString(r.Alias.SqlString())
-	}
-
-	return result.String()
-}
+func (r *RangeSubselect) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // RangeFunction represents a function call appearing in a FROM clause.
 // Supports ROWS FROM() syntax and WITH ORDINALITY.
@@ -238,115 +170,29 @@ type RangeFunction struct {
 
 // NewRangeFunction creates a new RangeFunction node.
 func NewRangeFunction(lateral, ordinality, isRowsFrom bool, functions *NodeList, alias *Alias, colDefList *NodeList) *RangeFunction {
-	return &RangeFunction{
-		BaseNode:   BaseNode{Tag: T_RangeFunction},
-		Lateral:    lateral,
-		Ordinality: ordinality,
-		IsRowsFrom: isRowsFrom,
-		Functions:  functions,
-		Alias:      alias,
-		ColDefList: colDefList,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeFunction) String() string {
-	var parts []string
-	if r.Lateral {
-		parts = append(parts, "LATERAL")
-	}
-	parts = append(parts, "RangeFunction")
-	if r.IsRowsFrom {
-		parts = append(parts, "ROWS_FROM")
-	}
-	if r.Ordinality {
-		parts = append(parts, "WITH_ORDINALITY")
-	}
-	return fmt.Sprintf("%s@%d", strings.Join(parts, " "), r.Location())
-}
+func (r *RangeFunction) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeFunction) StatementType() string {
-	return "RANGE_FUNCTION"
-}
+func (r *RangeFunction) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the RangeFunction.
-func (r *RangeFunction) SqlString() string {
-	var result strings.Builder
+func (r *RangeFunction) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if r.Lateral {
-		result.WriteString("LATERAL ")
-	}
+// Each item is a NodeList containing function + optional column definitions
 
-	if r.IsRowsFrom {
-		result.WriteString("ROWS FROM (")
-		if r.Functions != nil {
-			for i, item := range r.Functions.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				// Each item is a NodeList containing function + optional column definitions
-				if funcList, ok := item.(*NodeList); ok && len(funcList.Items) > 0 {
-					result.WriteString(funcList.Items[0].SqlString())
-					if len(funcList.Items) > 1 {
-						result.WriteString(" AS (")
-						for j, colDef := range funcList.Items[1:] {
-							if j > 0 {
-								result.WriteString(", ")
-							}
-							result.WriteString(colDef.SqlString())
-						}
-						result.WriteString(")")
-					}
-				}
-			}
-		}
-		result.WriteString(")")
-	} else {
-		// Simple function call - Functions contains a single NodeList with one function
-		if r.Functions != nil && len(r.Functions.Items) > 0 {
-			// For non-ROWS FROM, Functions.Items[0] is the NodeList containing the function
-			if funcList, ok := r.Functions.Items[0].(*NodeList); ok && len(funcList.Items) > 0 {
-				result.WriteString(funcList.Items[0].SqlString())
-			}
-		}
-	}
+// Simple function call - Functions contains a single NodeList with one function
 
-	if r.Ordinality {
-		result.WriteString(" WITH ORDINALITY")
-	}
+// For non-ROWS FROM, Functions.Items[0] is the NodeList containing the function
 
-	// A RECORD-returning function carries a column-definition list, written as
-	// `... AS alias (col type, ...)` or, when unaliased, `... AS (col type, ...)`.
-	if r.Alias != nil {
-		result.WriteString(" ")
-		result.WriteString(r.Alias.SqlString())
-		if r.ColDefList != nil && r.ColDefList.Len() > 0 {
-			result.WriteString(" ")
-			result.WriteString(renderColDefList(r.ColDefList))
-		}
-	} else if r.ColDefList != nil && r.ColDefList.Len() > 0 {
-		result.WriteString(" AS ")
-		result.WriteString(renderColDefList(r.ColDefList))
-	}
-
-	return result.String()
-}
+// A RECORD-returning function carries a column-definition list, written as
+// `... AS alias (col type, ...)` or, when unaliased, `... AS (col type, ...)`.
 
 // renderColDefList renders a parenthesized list of column definitions used by
 // RECORD-returning functions, e.g. "(a int, b text)".
-func renderColDefList(list *NodeList) string {
-	var b strings.Builder
-	b.WriteString("(")
-	for i, item := range list.Items {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-		if item != nil {
-			b.WriteString(item.SqlString())
-		}
-	}
-	b.WriteString(")")
-	return b.String()
-}
+func renderColDefList(list *NodeList) string { _ = "STUB: not implemented"; return "" }
 
 // RangeTableFunc represents raw form of "table functions" such as XMLTABLE.
 // Note: JSON_TABLE uses JsonTable node, not RangeTableFunc.
@@ -363,98 +209,24 @@ type RangeTableFunc struct {
 
 // NewRangeTableFunc creates a new RangeTableFunc node.
 func NewRangeTableFunc(lateral bool, docExpr, rowExpr Node, namespaces, columns *NodeList, alias *Alias, location int) *RangeTableFunc {
-	return &RangeTableFunc{
-		BaseNode:   BaseNode{Tag: T_RangeTableFunc, Loc: location},
-		Lateral:    lateral,
-		DocExpr:    docExpr,
-		RowExpr:    rowExpr,
-		Namespaces: namespaces,
-		Columns:    columns,
-		Alias:      alias,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeTableFunc) String() string {
-	lateral := ""
-	if r.Lateral {
-		lateral = "LATERAL "
-	}
-	colCount := 0
-	if r.Columns != nil {
-		colCount = r.Columns.Len()
-	}
-	return fmt.Sprintf("RangeTableFunc{%s%d columns}@%d", lateral, colCount, r.Location())
-}
+func (r *RangeTableFunc) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeTableFunc) StatementType() string {
-	return "RANGE_TABLE_FUNC"
-}
+func (r *RangeTableFunc) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the RangeTableFunc (XMLTABLE).
-func (r *RangeTableFunc) SqlString() string {
-	var result strings.Builder
+func (r *RangeTableFunc) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if r.Lateral {
-		result.WriteString("LATERAL ")
-	}
+// For now, we assume this is XMLTABLE since that's what we're implementing
 
-	// For now, we assume this is XMLTABLE since that's what we're implementing
-	result.WriteString("XMLTABLE(")
+// Optional XMLNAMESPACES(...) clause comes first. Each namespace is a
+// ResTarget: `uri AS name`, or `DEFAULT uri` when unnamed.
 
-	// Optional XMLNAMESPACES(...) clause comes first. Each namespace is a
-	// ResTarget: `uri AS name`, or `DEFAULT uri` when unnamed.
-	if r.Namespaces != nil && r.Namespaces.Len() > 0 {
-		result.WriteString("XMLNAMESPACES(")
-		for i, item := range r.Namespaces.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if rt, ok := item.(*ResTarget); ok {
-				if rt.Name == "" {
-					result.WriteString("DEFAULT ")
-					if rt.Val != nil {
-						result.WriteString(rt.Val.SqlString())
-					}
-				} else {
-					result.WriteString(rt.SqlString())
-				}
-			}
-		}
-		result.WriteString("), ")
-	}
-
-	// XMLTABLE syntax: XMLTABLE(xpath_expression PASSING document_expression COLUMNS ...)
-	// RowExpr is the XPath expression, DocExpr is the document
-	if r.RowExpr != nil {
-		result.WriteString(r.RowExpr.SqlString())
-	}
-
-	if r.DocExpr != nil {
-		result.WriteString(" PASSING ")
-		result.WriteString(r.DocExpr.SqlString())
-	}
-
-	if r.Columns != nil && r.Columns.Len() > 0 {
-		result.WriteString(" COLUMNS ")
-		for i, item := range r.Columns.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if col, ok := item.(*RangeTableFuncCol); ok {
-				result.WriteString(col.SqlString())
-			}
-		}
-	}
-
-	result.WriteString(")")
-
-	if r.Alias != nil {
-		result.WriteString(" ")
-		result.WriteString(r.Alias.SqlString())
-	}
-
-	return result.String()
-}
+// XMLTABLE syntax: XMLTABLE(xpath_expression PASSING document_expression COLUMNS ...)
+// RowExpr is the XPath expression, DocExpr is the document
 
 // RangeTableFuncCol represents one column in a RangeTableFunc->columns.
 // If ForOrdinality is true (FOR ORDINALITY), then the column is an int4 column
@@ -472,67 +244,22 @@ type RangeTableFuncCol struct {
 
 // NewRangeTableFuncCol creates a new RangeTableFuncCol node.
 func NewRangeTableFuncCol(colName string, typeName *TypeName, forOrdinality, isNotNull bool, colExpr, colDefExpr Node, location int) *RangeTableFuncCol {
-	return &RangeTableFuncCol{
-		BaseNode:      BaseNode{Tag: T_RangeTableFuncCol, Loc: location},
-		ColName:       colName,
-		TypeName:      typeName,
-		ForOrdinality: forOrdinality,
-		IsNotNull:     isNotNull,
-		ColExpr:       colExpr,
-		ColDefExpr:    colDefExpr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeTableFuncCol) String() string {
-	var parts []string
-	parts = append(parts, "RangeTableFuncCol{"+r.ColName)
-	if r.ForOrdinality {
-		parts = append(parts, "FOR_ORDINALITY")
-	}
-	if r.IsNotNull {
-		parts = append(parts, "NOT_NULL")
-	}
-	return fmt.Sprintf("%s}@%d", strings.Join(parts, " "), r.Location())
-}
+func (r *RangeTableFuncCol) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeTableFuncCol) StatementType() string {
-	return "RANGE_TABLE_FUNC_COL"
-}
+func (r *RangeTableFuncCol) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the RangeTableFuncCol.
-func (r *RangeTableFuncCol) SqlString() string {
-	var result strings.Builder
+func (r *RangeTableFuncCol) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if r.ForOrdinality {
-		result.WriteString(QuoteIdentifier(r.ColName))
-		result.WriteString(" FOR ORDINALITY")
-	} else {
-		// Quote column name if it needs quoting (contains special chars, is a keyword, etc.)
-		result.WriteString(QuoteIdentifier(r.ColName))
-		if r.TypeName != nil {
-			result.WriteString(" ")
-			result.WriteString(r.TypeName.SqlString())
-		}
+// Quote column name if it needs quoting (contains special chars, is a keyword, etc.)
 
-		// Add PATH clause if ColExpr is present
-		if r.ColExpr != nil {
-			result.WriteString(" PATH ")
-			result.WriteString(r.ColExpr.SqlString())
-		}
+// Add PATH clause if ColExpr is present
 
-		// Add DEFAULT clause if ColDefExpr is present
-		if r.ColDefExpr != nil {
-			result.WriteString(" DEFAULT ")
-			result.WriteString(r.ColDefExpr.SqlString())
-		}
-
-		if r.IsNotNull {
-			result.WriteString(" NOT NULL")
-		}
-	}
-
-	return result.String()
-}
+// Add DEFAULT clause if ColDefExpr is present
 
 // RangeTableSample represents TABLESAMPLE appearing in a raw FROM clause.
 // This node represents: <relation> TABLESAMPLE <method> (<params>) REPEATABLE (<num>)
@@ -547,75 +274,31 @@ type RangeTableSample struct {
 
 // NewRangeTableSample creates a new RangeTableSample node.
 func NewRangeTableSample(relation Node, method, args *NodeList, repeatable Node, location int) *RangeTableSample {
-	return &RangeTableSample{
-		BaseNode:   BaseNode{Tag: T_RangeTableSample, Loc: location},
-		Relation:   relation,
-		Method:     method,
-		Args:       args,
-		Repeatable: repeatable,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeTableSample) String() string {
-	repeatable := ""
-	if r.Repeatable != nil {
-		repeatable = " REPEATABLE"
-	}
-	argCount := 0
-	if r.Args != nil {
-		argCount = len(r.Args.Items)
-	}
-	return fmt.Sprintf("RangeTableSample{%d args%s}@%d", argCount, repeatable, r.Location())
-}
+func (r *RangeTableSample) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of RangeTableSample
 func (r *RangeTableSample) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Add relation
-	if r.Relation != nil {
-		parts = append(parts, r.Relation.SqlString())
-	}
-
-	// Add TABLESAMPLE keyword
-	parts = append(parts, "TABLESAMPLE")
-
-	// Add method name
-	if r.Method != nil && len(r.Method.Items) > 0 {
-		var methodParts []string
-		for _, item := range r.Method.Items {
-			// For TABLESAMPLE method names, treat as identifiers not string literals
-			if str, ok := item.(*String); ok {
-				methodParts = append(methodParts, QuoteIdentifier(str.SVal))
-			} else {
-				methodParts = append(methodParts, item.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(methodParts, "."))
-	}
-
-	// Add arguments if any
-	if r.Args != nil && len(r.Args.Items) > 0 {
-		var argStrs []string
-		for _, arg := range r.Args.Items {
-			argStrs = append(argStrs, arg.SqlString())
-		}
-		parts = append(parts, fmt.Sprintf("(%s)", strings.Join(argStrs, ", ")))
-	} else {
-		parts = append(parts, "()")
-	}
-
-	// Add REPEATABLE clause if present
-	if r.Repeatable != nil {
-		parts = append(parts, "REPEATABLE", fmt.Sprintf("(%s)", r.Repeatable.SqlString()))
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
 
-func (r *RangeTableSample) StatementType() string {
-	return "RANGE_TABLE_SAMPLE"
-}
+// Add TABLESAMPLE keyword
+
+// Add method name
+
+// For TABLESAMPLE method names, treat as identifiers not string literals
+
+// Add arguments if any
+
+// Add REPEATABLE clause if present
+
+func (r *RangeTableSample) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // RangeTblFunction represents RangeTblEntry subsidiary data for one function in a FUNCTION RTE.
 // Used when a function had a column definition list for an otherwise-unspecified RECORD result.
@@ -633,20 +316,13 @@ type RangeTblFunction struct {
 
 // NewRangeTblFunction creates a new RangeTblFunction node.
 func NewRangeTblFunction(funcExpr Node, funcColCount int) *RangeTblFunction {
-	return &RangeTblFunction{
-		BaseNode:     BaseNode{Tag: T_RangeTblFunction},
-		FuncExpr:     funcExpr,
-		FuncColCount: funcColCount,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RangeTblFunction) String() string {
-	return fmt.Sprintf("RangeTblFunction{%d cols}@%d", r.FuncColCount, r.Location())
-}
+func (r *RangeTblFunction) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeTblFunction) StatementType() string {
-	return "RANGE_TBL_FUNCTION"
-}
+func (r *RangeTblFunction) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // RTEPermissionInfo represents per-relation information for permission checking.
 // Added to the Query node by the parser when adding the corresponding RTE to the query range table.
@@ -664,22 +340,13 @@ type RTEPermissionInfo struct {
 
 // NewRTEPermissionInfo creates a new RTEPermissionInfo node.
 func NewRTEPermissionInfo(relid Oid, inh bool, requiredPerms AclMode, checkAsUser Oid) *RTEPermissionInfo {
-	return &RTEPermissionInfo{
-		BaseNode:      BaseNode{Tag: T_RTEPermissionInfo},
-		Relid:         relid,
-		Inh:           inh,
-		RequiredPerms: requiredPerms,
-		CheckAsUser:   checkAsUser,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RTEPermissionInfo) String() string {
-	return fmt.Sprintf("RTEPermissionInfo{relid=%d, perms=0x%x}@%d", r.Relid, r.RequiredPerms, r.Location())
-}
+func (r *RTEPermissionInfo) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RTEPermissionInfo) StatementType() string {
-	return "RTE_PERMISSION_INFO"
-}
+func (r *RTEPermissionInfo) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // RangeTblRef represents a range table reference from primnodes.h.
 // This is a simple reference to an entry in the range table by index.
@@ -690,17 +357,8 @@ type RangeTblRef struct {
 }
 
 // NewRangeTblRef creates a new RangeTblRef node.
-func NewRangeTblRef(rtIndex int) *RangeTblRef {
-	return &RangeTblRef{
-		BaseNode: BaseNode{Tag: T_RangeTblRef},
-		RtIndex:  rtIndex,
-	}
-}
+func NewRangeTblRef(rtIndex int) *RangeTblRef { _ = "STUB: not implemented"; return nil }
 
-func (r *RangeTblRef) String() string {
-	return fmt.Sprintf("RangeTblRef{index=%d}@%d", r.RtIndex, r.Location())
-}
+func (r *RangeTblRef) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RangeTblRef) ExpressionType() string {
-	return "RANGE_TBL_REF"
-}
+func (r *RangeTblRef) ExpressionType() string { _ = "STUB: not implemented"; return "" }

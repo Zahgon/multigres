@@ -20,34 +20,15 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/services/multipooler"
-	"github.com/multigres/multigres/go/tools/telemetry"
 
 	"github.com/spf13/cobra"
 )
 
 // CreateMultiPoolerCommand creates a cobra command with a MultiPooler instance and registers its flags
 func CreateMultiPoolerCommand() (*cobra.Command, *multipooler.MultiPooler) {
-	telemetry := telemetry.NewTelemetry()
-	mp := multipooler.NewMultiPooler(telemetry)
-
-	cmd := &cobra.Command{
-		Use:   constants.ServiceMultipooler,
-		Short: "Multipooler provides connection pooling and communicates with pgctld via gRPC to serve queries from multigateway instances.",
-		Long:  "Multipooler provides connection pooling and communicates with pgctld via gRPC to serve queries from multigateway instances.",
-		Args:  cobra.NoArgs,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return mp.CobraPreRunE(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return run(cmd, args, mp)
-		},
-	}
-
-	mp.RegisterFlags(cmd.Flags())
-
-	return cmd, mp
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func main() {
@@ -60,8 +41,6 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string, mp *multipooler.MultiPooler) error {
-	if err := mp.Init(cmd.Context()); err != nil {
-		return err
-	}
-	return mp.RunDefault()
+	_ = "STUB: not implemented"
+	return nil
 }

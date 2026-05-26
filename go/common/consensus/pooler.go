@@ -19,25 +19,10 @@ import clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 // IsLeader reports whether the pooler identified by cs is the consensus-elected
 // leader according to its highest recorded rule. Returns false when cs, its
 // ID, or the current rule is absent.
-func IsLeader(cs *clustermetadatapb.ConsensusStatus) bool {
-	if cs == nil {
-		return false
-	}
-	self := cs.GetId()
-	leader := cs.GetCurrentPosition().GetRule().GetLeaderId()
-	if self == nil || leader == nil {
-		return false
-	}
-	return self.Cell == leader.Cell && self.Name == leader.Name
-}
+func IsLeader(cs *clustermetadatapb.ConsensusStatus) bool { _ = "STUB: not implemented"; return false }
 
 // LeaderTerm returns the coordinator term of the pooler's current recorded
 // rule if the pooler holds the leader role (per IsLeader). Returns 0 when
 // the pooler is not the leader, when the consensus status is nil/empty, or
 // when the rule has no coordinator term.
-func LeaderTerm(cs *clustermetadatapb.ConsensusStatus) int64 {
-	if !IsLeader(cs) {
-		return 0
-	}
-	return cs.GetCurrentPosition().GetRule().GetRuleNumber().GetCoordinatorTerm()
-}
+func LeaderTerm(cs *clustermetadatapb.ConsensusStatus) int64 { _ = "STUB: not implemented"; return 0 }

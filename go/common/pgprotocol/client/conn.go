@@ -20,9 +20,6 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
-	"errors"
-	"fmt"
-	"io"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -155,29 +152,14 @@ type Conn struct {
 // poolCtx is used as the parent for the connection's lifetime context,
 // allowing pool-managed connections to be tied to the pool's lifecycle.
 func Connect(ctx context.Context, poolCtx context.Context, config *Config) (*Conn, error) {
-	netConn, err := dial(ctx, config)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create the connection object.
-	// The connection's lifetime is tied to poolCtx, not the caller's ctx.
-	connCtx, cancel := context.WithCancel(poolCtx)
-	c := &Conn{
-		config: config,
-		ctx:    connCtx,
-		cancel: cancel,
-	}
-	c.resetConn(netConn)
-
-	// Perform the startup handshake.
-	if err := c.startup(ctx); err != nil {
-		c.Close()
-		return nil, fmt.Errorf("startup failed: %w", err)
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Create the connection object.
+// The connection's lifetime is tied to poolCtx, not the caller's ctx.
+
+// Perform the startup handshake.
 
 // Reconnect replaces the underlying network connection in-place.
 // It closes the old (broken) socket, dials a new connection using the stored
@@ -191,82 +173,39 @@ func Connect(ctx context.Context, poolCtx context.Context, config *Config) (*Con
 // The caller is responsible for re-applying any session state (settings,
 // prepared statements) after a successful reconnect.
 func (c *Conn) Reconnect(ctx context.Context) error {
+	_ = "STUB: not implemented"
 	// Close the raw socket. Best-effort since the connection may already be broken.
 	// We intentionally don't call c.Close() because that cancels the lifetime
 	// context (derived from poolCtx) which we want to keep alive.
-	_ = c.conn.Close()
-
-	// Reset the closed flag so the connection is usable again.
-	c.closed.Store(false)
-
-	netConn, err := dial(ctx, c.config)
-	if err != nil {
-		c.closed.Store(true)
-		return fmt.Errorf("reconnect dial failed: %w", err)
-	}
-
-	c.resetConn(netConn)
-
-	// Perform the startup handshake on the new connection.
-	if err := c.startup(ctx); err != nil {
-		c.Close()
-		return fmt.Errorf("reconnect startup failed: %w", err)
-	}
-
 	return nil
 }
+
+// Reset the closed flag so the connection is usable again.
+
+// Perform the startup handshake on the new connection.
 
 // dial establishes a network connection using the given config.
 // Uses Unix socket if config.SocketFile is set, otherwise TCP.
 func dial(ctx context.Context, config *Config) (net.Conn, error) {
-	dialer := &net.Dialer{
-		Timeout: config.DialTimeout,
-	}
-	if config.SocketFile != "" {
-		conn, err := dialer.DialContext(ctx, "unix", config.SocketFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to connect to Unix socket %s: %w", config.SocketFile, err)
-		}
-		return conn, nil
-	}
-	address := fmt.Sprintf("%s:%d", config.Host, config.Port)
-	conn, err := dialer.DialContext(ctx, "tcp", address)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to %s: %w", address, err)
-	}
-	return conn, nil
+	_ = "STUB: not implemented"
+	return *new(net.Conn), nil
 }
 
 // resetConn replaces the connection internals with a new network connection.
 // This resets the buffered reader/writer, server params, and transaction status.
-func (c *Conn) resetConn(netConn net.Conn) {
-	c.conn = netConn
-	c.bufferedReader = bufio.NewReaderSize(netConn, connBufferSize)
-	c.bufferedWriter = bufio.NewWriterSize(netConn, connBufferSize)
-	c.serverParams = make(map[string]string)
-	c.txnStatus = protocol.TxnStatusIdle
-}
+func (c *Conn) resetConn(netConn net.Conn) { _ = "STUB: not implemented"; return }
 
 // Close closes the connection.
-func (c *Conn) Close() error {
-	if !c.closed.CompareAndSwap(false, true) {
-		return nil // Already closed.
-	}
+func (c *Conn) Close() error { _ = "STUB: not implemented"; return nil }
 
-	c.cancel()
+// Already closed.
 
-	// Send Terminate message (best effort).
-	_ = c.writeTerminate()
-	_ = c.flush()
+// Send Terminate message (best effort).
 
-	// Defensive cleanup: if a writer panicked between startPacket and
-	// writePacket, the slow-path pool buffer is still stashed on the
-	// Conn (writePacket's defer never fired). Close runs after
-	// concurrent access has stopped, so an unlocked Put is safe.
-	c.returnOutboundBuffer()
-
-	return c.conn.Close()
-}
+// Defensive cleanup: if a writer panicked between startPacket and
+// writePacket, the slow-path pool buffer is still stashed on the
+// Conn (writePacket's defer never fired). Close runs after
+// concurrent access has stopped, so an unlocked Put is safe.
 
 // ForceClose closes the underlying network connection without writing a
 // Terminate message. This is safe to call concurrently with ongoing
@@ -275,484 +214,213 @@ func (c *Conn) Close() error {
 // Use this instead of Close when you need to unblock a goroutine that is
 // mid-read/write on the connection, since Close writes to the buffered
 // writer and would race with the concurrent operation.
-func (c *Conn) ForceClose() error {
-	if !c.closed.CompareAndSwap(false, true) {
-		return nil // Already closed.
-	}
+func (c *Conn) ForceClose() error { _ = "STUB: not implemented"; return nil }
 
-	c.cancel()
-	return c.conn.Close()
-}
+// Already closed.
 
 // IsClosed returns true if the connection has been closed.
-func (c *Conn) IsClosed() bool {
-	return c.closed.Load()
-}
+func (c *Conn) IsClosed() bool { _ = "STUB: not implemented"; return false }
 
 // ProcessID returns the backend process ID.
 func (c *Conn) ProcessID() uint32 {
-	return c.processID
+	_ = "STUB: not implemented"
+
+	// SecretKey returns the backend secret key for query cancellation.
+	return 0
 }
 
-// SecretKey returns the backend secret key for query cancellation.
 func (c *Conn) SecretKey() uint32 {
-	return c.secretKey
+	_ = "STUB: not implemented"
+
+	// ServerParams returns the server parameters received during startup.
+	return 0
 }
 
-// ServerParams returns the server parameters received during startup.
-func (c *Conn) ServerParams() map[string]string {
-	return c.serverParams
-}
+func (c *Conn) ServerParams() map[string]string { _ = "STUB: not implemented"; return nil }
 
 // TxnStatus returns the current transaction status.
 func (c *Conn) TxnStatus() protocol.TransactionStatus {
-	return c.txnStatus
+	_ = "STUB: not implemented"
+	return *
+
+	// Context returns the connection's context.
+	new(protocol.TransactionStatus)
 }
 
-// Context returns the connection's context.
 func (c *Conn) Context() context.Context {
-	return c.ctx
+	_ = "STUB: not implemented"
+
+	// RemoteAddr returns the remote network address.
+	return *new(context.Context)
 }
 
-// RemoteAddr returns the remote network address.
-func (c *Conn) RemoteAddr() net.Addr {
-	return c.conn.RemoteAddr()
-}
+func (c *Conn) RemoteAddr() net.Addr { _ = "STUB: not implemented"; return *new(net.Addr) }
 
 // LocalAddr returns the local network address.
 func (c *Conn) LocalAddr() net.Addr {
-	return c.conn.LocalAddr()
+	_ = "STUB: not implemented"
+	return *
+
+	// SetDeadline sets the read and write deadlines on the connection.
+	new(net.Addr)
 }
 
-// SetDeadline sets the read and write deadlines on the connection.
-func (c *Conn) SetDeadline(t time.Time) error {
-	return c.conn.SetDeadline(t)
-}
+func (c *Conn) SetDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetReadDeadline sets the read deadline on the connection.
-func (c *Conn) SetReadDeadline(t time.Time) error {
-	return c.conn.SetReadDeadline(t)
-}
+func (c *Conn) SetReadDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetWriteDeadline sets the write deadline on the connection.
-func (c *Conn) SetWriteDeadline(t time.Time) error {
-	return c.conn.SetWriteDeadline(t)
-}
+func (c *Conn) SetWriteDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // GetConnectionState returns the connection-specific state.
 func (c *Conn) GetConnectionState() any {
-	return c.state
+	_ = "STUB: not implemented"
+
+	// SetConnectionState sets the connection-specific state.
+	// This allows callers to store their own state per connection.
+	return *new(any)
 }
 
-// SetConnectionState sets the connection-specific state.
-// This allows callers to store their own state per connection.
 func (c *Conn) SetConnectionState(state any) {
-	c.state = state
+	_ = "STUB: not implemented"
+
+	// flush flushes any buffered writes.
+	return
 }
 
-// flush flushes any buffered writes.
-func (c *Conn) flush() error {
-	return c.bufferedWriter.Flush()
-}
+func (c *Conn) flush() error { _ = "STUB: not implemented"; return nil }
 
 // WriteCopyData sends a CopyData ('d') message to PostgreSQL.
 // The data should already be appropriately sized by upstream layers
 // (client chunking, gRPC message limits, protocol reading).
-func (c *Conn) WriteCopyData(data []byte) error {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	buf, pos := c.startPacket(protocol.MsgCopyData, len(data))
-	pos = writeBytesAt(buf, pos, data)
-	if err := c.writePacket(buf, pos); err != nil {
-		return fmt.Errorf("failed to write CopyData: %w", err)
-	}
-	return c.flush()
-}
+func (c *Conn) WriteCopyData(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // WriteCopyDone sends a CopyDone ('c') message to PostgreSQL
 // This signals that all COPY data has been sent
-func (c *Conn) WriteCopyDone() error {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	buf, pos := c.startPacket(protocol.MsgCopyDone, 0)
-	if err := c.writePacket(buf, pos); err != nil {
-		return fmt.Errorf("failed to write CopyDone: %w", err)
-	}
-	return c.flush()
-}
+func (c *Conn) WriteCopyDone() error { _ = "STUB: not implemented"; return nil }
 
 // WriteCopyFail sends a CopyFail ('f') message to PostgreSQL
 // This aborts the COPY operation with the given error message
-func (c *Conn) WriteCopyFail(errorMsg string) error {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
+func (c *Conn) WriteCopyFail(errorMsg string) error { _ = "STUB: not implemented"; return nil }
 
-	bodyLen := len(errorMsg) + 1 // null terminator
-	buf, pos := c.startPacket(protocol.MsgCopyFail, bodyLen)
-	pos = writeStringAt(buf, pos, errorMsg)
-	if err := c.writePacket(buf, pos); err != nil {
-		return fmt.Errorf("failed to write CopyFail: %w", err)
-	}
-	return c.flush()
-}
+// null terminator
 
 // ReadCopyDoneResponse reads the CommandComplete response after WriteCopyDone()
 // Returns the command tag (e.g., "COPY 100") and rows affected
 // Note: In simple query protocol, PostgreSQL sends CommandComplete followed by ReadyForQuery
 // We need to consume both messages to clear the buffer
 func (c *Conn) ReadCopyDoneResponse(ctx context.Context) (string, uint64, error) {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	var commandTag string
-	var rowsAffected uint64
-	gotCommandComplete := false
-
-	// Read messages until we get both CommandComplete and ReadyForQuery
-	for {
-		msgType, err := c.readMessageType()
-		if err != nil {
-			return "", 0, fmt.Errorf("failed to read message type: %w", err)
-		}
-
-		length, err := c.readMessageLength()
-		if err != nil {
-			return "", 0, fmt.Errorf("failed to read message length: %w", err)
-		}
-
-		body, err := c.readMessageBody(length)
-		if err != nil {
-			return "", 0, fmt.Errorf("failed to read message body: %w", err)
-		}
-
-		switch msgType {
-		case protocol.MsgCommandComplete:
-			// Parse command tag
-			if len(body) == 0 {
-				return "", 0, errors.New("empty CommandComplete body")
-			}
-			// Command tag is null-terminated string
-			tag := string(body)
-			if len(tag) > 0 && tag[len(tag)-1] == 0 {
-				tag = tag[:len(tag)-1]
-			}
-
-			// Parse rows affected from tag (e.g., "COPY 100" -> 100)
-			var rows uint64
-			if len(tag) > 5 && tag[:4] == "COPY" {
-				_, _ = fmt.Sscanf(tag[5:], "%d", &rows)
-			}
-
-			commandTag = tag
-			rowsAffected = rows
-			gotCommandComplete = true
-			// Continue reading to get ReadyForQuery
-
-		case protocol.MsgErrorResponse:
-			// Parse the error, then drain the trailing ReadyForQuery so the
-			// connection is left in a clean state and is safe to return to the
-			// pool. Without this, the next operation on this socket would see
-			// the leftover RFQ as its first response and fail. waitForReadyForQuery
-			// also updates txnStatus from the RFQ payload, which we want even on
-			// the error path so callers can observe TxnStatusFailed when COPY
-			// finalization fails inside a transaction.
-			pgErr := c.parseError(body)
-			_ = c.waitForReadyForQuery(ctx)
-			return "", 0, pgErr
-
-		case protocol.MsgNoticeResponse:
-			// Ignore notices
-			continue
-
-		case protocol.MsgReadyForQuery:
-			// End of response - if we got CommandComplete, return success
-			if gotCommandComplete {
-				c.txnStatus = protocol.TransactionStatus(body[0])
-				return commandTag, rowsAffected, nil
-			}
-			// Otherwise, we got ReadyForQuery without CommandComplete (error case)
-			return "", 0, errors.New("received ReadyForQuery without CommandComplete")
-
-		default:
-			return "", 0, fmt.Errorf("unexpected message type after CopyDone: '%c'", msgType)
-		}
-	}
+	_ = "STUB: not implemented"
+	return "", 0, nil
 }
+
+// Read messages until we get both CommandComplete and ReadyForQuery
+
+// Parse command tag
+
+// Command tag is null-terminated string
+
+// Parse rows affected from tag (e.g., "COPY 100" -> 100)
+
+// Continue reading to get ReadyForQuery
+
+// Parse the error, then drain the trailing ReadyForQuery so the
+// connection is left in a clean state and is safe to return to the
+// pool. Without this, the next operation on this socket would see
+// the leftover RFQ as its first response and fail. waitForReadyForQuery
+// also updates txnStatus from the RFQ payload, which we want even on
+// the error path so callers can observe TxnStatusFailed when COPY
+// finalization fails inside a transaction.
+
+// Ignore notices
+
+// End of response - if we got CommandComplete, return success
+
+// Otherwise, we got ReadyForQuery without CommandComplete (error case)
 
 // ReadCopyFailResponse reads the expected ErrorResponse + ReadyForQuery sequence
 // after sending CopyFail. Unlike ReadCopyDoneResponse, this treats ErrorResponse
 // as the expected (normal) response and continues reading until ReadyForQuery,
 // leaving the connection in a clean protocol state.
 func (c *Conn) ReadCopyFailResponse(ctx context.Context) error {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	gotError := false
-
-	for {
-		msgType, err := c.readMessageType()
-		if err != nil {
-			return fmt.Errorf("failed to read message type: %w", err)
-		}
-
-		length, err := c.readMessageLength()
-		if err != nil {
-			return fmt.Errorf("failed to read message length: %w", err)
-		}
-
-		body, err := c.readMessageBody(length)
-		if err != nil {
-			return fmt.Errorf("failed to read message body: %w", err)
-		}
-
-		switch msgType {
-		case protocol.MsgErrorResponse:
-			// Expected after CopyFail — consume it and continue to ReadyForQuery.
-			_ = body
-			gotError = true
-
-		case protocol.MsgNoticeResponse:
-			continue
-
-		case protocol.MsgReadyForQuery:
-			if gotError {
-				return nil // clean abort: ErrorResponse + ReadyForQuery consumed
-			}
-			return errors.New("received ReadyForQuery without ErrorResponse after CopyFail")
-
-		default:
-			return fmt.Errorf("unexpected message type after CopyFail: '%c'", msgType)
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Expected after CopyFail — consume it and continue to ReadyForQuery.
+
+// clean abort: ErrorResponse + ReadyForQuery consumed
 
 // ReadCopyInResponse reads and parses a CopyInResponse ('G') message from PostgreSQL
 // This message is sent in response to a COPY FROM STDIN command
 // Returns the overall format and per-column formats
 func (c *Conn) ReadCopyInResponse() (format int16, columnFormats []int16, err error) {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	msgType, err := c.readMessageType()
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message type: %w", err)
-	}
-	if msgType != protocol.MsgCopyInResponse {
-		return 0, nil, fmt.Errorf("expected CopyInResponse ('G'), got '%c'", msgType)
-	}
-
-	length, err := c.readMessageLength()
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message length: %w", err)
-	}
-
-	body, err := c.readMessageBody(length)
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message body: %w", err)
-	}
-
-	if len(body) < 3 {
-		return 0, nil, fmt.Errorf("CopyInResponse body too short: %d bytes", len(body))
-	}
-
-	// Read format (Int8, 1 byte) - 0=text, 1=binary
-	format = int16(body[0])
-
-	// Read number of columns (Int16, 2 bytes, big-endian)
-	numCols := int16(uint16(body[1])<<8 | uint16(body[2]))
-
-	// Read format codes for each column (Int16 each)
-	columnFormats = make([]int16, numCols)
-	offset := 3
-	for i := 0; i < int(numCols); i++ {
-		if offset+2 > len(body) {
-			return 0, nil, errors.New("CopyInResponse body too short for column formats")
-		}
-		columnFormats[i] = int16(uint16(body[offset])<<8 | uint16(body[offset+1]))
-		offset += 2
-	}
-
-	return format, columnFormats, nil
+	_ = "STUB: not implemented"
+	return 0, nil, nil
 }
+
+// Read format (Int8, 1 byte) - 0=text, 1=binary
+
+// Read number of columns (Int16, 2 bytes, big-endian)
+
+// Read format codes for each column (Int16 each)
 
 // InitiateCopyFromStdin sends a COPY FROM STDIN query and reads the CopyInResponse.
 // This is a special operation that doesn't follow the normal query flow.
 // Returns the COPY format and column formats from the CopyInResponse.
 func (c *Conn) InitiateCopyFromStdin(ctx context.Context, copyQuery string) (format int16, columnFormats []int16, err error) {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	// Send the COPY query (simple-protocol Q message + flush).
-	if err := c.writeQueryMessage(copyQuery); err != nil {
-		return 0, nil, fmt.Errorf("failed to send COPY query: %w", err)
-	}
-
-	// Loop through messages until we get CopyInResponse or an error
-	// We need to skip NoticeResponse and ParameterStatus messages
-	// This is similar to processQueryResponses but simplified for COPY initiation
-	for {
-		msgType, err := c.readMessageType()
-		if err != nil {
-			return 0, nil, fmt.Errorf("failed to read message type: %w", err)
-		}
-
-		bodyLen, err := c.readMessageLength()
-		if err != nil {
-			return 0, nil, fmt.Errorf("failed to read message length: %w", err)
-		}
-
-		body, err := c.readMessageBody(bodyLen)
-		if err != nil {
-			return 0, nil, fmt.Errorf("failed to read message body: %w", err)
-		}
-
-		switch msgType {
-		case protocol.MsgCopyInResponse:
-			// Parse CopyInResponse body using manual byte array indexing
-			// Format: Int8 (format) + Int16 (numCols) + Int16[numCols] (column formats)
-			if len(body) < 3 {
-				return 0, nil, fmt.Errorf("CopyInResponse body too short: %d bytes", len(body))
-			}
-
-			// Read format (Int8, 1 byte) - 0=text, 1=binary
-			format = int16(body[0])
-
-			// Read number of columns (Int16, 2 bytes, big-endian)
-			numCols := int16(uint16(body[1])<<8 | uint16(body[2]))
-
-			// Read format codes for each column (Int16 each)
-			columnFormats = make([]int16, numCols)
-			offset := 3
-			for i := 0; i < int(numCols); i++ {
-				if offset+2 > len(body) {
-					return 0, nil, errors.New("CopyInResponse body too short for column formats")
-				}
-				columnFormats[i] = int16(uint16(body[offset])<<8 | uint16(body[offset+1]))
-				offset += 2
-			}
-
-			return format, columnFormats, nil
-
-		case protocol.MsgErrorResponse:
-			// Parse the error, then drain the trailing ReadyForQuery so
-			// the connection is left in a clean state and is safe to
-			// return to the pool. Without this, the next operation on
-			// this socket would see the leftover RFQ as its first
-			// response and fail with "received ReadyForQuery before X".
-			// waitForReadyForQuery also updates txnStatus from the RFQ
-			// payload, which we want even on the error path.
-			pgErr := c.parseError(body)
-			_ = c.waitForReadyForQuery(ctx)
-			return 0, nil, pgErr
-
-		case protocol.MsgNoticeResponse:
-			// Skip notices (PostgreSQL might send notices before CopyInResponse)
-			continue
-
-		case protocol.MsgParameterStatus:
-			// Handle parameter status updates, ignore errors
-			_ = c.handleParameterStatus(body)
-			continue
-
-		case protocol.MsgReadyForQuery:
-			// If we get ReadyForQuery before CopyInResponse, the query failed
-			// but we didn't get an ErrorResponse (which shouldn't happen)
-			return 0, nil, errors.New("received ReadyForQuery before CopyInResponse - query may have failed without error")
-
-		default:
-			return 0, nil, fmt.Errorf("unexpected message type during COPY initiation: '%c' (0x%02x)", msgType, msgType)
-		}
-	}
+	_ = "STUB: not implemented"
+	return 0, nil, nil
 }
+
+// Send the COPY query (simple-protocol Q message + flush).
+
+// Loop through messages until we get CopyInResponse or an error
+// We need to skip NoticeResponse and ParameterStatus messages
+// This is similar to processQueryResponses but simplified for COPY initiation
+
+// Parse CopyInResponse body using manual byte array indexing
+// Format: Int8 (format) + Int16 (numCols) + Int16[numCols] (column formats)
+
+// Read format (Int8, 1 byte) - 0=text, 1=binary
+
+// Read number of columns (Int16, 2 bytes, big-endian)
+
+// Read format codes for each column (Int16 each)
+
+// Parse the error, then drain the trailing ReadyForQuery so
+// the connection is left in a clean state and is safe to
+// return to the pool. Without this, the next operation on
+// this socket would see the leftover RFQ as its first
+// response and fail with "received ReadyForQuery before X".
+// waitForReadyForQuery also updates txnStatus from the RFQ
+// payload, which we want even on the error path.
+
+// Skip notices (PostgreSQL might send notices before CopyInResponse)
+
+// Handle parameter status updates, ignore errors
+
+// If we get ReadyForQuery before CopyInResponse, the query failed
+// but we didn't get an ErrorResponse (which shouldn't happen)
 
 // ReadCopyOutResponse reads and parses a CopyOutResponse ('H') message from PostgreSQL
 // This message is sent in response to a COPY TO STDOUT command
 // Returns the overall format and per-column formats
 func (c *Conn) ReadCopyOutResponse() (format int16, columnFormats []int16, err error) {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
-
-	msgType, err := c.readMessageType()
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message type: %w", err)
-	}
-	if msgType != protocol.MsgCopyOutResponse {
-		return 0, nil, fmt.Errorf("expected CopyOutResponse ('H'), got '%c'", msgType)
-	}
-
-	length, err := c.readMessageLength()
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message length: %w", err)
-	}
-
-	body, err := c.readMessageBody(length)
-	if err != nil {
-		return 0, nil, fmt.Errorf("failed to read message body: %w", err)
-	}
-
-	if len(body) < 3 {
-		return 0, nil, fmt.Errorf("CopyOutResponse body too short: %d bytes", len(body))
-	}
-
-	// Read format (Int8, 1 byte) - 0=text, 1=binary
-	format = int16(body[0])
-
-	// Read number of columns (Int16, 2 bytes, big-endian)
-	numCols := int16(uint16(body[1])<<8 | uint16(body[2]))
-
-	// Read format codes for each column (Int16 each)
-	columnFormats = make([]int16, numCols)
-	offset := 3
-	for i := 0; i < int(numCols); i++ {
-		if offset+2 > len(body) {
-			return 0, nil, errors.New("CopyOutResponse body too short for column formats")
-		}
-		columnFormats[i] = int16(uint16(body[offset])<<8 | uint16(body[offset+1]))
-		offset += 2
-	}
-
-	return format, columnFormats, nil
+	_ = "STUB: not implemented"
+	return 0, nil, nil
 }
+
+// Read format (Int8, 1 byte) - 0=text, 1=binary
+
+// Read number of columns (Int16, 2 bytes, big-endian)
+
+// Read format codes for each column (Int16 each)
 
 // ReadCopyData reads a CopyData ('d') message from PostgreSQL.
 // This is used during COPY TO STDOUT to receive data rows.
 // Returns the data bytes, or io.EOF when CopyDone is received to signal end of stream.
-func (c *Conn) ReadCopyData() ([]byte, error) {
-	c.bufMu.Lock()
-	defer c.bufMu.Unlock()
+func (c *Conn) ReadCopyData() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	msgType, err := c.readMessageType()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read message type: %w", err)
-	}
-
-	// CopyDone signals end of COPY data stream
-	if msgType == protocol.MsgCopyDone {
-		length, err := c.readMessageLength()
-		if err != nil {
-			return nil, fmt.Errorf("failed to read CopyDone length: %w", err)
-		}
-		if length != 4 {
-			return nil, fmt.Errorf("invalid CopyDone length: %d (expected 4)", length)
-		}
-		return nil, io.EOF
-	}
-
-	if msgType != protocol.MsgCopyData {
-		return nil, fmt.Errorf("expected CopyData ('d') or CopyDone ('c'), got '%c'", msgType)
-	}
-
-	length, err := c.readMessageLength()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read message length: %w", err)
-	}
-
-	data, err := c.readMessageBody(length)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read CopyData body: %w", err)
-	}
-
-	return data, nil
-}
+// CopyDone signals end of COPY data stream

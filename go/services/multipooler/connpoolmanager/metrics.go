@@ -16,14 +16,9 @@ package connpoolmanager
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/multigres/multigres/go/services/multipooler/pools/connpool"
 )
@@ -117,179 +112,43 @@ type Metrics struct {
 // Individual metrics that fail to initialize will use noop implementations and be included
 // in the returned error. The returned Metrics instance is always usable (with noop fallbacks
 // for failed metrics), and the error indicates which specific metrics failed to initialize.
-func NewMetrics() (*Metrics, error) {
-	meter := otel.Meter("github.com/multigres/multigres/go/services/multipooler/connpoolmanager")
+func NewMetrics() (*Metrics, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	m := &Metrics{meter: meter}
+// ConnectionCount for regular pools
 
-	var errs []error
+// Use zero value (noop) on error
 
-	// ConnectionCount for regular pools
-	regularCount, err := connpool.NewConnectionCount(meter)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("regular pool ConnectionCount: %w", err))
-		m.regularConnCount = connpool.ConnectionCount{} // Use zero value (noop) on error
-	} else {
-		m.regularConnCount = regularCount
-	}
+// ConnectionCount for reserved pools
 
-	// ConnectionCount for reserved pools
-	reservedCount, err := connpool.NewConnectionCount(meter)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("reserved pool ConnectionCount: %w", err))
-		m.reservedConnCount = connpool.ConnectionCount{} // Use zero value (noop) on error
-	} else {
-		m.reservedConnCount = reservedCount
-	}
+// Use zero value (noop) on error
 
-	// Pooler health gauge
-	m.poolerUp, err = meter.Int64ObservableGauge(
-		"mg.pooler.up",
-		metric.WithDescription("Whether the connection pooler is operational (1 = up, 0 = down)"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.up gauge: %w", err))
-	}
+// Pooler health gauge
 
-	// Pool count gauge
-	m.poolCount, err = meter.Int64ObservableGauge(
-		"mg.pooler.pools",
-		metric.WithDescription("Number of active connection pools"),
-		metric.WithUnit("{pool}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.pools gauge: %w", err))
-	}
+// Pool count gauge
 
-	// User count gauge
-	m.userCount, err = meter.Int64ObservableGauge(
-		"mg.pooler.users",
-		metric.WithDescription("Number of distinct users with connection pools"),
-		metric.WithUnit("{user}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.users gauge: %w", err))
-	}
+// User count gauge
 
-	// Database count gauge
-	m.databaseCount, err = meter.Int64ObservableGauge(
-		"mg.pooler.databases",
-		metric.WithDescription("Number of databases managed by the pooler"),
-		metric.WithUnit("{database}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.databases gauge: %w", err))
-	}
+// Database count gauge
 
-	// Server connections gauge (with state attribute)
-	m.serverConnections, err = meter.Int64ObservableGauge(
-		"mg.pooler.server.connections",
-		metric.WithDescription("Number of server (PostgreSQL) connections by state"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.server.connections gauge: %w", err))
-	}
+// Server connections gauge (with state attribute)
 
-	// Client waiting connections gauge
-	m.clientWaitingConnections, err = meter.Int64ObservableGauge(
-		"mg.pooler.client.waiting_connections",
-		metric.WithDescription("Number of clients waiting for a server connection"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.client.waiting_connections gauge: %w", err))
-	}
+// Client waiting connections gauge
 
-	// Reserved active connections gauge
-	m.reservedActiveConnections, err = meter.Int64ObservableGauge(
-		"mg.pooler.reserved.active_connections",
-		metric.WithDescription("Number of active reserved connections (clients in transactions)"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.reserved.active_connections gauge: %w", err))
-	}
+// Reserved active connections gauge
 
-	// Config max server connections gauge
-	m.configMaxServerConnections, err = meter.Int64ObservableGauge(
-		"mg.pooler.config.max_server_connections",
-		metric.WithDescription("Configured maximum number of server connections (global capacity)"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.config.max_server_connections gauge: %w", err))
-	}
+// Config max server connections gauge
 
-	// Per-user pool capacity gauge
-	m.poolCapacity, err = meter.Int64ObservableGauge(
-		"mg.pooler.pool.capacity",
-		metric.WithDescription("Allocated pool capacity per user (regular + reserved)"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.pool.capacity gauge: %w", err))
-	}
+// Per-user pool capacity gauge
 
-	// Per-user current connections gauge
-	m.poolCurrentConnections, err = meter.Int64ObservableGauge(
-		"mg.pooler.pool.current_connections",
-		metric.WithDescription("Current server connections per user (regular + reserved)"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.pool.current_connections gauge: %w", err))
-	}
+// Per-user current connections gauge
 
-	// Client wait time counter
-	m.clientWaitTimeTotal, err = meter.Float64ObservableCounter(
-		"mg.pooler.client.wait_time_total",
-		metric.WithDescription("Total time clients spent waiting for a server connection"),
-		metric.WithUnit("s"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.client.wait_time_total counter: %w", err))
-	}
+// Client wait time counter
 
-	// Queries pooled counter
-	m.queriesPooledTotal, err = meter.Int64ObservableCounter(
-		"mg.pooler.queries_pooled_total",
-		metric.WithDescription("Total number of connections borrowed from pools"),
-		metric.WithUnit("{query}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.queries_pooled_total counter: %w", err))
-	}
+// Queries pooled counter
 
-	// Auth credential-query latency histogram.
-	m.authCredQueryDuration, err = meter.Float64Histogram(
-		"mg.pooler.auth.credential_query.duration",
-		metric.WithDescription("Admin-pool SELECT rolpassword FROM pg_authid lookup duration"),
-		metric.WithUnit("s"),
-		metric.WithExplicitBucketBoundaries(0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.auth.credential_query.duration histogram: %w", err))
-		m.authCredQueryDuration = noop.Float64Histogram{}
-	}
+// Auth credential-query latency histogram.
 
-	// Auth credential-query error counter.
-	m.authCredQueryErrors, err = meter.Int64Counter(
-		"mg.pooler.auth.credential_query.errors",
-		metric.WithDescription("Credential-query failures labeled by error type"),
-		metric.WithUnit("{error}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("mg.pooler.auth.credential_query.errors counter: %w", err))
-		m.authCredQueryErrors = noop.Int64Counter{}
-	}
-
-	if len(errs) > 0 {
-		return m, errors.Join(errs...)
-	}
-
-	return m, nil
-}
+// Auth credential-query error counter.
 
 // RecordCredentialQuery records a credential-query latency observation and,
 // when errorType is non-empty, bumps the corresponding error counter. Use
@@ -297,14 +156,8 @@ func NewMetrics() (*Metrics, error) {
 // closed. Safe to call on a nil receiver so the gRPC handler can stay
 // unconditional even when metric init failed.
 func (m *Metrics) RecordCredentialQuery(ctx context.Context, d time.Duration, errorType string) {
-	if m == nil {
-		return
-	}
-	m.authCredQueryDuration.Record(ctx, d.Seconds())
-	if errorType != "" {
-		m.authCredQueryErrors.Add(ctx, 1,
-			metric.WithAttributes(attribute.String("error_type", errorType)))
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // RegisterManagerCallbacks registers OTel observable callbacks that read pool statistics.
@@ -321,158 +174,45 @@ func (m *Metrics) RegisterManagerCallbacks(
 	globalCapacityGetter func() int64,
 	isClosedGetter func() bool,
 ) error {
+	_ = "STUB: not implemented"
 	// Collect all instruments that were successfully initialized.
-	var instruments []metric.Observable
-	for _, inst := range []metric.Observable{
-		m.poolerUp,
-		m.poolCount,
-		m.userCount,
-		m.databaseCount,
-		m.serverConnections,
-		m.clientWaitingConnections,
-		m.reservedActiveConnections,
-		m.configMaxServerConnections,
-		m.poolCapacity,
-		m.poolCurrentConnections,
-		m.clientWaitTimeTotal,
-		m.queriesPooledTotal,
-	} {
-		if inst != nil {
-			instruments = append(instruments, inst)
-		}
-	}
-
-	if len(instruments) == 0 {
-		return nil
-	}
-
-	registration, err := m.meter.RegisterCallback(
-		func(_ context.Context, o metric.Observer) error {
-			// Pooler health.
-			if m.poolerUp != nil {
-				var up int64
-				if !isClosedGetter() {
-					up = 1
-				}
-				o.ObserveInt64(m.poolerUp, up)
-			}
-
-			// Pool/user count.
-			poolCount := poolCountGetter()
-			if m.poolCount != nil {
-				o.ObserveInt64(m.poolCount, int64(poolCount))
-			}
-			if m.userCount != nil {
-				o.ObserveInt64(m.userCount, int64(poolCount))
-			}
-
-			// Database count (always 1 per multipooler instance).
-			if m.databaseCount != nil {
-				var dbCount int64
-				if !isClosedGetter() {
-					dbCount = 1
-				}
-				o.ObserveInt64(m.databaseCount, dbCount)
-			}
-
-			// Read global capacity config.
-			if m.configMaxServerConnections != nil {
-				o.ObserveInt64(m.configMaxServerConnections, globalCapacityGetter())
-			}
-
-			// Aggregate stats across all user pools.
-			stats := statsGetter()
-			var totalActive, totalIdle int64
-			var totalWaiting int
-			var totalReservedActive int
-			var totalWaitTime float64
-			var totalGetCount int64
-
-			for user, userStats := range stats.UserPools {
-				// Regular pool: server connections
-				totalActive += userStats.Regular.Borrowed
-				totalIdle += userStats.Regular.Idle
-
-				// Reserved pool: underlying server connections
-				totalActive += userStats.Reserved.RegularPool.Borrowed
-				totalIdle += userStats.Reserved.RegularPool.Idle
-
-				// Reserved active (clients in transactions)
-				totalReservedActive += userStats.Reserved.Active
-
-				// Aggregate cumulative metrics
-				totalWaiting += userStats.Waiting
-				totalWaitTime += userStats.WaitTime.Seconds()
-				totalGetCount += userStats.GetCount
-
-				// Per-user pool capacity and current connections.
-				userAttr := metric.WithAttributes(attribute.String("user", user))
-
-				if m.poolCapacity != nil {
-					capacity := userStats.Regular.Capacity + userStats.Reserved.RegularPool.Capacity
-					o.ObserveInt64(m.poolCapacity, capacity, userAttr)
-				}
-				if m.poolCurrentConnections != nil {
-					active := userStats.Regular.Active + userStats.Reserved.RegularPool.Active
-					o.ObserveInt64(m.poolCurrentConnections, active, userAttr)
-				}
-			}
-
-			// Also include admin pool connections.
-			totalActive += stats.Admin.Borrowed
-			totalIdle += stats.Admin.Idle
-
-			if m.serverConnections != nil {
-				o.ObserveInt64(m.serverConnections, totalActive,
-					metric.WithAttributes(attribute.String("state", "active")))
-				o.ObserveInt64(m.serverConnections, totalIdle,
-					metric.WithAttributes(attribute.String("state", "idle")))
-			}
-
-			if m.clientWaitingConnections != nil {
-				o.ObserveInt64(m.clientWaitingConnections, int64(totalWaiting))
-			}
-
-			if m.reservedActiveConnections != nil {
-				o.ObserveInt64(m.reservedActiveConnections, int64(totalReservedActive))
-			}
-
-			if m.clientWaitTimeTotal != nil {
-				o.ObserveFloat64(m.clientWaitTimeTotal, totalWaitTime)
-			}
-
-			if m.queriesPooledTotal != nil {
-				o.ObserveInt64(m.queriesPooledTotal, totalGetCount)
-			}
-
-			return nil
-		},
-		instruments...,
-	)
-	if err != nil {
-		return err
-	}
-	m.registration = registration
 	return nil
 }
 
+// Pooler health.
+
+// Pool/user count.
+
+// Database count (always 1 per multipooler instance).
+
+// Read global capacity config.
+
+// Aggregate stats across all user pools.
+
+// Regular pool: server connections
+
+// Reserved pool: underlying server connections
+
+// Reserved active (clients in transactions)
+
+// Aggregate cumulative metrics
+
+// Per-user pool capacity and current connections.
+
+// Also include admin pool connections.
+
 // Close unregisters the observable callback so the OTel SDK stops invoking it.
 // Safe to call multiple times and when no callback was registered.
-func (m *Metrics) Close() error {
-	if m.registration == nil {
-		return nil
-	}
-	err := m.registration.Unregister()
-	m.registration = nil
-	return err
-}
+func (m *Metrics) Close() error { _ = "STUB: not implemented"; return nil }
 
 // RegularConnCount returns the ConnectionCount metric for regular pools.
 func (m *Metrics) RegularConnCount() connpool.ConnectionCount {
-	return m.regularConnCount
+	_ = "STUB: not implemented"
+	return *new(connpool.ConnectionCount)
 }
 
 // ReservedConnCount returns the ConnectionCount metric for reserved pools.
 func (m *Metrics) ReservedConnCount() connpool.ConnectionCount {
-	return m.reservedConnCount
+	_ = "STUB: not implemented"
+	return *new(connpool.ConnectionCount)
 }

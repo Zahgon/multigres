@@ -36,7 +36,6 @@ package ast
 
 import (
 	"regexp"
-	"strings"
 )
 
 // ==============================================================================
@@ -78,239 +77,105 @@ var (
 
 // QuoteIdentifier quotes an SQL identifier if necessary
 // Follows PostgreSQL rules: quote if contains special chars, is a keyword, or is case-sensitive
-func QuoteIdentifier(name string) string {
-	if name == "" {
-		return ""
-	}
+func QuoteIdentifier(name string) string { _ = "STUB: not implemented"; return "" }
 
-	// Check if the identifier needs quoting
-	// Must quote if doesn't match identifier pattern
-	needsQuoting := !sqlIdentifierRegex.MatchString(name)
+// Check if the identifier needs quoting
+// Must quote if doesn't match identifier pattern
 
-	// Must quote if it's a keyword that can't be used as a column name (case-insensitive check)
-	if keywordsNeedingQuotes[strings.ToLower(name)] {
-		needsQuoting = true
-	}
+// Must quote if it's a keyword that can't be used as a column name (case-insensitive check)
 
-	// Must quote if it contains uppercase letters (PostgreSQL folds unquoted identifiers to lowercase)
-	if strings.ToLower(name) != name {
-		needsQuoting = true
-	}
+// Must quote if it contains uppercase letters (PostgreSQL folds unquoted identifiers to lowercase)
 
-	if needsQuoting {
-		// Escape any internal double quotes by doubling them
-		escaped := strings.ReplaceAll(name, `"`, `""`)
-		return `"` + escaped + `"`
-	}
-
-	return name
-}
+// Escape any internal double quotes by doubling them
 
 // QuoteStringLiteral quotes a string literal for SQL
 // Handles escaping of single quotes and other special characters
 func QuoteStringLiteral(value string) string {
+	_ = "STUB: not implemented"
 	// Escape single quotes by doubling them
-	escaped := strings.ReplaceAll(value, `'`, `''`)
-	return `'` + escaped + `'`
+	return ""
 }
 
 // FormatList formats a list of SQL elements with separators
-func FormatList(elements []string, separator string) string {
-	return strings.Join(elements, separator)
-}
+func FormatList(elements []string, separator string) string { _ = "STUB: not implemented"; return "" }
 
 // FormatQualifiedName formats a qualified name (e.g., schema.table, database.schema.table)
-func FormatQualifiedName(parts ...string) string {
-	var quotedParts []string
-	for _, part := range parts {
-		if part != "" {
-			quotedParts = append(quotedParts, QuoteIdentifier(part))
-		}
-	}
-	return strings.Join(quotedParts, ".")
-}
+func FormatQualifiedName(parts ...string) string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // SQL FORMATTING HELPERS
 // ==============================================================================
 
 // FormatColumnList formats a list of column names for SQL
-func FormatColumnList(columns []string) string {
-	if len(columns) == 0 {
-		return ""
-	}
-
-	var quoted []string
-	for _, col := range columns {
-		quoted = append(quoted, QuoteIdentifier(col))
-	}
-	return strings.Join(quoted, ", ")
-}
+func FormatColumnList(columns []string) string { _ = "STUB: not implemented"; return "" }
 
 // FormatParentheses wraps content in parentheses if not empty
-func FormatParentheses(content string) string {
-	if content == "" {
-		return ""
-	}
-	return "(" + content + ")"
-}
+func FormatParentheses(content string) string { _ = "STUB: not implemented"; return "" }
 
 // FormatOptionalClause formats an optional SQL clause with keyword
-func FormatOptionalClause(keyword, content string) string {
-	if content == "" {
-		return ""
-	}
-	return keyword + " " + content
-}
+func FormatOptionalClause(keyword, content string) string { _ = "STUB: not implemented"; return "" }
 
 // FormatCommaList formats a list with commas and proper spacing
-func FormatCommaList(items []string) string {
-	var nonEmpty []string
-	for _, item := range items {
-		if item != "" {
-			nonEmpty = append(nonEmpty, item)
-		}
-	}
-	return strings.Join(nonEmpty, ", ")
-}
+func FormatCommaList(items []string) string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // POSTGRESQL-SPECIFIC FORMATTING
 // ==============================================================================
 
 // FormatAlias formats an alias clause (AS alias_name)
-func FormatAlias(aliasName string) string {
-	if aliasName == "" {
-		return ""
-	}
-	return "AS " + QuoteIdentifier(aliasName)
-}
+func FormatAlias(aliasName string) string { _ = "STUB: not implemented"; return "" }
 
 // DollarQuoteString wraps a string in dollar quotes, choosing a tag that doesn't conflict with the content
 func DollarQuoteString(s string) string {
+	_ = "STUB: not implemented"
 	// Start with the simplest delimiter
-	delimiter := "$$"
-
-	// If the string contains $$, find an alternative delimiter
-	if strings.Contains(s, "$$") {
-		// Try common alternatives
-		alternatives := []string{"$_$", "$body$", "$func$", "$proc$", "$string$"}
-		for _, alt := range alternatives {
-			if !strings.Contains(s, alt) {
-				delimiter = alt
-				break
-			}
-		}
-
-		// If all common alternatives are in use, generate a unique one
-		if strings.Contains(s, delimiter) {
-			for i := 1; ; i++ {
-				delimiter = "$tag" + strings.Repeat("x", i) + "$"
-				if !strings.Contains(s, delimiter) {
-					break
-				}
-			}
-		}
-	}
-
-	return delimiter + s + delimiter
+	return ""
 }
+
+// If the string contains $$, find an alternative delimiter
+
+// Try common alternatives
+
+// If all common alternatives are in use, generate a unique one
 
 // FormatSchemaQualifiedName formats schema.name or just name
-func FormatSchemaQualifiedName(schema, name string) string {
-	if schema != "" {
-		return QuoteIdentifier(schema) + "." + QuoteIdentifier(name)
-	}
-	return QuoteIdentifier(name)
-}
+func FormatSchemaQualifiedName(schema, name string) string { _ = "STUB: not implemented"; return "" }
 
 // FormatFullyQualifiedName formats database.schema.name or shorter versions
 func FormatFullyQualifiedName(database, schema, name string) string {
-	return FormatQualifiedName(database, schema, name)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // QuoteQualifiedIdentifier handles dotted identifiers where parts may already be quoted
 // This function preserves existing quotes and only quotes parts that need it
-func QuoteQualifiedIdentifier(name string) string {
-	if name == "" {
-		return ""
-	}
+func QuoteQualifiedIdentifier(name string) string { _ = "STUB: not implemented"; return "" }
 
-	// For dotted identifiers, we need to handle each part separately
-	// but preserve any existing quotes in the original string
-	if strings.Contains(name, ".") {
-		// Parse the qualified name, respecting existing quotes
-		parts := parseQualifiedIdentifier(name)
-		var quotedParts []string
-		for _, part := range parts {
-			// If the part is already quoted, preserve it as-is
-			if len(part) >= 2 && part[0] == '"' && part[len(part)-1] == '"' {
-				quotedParts = append(quotedParts, part)
-			} else {
-				// Otherwise apply normal quoting rules
-				quotedParts = append(quotedParts, QuoteIdentifier(part))
-			}
-		}
-		return strings.Join(quotedParts, ".")
-	}
+// For dotted identifiers, we need to handle each part separately
+// but preserve any existing quotes in the original string
 
-	// Single identifier - use normal quoting
-	return QuoteIdentifier(name)
-}
+// Parse the qualified name, respecting existing quotes
+
+// If the part is already quoted, preserve it as-is
+
+// Otherwise apply normal quoting rules
+
+// Single identifier - use normal quoting
 
 // parseQualifiedIdentifier splits a qualified identifier respecting quoted parts
-func parseQualifiedIdentifier(name string) []string {
-	var parts []string
-	var current strings.Builder
-	inQuotes := false
+func parseQualifiedIdentifier(name string) []string { _ = "STUB: not implemented"; return nil }
 
-	for _, r := range name {
-		if r == '"' {
-			inQuotes = !inQuotes
-			current.WriteRune(r)
-		} else if r == '.' && !inQuotes {
-			// Found a separator outside of quotes
-			parts = append(parts, current.String())
-			current.Reset()
-		} else {
-			current.WriteRune(r)
-		}
-	}
+// Found a separator outside of quotes
 
-	// Add the last part
-	if current.Len() > 0 {
-		parts = append(parts, current.String())
-	}
-
-	return parts
-}
+// Add the last part
 
 // printAExprConst formats an expression using the appropriate syntax for constants.
 // For TypeCast expressions, it uses the 'type value' syntax instead of 'CAST(value AS type)'.
 // For all other expressions, it uses the standard SqlString() method.
-func PrintAExprConst(expr Expression) string {
-	if expr == nil {
-		return ""
-	}
+func PrintAExprConst(expr Expression) string { _ = "STUB: not implemented"; return "" }
 
-	// Check if this is a TypeCast expression
-	if typeCast, ok := expr.(*TypeCast); ok {
-		// Use the shorter 'type value' syntax instead of CAST(value AS type)
-		argStr := ""
-		if typeCast.Arg != nil {
-			argStr = typeCast.Arg.SqlString()
-		}
+// Check if this is a TypeCast expression
 
-		typeStr := ""
-		if typeCast.TypeName != nil {
-			typeStr = typeCast.TypeName.SqlString()
-		}
+// Use the shorter 'type value' syntax instead of CAST(value AS type)
 
-		if typeStr != "" && argStr != "" {
-			return typeStr + " " + argStr
-		}
-	}
-
-	// For all other expressions, use the standard SqlString method
-	return expr.SqlString()
-}
+// For all other expressions, use the standard SqlString method

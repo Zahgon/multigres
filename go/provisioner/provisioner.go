@@ -43,7 +43,6 @@ package provisioner
 
 import (
 	"context"
-	"fmt"
 )
 
 // ProvisionResult contains the result of provisioning a service.
@@ -162,9 +161,7 @@ var provisionerFactories = make(map[string]Factory)
 // The name parameter should be unique across all registered provisioners.
 // If a provisioner with the same name is already registered, it will be
 // replaced with the new factory.
-func RegisterProvisioner(name string, factory Factory) {
-	provisionerFactories[name] = factory
-}
+func RegisterProvisioner(name string, factory Factory) { _ = "STUB: not implemented"; return }
 
 // GetProvisioner creates a provisioner instance by name.
 // This function looks up the registered factory for the given name and
@@ -173,22 +170,12 @@ func RegisterProvisioner(name string, factory Factory) {
 // Returns an error if no provisioner is registered with the given name.
 // The error message includes a list of available provisioner names.
 func GetProvisioner(name string) (Provisioner, error) {
-	factory, exists := provisionerFactories[name]
-	if !exists {
-		return nil, fmt.Errorf("provisioner '%s' not found. Available provisioners: %v", name, GetAvailableProvisioners())
-	}
-
-	return factory()
+	_ = "STUB: not implemented"
+	return *new(Provisioner), nil
 }
 
 // GetAvailableProvisioners returns a list of registered provisioner names.
 // This function provides a way to discover what provisioners are available
 // in the system. It returns a slice containing the names of all registered
 // provisioners.
-func GetAvailableProvisioners() []string {
-	names := make([]string, 0, len(provisionerFactories))
-	for name := range provisionerFactories {
-		names = append(names, name)
-	}
-	return names
-}
+func GetAvailableProvisioners() []string { _ = "STUB: not implemented"; return nil }

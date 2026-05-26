@@ -38,23 +38,8 @@ type Event interface {
 // Context is required for OpenTelemetry trace correlation.
 // Failed outcome logs at ERROR; all others at INFO.
 func Emit(ctx context.Context, logger *slog.Logger, outcome Outcome, event Event, extra ...any) {
-	level := slog.LevelInfo
-	if outcome == Failed {
-		level = slog.LevelError
-	}
-
-	attrs := []slog.Attr{
-		slog.String("event_type", event.EventType()),
-		slog.String("outcome", string(outcome)),
-	}
-	attrs = append(attrs, event.LogAttrs()...)
-
-	// Convert extra key-value pairs to attrs.
-	for i := 0; i+1 < len(extra); i += 2 {
-		if key, ok := extra[i].(string); ok {
-			attrs = append(attrs, slog.Any(key, extra[i+1]))
-		}
-	}
-
-	logger.LogAttrs(ctx, level, "multigres.event", attrs...)
+	_ = "STUB: not implemented"
+	return
 }
+
+// Convert extra key-value pairs to attrs.

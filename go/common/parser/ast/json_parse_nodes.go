@@ -26,7 +26,6 @@
 package ast
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -324,939 +323,340 @@ type JsonArrayAgg struct {
 
 // Implement Node interface for all JSON types
 
-func (n *JsonFormat) node() {}
+func (n *JsonFormat) node() { _ = "STUB: not implemented"; return }
 
-func (n *JsonFormat) String() string {
-	formatStr := "DEFAULT"
-	switch n.FormatType {
-	case JS_FORMAT_JSON:
-		formatStr = "JSON"
-	case JS_FORMAT_JSONB:
-		formatStr = "JSONB"
-	}
-	return formatStr
-}
+func (n *JsonFormat) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonFormat
-func (n *JsonFormat) SqlString() string {
-	switch n.FormatType {
-	case JS_FORMAT_JSON:
-		switch n.Encoding {
-		case JS_ENC_UTF8:
-			return "JSON ENCODING UTF8"
-		case JS_ENC_UTF16:
-			return "JSON ENCODING UTF16"
-		case JS_ENC_UTF32:
-			return "JSON ENCODING UTF32"
-		default:
-			return "JSON"
-		}
-	case JS_FORMAT_JSONB:
-		return "JSONB"
-	default:
-		return ""
-	}
-}
+func (n *JsonFormat) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonReturning
 func (n *JsonReturning) SqlString() string {
+	_ = "STUB: not implemented"
 	// For now, just return the type name representation
 	// Full implementation would need access to type system for proper type names
-	return "TEXT" // placeholder - in a real implementation this would resolve n.Typid to a type name
+	return ""
 }
 
-func (n *JsonValueExpr) String() string {
-	return "JsonValueExpr"
-}
+// placeholder - in a real implementation this would resolve n.Typid to a type name
+
+func (n *JsonValueExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the JsonValueExpr.
-func (n *JsonValueExpr) SqlString() string {
-	var result strings.Builder
+func (n *JsonValueExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.RawExpr != nil {
-		result.WriteString(n.RawExpr.SqlString())
-	}
+func (n *JsonValueExpr) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonValueExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Format != nil {
-		result.WriteString(" FORMAT ")
-		result.WriteString(n.Format.SqlString())
-	}
-
-	return result.String()
-}
-
-func (n *JsonValueExpr) IsExpr() bool           { return true }
-func (n *JsonValueExpr) ExpressionType() string { return "JsonValueExpr" }
-
-func (n *JsonBehavior) String() string {
-	behaviorStr := "NULL"
-	switch n.Btype {
-	case JSON_BEHAVIOR_ERROR:
-		behaviorStr = "ERROR"
-	case JSON_BEHAVIOR_EMPTY:
-		behaviorStr = "EMPTY"
-	case JSON_BEHAVIOR_TRUE:
-		behaviorStr = "TRUE"
-	case JSON_BEHAVIOR_FALSE:
-		behaviorStr = "FALSE"
-	case JSON_BEHAVIOR_UNKNOWN:
-		behaviorStr = "UNKNOWN"
-	case JSON_BEHAVIOR_EMPTY_ARRAY:
-		behaviorStr = "EMPTY_ARRAY"
-	case JSON_BEHAVIOR_EMPTY_OBJECT:
-		behaviorStr = "EMPTY_OBJECT"
-	case JSON_BEHAVIOR_DEFAULT:
-		behaviorStr = "DEFAULT"
-	}
-	return behaviorStr
-}
+func (n *JsonBehavior) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonBehavior
-func (n *JsonBehavior) SqlString() string {
-	switch n.Btype {
-	case JSON_BEHAVIOR_NULL:
-		return "NULL"
-	case JSON_BEHAVIOR_ERROR:
-		return "ERROR"
-	case JSON_BEHAVIOR_EMPTY:
-		return "EMPTY"
-	case JSON_BEHAVIOR_TRUE:
-		return "TRUE"
-	case JSON_BEHAVIOR_FALSE:
-		return "FALSE"
-	case JSON_BEHAVIOR_UNKNOWN:
-		return "UNKNOWN"
-	case JSON_BEHAVIOR_EMPTY_ARRAY:
-		return "EMPTY ARRAY"
-	case JSON_BEHAVIOR_EMPTY_OBJECT:
-		return "EMPTY OBJECT"
-	case JSON_BEHAVIOR_DEFAULT:
-		if n.Expr != nil {
-			return "DEFAULT " + n.Expr.SqlString()
-		}
-		return "DEFAULT"
-	default:
-		return "NULL"
-	}
-}
+func (n *JsonBehavior) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-func (n *JsonOutput) String() string {
-	return "JsonOutput"
-}
+func (n *JsonOutput) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *JsonArgument) String() string {
-	return "JsonArgument"
-}
+func (n *JsonArgument) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonArgument
-func (n *JsonArgument) SqlString() string {
-	var result strings.Builder
+func (n *JsonArgument) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Val != nil {
-		result.WriteString(n.Val.SqlString())
-	}
+func (n *JsonFuncExpr) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Name != "" {
-		result.WriteString(" AS ")
-		result.WriteString(QuoteIdentifier(n.Name))
-	}
-
-	return result.String()
-}
-
-func (n *JsonFuncExpr) String() string {
-	opStr := "JSON_EXISTS"
-	switch n.Op {
-	case JSON_QUERY_OP:
-		opStr = "JSON_QUERY"
-	case JSON_VALUE_OP:
-		opStr = "JSON_VALUE"
-	case JSON_TABLE_OP:
-		opStr = "JSON_TABLE"
-	}
-	return opStr
-}
-func (n *JsonFuncExpr) IsExpr() bool           { return true }
-func (n *JsonFuncExpr) ExpressionType() string { return "JsonFuncExpr" }
+func (n *JsonFuncExpr) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonFuncExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // appendJsonReturning writes ` RETURNING <type> [FORMAT JSON [ENCODING X]]`
 // when an output clause is present. The FORMAT clause is carried on
 // Output.Returning.Format and applies to the returning value, distinct from
 // any FORMAT clause on the input expression.
-func appendJsonReturning(b *strings.Builder, output *JsonOutput) {
-	if output == nil || output.TypeName == nil {
-		return
-	}
-	b.WriteString(" RETURNING ")
-	b.WriteString(output.TypeName.SqlString())
-	if output.Returning != nil && output.Returning.Format != nil {
-		if s := output.Returning.Format.SqlString(); s != "" {
-			b.WriteString(" FORMAT ")
-			b.WriteString(s)
-		}
-	}
-}
+func appendJsonReturning(b *strings.Builder, output *JsonOutput) { _ = "STUB: not implemented"; return }
 
 // appendJsonWrapperAndQuotes writes the [WITH/WITHOUT ARRAY WRAPPER]
 // and [KEEP/OMIT QUOTES] clauses to the builder. Shared by JsonFuncExpr
 // (for JSON_QUERY) and JsonTableColumn (for JTC_REGULAR / JTC_FORMATTED).
 func appendJsonWrapperAndQuotes(b *strings.Builder, wrapper JsonWrapper, quotes JsonQuotes) {
-	switch wrapper {
-	case JSW_NONE:
-		b.WriteString(" WITHOUT ARRAY WRAPPER")
-	case JSW_CONDITIONAL:
-		b.WriteString(" WITH CONDITIONAL ARRAY WRAPPER")
-	case JSW_UNCONDITIONAL:
-		b.WriteString(" WITH UNCONDITIONAL ARRAY WRAPPER")
-	}
-	switch quotes {
-	case JS_QUOTES_KEEP:
-		b.WriteString(" KEEP QUOTES")
-	case JS_QUOTES_OMIT:
-		b.WriteString(" OMIT QUOTES")
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // SqlString returns the SQL representation of JsonFuncExpr
-func (n *JsonFuncExpr) SqlString() string {
-	var result strings.Builder
+func (n *JsonFuncExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	switch n.Op {
-	case JSON_EXISTS_OP:
-		result.WriteString("JSON_EXISTS(")
-	case JSON_QUERY_OP:
-		result.WriteString("JSON_QUERY(")
-	case JSON_VALUE_OP:
-		result.WriteString("JSON_VALUE(")
-	default:
-		result.WriteString("JSON_FUNC(")
-	}
+// WRAPPER and QUOTES are JSON_QUERY-only.
 
-	if n.ContextItem != nil {
-		result.WriteString(n.ContextItem.SqlString())
-	}
-
-	if n.Pathspec != nil {
-		result.WriteString(", ")
-		result.WriteString(n.Pathspec.SqlString())
-	}
-
-	if n.Passing != nil && len(n.Passing.Items) > 0 {
-		result.WriteString(" PASSING ")
-		for i, item := range n.Passing.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			result.WriteString(item.SqlString())
-		}
-	}
-
-	appendJsonReturning(&result, n.Output)
-
-	// WRAPPER and QUOTES are JSON_QUERY-only.
-	if n.Op == JSON_QUERY_OP {
-		appendJsonWrapperAndQuotes(&result, n.Wrapper, n.Quotes)
-	}
-
-	if n.OnEmpty != nil {
-		result.WriteString(" ")
-		result.WriteString(n.OnEmpty.SqlString())
-		result.WriteString(" ON EMPTY")
-	}
-
-	if n.OnError != nil {
-		result.WriteString(" ")
-		result.WriteString(n.OnError.SqlString())
-		result.WriteString(" ON ERROR")
-	}
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonTablePathSpec) String() string {
-	return "JsonTablePathSpec"
-}
+func (n *JsonTablePathSpec) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the JsonTablePathSpec.
 // The optional `AS <name>` suffix is required for PG to detect duplicate
 // column/path-name conflicts inside JSON_TABLE.
-func (n *JsonTablePathSpec) SqlString() string {
-	var path string
-	if n.StringExpr != nil {
-		path = n.StringExpr.SqlString()
-	}
-	if n.Name != "" {
-		if path == "" {
-			return "AS " + QuoteIdentifier(n.Name)
-		}
-		return path + " AS " + QuoteIdentifier(n.Name)
-	}
-	return path
-}
+func (n *JsonTablePathSpec) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (n *JsonTable) String() string {
-	return "JsonTable"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the JsonTable.
+	return ""
 }
 
-// SqlString returns the SQL representation of the JsonTable.
-func (n *JsonTable) SqlString() string {
-	var result strings.Builder
+func (n *JsonTable) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Lateral {
-		result.WriteString("LATERAL ")
-	}
+// Context item expression (usually a JSON document)
 
-	result.WriteString("JSON_TABLE(")
+// Path specification
 
-	// Context item expression (usually a JSON document)
-	if n.ContextItem != nil {
-		result.WriteString(n.ContextItem.SqlString())
-	}
+// PASSING clause
 
-	// Path specification
-	if n.Pathspec != nil {
-		result.WriteString(", ")
-		result.WriteString(n.Pathspec.SqlString())
-	}
+// COLUMNS clause
 
-	// PASSING clause
-	if n.Passing != nil && len(n.Passing.Items) > 0 {
-		result.WriteString(" PASSING ")
-		for i, item := range n.Passing.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			result.WriteString(item.SqlString())
-		}
-	}
+// ON ERROR clause
 
-	// COLUMNS clause
-	if n.Columns != nil && len(n.Columns.Items) > 0 {
-		result.WriteString(" COLUMNS (")
-		for i, item := range n.Columns.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if col, ok := item.(*JsonTableColumn); ok {
-				result.WriteString(col.SqlString())
-			}
-		}
-		result.WriteString(")")
-	}
-
-	// ON ERROR clause
-	if n.OnError != nil {
-		result.WriteString(" ")
-		result.WriteString(n.OnError.SqlString())
-		result.WriteString(" ON ERROR")
-	}
-
-	result.WriteString(")")
-
-	if n.Alias != nil {
-		result.WriteString(" ")
-		result.WriteString(n.Alias.SqlString())
-	}
-
-	return result.String()
-}
-
-func (n *JsonTableColumn) String() string {
-	return "JsonTableColumn"
-}
+func (n *JsonTableColumn) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the JsonTableColumn.
-func (n *JsonTableColumn) SqlString() string {
-	var result strings.Builder
+func (n *JsonTableColumn) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Column name (only for non-NESTED columns)
-	if n.Coltype != JTC_NESTED {
-		result.WriteString(QuoteIdentifier(n.Name))
-	}
+// Column name (only for non-NESTED columns)
 
-	switch n.Coltype {
-	case JTC_FOR_ORDINALITY:
-		result.WriteString(" FOR ORDINALITY")
+// Add PATH clause if specified
 
-	case JTC_REGULAR:
-		if n.TypeName != nil {
-			result.WriteString(" ")
-			result.WriteString(n.TypeName.SqlString())
-		}
-		// Add PATH clause if specified
-		if n.Pathspec != nil {
-			result.WriteString(" PATH ")
-			result.WriteString(n.Pathspec.SqlString())
-		}
-		appendJsonWrapperAndQuotes(&result, n.Wrapper, n.Quotes)
+// Add PATH clause if specified
 
-	case JTC_EXISTS:
-		if n.TypeName != nil {
-			result.WriteString(" ")
-			result.WriteString(n.TypeName.SqlString())
-		}
-		result.WriteString(" EXISTS")
-		// Add PATH clause if specified
-		if n.Pathspec != nil {
-			result.WriteString(" PATH ")
-			result.WriteString(n.Pathspec.SqlString())
-		}
+// Add FORMAT clause if specified
 
-	case JTC_FORMATTED:
-		if n.TypeName != nil {
-			result.WriteString(" ")
-			result.WriteString(n.TypeName.SqlString())
-		}
-		// Add FORMAT clause if specified
-		if n.Format != nil {
-			result.WriteString(" FORMAT ")
-			result.WriteString(n.Format.SqlString())
-		}
-		// Add PATH clause if specified
-		if n.Pathspec != nil {
-			result.WriteString(" PATH ")
-			result.WriteString(n.Pathspec.SqlString())
-		}
-		appendJsonWrapperAndQuotes(&result, n.Wrapper, n.Quotes)
+// Add PATH clause if specified
 
-	case JTC_NESTED:
-		result.WriteString("NESTED PATH ")
-		if n.Pathspec != nil {
-			result.WriteString(n.Pathspec.SqlString())
-		}
-		// The `AS <name>` for a NESTED path is stored on the column's Name
-		// field (the path's own JsonTablePathSpec.Name is left empty by the
-		// grammar for NESTED paths). Emit it here so PG can validate
-		// column/path-name uniqueness.
-		if n.Name != "" {
-			result.WriteString(" AS ")
-			result.WriteString(QuoteIdentifier(n.Name))
-		}
-		if n.Columns != nil && len(n.Columns.Items) > 0 {
-			result.WriteString(" COLUMNS (")
-			for i, item := range n.Columns.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				if col, ok := item.(*JsonTableColumn); ok {
-					result.WriteString(col.SqlString())
-				}
-			}
-			result.WriteString(")")
-		}
-	}
+// The `AS <name>` for a NESTED path is stored on the column's Name
+// field (the path's own JsonTablePathSpec.Name is left empty by the
+// grammar for NESTED paths). Emit it here so PG can validate
+// column/path-name uniqueness.
 
-	// Add ON EMPTY clause if specified
-	if n.OnEmpty != nil {
-		result.WriteString(" ")
-		result.WriteString(n.OnEmpty.SqlString())
-		result.WriteString(" ON EMPTY")
-	}
+// Add ON EMPTY clause if specified
 
-	// Add ON ERROR clause if specified
-	if n.OnError != nil {
-		result.WriteString(" ")
-		result.WriteString(n.OnError.SqlString())
-		result.WriteString(" ON ERROR")
-	}
+// Add ON ERROR clause if specified
 
-	return result.String()
-}
-
-func (n *JsonKeyValue) String() string {
-	return "JsonKeyValue"
-}
+func (n *JsonKeyValue) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonKeyValue
-func (n *JsonKeyValue) SqlString() string {
-	var result strings.Builder
+func (n *JsonKeyValue) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Key != nil {
-		result.WriteString(n.Key.SqlString())
-	}
-	result.WriteString(" : ")
-	if n.Value != nil {
-		result.WriteString(n.Value.SqlString())
-	}
+func (n *JsonParseExpr) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonParseExpr) String() string { _ = "STUB: not implemented"; return "" }
 
-	return result.String()
-}
-
-func (n *JsonParseExpr) node() {}
-func (n *JsonParseExpr) String() string {
-	return "JsonParseExpr"
-}
-func (n *JsonParseExpr) IsExpr() bool           { return true }
-func (n *JsonParseExpr) ExpressionType() string { return "JsonParseExpr" }
+func (n *JsonParseExpr) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonParseExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonParseExpr
-func (n *JsonParseExpr) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON(")
+func (n *JsonParseExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Expr != nil {
-		result.WriteString(n.Expr.SqlString())
-	}
+func (n *JsonScalarExpr) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonScalarExpr) String() string { _ = "STUB: not implemented"; return "" }
 
-	appendJsonReturning(&result, n.Output)
-
-	if n.UniqueKeys {
-		result.WriteString(" WITH UNIQUE KEYS")
-	}
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonScalarExpr) node() {}
-func (n *JsonScalarExpr) String() string {
-	return "JsonScalarExpr"
-}
-func (n *JsonScalarExpr) IsExpr() bool           { return true }
-func (n *JsonScalarExpr) ExpressionType() string { return "JsonScalarExpr" }
+func (n *JsonScalarExpr) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonScalarExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonScalarExpr
-func (n *JsonScalarExpr) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_SCALAR(")
+func (n *JsonScalarExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Expr != nil {
-		result.WriteString(n.Expr.SqlString())
-	}
+func (n *JsonSerializeExpr) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonSerializeExpr) String() string { _ = "STUB: not implemented"; return "" }
 
-	appendJsonReturning(&result, n.Output)
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonSerializeExpr) node() {}
-func (n *JsonSerializeExpr) String() string {
-	return "JsonSerializeExpr"
-}
-func (n *JsonSerializeExpr) IsExpr() bool           { return true }
-func (n *JsonSerializeExpr) ExpressionType() string { return "JsonSerializeExpr" }
+func (n *JsonSerializeExpr) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonSerializeExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonSerializeExpr
-func (n *JsonSerializeExpr) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_SERIALIZE(")
+func (n *JsonSerializeExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Expr != nil {
-		result.WriteString(n.Expr.SqlString())
-	}
+func (n *JsonObjectConstructor) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonObjectConstructor) String() string { _ = "STUB: not implemented"; return "" }
 
-	appendJsonReturning(&result, n.Output)
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonObjectConstructor) node() {}
-func (n *JsonObjectConstructor) String() string {
-	return "JsonObjectConstructor"
-}
-func (n *JsonObjectConstructor) IsExpr() bool           { return true }
-func (n *JsonObjectConstructor) ExpressionType() string { return "JsonObjectConstructor" }
+func (n *JsonObjectConstructor) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonObjectConstructor) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonObjectConstructor
-func (n *JsonObjectConstructor) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_OBJECT(")
+func (n *JsonObjectConstructor) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Exprs != nil && len(n.Exprs.Items) > 0 {
-		for i, item := range n.Exprs.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if kv, ok := item.(*JsonKeyValue); ok {
-				result.WriteString(kv.SqlString())
-			}
-		}
-	}
+// JSON_OBJECT defaults to NULL ON NULL; emit only the non-default.
 
-	// JSON_OBJECT defaults to NULL ON NULL; emit only the non-default.
-	if n.AbsentOnNull {
-		result.WriteString(" ABSENT ON NULL")
-	}
+func (n *JsonArrayConstructor) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonArrayConstructor) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Unique {
-		result.WriteString(" WITH UNIQUE KEYS")
-	}
-
-	appendJsonReturning(&result, n.Output)
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonArrayConstructor) node() {}
-func (n *JsonArrayConstructor) String() string {
-	return "JsonArrayConstructor"
-}
-func (n *JsonArrayConstructor) IsExpr() bool           { return true }
-func (n *JsonArrayConstructor) ExpressionType() string { return "JsonArrayConstructor" }
+func (n *JsonArrayConstructor) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonArrayConstructor) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonArrayConstructor
-func (n *JsonArrayConstructor) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_ARRAY(")
+func (n *JsonArrayConstructor) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Exprs != nil && len(n.Exprs.Items) > 0 {
-		for i, item := range n.Exprs.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if ve, ok := item.(*JsonValueExpr); ok {
-				result.WriteString(ve.SqlString())
-			} else {
-				result.WriteString(item.SqlString())
-			}
-		}
-	}
+// JSON_ARRAY defaults to ABSENT ON NULL; emit only the non-default.
 
-	// JSON_ARRAY defaults to ABSENT ON NULL; emit only the non-default.
-	if !n.AbsentOnNull {
-		result.WriteString(" NULL ON NULL")
-	}
+func (n *JsonArrayQueryConstructor) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonArrayQueryConstructor) String() string { _ = "STUB: not implemented"; return "" }
 
-	appendJsonReturning(&result, n.Output)
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonArrayQueryConstructor) node() {}
-func (n *JsonArrayQueryConstructor) String() string {
-	return "JsonArrayQueryConstructor"
-}
-func (n *JsonArrayQueryConstructor) IsExpr() bool           { return true }
-func (n *JsonArrayQueryConstructor) ExpressionType() string { return "JsonArrayQueryConstructor" }
+func (n *JsonArrayQueryConstructor) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonArrayQueryConstructor) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonArrayQueryConstructor
-func (n *JsonArrayQueryConstructor) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_ARRAY(")
+func (n *JsonArrayQueryConstructor) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Query != nil {
-		result.WriteString(n.Query.SqlString())
-	}
-
-	if n.Format != nil {
-		result.WriteString(" FORMAT ")
-		result.WriteString(n.Format.SqlString())
-	}
-
-	appendJsonReturning(&result, n.Output)
-
-	result.WriteString(")")
-	return result.String()
-}
-
-func (n *JsonAggConstructor) node() {}
-func (n *JsonAggConstructor) String() string {
-	return "JsonAggConstructor"
-}
+func (n *JsonAggConstructor) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonAggConstructor) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of filter and over clauses
-func (n *JsonAggConstructor) SqlString() string {
-	var result strings.Builder
+func (n *JsonAggConstructor) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add FILTER clause if present
-	if n.AggFilter != nil {
-		result.WriteString(" FILTER (WHERE ")
-		result.WriteString(n.AggFilter.SqlString())
-		result.WriteString(")")
-	}
+// Add FILTER clause if present
 
-	// Add OVER clause if present
-	if n.Over != nil {
-		result.WriteString(" OVER (")
-		result.WriteString(n.Over.SqlString())
-		result.WriteString(")")
-	}
+// Add OVER clause if present
 
-	return result.String()
-}
+func (n *JsonObjectAgg) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonObjectAgg) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *JsonObjectAgg) node() {}
-func (n *JsonObjectAgg) String() string {
-	return "JsonObjectAgg"
-}
-func (n *JsonObjectAgg) IsExpr() bool           { return true }
-func (n *JsonObjectAgg) ExpressionType() string { return "JsonObjectAgg" }
+func (n *JsonObjectAgg) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonObjectAgg) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonObjectAgg
-func (n *JsonObjectAgg) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_OBJECTAGG(")
+func (n *JsonObjectAgg) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Arg != nil {
-		result.WriteString(n.Arg.SqlString())
-	}
+// JSON_OBJECTAGG defaults to NULL ON NULL; emit only the non-default.
 
-	// JSON_OBJECTAGG defaults to NULL ON NULL; emit only the non-default.
-	if n.AbsentOnNull {
-		result.WriteString(" ABSENT ON NULL")
-	}
+// Add RETURNING clause if present
 
-	if n.Unique {
-		result.WriteString(" WITH UNIQUE KEYS")
-	}
+// Add FILTER and OVER clauses if present
 
-	// Add RETURNING clause if present
-	if n.Constructor != nil {
-		appendJsonReturning(&result, n.Constructor.Output)
-	}
+func (n *JsonArrayAgg) node()          { _ = "STUB: not implemented"; return }
+func (n *JsonArrayAgg) String() string { _ = "STUB: not implemented"; return "" }
 
-	result.WriteString(")")
-
-	// Add FILTER and OVER clauses if present
-	if n.Constructor != nil {
-		result.WriteString(n.Constructor.SqlString())
-	}
-
-	return result.String()
-}
-
-func (n *JsonArrayAgg) node() {}
-func (n *JsonArrayAgg) String() string {
-	return "JsonArrayAgg"
-}
-func (n *JsonArrayAgg) IsExpr() bool           { return true }
-func (n *JsonArrayAgg) ExpressionType() string { return "JsonArrayAgg" }
+func (n *JsonArrayAgg) IsExpr() bool           { _ = "STUB: not implemented"; return false }
+func (n *JsonArrayAgg) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonArrayAgg
-func (n *JsonArrayAgg) SqlString() string {
-	var result strings.Builder
-	result.WriteString("JSON_ARRAYAGG(")
+func (n *JsonArrayAgg) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Arg != nil {
-		result.WriteString(n.Arg.SqlString())
-	}
+// ORDER BY (lives on Constructor.AggOrder, between the arg and the
+// ABSENT/RETURNING clauses per the json_aggregate_func grammar).
 
-	// ORDER BY (lives on Constructor.AggOrder, between the arg and the
-	// ABSENT/RETURNING clauses per the json_aggregate_func grammar).
-	if n.Constructor != nil && n.Constructor.AggOrder != nil && len(n.Constructor.AggOrder.Items) > 0 {
-		result.WriteString(" ORDER BY ")
-		for i, item := range n.Constructor.AggOrder.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			result.WriteString(item.SqlString())
-		}
-	}
+// JSON_ARRAYAGG defaults to ABSENT ON NULL; emit only the non-default.
 
-	// JSON_ARRAYAGG defaults to ABSENT ON NULL; emit only the non-default.
-	if !n.AbsentOnNull {
-		result.WriteString(" NULL ON NULL")
-	}
+// Add RETURNING clause if present
 
-	// Add RETURNING clause if present
-	if n.Constructor != nil {
-		appendJsonReturning(&result, n.Constructor.Output)
-	}
-
-	result.WriteString(")")
-
-	// Add FILTER and OVER clauses if present
-	if n.Constructor != nil {
-		result.WriteString(n.Constructor.SqlString())
-	}
-
-	return result.String()
-}
+// Add FILTER and OVER clauses if present
 
 // Constructor functions
 
 // NewJsonFormat creates a new JsonFormat node
 func NewJsonFormat(formatType JsonFormatType, encoding JsonEncoding, location int) *JsonFormat {
-	node := &JsonFormat{
-		BaseNode:   BaseNode{Tag: T_JsonFormat},
-		FormatType: formatType,
-		Encoding:   encoding,
-	}
-	node.SetLocation(location)
-	return node
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonReturning creates a new JsonReturning node
 func NewJsonReturning(format *JsonFormat, typid Oid, typmod int32) *JsonReturning {
-	return &JsonReturning{
-		BaseNode: BaseNode{Tag: T_JsonReturning},
-		Format:   format,
-		Typid:    typid,
-		Typmod:   typmod,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonValueExpr creates a new JsonValueExpr node
 func NewJsonValueExpr(rawExpr Node, format *JsonFormat) *JsonValueExpr {
-	return &JsonValueExpr{
-		BaseNode: BaseNode{Tag: T_JsonValueExpr},
-		RawExpr:  rawExpr,
-		Format:   format,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonBehavior creates a new JsonBehavior node
 func NewJsonBehavior(btype JsonBehaviorType, expr Node, location int) *JsonBehavior {
-	node := &JsonBehavior{
-		BaseNode: BaseNode{Tag: T_JsonBehavior},
-		Btype:    btype,
-		Expr:     expr,
-	}
-	node.SetLocation(location)
-	return node
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonOutput creates a new JsonOutput node
 func NewJsonOutput(typeName *TypeName, returning *JsonReturning) *JsonOutput {
-	return &JsonOutput{
-		BaseNode:  BaseNode{Tag: T_JsonOutput},
-		TypeName:  typeName,
-		Returning: returning,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonArgument creates a new JsonArgument node
 func NewJsonArgument(val *JsonValueExpr, name string) *JsonArgument {
-	return &JsonArgument{
-		BaseNode: BaseNode{Tag: T_JsonArgument},
-		Val:      val,
-		Name:     name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonFuncExpr creates a new JsonFuncExpr node
 func NewJsonFuncExpr(op JsonExprOp, contextItem *JsonValueExpr, pathspec Node) *JsonFuncExpr {
-	return &JsonFuncExpr{
-		BaseNode:    BaseNode{Tag: T_JsonFuncExpr},
-		Op:          op,
-		ContextItem: contextItem,
-		Pathspec:    pathspec,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonTablePathSpec creates a new JsonTablePathSpec node
 func NewJsonTablePathSpec(str Node, name string, location int) *JsonTablePathSpec {
-	node := &JsonTablePathSpec{
-		BaseNode:   BaseNode{Tag: T_JsonTablePathSpec},
-		StringExpr: str,
-		Name:       name,
-	}
-	node.SetLocation(location)
-	return node
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonTable creates a new JsonTable node
 func NewJsonTable(contextItem *JsonValueExpr, pathspec *JsonTablePathSpec) *JsonTable {
-	return &JsonTable{
-		BaseNode:    BaseNode{Tag: T_JsonTable},
-		ContextItem: contextItem,
-		Pathspec:    pathspec,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonTableColumn creates a new JsonTableColumn node
 func NewJsonTableColumn(coltype JsonTableColumnType, name string) *JsonTableColumn {
-	return &JsonTableColumn{
-		BaseNode: BaseNode{Tag: T_JsonTableColumn},
-		Coltype:  coltype,
-		Name:     name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonKeyValue creates a new JsonKeyValue node
 func NewJsonKeyValue(key Expr, value *JsonValueExpr) *JsonKeyValue {
-	return &JsonKeyValue{
-		BaseNode: BaseNode{Tag: T_JsonKeyValue},
-		Key:      key,
-		Value:    value,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonParseExpr creates a new JsonParseExpr node
 func NewJsonParseExpr(expr *JsonValueExpr, uniqueKeys bool) *JsonParseExpr {
-	return &JsonParseExpr{
-		BaseNode:   BaseNode{Tag: T_JsonParseExpr},
-		Expr:       expr,
-		UniqueKeys: uniqueKeys,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonScalarExpr creates a new JsonScalarExpr node
-func NewJsonScalarExpr(expr Expr) *JsonScalarExpr {
-	return &JsonScalarExpr{
-		BaseNode: BaseNode{Tag: T_JsonScalarExpr},
-		Expr:     expr,
-	}
-}
+func NewJsonScalarExpr(expr Expr) *JsonScalarExpr { _ = "STUB: not implemented"; return nil }
 
 // NewJsonSerializeExpr creates a new JsonSerializeExpr node
 func NewJsonSerializeExpr(expr *JsonValueExpr) *JsonSerializeExpr {
-	return &JsonSerializeExpr{
-		BaseNode: BaseNode{Tag: T_JsonSerializeExpr},
-		Expr:     expr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonObjectConstructor creates a new JsonObjectConstructor node
 func NewJsonObjectConstructor(exprs *NodeList, absentOnNull bool, unique bool) *JsonObjectConstructor {
-	return &JsonObjectConstructor{
-		BaseNode:     BaseNode{Tag: T_JsonObjectConstructor},
-		Exprs:        exprs,
-		AbsentOnNull: absentOnNull,
-		Unique:       unique,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonArrayConstructor creates a new JsonArrayConstructor node
 func NewJsonArrayConstructor(exprs *NodeList, absentOnNull bool) *JsonArrayConstructor {
-	return &JsonArrayConstructor{
-		BaseNode:     BaseNode{Tag: T_JsonArrayConstructor},
-		Exprs:        exprs,
-		AbsentOnNull: absentOnNull,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonArrayQueryConstructor creates a new JsonArrayQueryConstructor node
 func NewJsonArrayQueryConstructor(query Node, absentOnNull bool) *JsonArrayQueryConstructor {
-	return &JsonArrayQueryConstructor{
-		BaseNode:     BaseNode{Tag: T_JsonArrayQueryConstructor},
-		Query:        query,
-		AbsentOnNull: absentOnNull,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonAggConstructor creates a new JsonAggConstructor node
 func NewJsonAggConstructor(output *JsonOutput) *JsonAggConstructor {
-	return &JsonAggConstructor{
-		BaseNode: BaseNode{Tag: T_JsonAggConstructor},
-		Output:   output,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonObjectAgg creates a new JsonObjectAgg node
 func NewJsonObjectAgg(constructor *JsonAggConstructor, arg *JsonKeyValue, absentOnNull bool, unique bool) *JsonObjectAgg {
-	return &JsonObjectAgg{
-		BaseNode:     BaseNode{Tag: T_JsonObjectAgg},
-		Constructor:  constructor,
-		Arg:          arg,
-		AbsentOnNull: absentOnNull,
-		Unique:       unique,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJsonArrayAgg creates a new JsonArrayAgg node
 func NewJsonArrayAgg(constructor *JsonAggConstructor, arg *JsonValueExpr, absentOnNull bool) *JsonArrayAgg {
-	return &JsonArrayAgg{
-		BaseNode:     BaseNode{Tag: T_JsonArrayAgg},
-		Constructor:  constructor,
-		Arg:          arg,
-		AbsentOnNull: absentOnNull,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ==============================================================================
@@ -1291,26 +691,14 @@ type JsonConstructorExpr struct {
 	Unique       bool                // WITH UNIQUE KEYS? (JSON_OBJECT[AGG] only)
 }
 
-func (j *JsonConstructorExpr) ExpressionType() string {
-	return "JsonConstructorExpr"
-}
+func (j *JsonConstructorExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (j *JsonConstructorExpr) String() string {
-	return fmt.Sprintf("JsonConstructorExpr{type=%d}@%d", j.Type, j.Location())
-}
+func (j *JsonConstructorExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonConstructorExpr creates a new JsonConstructorExpr node
 func NewJsonConstructorExpr(constructorType JsonConstructorType, args *NodeList, function, coercion Expr, returning *JsonReturning, absentOnNull, unique bool, location int) *JsonConstructorExpr {
-	return &JsonConstructorExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_JsonConstructorExpr, Loc: location}},
-		Type:         constructorType,
-		Args:         args,
-		Func:         function,
-		Coercion:     coercion,
-		Returning:    returning,
-		AbsentOnNull: absentOnNull,
-		Unique:       unique,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // JsonIsPredicate represents an IS JSON predicate
@@ -1323,46 +711,17 @@ type JsonIsPredicate struct {
 	UniqueKeys bool          // check key uniqueness?
 }
 
-func (j *JsonIsPredicate) String() string {
-	return fmt.Sprintf("JsonIsPredicate{type=%d}@%d", j.ItemType, j.Location())
-}
+func (j *JsonIsPredicate) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of JsonIsPredicate
-func (j *JsonIsPredicate) SqlString() string {
-	var result strings.Builder
+func (j *JsonIsPredicate) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if j.Expr != nil {
-		result.WriteString(j.Expr.SqlString())
-		result.WriteString(" IS JSON")
-
-		switch j.ItemType {
-		case JS_TYPE_OBJECT:
-			result.WriteString(" OBJECT")
-		case JS_TYPE_ARRAY:
-			result.WriteString(" ARRAY")
-		case JS_TYPE_SCALAR:
-			result.WriteString(" SCALAR")
-		case JS_TYPE_ANY:
-			// For JS_TYPE_ANY, we don't add any suffix (just "IS JSON")
-		}
-
-		if j.UniqueKeys {
-			result.WriteString(" WITH UNIQUE KEYS")
-		}
-	}
-
-	return result.String()
-}
+// For JS_TYPE_ANY, we don't add any suffix (just "IS JSON")
 
 // NewJsonIsPredicate creates a new JsonIsPredicate node
 func NewJsonIsPredicate(expr Node, format *JsonFormat, itemType JsonValueType, uniqueKeys bool, location int) *JsonIsPredicate {
-	return &JsonIsPredicate{
-		BaseNode:   BaseNode{Tag: T_JsonIsPredicate, Loc: location},
-		Expr:       expr,
-		Format:     format,
-		ItemType:   itemType,
-		UniqueKeys: uniqueKeys,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // JsonExpr represents transformed representation of JSON_VALUE(), JSON_QUERY(), and JSON_EXISTS()
@@ -1386,34 +745,14 @@ type JsonExpr struct {
 	Collation       Oid            // JsonExpr's collation
 }
 
-func (j *JsonExpr) ExpressionType() string {
-	return "JsonExpr"
-}
+func (j *JsonExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (j *JsonExpr) String() string {
-	return fmt.Sprintf("JsonExpr{op=%d, col=%s}@%d", j.Op, j.ColumnName, j.Location())
-}
+func (j *JsonExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonExpr creates a new JsonExpr node
 func NewJsonExpr(op JsonExprOp, columnName string, formattedExpr Node, format *JsonFormat, pathSpec Node, returning *JsonReturning, passingNames []string, passingValues *NodeList, onEmpty, onError *JsonBehavior, useIOCoercion, useJsonCoercion bool, wrapper JsonWrapper, omitQuotes bool, collation Oid, location int) *JsonExpr {
-	return &JsonExpr{
-		BaseExpr:        BaseExpr{BaseNode: BaseNode{Tag: T_JsonExpr, Loc: location}},
-		Op:              op,
-		ColumnName:      columnName,
-		FormattedExpr:   formattedExpr,
-		Format:          format,
-		PathSpec:        pathSpec,
-		Returning:       returning,
-		PassingNames:    passingNames,
-		PassingValues:   passingValues,
-		OnEmpty:         onEmpty,
-		OnError:         onError,
-		UseIOCoercion:   useIOCoercion,
-		UseJsonCoercion: useJsonCoercion,
-		Wrapper:         wrapper,
-		OmitQuotes:      omitQuotes,
-		Collation:       collation,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // JsonTablePath represents a JSON path expression to be computed as part of evaluating a JSON_TABLE plan node
@@ -1424,17 +763,12 @@ type JsonTablePath struct {
 	Name  string // path name
 }
 
-func (j *JsonTablePath) String() string {
-	return fmt.Sprintf("JsonTablePath{name=%s}@%d", j.Name, j.Location())
-}
+func (j *JsonTablePath) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonTablePath creates a new JsonTablePath node
 func NewJsonTablePath(value *Const, name string, location int) *JsonTablePath {
-	return &JsonTablePath{
-		BaseNode: BaseNode{Tag: T_JsonTablePath, Loc: location},
-		Value:    value,
-		Name:     name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // JsonTablePlan represents abstract base type for different types of JSON_TABLE "plans"
@@ -1443,16 +777,10 @@ type JsonTablePlan struct {
 	BaseNode
 }
 
-func (j *JsonTablePlan) String() string {
-	return fmt.Sprintf("JsonTablePlan@%d", j.Location())
-}
+func (j *JsonTablePlan) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonTablePlan creates a new JsonTablePlan node
-func NewJsonTablePlan(location int) *JsonTablePlan {
-	return &JsonTablePlan{
-		BaseNode: BaseNode{Tag: T_JsonTablePlan, Loc: location},
-	}
-}
+func NewJsonTablePlan(location int) *JsonTablePlan { _ = "STUB: not implemented"; return nil }
 
 // JsonTablePathScan represents a JSON_TABLE plan to evaluate a JSON path expression and NESTED paths
 // Ported from postgres/src/include/nodes/primnodes.h:1893-1916
@@ -1465,20 +793,12 @@ type JsonTablePathScan struct {
 	ColMax       int            // 0-based index in TableFunc.colvalexprs of the last column covered by this plan
 }
 
-func (j *JsonTablePathScan) String() string {
-	return fmt.Sprintf("JsonTablePathScan{cols=%d-%d}@%d", j.ColMin, j.ColMax, j.Location())
-}
+func (j *JsonTablePathScan) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonTablePathScan creates a new JsonTablePathScan node
 func NewJsonTablePathScan(path *JsonTablePath, errorOnError bool, child *JsonTablePlan, colMin, colMax, location int) *JsonTablePathScan {
-	return &JsonTablePathScan{
-		BaseNode:     BaseNode{Tag: T_JsonTablePathScan, Loc: location},
-		Path:         path,
-		ErrorOnError: errorOnError,
-		Child:        child,
-		ColMin:       colMin,
-		ColMax:       colMax,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // JsonTableSiblingJoin represents a plan to join rows of sibling NESTED COLUMNS clauses in the same parent COLUMNS clause
@@ -1489,15 +809,10 @@ type JsonTableSiblingJoin struct {
 	Rplan *JsonTablePlan // right plan
 }
 
-func (j *JsonTableSiblingJoin) String() string {
-	return fmt.Sprintf("JsonTableSiblingJoin@%d", j.Location())
-}
+func (j *JsonTableSiblingJoin) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewJsonTableSiblingJoin creates a new JsonTableSiblingJoin node
 func NewJsonTableSiblingJoin(lplan, rplan *JsonTablePlan, location int) *JsonTableSiblingJoin {
-	return &JsonTableSiblingJoin{
-		BaseNode: BaseNode{Tag: T_JsonTableSiblingJoin, Loc: location},
-		Lplan:    lplan,
-		Rplan:    rplan,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

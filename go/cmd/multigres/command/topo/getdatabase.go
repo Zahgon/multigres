@@ -15,65 +15,25 @@
 package topo
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"time"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // AddGetDatabaseCommand adds the getdatabase subcommand
-func AddGetDatabaseCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getdatabase",
-		Short: "Get information about a specific database",
-		Long:  "Retrieve detailed information about a database from the multiadmin server.",
-		RunE:  runGetDatabase,
-	}
+func AddGetDatabaseCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }
 
-	// Add command-specific flags
-	cmd.Flags().String("name", "", "Name of the database to retrieve (required)")
-	cmd.Flags().String("admin-server", "", "gRPC address of the multiadmin server (e.g., localhost:15990)")
+// Add command-specific flags
 
-	// Mark the name flag as required
-	_ = cmd.MarkFlagRequired("name")
-
-	return cmd
-}
+// Mark the name flag as required
 
 // runGetDatabase executes the getdatabase command
 func runGetDatabase(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Get the database name
-	databaseName, _ := cmd.Flags().GetString("name")
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	// Create context with timeout and call GetDatabase RPC
-	ctx, cancel := context.WithTimeout(cmd.Context(), 10*time.Second)
-	defer cancel()
-
-	response, err := client.GetDatabase(ctx, &multiadminpb.GetDatabaseRequest{
-		Name: databaseName,
-	})
-	if err != nil {
-		return fmt.Errorf("GetDatabase RPC failed: %w", err)
-	}
-
-	// Output the response in JSON format
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
+
+// Create admin client
+
+// Create context with timeout and call GetDatabase RPC
+
+// Output the response in JSON format

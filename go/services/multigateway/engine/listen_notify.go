@@ -46,15 +46,18 @@ type ListenNotifyPrimitive struct {
 }
 
 func NewListenPrimitive(channel, query string) *ListenNotifyPrimitive {
-	return &ListenNotifyPrimitive{Action: ListenActionListen, Channel: channel, Query: query}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func NewUnlistenPrimitive(channel, query string) *ListenNotifyPrimitive {
-	return &ListenNotifyPrimitive{Action: ListenActionUnlisten, Channel: channel, Query: query}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func NewUnlistenAllPrimitive(query string) *ListenNotifyPrimitive {
-	return &ListenNotifyPrimitive{Action: ListenActionUnlistenAll, Query: query}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (l *ListenNotifyPrimitive) StreamExecute(
@@ -65,78 +68,36 @@ func (l *ListenNotifyPrimitive) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
+	_ = "STUB: not implemented"
 	// PostgreSQL truncates channel names to NAMEDATALEN-1 (63 chars).
 	// We must do the same so our internal tracking matches PG's behavior.
-	channel := l.Channel
-	if len(channel) > 63 {
-		channel = channel[:63]
-	}
-
-	// Update connection state and, for autocommit, sync subscriptions immediately
-	// via SubSync so they are active before the client is told LISTEN/UNLISTEN
-	// succeeded. Inside a transaction, changes are buffered as pending and
-	// applied at COMMIT by the TransactionPrimitive.
-	switch l.Action {
-	case ListenActionListen:
-		if conn.IsInTransaction() {
-			state.AddPendingListen(channel)
-		} else if !state.IsListening(channel) {
-			state.AddListenChannel(channel)
-			state.SubSync.SyncSubscriptions(conn.Context(), conn, state, []string{channel}, nil, false)
-		}
-	case ListenActionUnlisten:
-		if conn.IsInTransaction() {
-			state.AddPendingUnlisten(channel)
-		} else {
-			state.RemoveListenChannel(channel)
-			state.SubSync.SyncSubscriptions(conn.Context(), conn, state, nil, []string{channel}, false)
-		}
-	case ListenActionUnlistenAll:
-		if conn.IsInTransaction() {
-			state.AddPendingUnlistenAll()
-		} else {
-			state.ClearListenChannels()
-			state.SubSync.SyncSubscriptions(conn.Context(), conn, state, nil, nil, true)
-		}
-	}
-
-	var tag string
-	switch l.Action {
-	case ListenActionListen:
-		tag = "LISTEN"
-	case ListenActionUnlisten, ListenActionUnlistenAll:
-		tag = "UNLISTEN"
-	}
-
-	return callback(ctx, &sqltypes.Result{CommandTag: tag})
+	return nil
 }
 
-func (l *ListenNotifyPrimitive) String() string {
-	switch l.Action {
-	case ListenActionListen:
-		return "Listen(" + l.Channel + ")"
-	case ListenActionUnlisten:
-		return "Unlisten(" + l.Channel + ")"
-	case ListenActionUnlistenAll:
-		return "UnlistenAll"
-	default:
-		return "ListenNotify"
-	}
-}
+// Update connection state and, for autocommit, sync subscriptions immediately
+// via SubSync so they are active before the client is told LISTEN/UNLISTEN
+// succeeded. Inside a transaction, changes are buffered as pending and
+// applied at COMMIT by the TransactionPrimitive.
+
+func (l *ListenNotifyPrimitive) String() string { _ = "STUB: not implemented"; return "" }
 
 // GetQuery returns the original SQL string.
 func (l *ListenNotifyPrimitive) GetQuery() string {
-	return l.Query
-}
+	_ = "STUB: not implemented"
 
-// GetTableGroup returns empty string — LISTEN/UNLISTEN don't target a tablegroup.
-func (l *ListenNotifyPrimitive) GetTableGroup() string {
+	// GetTableGroup returns empty string — LISTEN/UNLISTEN don't target a tablegroup.
 	return ""
 }
 
-// PortalStreamExecute satisfies the Primitive interface for the
-// extended-protocol path. LISTEN/UNLISTEN take no parameters; the
-// channel name is fixed at plan time. Delegate.
+func (l *ListenNotifyPrimitive) GetTableGroup() string {
+	_ = "STUB: not implemented"
+
+	// PortalStreamExecute satisfies the Primitive interface for the
+	// extended-protocol path. LISTEN/UNLISTEN take no parameters; the
+	// channel name is fixed at plan time. Delegate.
+	return ""
+}
+
 func (l *ListenNotifyPrimitive) PortalStreamExecute(
 	ctx context.Context,
 	exec IExecute,
@@ -147,5 +108,6 @@ func (l *ListenNotifyPrimitive) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return l.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -15,20 +15,12 @@
 package command
 
 import (
-	"github.com/multigres/multigres/go/cmd/multigres/command/topo"
-
 	"github.com/spf13/cobra"
 )
 
 // AddTopoCommands adds the topo subcommands to the root command
 func AddTopoCommands(root *cobra.Command, mc *MultigresCommand) {
+	_ = "STUB: not implemented"
 	// Register topo commands with root
-	root.AddCommand(topo.AddGetCellCommand())
-	root.AddCommand(topo.AddGetDatabaseCommand())
-	root.AddCommand(topo.AddGetCellNamesCommand())
-	root.AddCommand(topo.AddGetDatabaseNamesCommand())
-	root.AddCommand(topo.AddGetGatewaysCommand())
-	root.AddCommand(topo.AddGetPoolersCommand())
-	root.AddCommand(topo.AddGetOrchsCommand())
-	root.AddCommand(topo.CreateClusterMetadataCommand())
+	return
 }

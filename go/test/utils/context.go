@@ -24,16 +24,14 @@ import (
 // the cancel function with t.Cleanup() for automatic cleanup.
 // The context is derived from t.Context() so it will be cancelled if the test ends.
 func WithShortDeadline(t *testing.T) context.Context {
-	t.Helper()
-	return WithTimeout(t, 2*time.Second)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // WithTimeout creates a context with the provided timeout and registers
 // the cancel function with t.Cleanup() for automatic cleanup.
 // The context is derived from t.Context() so it will be cancelled if the test ends.
 func WithTimeout(t *testing.T, timeout time.Duration) context.Context {
-	t.Helper()
-	ctx, cancel := context.WithTimeout(t.Context(), timeout)
-	t.Cleanup(cancel)
-	return ctx
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }

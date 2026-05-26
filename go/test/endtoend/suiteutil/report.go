@@ -14,29 +14,12 @@
 
 package suiteutil
 
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"path/filepath"
-)
-
 // WriteJSON marshals v with two-space indent and writes it to
 // <outputDir>/<filename>. The output directory is created if missing.
 // Returns the absolute path that was written.
 func WriteJSON(outputDir, filename string, v any) (string, error) {
-	if err := os.MkdirAll(outputDir, 0o755); err != nil {
-		return "", fmt.Errorf("mkdir %s: %w", outputDir, err)
-	}
-	data, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return "", fmt.Errorf("marshal JSON: %w", err)
-	}
-	path := filepath.Join(outputDir, filename)
-	if err := os.WriteFile(path, data, 0o644); err != nil {
-		return "", fmt.Errorf("write %s: %w", path, err)
-	}
-	return path, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // WriteMarkdown writes content to <outputDir>/<filename> and, when running in
@@ -47,21 +30,8 @@ func WriteJSON(outputDir, filename string, v any) (string, error) {
 // Failing to append to GITHUB_STEP_SUMMARY is non-fatal — the markdown file
 // on disk is the authoritative copy.
 func WriteMarkdown(outputDir, filename, content string) (string, error) {
-	if err := os.MkdirAll(outputDir, 0o755); err != nil {
-		return "", fmt.Errorf("mkdir %s: %w", outputDir, err)
-	}
-	path := filepath.Join(outputDir, filename)
-	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
-		return "", fmt.Errorf("write %s: %w", path, err)
-	}
-
-	if f := os.Getenv("GITHUB_STEP_SUMMARY"); f != "" {
-		if fh, err := os.OpenFile(f, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err == nil {
-			_, _ = fh.WriteString(content)
-			_ = fh.Close()
-		}
-	}
-	return path, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // BadgeColor picks a shields.io badge colour from a pass rate.
@@ -71,23 +41,7 @@ func WriteMarkdown(outputDir, filename, content string) (string, error) {
 //	 50+% → orange
 //	  <50 → red
 //	 0/0  → lightgrey (no data)
-func BadgeColor(passed, total int) string {
-	if total == 0 {
-		return "lightgrey"
-	}
-	if passed == total {
-		return "brightgreen"
-	}
-	pct := passed * 100 / total
-	switch {
-	case pct >= 80:
-		return "yellow"
-	case pct >= 50:
-		return "orange"
-	default:
-		return "red"
-	}
-}
+func BadgeColor(passed, total int) string { _ = "STUB: not implemented"; return "" }
 
 // BadgeMarkdown renders a shields.io badge as an `![alt](url)` markdown image.
 //
@@ -97,16 +51,6 @@ func BadgeColor(passed, total int) string {
 // colour level from brightgreen so 100% timed-out runs don't visually appear
 // identical to a clean pass.
 func BadgeMarkdown(label string, passed, total, expected int, timedOut bool) string {
-	colour := BadgeColor(passed, total)
-	value := fmt.Sprintf("%d%%2F%d_passed", passed, total)
-	if expected > 0 && expected > total {
-		value = fmt.Sprintf("%d%%2F%d_passed_(of_%d)", passed, total, expected)
-	}
-	if timedOut {
-		value += "_(timed_out)"
-		if colour == "brightgreen" {
-			colour = "yellow"
-		}
-	}
-	return fmt.Sprintf("![%s](https://img.shields.io/badge/%s-%s-%s)", label, label, value, colour)
+	_ = "STUB: not implemented"
+	return ""
 }

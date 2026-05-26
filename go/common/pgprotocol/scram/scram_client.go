@@ -14,14 +14,6 @@
 
 package scram
 
-import (
-	"crypto/hmac"
-	"crypto/rand"
-	"encoding/base64"
-	"errors"
-	"fmt"
-)
-
 // SCRAMClient implements client-side SCRAM-SHA-256 authentication.
 // It supports two modes:
 // 1. Password mode: authenticate using a plaintext password
@@ -58,10 +50,8 @@ type SCRAMClient struct {
 // NewSCRAMClientWithPassword creates a SCRAM client that authenticates with a password.
 // This is the standard mode where the password is used to derive SCRAM keys.
 func NewSCRAMClientWithPassword(username, password string) *SCRAMClient {
-	return &SCRAMClient{
-		username: username,
-		password: password,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewSCRAMClientWithKeys creates a SCRAM client that authenticates with extracted SCRAM keys.
@@ -71,11 +61,8 @@ func NewSCRAMClientWithPassword(username, password string) *SCRAMClient {
 // The clientKey and serverKey should be extracted from a previous SCRAM authentication
 // using ExtractAndVerifyClientProof and the hash's ServerKey.
 func NewSCRAMClientWithKeys(username string, clientKey, serverKey []byte) *SCRAMClient {
-	return &SCRAMClient{
-		username:  username,
-		clientKey: clientKey,
-		serverKey: serverKey,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // clientNonceLength is the length of the client nonce in bytes.
@@ -86,123 +73,62 @@ const clientNonceLength = 24
 // using the tls-server-end-point binding type, with the supplied hash as the
 // cbind-data. Call before ClientFirstMessage. Pass nil to clear.
 func (c *SCRAMClient) EnableChannelBinding(tlsServerEndPointHash []byte) {
-	c.channelBindingHash = tlsServerEndPointHash
+	_ = "STUB: not implemented"
+	return
 }
 
 // Mechanism returns the SASL mechanism name the client will use, based on
 // whether channel binding has been enabled.
-func (c *SCRAMClient) Mechanism() string {
-	if c.channelBindingHash != nil {
-		return ScramSHA256PlusMechanism
-	}
-	return ScramSHA256Mechanism
-}
+func (c *SCRAMClient) Mechanism() string { _ = "STUB: not implemented"; return "" }
 
 // ClientFirstMessage generates the client-first-message to send to the server.
 // This starts the SCRAM authentication handshake.
 // Returns the full message including the GS2 header.
 func (c *SCRAMClient) ClientFirstMessage() (string, error) {
+	_ = "STUB: not implemented"
 	// Generate random client nonce.
-	nonceBytes := make([]byte, clientNonceLength)
-	if _, err := rand.Read(nonceBytes); err != nil {
-		return "", fmt.Errorf("failed to generate client nonce: %w", err)
-	}
-	c.clientNonce = base64.StdEncoding.EncodeToString(nonceBytes)
-
-	// Build client-first-message-bare: n=<username>,r=<nonce>
-	c.clientFirstMessageBare = "n=" + encodeSaslName(c.username) + ",r=" + c.clientNonce
-
-	// GS2 header: "p=tls-server-end-point,," when channel binding is on,
-	// "n,," otherwise. The authzid slot stays empty in both cases.
-	if c.channelBindingHash != nil {
-		c.gs2Header = "p=" + ChannelBindingTypeTLSServerEndPoint + ",,"
-	} else {
-		c.gs2Header = "n,,"
-	}
-
-	return c.gs2Header + c.clientFirstMessageBare, nil
+	return "", nil
 }
+
+// Build client-first-message-bare: n=<username>,r=<nonce>
+
+// GS2 header: "p=tls-server-end-point,," when channel binding is on,
+// "n,," otherwise. The authzid slot stays empty in both cases.
 
 // ProcessServerFirst processes the server-first-message and generates the client-final-message.
 // The serverFirst parameter is the server's response to the client-first-message.
 // Returns the client-final-message to send to the server.
 func (c *SCRAMClient) ProcessServerFirst(serverFirst string) (string, error) {
+	_ = "STUB: not implemented"
 	// Parse server-first-message.
-	combinedNonce, salt, iterations, err := parseServerFirstMessage(serverFirst)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse server-first-message: %w", err)
-	}
-
-	// Verify the combined nonce starts with our client nonce.
-	if len(combinedNonce) < len(c.clientNonce) || combinedNonce[:len(c.clientNonce)] != c.clientNonce {
-		return "", errors.New("server nonce does not start with client nonce (possible attack)")
-	}
-
-	// Build cbind data: gs2-header || cbind-data (PLUS) or just gs2-header.
-	cbind := []byte(c.gs2Header)
-	if c.channelBindingHash != nil {
-		cbind = append(cbind, c.channelBindingHash...)
-	}
-	channelBinding := base64.StdEncoding.EncodeToString(cbind)
-	clientFinalWithoutProof := "c=" + channelBinding + ",r=" + combinedNonce
-
-	// Build AuthMessage.
-	c.authMessage = buildAuthMessage(c.clientFirstMessageBare, serverFirst, clientFinalWithoutProof)
-
-	// Compute ClientProof.
-	var clientKey []byte
-	if c.clientKey != nil {
-		// Passthrough mode: use pre-extracted ClientKey.
-		clientKey = c.clientKey
-	} else {
-		// Password mode: derive keys from password.
-		saltedPassword := ComputeSaltedPassword(c.password, salt, iterations)
-		clientKey = ComputeClientKey(saltedPassword)
-
-		// Store derived keys for server signature verification.
-		c.clientKey = clientKey
-		c.serverKey = ComputeServerKey(saltedPassword)
-	}
-
-	storedKey := ComputeStoredKey(clientKey)
-	clientSignature := ComputeClientSignature(storedKey, c.authMessage)
-	clientProof, err := computeClientProof(clientKey, clientSignature)
-	if err != nil {
-		return "", fmt.Errorf("failed to compute client proof: %w", err)
-	}
-
-	// Build client-final-message.
-	proofB64 := base64.StdEncoding.EncodeToString(clientProof)
-	clientFinalMessage := clientFinalWithoutProof + ",p=" + proofB64
-
-	return clientFinalMessage, nil
+	return "", nil
 }
+
+// Verify the combined nonce starts with our client nonce.
+
+// Build cbind data: gs2-header || cbind-data (PLUS) or just gs2-header.
+
+// Build AuthMessage.
+
+// Compute ClientProof.
+
+// Passthrough mode: use pre-extracted ClientKey.
+
+// Password mode: derive keys from password.
+
+// Store derived keys for server signature verification.
+
+// Build client-final-message.
 
 // VerifyServerFinal verifies the server-final-message for mutual authentication.
 // The serverFinal parameter is the server's response to the client-final-message.
 // Returns nil if the server signature is valid, or an error if verification fails.
 func (c *SCRAMClient) VerifyServerFinal(serverFinal string) error {
+	_ = "STUB: not implemented"
 	// Parse server-final-message: v=<server_signature_b64>
-	if len(serverFinal) < 2 || serverFinal[:2] != "v=" {
-		return errors.New("invalid server-final-message: expected v=...")
-	}
-
-	serverSigB64 := serverFinal[2:]
-	serverSig, err := base64.StdEncoding.DecodeString(serverSigB64)
-	if err != nil {
-		return fmt.Errorf("invalid server signature: %w", err)
-	}
-
-	// Compute expected server signature.
-	if c.serverKey == nil {
-		return errors.New("server key not available for verification")
-	}
-	expectedServerSig := ComputeServerSignature(c.serverKey, c.authMessage)
-
-	// Use constant-time comparison.
-	if !hmac.Equal(serverSig, expectedServerSig) {
-		return errors.New("server signature verification failed")
-	}
-
 	return nil
 }
+
+// Compute expected server signature.
+
+// Use constant-time comparison.

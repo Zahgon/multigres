@@ -17,16 +17,9 @@
 package debug
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
-	"strings"
 
-	"github.com/multigres/multigres/go/common/web"
 	"github.com/multigres/multigres/go/tools/viperutil"
-
-	"github.com/spf13/pflag"
 )
 
 // HandlerFunc returns an http.HandlerFunc that renders the combined config
@@ -36,56 +29,14 @@ import (
 //   - GET /debug/config
 //   - GET /debug/config?format=json
 func HandlerFunc(reg *viperutil.Registry) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		v := reg.Combined()
-		format := strings.ToLower(r.URL.Query().Get("format"))
-
-		// Collect command-line flags
-		type ConfigData struct {
-			Title   string
-			Options map[string]string
-			Config  map[string]string
-		}
-		configData := ConfigData{
-			Title:   os.Args[0],
-			Options: make(map[string]string),
-			Config:  make(map[string]string),
-		}
-		pflag.CommandLine.VisitAll(func(flag *pflag.Flag) {
-			if flag.Changed {
-				configData.Options[flag.Name] = flag.Value.String()
-			}
-		})
-
-		// Handle default format (debug text)
-		if format == "" {
-			for _, k := range v.AllKeys() {
-				value := v.Get(k)
-				if value == nil {
-					// should not happen
-					continue
-				}
-				configData.Config[k] = fmt.Sprintf("%v", value)
-			}
-			_ = web.Templates.ExecuteTemplate(w, "config.html", configData)
-			return
-		}
-
-		// Handle JSON format specially to include both cmdline flags and viper config
-		if format == "json" {
-			w.Header().Set("Content-Type", "application/json")
-
-			response := map[string]any{
-				"command_line_flags": configData.Options,
-				"viper_config":       v.AllSettings(),
-			}
-
-			encoder := json.NewEncoder(w)
-			encoder.SetIndent("", "  ")
-			if err := encoder.Encode(response); err != nil {
-				http.Error(w, fmt.Sprintf("failed to encode JSON: %v", err), http.StatusInternalServerError)
-			}
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return *new(http.HandlerFunc)
 }
+
+// Collect command-line flags
+
+// Handle default format (debug text)
+
+// should not happen
+
+// Handle JSON format specially to include both cmdline flags and viper config

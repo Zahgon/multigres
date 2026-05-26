@@ -15,9 +15,6 @@
 package protoutil
 
 import (
-	"fmt"
-	"strings"
-
 	multipoolerpb "github.com/multigres/multigres/go/pb/multipoolerservice"
 	querypb "github.com/multigres/multigres/go/pb/query"
 )
@@ -55,131 +52,68 @@ const (
 )
 
 // ValidateReasons returns an error if any unknown bits are set in the reasons bitmask.
-func ValidateReasons(reasons uint32) error {
-	if reasons & ^validReasonsMask != 0 {
-		return fmt.Errorf("invalid reservation reasons: %032b", reasons)
-	}
-	return nil
-}
+func ValidateReasons(reasons uint32) error { _ = "STUB: not implemented"; return nil }
 
 // HasReason returns true if the reasons bitmask contains the specified reason.
-func HasReason(reasons uint32, reason uint32) bool {
-	return reasons&reason != 0
-}
+func HasReason(reasons uint32, reason uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasTransactionReason returns true if the reasons bitmask includes transaction.
-func HasTransactionReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonTransaction)
-}
+func HasTransactionReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasTempTableReason returns true if the reasons bitmask includes temp table.
-func HasTempTableReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonTempTable)
-}
+func HasTempTableReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasPortalReason returns true if the reasons bitmask includes portal.
-func HasPortalReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonPortal)
-}
+func HasPortalReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasCopyReason returns true if the reasons bitmask includes an active COPY operation.
-func HasCopyReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonCopy)
-}
+func HasCopyReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasListenReason returns true if the reasons bitmask includes LISTEN/NOTIFY.
-func HasListenReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonListen)
-}
+func HasListenReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // HasLogicalReplicationReason returns true if the reasons bitmask includes a logical-replication session.
-func HasLogicalReplicationReason(reasons uint32) bool {
-	return HasReason(reasons, ReasonLogicalReplication)
-}
+func HasLogicalReplicationReason(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // AddReason adds a reason to the bitmask and returns the new value.
-func AddReason(reasons uint32, reason uint32) uint32 {
-	return reasons | reason
-}
+func AddReason(reasons uint32, reason uint32) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // RemoveReason removes a reason from the bitmask and returns the new value.
-func RemoveReason(reasons uint32, reason uint32) uint32 {
-	return reasons &^ reason
-}
+func RemoveReason(reasons uint32, reason uint32) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // RequiresBegin returns true if the reasons bitmask includes transaction reason.
 // This determines if BEGIN should be executed when reserving.
-func RequiresBegin(reasons uint32) bool {
-	return HasTransactionReason(reasons)
-}
+func RequiresBegin(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // IsEmpty returns true if no reasons are set (connection can be released).
-func IsEmpty(reasons uint32) bool {
-	return reasons == 0
-}
+func IsEmpty(reasons uint32) bool { _ = "STUB: not implemented"; return false }
 
 // NewTransactionReservationOptions creates ReservationOptions for a transaction.
 func NewTransactionReservationOptions() *querypb.ReservationOptions {
-	return &querypb.ReservationOptions{
-		Reasons: ReasonTransaction,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewTempTableReservationOptions creates ReservationOptions for temporary tables.
 func NewTempTableReservationOptions() *querypb.ReservationOptions {
-	return &querypb.ReservationOptions{
-		Reasons: ReasonTempTable,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewPortalReservationOptions creates ReservationOptions for portal/cursor operations.
 func NewPortalReservationOptions() *querypb.ReservationOptions {
-	return &querypb.ReservationOptions{
-		Reasons: ReasonPortal,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewReservationOptions creates ReservationOptions with the given reasons bitmask.
 func NewReservationOptions(reasons uint32) *querypb.ReservationOptions {
-	return &querypb.ReservationOptions{
-		Reasons: reasons,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetReasons extracts the reasons bitmask from ReservationOptions, returning 0 if nil.
-func GetReasons(opts *querypb.ReservationOptions) uint32 {
-	if opts == nil {
-		return 0
-	}
-	return opts.Reasons
-}
+func GetReasons(opts *querypb.ReservationOptions) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // ReasonsString returns a human-readable string of the reasons bitmask.
-func ReasonsString(reasons uint32) string {
-	if reasons == 0 {
-		return "none"
-	}
-	var parts []string
-	if HasTransactionReason(reasons) {
-		parts = append(parts, "transaction")
-	}
-	if HasTempTableReason(reasons) {
-		parts = append(parts, "temp_table")
-	}
-	if HasPortalReason(reasons) {
-		parts = append(parts, "portal")
-	}
-	if HasCopyReason(reasons) {
-		parts = append(parts, "copy")
-	}
-	if HasListenReason(reasons) {
-		parts = append(parts, "listen")
-	}
-	if HasLogicalReplicationReason(reasons) {
-		parts = append(parts, "logical_replication")
-	}
-	if len(parts) == 0 {
-		return "unknown"
-	}
-	return strings.Join(parts, "|")
-}
+func ReasonsString(reasons uint32) string { _ = "STUB: not implemented"; return "" }

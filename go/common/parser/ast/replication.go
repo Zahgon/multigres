@@ -50,12 +50,10 @@ type IdentifySystemCmd struct {
 	BaseNode
 }
 
-func NewIdentifySystemCmd() *IdentifySystemCmd {
-	return &IdentifySystemCmd{BaseNode: BaseNode{Tag: T_IdentifySystemCmd}}
-}
+func NewIdentifySystemCmd() *IdentifySystemCmd { _ = "STUB: not implemented"; return nil }
 
-func (n *IdentifySystemCmd) StatementType() string { return "IDENTIFY_SYSTEM" }
-func (n *IdentifySystemCmd) SqlString() string     { return "IDENTIFY_SYSTEM" }
+func (n *IdentifySystemCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *IdentifySystemCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }
 
 // CreateReplicationSlotCmd - CREATE_REPLICATION_SLOT command.
 // Ported from postgres/src/include/nodes/replnodes.h:52-60
@@ -69,17 +67,12 @@ type CreateReplicationSlotCmd struct {
 }
 
 func NewCreateReplicationSlotCmd(slot string, kind ReplicationKind, plugin string, temp bool) *CreateReplicationSlotCmd {
-	return &CreateReplicationSlotCmd{
-		BaseNode:  BaseNode{Tag: T_CreateReplicationSlotCmd},
-		SlotName:  slot,
-		Kind:      kind,
-		Plugin:    plugin,
-		Temporary: temp,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *CreateReplicationSlotCmd) StatementType() string { return "CREATE_REPLICATION_SLOT" }
-func (n *CreateReplicationSlotCmd) SqlString() string     { return "CREATE_REPLICATION_SLOT" }
+func (n *CreateReplicationSlotCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *CreateReplicationSlotCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }
 
 // DropReplicationSlotCmd - DROP_REPLICATION_SLOT command.
 // Ported from postgres/src/include/nodes/replnodes.h:67-72
@@ -90,15 +83,12 @@ type DropReplicationSlotCmd struct {
 }
 
 func NewDropReplicationSlotCmd(slot string, wait bool) *DropReplicationSlotCmd {
-	return &DropReplicationSlotCmd{
-		BaseNode: BaseNode{Tag: T_DropReplicationSlotCmd},
-		SlotName: slot,
-		Wait:     wait,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *DropReplicationSlotCmd) StatementType() string { return "DROP_REPLICATION_SLOT" }
-func (n *DropReplicationSlotCmd) SqlString() string     { return "DROP_REPLICATION_SLOT" }
+func (n *DropReplicationSlotCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *DropReplicationSlotCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }
 
 // AlterReplicationSlotCmd - ALTER_REPLICATION_SLOT command.
 // Ported from postgres/src/include/nodes/replnodes.h:79-84
@@ -109,15 +99,12 @@ type AlterReplicationSlotCmd struct {
 }
 
 func NewAlterReplicationSlotCmd(slot string, options []*DefElem) *AlterReplicationSlotCmd {
-	return &AlterReplicationSlotCmd{
-		BaseNode: BaseNode{Tag: T_AlterReplicationSlotCmd},
-		SlotName: slot,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *AlterReplicationSlotCmd) StatementType() string { return "ALTER_REPLICATION_SLOT" }
-func (n *AlterReplicationSlotCmd) SqlString() string     { return "ALTER_REPLICATION_SLOT" }
+func (n *AlterReplicationSlotCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *AlterReplicationSlotCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }
 
 // StartReplicationCmd - START_REPLICATION command.
 // Ported from postgres/src/include/nodes/replnodes.h:91-99
@@ -131,18 +118,12 @@ type StartReplicationCmd struct {
 }
 
 func NewStartReplicationCmd(kind ReplicationKind, slot string, timeline TimeLineID, start XLogRecPtr, options []*DefElem) *StartReplicationCmd {
-	return &StartReplicationCmd{
-		BaseNode:   BaseNode{Tag: T_StartReplicationCmd},
-		Kind:       kind,
-		SlotName:   slot,
-		Timeline:   timeline,
-		StartPoint: start,
-		Options:    options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *StartReplicationCmd) StatementType() string { return "START_REPLICATION" }
-func (n *StartReplicationCmd) SqlString() string     { return "START_REPLICATION" }
+func (n *StartReplicationCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *StartReplicationCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }
 
 // ReadReplicationSlotCmd - READ_REPLICATION_SLOT command.
 // Ported from postgres/src/include/nodes/replnodes.h:106-110
@@ -152,11 +133,9 @@ type ReadReplicationSlotCmd struct {
 }
 
 func NewReadReplicationSlotCmd(slot string) *ReadReplicationSlotCmd {
-	return &ReadReplicationSlotCmd{
-		BaseNode: BaseNode{Tag: T_ReadReplicationSlotCmd},
-		SlotName: slot,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *ReadReplicationSlotCmd) StatementType() string { return "READ_REPLICATION_SLOT" }
-func (n *ReadReplicationSlotCmd) SqlString() string     { return "READ_REPLICATION_SLOT" }
+func (n *ReadReplicationSlotCmd) StatementType() string { _ = "STUB: not implemented"; return "" }
+func (n *ReadReplicationSlotCmd) SqlString() string     { _ = "STUB: not implemented"; return "" }

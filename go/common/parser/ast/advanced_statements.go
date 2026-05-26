@@ -25,11 +25,6 @@
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // ADVANCED STATEMENT NODES - PostgreSQL Phase 1B Implementation
 // Ported from postgres/src/include/nodes/parsenodes.h
@@ -51,110 +46,37 @@ type MergeStmt struct {
 	WithClause       *WithClause `json:"withClause"`       // WITH clause
 }
 
-func (n *MergeStmt) node() {}
-func (n *MergeStmt) stmt() {}
+func (n *MergeStmt) node() { _ = "STUB: not implemented"; return }
+func (n *MergeStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *MergeStmt) StatementType() string {
-	return "MERGE"
-}
+func (n *MergeStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *MergeStmt) String() string {
-	var parts []string
+func (n *MergeStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.WithClause != nil {
-		parts = append(parts, n.WithClause.String())
-	}
-
-	// Get proper table names from RangeVar
-	targetTable := n.Relation.RelName
-	if n.Relation.SchemaName != "" {
-		targetTable = n.Relation.SchemaName + "." + targetTable
-	}
-
-	sourceTable := "source"
-	if sourceRv, ok := n.SourceRelation.(*RangeVar); ok {
-		sourceTable = sourceRv.RelName
-		if sourceRv.SchemaName != "" {
-			sourceTable = sourceRv.SchemaName + "." + sourceTable
-		}
-	}
-
-	parts = append(parts, "MERGE INTO", targetTable, "USING", sourceTable, "ON", n.JoinCondition.String())
-
-	if n.MergeWhenClauses != nil {
-		for _, item := range n.MergeWhenClauses.Items {
-			if clause, ok := item.(*MergeWhenClause); ok {
-				parts = append(parts, clause.String())
-			}
-		}
-	}
-
-	if n.ReturningList != nil && n.ReturningList.Len() > 0 {
-		returning := make([]string, n.ReturningList.Len())
-		for i, expr := range n.ReturningList.Items {
-			returning[i] = expr.String()
-		}
-		parts = append(parts, "RETURNING", strings.Join(returning, ", "))
-	}
-
-	return strings.Join(parts, " ")
-}
+// Get proper table names from RangeVar
 
 // SqlString returns the SQL representation of the MergeStmt
 func (m *MergeStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// WITH clause
-	if m.WithClause != nil {
-		parts = append(parts, m.WithClause.SqlString())
-	}
-
-	// MERGE INTO target
-	parts = append(parts, "MERGE INTO")
-	if m.Relation != nil {
-		parts = append(parts, m.Relation.SqlString())
-	}
-
-	// USING source
-	parts = append(parts, "USING")
-	if m.SourceRelation != nil {
-		parts = append(parts, m.SourceRelation.SqlString())
-	}
-
-	// ON condition
-	if m.JoinCondition != nil {
-		parts = append(parts, "ON", m.JoinCondition.SqlString())
-	}
-
-	// WHEN clauses
-	if m.MergeWhenClauses != nil {
-		for _, item := range m.MergeWhenClauses.Items {
-			if clause, ok := item.(*MergeWhenClause); ok && clause != nil {
-				parts = append(parts, clause.SqlString())
-			}
-		}
-	}
-
-	// RETURNING clause
-	if m.ReturningList != nil && m.ReturningList.Len() > 0 {
-		var returning []string
-		for _, ret := range m.ReturningList.Items {
-			returning = append(returning, ret.SqlString())
-		}
-		parts = append(parts, "RETURNING", strings.Join(returning, ", "))
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// MERGE INTO target
+
+// USING source
+
+// ON condition
+
+// WHEN clauses
+
+// RETURNING clause
 
 // NewMergeStmt creates a new MergeStmt node
 func NewMergeStmt(relation *RangeVar, sourceRelation Node, joinCondition Node) *MergeStmt {
-	return &MergeStmt{
-		BaseNode:       BaseNode{Tag: T_MergeStmt},
-		Relation:       relation,
-		SourceRelation: sourceRelation,
-		JoinCondition:  joinCondition,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // MergeMatchKind represents the type of WHEN clause in MERGE statements
@@ -167,31 +89,11 @@ const (
 	MERGE_WHEN_NOT_MATCHED_BY_TARGET                       // WHEN NOT MATCHED BY TARGET
 )
 
-func (m MergeMatchKind) String() string {
-	switch m {
-	case MERGE_WHEN_MATCHED:
-		return "WHEN MATCHED"
-	case MERGE_WHEN_NOT_MATCHED_BY_SOURCE:
-		return "WHEN NOT MATCHED BY SOURCE"
-	case MERGE_WHEN_NOT_MATCHED_BY_TARGET:
-		return "WHEN NOT MATCHED BY TARGET"
-	default:
-		return fmt.Sprintf("MergeMatchKind(%d)", int(m))
-	}
-}
+func (m MergeMatchKind) String() string { _ = "STUB: not implemented"; return "" }
 
-func (m MergeMatchKind) SqlString() string {
-	switch m {
-	case MERGE_WHEN_MATCHED:
-		return "WHEN MATCHED"
-	case MERGE_WHEN_NOT_MATCHED_BY_SOURCE:
-		return "WHEN NOT MATCHED BY SOURCE"
-	case MERGE_WHEN_NOT_MATCHED_BY_TARGET:
-		return "WHEN NOT MATCHED" // BY TARGET is the default, so we omit it
-	default:
-		return fmt.Sprintf("MergeMatchKind(%d)", int(m))
-	}
-}
+func (m MergeMatchKind) SqlString() string { _ = "STUB: not implemented"; return "" }
+
+// BY TARGET is the default, so we omit it
 
 // Note: OverridingKind is already defined in statements.go
 
@@ -207,112 +109,26 @@ type MergeWhenClause struct {
 	Values      *NodeList      `json:"values"`      // VALUES to INSERT, or NULL
 }
 
-func (n *MergeWhenClause) node() {}
+func (n *MergeWhenClause) node() { _ = "STUB: not implemented"; return }
 
-func (n *MergeWhenClause) String() string {
-	var parts []string
-	parts = append(parts, n.MatchKind.String())
+func (n *MergeWhenClause) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Condition != nil {
-		parts = append(parts, "AND", n.Condition.String())
-	}
+func (n *MergeWhenClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "THEN")
+// If we have columns specified
 
-	switch n.CommandType {
-	case CMD_INSERT:
-		parts = append(parts, "INSERT")
-		if n.Override != OVERRIDING_NOT_SET {
-			parts = append(parts, n.Override.String())
-		}
-		if n.Values != nil && n.Values.Len() > 0 {
-			values := make([]string, n.Values.Len())
-			for i, val := range n.Values.Items {
-				values[i] = val.String()
-			}
-			parts = append(parts, "VALUES", "("+strings.Join(values, ", ")+")")
-		}
-	case CMD_UPDATE:
-		parts = append(parts, "UPDATE SET")
-		if len(n.TargetList) > 0 {
-			targets := make([]string, len(n.TargetList))
-			for i, target := range n.TargetList {
-				targets[i] = target.String()
-			}
-			parts = append(parts, strings.Join(targets, ", "))
-		}
-	case CMD_DELETE:
-		parts = append(parts, "DELETE")
-	case CMD_NOTHING:
-		parts = append(parts, "DO NOTHING")
-	}
+// OVERRIDING clause comes after column list, before VALUES
 
-	return strings.Join(parts, " ")
-}
+// If no explicit values and no target columns, use DEFAULT VALUES
 
-func (n *MergeWhenClause) SqlString() string {
-	var parts []string
-	parts = append(parts, n.MatchKind.SqlString())
-
-	if n.Condition != nil {
-		parts = append(parts, "AND", n.Condition.SqlString())
-	}
-
-	parts = append(parts, "THEN")
-
-	switch n.CommandType {
-	case CMD_INSERT:
-		parts = append(parts, "INSERT")
-		if len(n.TargetList) > 0 {
-			// If we have columns specified
-			columns := make([]string, len(n.TargetList))
-			for i, target := range n.TargetList {
-				columns[i] = QuoteIdentifier(target.Name)
-			}
-			parts = append(parts, "("+strings.Join(columns, ", ")+")")
-		}
-		// OVERRIDING clause comes after column list, before VALUES
-		if n.Override != OVERRIDING_NOT_SET {
-			parts = append(parts, n.Override.SqlString())
-		}
-		if n.Values != nil && n.Values.Len() > 0 {
-			values := make([]string, n.Values.Len())
-			for i, val := range n.Values.Items {
-				values[i] = val.SqlString()
-			}
-			parts = append(parts, "VALUES", "("+strings.Join(values, ", ")+")")
-		} else if len(n.TargetList) == 0 {
-			// If no explicit values and no target columns, use DEFAULT VALUES
-			parts = append(parts, "DEFAULT VALUES")
-		}
-	case CMD_UPDATE:
-		parts = append(parts, "UPDATE SET")
-		if len(n.TargetList) > 0 {
-			// Reuse the UPDATE SET renderer so multi-column assignments
-			// `SET (a, b) = <source>` are regrouped instead of emitted as
-			// duplicated per-column assignments.
-			items := make([]Node, len(n.TargetList))
-			for i, target := range n.TargetList {
-				items[i] = target
-			}
-			parts = append(parts, strings.Join(renderSetClauses(items), ", "))
-		}
-	case CMD_DELETE:
-		parts = append(parts, "DELETE")
-	case CMD_NOTHING:
-		parts = append(parts, "DO NOTHING")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Reuse the UPDATE SET renderer so multi-column assignments
+// `SET (a, b) = <source>` are regrouped instead of emitted as
+// duplicated per-column assignments.
 
 // NewMergeWhenClause creates a new MergeWhenClause node
 func NewMergeWhenClause(matchKind MergeMatchKind, commandType CmdType) *MergeWhenClause {
-	return &MergeWhenClause{
-		BaseNode:    BaseNode{Tag: T_MergeWhenClause},
-		MatchKind:   matchKind,
-		CommandType: commandType,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ==============================================================================
@@ -335,33 +151,15 @@ type SetOperationStmt struct {
 	GroupClauses  []*SortGroupClause `json:"groupClauses"`  // List of SortGroupClauses
 }
 
-func (n *SetOperationStmt) node() {}
-func (n *SetOperationStmt) stmt() {}
+func (n *SetOperationStmt) node() { _ = "STUB: not implemented"; return }
+func (n *SetOperationStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *SetOperationStmt) String() string {
-	var parts []string
-
-	parts = append(parts, n.Larg.String())
-	parts = append(parts, n.Op.String())
-
-	if n.All {
-		parts = append(parts, "ALL")
-	}
-
-	parts = append(parts, n.Rarg.String())
-
-	return strings.Join(parts, " ")
-}
+func (n *SetOperationStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewSetOperationStmt creates a new SetOperationStmt node
 func NewSetOperationStmt(op SetOperation, all bool, larg Node, rarg Node) *SetOperationStmt {
-	return &SetOperationStmt{
-		BaseNode: BaseNode{Tag: T_SetOperationStmt},
-		Op:       op,
-		All:      all,
-		Larg:     larg,
-		Rarg:     rarg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ==============================================================================
@@ -375,36 +173,23 @@ type ReturnStmt struct {
 	ReturnVal Node `json:"returnval"` // Expression to return
 }
 
-func (n *ReturnStmt) node() {}
-func (n *ReturnStmt) stmt() {}
+func (n *ReturnStmt) node() { _ = "STUB: not implemented"; return }
+func (n *ReturnStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *ReturnStmt) String() string {
-	if n.ReturnVal != nil {
-		return "RETURN " + n.ReturnVal.String()
-	}
-	return "RETURN"
-}
+func (n *ReturnStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ReturnStmt
-func (n *ReturnStmt) SqlString() string {
-	if n.ReturnVal != nil {
-		return "RETURN " + n.ReturnVal.SqlString()
-	}
-	return "RETURN"
-}
+func (n *ReturnStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // StatementType returns the statement type for this node
 func (n *ReturnStmt) StatementType() string {
-	return "RETURN"
+	_ = "STUB: not implemented"
+
+	// NewReturnStmt creates a new ReturnStmt node
+	return ""
 }
 
-// NewReturnStmt creates a new ReturnStmt node
-func NewReturnStmt(returnVal Node) *ReturnStmt {
-	return &ReturnStmt{
-		BaseNode:  BaseNode{Tag: T_ReturnStmt},
-		ReturnVal: returnVal,
-	}
-}
+func NewReturnStmt(returnVal Node) *ReturnStmt { _ = "STUB: not implemented"; return nil }
 
 // PLAssignStmt represents PL/pgSQL assignment statements
 // Ported from postgres/src/include/nodes/parsenodes.h:2224-2233
@@ -416,45 +201,29 @@ type PLAssignStmt struct {
 	Val         *SelectStmt `json:"val"`         // The PL/pgSQL expression to assign
 }
 
-func (n *PLAssignStmt) node() {}
-func (n *PLAssignStmt) stmt() {}
+func (n *PLAssignStmt) node() { _ = "STUB: not implemented"; return }
+func (n *PLAssignStmt) stmt() {
+	_ = "STUB: not implemented"
 
-// StatementType returns the statement type
-func (n *PLAssignStmt) StatementType() string {
-	return "PL_ASSIGN"
+	// StatementType returns the statement type
+	return
 }
 
-func (n *PLAssignStmt) String() string {
-	var parts []string
-	parts = append(parts, n.Name)
+func (n *PLAssignStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Indirection != nil {
-		for _, ind := range n.Indirection.Items {
-			parts = append(parts, "["+ind.String()+"]")
-		}
-	}
-
-	parts = append(parts, ":=")
-
-	if n.Val != nil {
-		parts = append(parts, n.Val.String())
-	}
-
-	return strings.Join(parts, "")
-}
+func (n *PLAssignStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the PLAssignStmt
 func (n *PLAssignStmt) SqlString() string {
-	return n.String()
+	_ = "STUB: not implemented"
+
+	// NewPLAssignStmt creates a new PLAssignStmt node
+	return ""
 }
 
-// NewPLAssignStmt creates a new PLAssignStmt node
 func NewPLAssignStmt(name string, val *SelectStmt) *PLAssignStmt {
-	return &PLAssignStmt{
-		BaseNode: BaseNode{Tag: T_PLAssignStmt, Loc: -1},
-		Name:     name,
-		Val:      val,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ==============================================================================
@@ -474,66 +243,14 @@ type InferClause struct {
 	Conname     string    `json:"conname"`     // Constraint name, or NULL if unnamed
 }
 
-func (n *InferClause) node() {}
+func (n *InferClause) node() { _ = "STUB: not implemented"; return }
 
-func (n *InferClause) String() string {
-	var parts []string
+func (n *InferClause) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.IndexElems != nil && n.IndexElems.Len() > 0 {
-		var elems []string
-		for _, item := range n.IndexElems.Items {
-			if elem, ok := item.(*IndexElem); ok {
-				elems = append(elems, elem.String())
-			}
-		}
-		if len(elems) > 0 {
-			parts = append(parts, "("+strings.Join(elems, ", ")+")")
-		}
-	}
-
-	if n.WhereClause != nil {
-		parts = append(parts, "WHERE", n.WhereClause.String())
-	}
-
-	if n.Conname != "" {
-		parts = append(parts, "ON CONSTRAINT", QuoteIdentifier(n.Conname))
-	}
-
-	return strings.Join(parts, " ")
-}
-
-func (n *InferClause) SqlString() string {
-	var parts []string
-
-	if n.IndexElems != nil && n.IndexElems.Len() > 0 {
-		var elems []string
-		for _, item := range n.IndexElems.Items {
-			if elem, ok := item.(*IndexElem); ok {
-				elems = append(elems, elem.SqlString())
-			}
-		}
-		if len(elems) > 0 {
-			parts = append(parts, "("+strings.Join(elems, ", ")+")")
-		}
-	}
-
-	if n.WhereClause != nil {
-		parts = append(parts, "WHERE", n.WhereClause.SqlString())
-	}
-
-	if n.Conname != "" {
-		parts = append(parts, "ON CONSTRAINT", QuoteIdentifier(n.Conname))
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *InferClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewInferClause creates a new InferClause node
-func NewInferClause() *InferClause {
-	return &InferClause{
-		BaseNode: BaseNode{Tag: T_InferClause},
-	}
-}
+func NewInferClause() *InferClause { _ = "STUB: not implemented"; return nil }
 
 // ==============================================================================
 // WITH CHECK OPTION Support
@@ -552,24 +269,7 @@ const (
 	WCO_RLS_MERGE_DELETE_CHECK                // RLS MERGE DELETE USING policy
 )
 
-func (w WCOKind) String() string {
-	switch w {
-	case WCO_VIEW_CHECK:
-		return "VIEW CHECK"
-	case WCO_RLS_INSERT_CHECK:
-		return "RLS INSERT CHECK"
-	case WCO_RLS_UPDATE_CHECK:
-		return "RLS UPDATE CHECK"
-	case WCO_RLS_CONFLICT_CHECK:
-		return "RLS CONFLICT CHECK"
-	case WCO_RLS_MERGE_UPDATE_CHECK:
-		return "RLS MERGE UPDATE CHECK"
-	case WCO_RLS_MERGE_DELETE_CHECK:
-		return "RLS MERGE DELETE CHECK"
-	default:
-		return fmt.Sprintf("WCOKind(%d)", int(w))
-	}
-}
+func (w WCOKind) String() string { _ = "STUB: not implemented"; return "" }
 
 // WithCheckOption represents WITH CHECK OPTION for views and RLS policies
 // Ported from postgres/src/include/nodes/parsenodes.h:1368-1376
@@ -582,30 +282,14 @@ type WithCheckOption struct {
 	Cascaded bool    `json:"cascaded"` // True for a cascaded WCO on a view
 }
 
-func (n *WithCheckOption) node() {}
+func (n *WithCheckOption) node() { _ = "STUB: not implemented"; return }
 
-func (n *WithCheckOption) String() string {
-	var parts []string
-	parts = append(parts, "WITH")
-
-	if n.Cascaded {
-		parts = append(parts, "CASCADED")
-	} else {
-		parts = append(parts, "LOCAL")
-	}
-
-	parts = append(parts, "CHECK OPTION")
-
-	return strings.Join(parts, " ")
-}
+func (n *WithCheckOption) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewWithCheckOption creates a new WithCheckOption node
 func NewWithCheckOption(kind WCOKind, cascaded bool) *WithCheckOption {
-	return &WithCheckOption{
-		BaseNode: BaseNode{Tag: T_WithCheckOption},
-		Kind:     kind,
-		Cascaded: cascaded,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ==============================================================================
@@ -621,76 +305,23 @@ type TruncateStmt struct {
 	Behavior    DropBehavior `json:"behavior"`    // RESTRICT or CASCADE behavior
 }
 
-func (n *TruncateStmt) node() {}
-func (n *TruncateStmt) stmt() {}
+func (n *TruncateStmt) node() { _ = "STUB: not implemented"; return }
+func (n *TruncateStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *TruncateStmt) String() string {
-	var parts []string
-	parts = append(parts, "TRUNCATE TABLE")
-
-	if n.Relations != nil && n.Relations.Len() > 0 {
-		relations := make([]string, n.Relations.Len())
-		for i, item := range n.Relations.Items {
-			relations[i] = item.String()
-		}
-		parts = append(parts, strings.Join(relations, ", "))
-	}
-
-	if n.RestartSeqs {
-		parts = append(parts, "RESTART IDENTITY")
-	} else {
-		parts = append(parts, "CONTINUE IDENTITY")
-	}
-
-	parts = append(parts, n.Behavior.String())
-
-	return strings.Join(parts, " ")
-}
+func (n *TruncateStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // NewTruncateStmt creates a new TruncateStmt node
-func NewTruncateStmt(relations *NodeList) *TruncateStmt {
-	return &TruncateStmt{
-		BaseNode:  BaseNode{Tag: T_TruncateStmt},
-		Relations: relations,
-		Behavior:  DropRestrict,
-	}
-}
+func NewTruncateStmt(relations *NodeList) *TruncateStmt { _ = "STUB: not implemented"; return nil }
 
 // StatementType implements the Stmt interface
 func (n *TruncateStmt) StatementType() string {
-	return "TRUNCATE"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the TRUNCATE statement
+	return ""
 }
 
-// SqlString returns the SQL representation of the TRUNCATE statement
-func (n *TruncateStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "TRUNCATE TABLE")
-
-	if n.Relations != nil && n.Relations.Len() > 0 {
-		relations := make([]string, n.Relations.Len())
-		for i, item := range n.Relations.Items {
-			if rangeVar, ok := item.(*RangeVar); ok {
-				relations[i] = rangeVar.SqlString()
-			}
-		}
-		parts = append(parts, strings.Join(relations, ", "))
-	}
-
-	if n.RestartSeqs {
-		parts = append(parts, "RESTART IDENTITY")
-	} else {
-		parts = append(parts, "CONTINUE IDENTITY")
-	}
-
-	switch n.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *TruncateStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // CommentStmt represents COMMENT ON statements
 // Ported from postgres/src/include/nodes/parsenodes.h:3252-3258
@@ -701,213 +332,63 @@ type CommentStmt struct {
 	Comment string     `json:"comment"` // Comment to insert, or NULL to remove
 }
 
-func (n *CommentStmt) node() {}
-func (n *CommentStmt) stmt() {}
+func (n *CommentStmt) node() { _ = "STUB: not implemented"; return }
+func (n *CommentStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *CommentStmt) StatementType() string {
-	return "CommentStmt"
-}
+func (n *CommentStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *CommentStmt) String() string {
-	return n.SqlString()
-}
+func (n *CommentStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (n *CommentStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Handle special object types that need custom formatting
-	switch n.Objtype {
-	case OBJECT_TABCONSTRAINT:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) > 1 {
-			// Last item is constraint name, preceding items are table name
-			constraintName := ""
-			var tableNameParts []string
-
-			for i, item := range nodeList.Items {
-				if str, ok := item.(*String); ok {
-					if i == len(nodeList.Items)-1 {
-						constraintName = str.SVal
-					} else {
-						tableNameParts = append(tableNameParts, str.SVal)
-					}
-				}
-			}
-
-			tableName := FormatQualifiedName(tableNameParts...)
-			parts = append(parts, "COMMENT ON CONSTRAINT", QuoteIdentifier(constraintName), "ON", tableName, "IS")
-		}
-
-	case OBJECT_DOMCONSTRAINT:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 2 {
-			// First item is TypeName, second is constraint name (as String)
-			domainName := ""
-			constraintName := ""
-
-			// Get the domain TypeName and format it
-			if typeName, ok := nodeList.Items[0].(*TypeName); ok {
-				domainName = typeName.SqlString()
-			}
-
-			// Get the constraint name
-			if str, ok := nodeList.Items[1].(*String); ok {
-				constraintName = str.SVal
-			}
-
-			parts = append(parts, "COMMENT ON CONSTRAINT", QuoteIdentifier(constraintName), "ON DOMAIN", domainName, "IS")
-		}
-
-	case OBJECT_TRANSFORM:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 2 {
-			// First item is Typename, second is language name
-			typeName := nodeList.Items[0].SqlString()
-			if str, ok := nodeList.Items[1].(*String); ok {
-				parts = append(parts, "COMMENT ON TRANSFORM FOR", typeName, "LANGUAGE", QuoteIdentifier(str.SVal), "IS")
-			}
-		}
-
-	case OBJECT_OPCLASS:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) > 1 {
-			// First item is access method, rest are class name parts
-			if str, ok := nodeList.Items[0].(*String); ok {
-				accessMethod := str.SVal
-				var classNameParts []string
-				for i := 1; i < len(nodeList.Items); i++ {
-					if str, ok := nodeList.Items[i].(*String); ok {
-						classNameParts = append(classNameParts, str.SVal)
-					}
-				}
-				className := FormatQualifiedName(classNameParts...)
-				parts = append(parts, "COMMENT ON OPERATOR CLASS", className, "USING", QuoteIdentifier(accessMethod), "IS")
-			}
-		}
-
-	case OBJECT_OPFAMILY:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) > 1 {
-			// First item is access method, rest are family name parts
-			if str, ok := nodeList.Items[0].(*String); ok {
-				accessMethod := str.SVal
-				var familyNameParts []string
-				for i := 1; i < len(nodeList.Items); i++ {
-					if str, ok := nodeList.Items[i].(*String); ok {
-						familyNameParts = append(familyNameParts, str.SVal)
-					}
-				}
-				familyName := FormatQualifiedName(familyNameParts...)
-				parts = append(parts, "COMMENT ON OPERATOR FAMILY", familyName, "USING", QuoteIdentifier(accessMethod), "IS")
-			}
-		}
-
-	case OBJECT_LARGEOBJECT:
-		// NumericOnly should format directly
-		parts = append(parts, "COMMENT ON LARGE OBJECT", n.Object.SqlString(), "IS")
-
-	case OBJECT_RULE:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 2 {
-			// For RULE, NodeList has [table_name, rule_name] but we want "RULE rule_name ON table_name"
-			ruleName := ""
-			tableName := ""
-
-			if str, ok := nodeList.Items[1].(*String); ok {
-				ruleName = QuoteIdentifier(str.SVal)
-			}
-			if str, ok := nodeList.Items[0].(*String); ok {
-				tableName = QuoteIdentifier(str.SVal)
-			}
-
-			parts = append(parts, "COMMENT ON RULE", ruleName, "ON", tableName, "IS")
-		} else {
-			// Fallback to regular formatting
-			parts = append(parts, "COMMENT ON RULE", n.Object.SqlString(), "IS")
-		}
-
-	case OBJECT_TRIGGER:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 3 {
-			// For TRIGGER with schema, NodeList has [schema, table, trigger_name]
-			// We want "TRIGGER trigger_name ON schema.table"
-			triggerName := ""
-			schemaName := ""
-			tableName := ""
-
-			if str, ok := nodeList.Items[2].(*String); ok {
-				triggerName = QuoteIdentifier(str.SVal)
-			}
-			if str, ok := nodeList.Items[0].(*String); ok {
-				schemaName = QuoteIdentifier(str.SVal)
-			}
-			if str, ok := nodeList.Items[1].(*String); ok {
-				tableName = QuoteIdentifier(str.SVal)
-			}
-
-			parts = append(parts, "COMMENT ON TRIGGER", triggerName, "ON", schemaName+"."+tableName, "IS")
-		} else if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 2 {
-			// For TRIGGER without schema, NodeList has [table_name, trigger_name]
-			// We want "TRIGGER trigger_name ON table_name"
-			triggerName := ""
-			tableName := ""
-
-			if str, ok := nodeList.Items[1].(*String); ok {
-				triggerName = QuoteIdentifier(str.SVal)
-			}
-			if str, ok := nodeList.Items[0].(*String); ok {
-				tableName = QuoteIdentifier(str.SVal)
-			}
-
-			parts = append(parts, "COMMENT ON TRIGGER", triggerName, "ON", tableName, "IS")
-		} else {
-			// Fallback to regular formatting
-			parts = append(parts, "COMMENT ON TRIGGER", n.Object.SqlString(), "IS")
-		}
-
-	case OBJECT_CAST:
-		if nodeList, ok := n.Object.(*NodeList); ok && len(nodeList.Items) == 2 {
-			// First is source type, second is target type
-			sourceType := nodeList.Items[0].SqlString()
-			targetType := nodeList.Items[1].SqlString()
-			parts = append(parts, "COMMENT ON CAST (", sourceType, "AS", targetType, ") IS")
-		}
-
-	default:
-		// Regular format for other object types
-		objectName := formatObjectName(n.Object)
-		parts = append(parts, "COMMENT ON", n.Objtype.String(), objectName, "IS")
-	}
-
-	if n.Comment != "" {
-		parts = append(parts, QuoteStringLiteral(n.Comment))
-	} else {
-		parts = append(parts, "NULL")
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Last item is constraint name, preceding items are table name
+
+// First item is TypeName, second is constraint name (as String)
+
+// Get the domain TypeName and format it
+
+// Get the constraint name
+
+// First item is Typename, second is language name
+
+// First item is access method, rest are class name parts
+
+// First item is access method, rest are family name parts
+
+// NumericOnly should format directly
+
+// For RULE, NodeList has [table_name, rule_name] but we want "RULE rule_name ON table_name"
+
+// Fallback to regular formatting
+
+// For TRIGGER with schema, NodeList has [schema, table, trigger_name]
+// We want "TRIGGER trigger_name ON schema.table"
+
+// For TRIGGER without schema, NodeList has [table_name, trigger_name]
+// We want "TRIGGER trigger_name ON table_name"
+
+// Fallback to regular formatting
+
+// First is source type, second is target type
+
+// Regular format for other object types
 
 // formatObjectName formats a Node (NodeList of String nodes or single String) as a qualified identifier
-func formatObjectName(obj Node) string {
-	if nodeList, ok := obj.(*NodeList); ok && len(nodeList.Items) > 0 {
-		var parts []string
-		for _, item := range nodeList.Items {
-			if str, ok := item.(*String); ok {
-				parts = append(parts, str.SVal)
-			}
-		}
-		return FormatQualifiedName(parts...)
-	}
-	// Handle single String nodes (from object_type_name rules)
-	if str, ok := obj.(*String); ok {
-		return QuoteIdentifier(str.SVal)
-	}
-	// Fallback to regular SqlString for other node types (Typename, etc.)
-	return obj.SqlString()
-}
+func formatObjectName(obj Node) string { _ = "STUB: not implemented"; return "" }
+
+// Handle single String nodes (from object_type_name rules)
+
+// Fallback to regular SqlString for other node types (Typename, etc.)
 
 // NewCommentStmt creates a new CommentStmt node
 func NewCommentStmt(objtype ObjectType, object Node, comment string) *CommentStmt {
-	return &CommentStmt{
-		BaseNode: BaseNode{Tag: T_CommentStmt},
-		Objtype:  objtype,
-		Object:   object,
-		Comment:  comment,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SecLabelStmt represents SECURITY LABEL statements
@@ -920,47 +401,21 @@ type SecLabelStmt struct {
 	Label    string     `json:"label"`    // New security label to be assigned
 }
 
-func (n *SecLabelStmt) node() {}
-func (n *SecLabelStmt) stmt() {}
+func (n *SecLabelStmt) node() { _ = "STUB: not implemented"; return }
+func (n *SecLabelStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *SecLabelStmt) StatementType() string {
-	return "SecLabelStmt"
-}
+func (n *SecLabelStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *SecLabelStmt) String() string {
-	return n.SqlString()
-}
+func (n *SecLabelStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *SecLabelStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "SECURITY LABEL")
+func (n *SecLabelStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Provider != "" {
-		parts = append(parts, "FOR", n.Provider)
-	}
-
-	// Format object name as qualified identifier, not string literal
-	objectName := formatObjectName(n.Object)
-	parts = append(parts, "ON", n.Objtype.String(), objectName, "IS")
-
-	if n.Label != "" {
-		parts = append(parts, "'"+n.Label+"'")
-	} else {
-		parts = append(parts, "NULL")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Format object name as qualified identifier, not string literal
 
 // NewSecLabelStmt creates a new SecLabelStmt node
 func NewSecLabelStmt(objtype ObjectType, object Node, provider string, label string) *SecLabelStmt {
-	return &SecLabelStmt{
-		BaseNode: BaseNode{Tag: T_SecLabelStmt},
-		Objtype:  objtype,
-		Object:   object,
-		Provider: provider,
-		Label:    label,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // DoStmt represents DO statements
@@ -970,52 +425,23 @@ type DoStmt struct {
 	Args *NodeList `json:"args"` // List of DefElem nodes
 }
 
-func (n *DoStmt) node() {}
-func (n *DoStmt) stmt() {}
+func (n *DoStmt) node() { _ = "STUB: not implemented"; return }
+func (n *DoStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *DoStmt) StatementType() string {
-	return "DoStmt"
-}
+func (n *DoStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *DoStmt) String() string {
-	return n.SqlString()
-}
+func (n *DoStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *DoStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "DO")
+func (n *DoStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Args != nil {
-		// Emit the options in their original order: the code block and an
-		// optional LANGUAGE may appear in either order, and re-ordering them
-		// changes the parsed option list (so the round-trip would differ).
-		for _, arg := range n.Args.Items {
-			if defElem, ok := arg.(*DefElem); ok {
-				switch defElem.Defname {
-				case "language":
-					if str, ok := defElem.Arg.(*String); ok {
-						parts = append(parts, "LANGUAGE", QuoteIdentifier(str.SVal))
-					}
-				case "as":
-					if str, ok := defElem.Arg.(*String); ok {
-						// Use single quotes for the code block
-						parts = append(parts, QuoteStringLiteral(str.SVal))
-					}
-				}
-			}
-		}
-	}
+// Emit the options in their original order: the code block and an
+// optional LANGUAGE may appear in either order, and re-ordering them
+// changes the parsed option list (so the round-trip would differ).
 
-	return strings.Join(parts, " ")
-}
+// Use single quotes for the code block
 
 // NewDoStmt creates a new DoStmt node
-func NewDoStmt(args *NodeList) *DoStmt {
-	return &DoStmt{
-		BaseNode: BaseNode{Tag: T_DoStmt},
-		Args:     args,
-	}
-}
+func NewDoStmt(args *NodeList) *DoStmt { _ = "STUB: not implemented"; return nil }
 
 // CallStmt represents CALL statements
 // Ported from postgres/src/include/nodes/parsenodes.h:3451-3458
@@ -1025,28 +451,17 @@ type CallStmt struct {
 	// Note: funcexpr and outargs are used at execution time, not parsing
 }
 
-func (n *CallStmt) node() {}
-func (n *CallStmt) stmt() {}
+func (n *CallStmt) node() { _ = "STUB: not implemented"; return }
+func (n *CallStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *CallStmt) StatementType() string {
-	return "CallStmt"
-}
+func (n *CallStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *CallStmt) String() string {
-	return n.SqlString()
-}
+func (n *CallStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *CallStmt) SqlString() string {
-	return "CALL " + n.Funccall.SqlString()
-}
+func (n *CallStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewCallStmt creates a new CallStmt node
-func NewCallStmt(funccall *FuncCall) *CallStmt {
-	return &CallStmt{
-		BaseNode: BaseNode{Tag: T_CallStmt},
-		Funccall: funccall,
-	}
-}
+func NewCallStmt(funccall *FuncCall) *CallStmt { _ = "STUB: not implemented"; return nil }
 
 // RenameStmt represents ALTER ... RENAME TO statements
 // Ported from postgres/src/include/nodes/parsenodes.h:3525-3537
@@ -1062,261 +477,77 @@ type RenameStmt struct {
 	MissingOk    bool         `json:"missingOk"`    // Skip error if missing?
 }
 
-func (n *RenameStmt) StatementType() string {
-	return "RenameStmt"
-}
+func (n *RenameStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *RenameStmt) String() string {
-	var parts []string
-	parts = append(parts, "ALTER", n.RenameType.String())
-
-	if n.Relation != nil {
-		parts = append(parts, n.Relation.String())
-	} else if n.Object != nil {
-		parts = append(parts, n.Object.String())
-	}
-
-	if n.Subname != "" {
-		parts = append(parts, "RENAME", n.Subname, "TO", n.Newname)
-	} else {
-		parts = append(parts, "RENAME TO", n.Newname)
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *RenameStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // formatRenameObjectName formats the object name for a RenameStmt based on the object type
 // Uses QuoteIdentifier to properly handle identifier quoting rules
 func formatRenameObjectName(renameType ObjectType, object Node) string {
-	if object == nil {
-		return ""
-	}
-
-	// Handle NodeList objects - format as qualified identifier
-	if nodeList, ok := object.(*NodeList); ok {
-		// Special handling for OPERATOR CLASS and OPERATOR FAMILY
-		// When NodeList has 2 items, first is access method, second is name
-		if (renameType == OBJECT_OPCLASS || renameType == OBJECT_OPFAMILY) && len(nodeList.Items) == 2 {
-			// Format as "name USING method"
-			name := ""
-			method := ""
-			if str, ok := nodeList.Items[1].(*String); ok {
-				name = QuoteIdentifier(str.SVal)
-			} else {
-				name = nodeList.Items[1].SqlString()
-			}
-			if str, ok := nodeList.Items[0].(*String); ok {
-				method = str.SVal
-			} else {
-				method = nodeList.Items[0].SqlString()
-			}
-			return name + " USING " + method
-		}
-
-		// Default NodeList handling for other cases
-		var nameParts []string
-		for _, item := range nodeList.Items {
-			if str, ok := item.(*String); ok {
-				// Use QuoteIdentifier for proper identifier quoting
-				nameParts = append(nameParts, QuoteIdentifier(str.SVal))
-			} else {
-				nameParts = append(nameParts, item.SqlString())
-			}
-		}
-		return strings.Join(nameParts, ".")
-	}
-
-	// Handle String objects - format as identifier
-	if str, ok := object.(*String); ok {
-		return QuoteIdentifier(str.SVal)
-	}
-
-	// Default: use object's SqlString
-	return object.SqlString()
+	_ = "STUB: not implemented"
+	return ""
 }
+
+// Handle NodeList objects - format as qualified identifier
+
+// Special handling for OPERATOR CLASS and OPERATOR FAMILY
+// When NodeList has 2 items, first is access method, second is name
+
+// Format as "name USING method"
+
+// Default NodeList handling for other cases
+
+// Use QuoteIdentifier for proper identifier quoting
+
+// Handle String objects - format as identifier
+
+// Default: use object's SqlString
 
 func (n *RenameStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Start with ALTER
-	parts = append(parts, "ALTER")
-
-	// Add object type
-	switch n.RenameType {
-	case OBJECT_COLUMN:
-		// Column rename requires the relation type
-		switch n.RelationType {
-		case OBJECT_TABLE:
-			parts = append(parts, "TABLE")
-		case OBJECT_VIEW:
-			parts = append(parts, "VIEW")
-		case OBJECT_MATVIEW:
-			parts = append(parts, "MATERIALIZED VIEW")
-		case OBJECT_FOREIGN_TABLE:
-			parts = append(parts, "FOREIGN TABLE")
-		default:
-			parts = append(parts, "TABLE")
-		}
-	case OBJECT_TABLE:
-		parts = append(parts, "TABLE")
-	case OBJECT_INDEX:
-		parts = append(parts, "INDEX")
-	case OBJECT_SEQUENCE:
-		parts = append(parts, "SEQUENCE")
-	case OBJECT_VIEW:
-		parts = append(parts, "VIEW")
-	case OBJECT_MATVIEW:
-		parts = append(parts, "MATERIALIZED VIEW")
-	case OBJECT_FOREIGN_TABLE:
-		parts = append(parts, "FOREIGN TABLE")
-	case OBJECT_TABCONSTRAINT:
-		parts = append(parts, "TABLE")
-	case OBJECT_DATABASE:
-		parts = append(parts, "DATABASE")
-	case OBJECT_SCHEMA:
-		parts = append(parts, "SCHEMA")
-	case OBJECT_ROLE:
-		parts = append(parts, "ROLE")
-	case OBJECT_TABLESPACE:
-		parts = append(parts, "TABLESPACE")
-	case OBJECT_DOMAIN:
-		parts = append(parts, "DOMAIN")
-	case OBJECT_DOMCONSTRAINT:
-		parts = append(parts, "DOMAIN")
-	case OBJECT_TYPE:
-		parts = append(parts, "TYPE")
-	case OBJECT_ATTRIBUTE:
-		parts = append(parts, "TYPE")
-	case OBJECT_FUNCTION:
-		parts = append(parts, "FUNCTION")
-	case OBJECT_PROCEDURE:
-		parts = append(parts, "PROCEDURE")
-	case OBJECT_ROUTINE:
-		parts = append(parts, "ROUTINE")
-	case OBJECT_AGGREGATE:
-		parts = append(parts, "AGGREGATE")
-	case OBJECT_COLLATION:
-		parts = append(parts, "COLLATION")
-	case OBJECT_CONVERSION:
-		parts = append(parts, "CONVERSION")
-	case OBJECT_LANGUAGE:
-		parts = append(parts, "LANGUAGE")
-	case OBJECT_OPCLASS:
-		parts = append(parts, "OPERATOR CLASS")
-	case OBJECT_OPFAMILY:
-		parts = append(parts, "OPERATOR FAMILY")
-	case OBJECT_POLICY:
-		parts = append(parts, "POLICY")
-	case OBJECT_RULE:
-		parts = append(parts, "RULE")
-	case OBJECT_TRIGGER:
-		parts = append(parts, "TRIGGER")
-	case OBJECT_EVENT_TRIGGER:
-		parts = append(parts, "EVENT TRIGGER")
-	case OBJECT_PUBLICATION:
-		parts = append(parts, "PUBLICATION")
-	case OBJECT_SUBSCRIPTION:
-		parts = append(parts, "SUBSCRIPTION")
-	case OBJECT_FDW:
-		parts = append(parts, "FOREIGN DATA WRAPPER")
-	case OBJECT_FOREIGN_SERVER:
-		parts = append(parts, "SERVER")
-	case OBJECT_STATISTIC_EXT:
-		parts = append(parts, "STATISTICS")
-	case OBJECT_TSPARSER:
-		parts = append(parts, "TEXT SEARCH PARSER")
-	case OBJECT_TSDICTIONARY:
-		parts = append(parts, "TEXT SEARCH DICTIONARY")
-	case OBJECT_TSTEMPLATE:
-		parts = append(parts, "TEXT SEARCH TEMPLATE")
-	case OBJECT_TSCONFIGURATION:
-		parts = append(parts, "TEXT SEARCH CONFIGURATION")
-	default:
-		// Use the generic String() method for any unhandled cases
-		parts = append(parts, n.RenameType.String())
-	}
-
-	// Add IF EXISTS if specified (for POLICY/RULE/TRIGGER, it goes after the object name)
-	if n.MissingOk && n.RenameType != OBJECT_POLICY && n.RenameType != OBJECT_RULE && n.RenameType != OBJECT_TRIGGER {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	// Handle different rename patterns
-	switch n.RenameType {
-	case OBJECT_POLICY, OBJECT_RULE, OBJECT_TRIGGER:
-		// These have special syntax: ALTER <type> [IF EXISTS] old_name ON tablename RENAME TO new_name
-		if n.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-
-		// Add old name
-		if n.Subname != "" {
-			parts = append(parts, QuoteIdentifier(n.Subname))
-		}
-
-		// Add ON tablename
-		if n.Relation != nil {
-			parts = append(parts, "ON", n.Relation.SqlString())
-		}
-
-		parts = append(parts, "RENAME", "TO", QuoteIdentifier(n.Newname))
-	case OBJECT_COLUMN:
-		// Column rename: ALTER <type> tablename RENAME [COLUMN] old_name TO new_name
-		if n.Relation != nil {
-			parts = append(parts, n.Relation.SqlString())
-		}
-		parts = append(parts, "RENAME", "COLUMN", QuoteIdentifier(n.Subname), "TO", QuoteIdentifier(n.Newname))
-	case OBJECT_TABCONSTRAINT:
-		// Constraint rename: ALTER TABLE tablename RENAME CONSTRAINT old_name TO new_name
-		if n.Relation != nil {
-			parts = append(parts, n.Relation.SqlString())
-		}
-		parts = append(parts, "RENAME", "CONSTRAINT", QuoteIdentifier(n.Subname), "TO", QuoteIdentifier(n.Newname))
-	case OBJECT_DOMCONSTRAINT:
-		// Domain constraint rename: ALTER DOMAIN domain_name RENAME CONSTRAINT old_name TO new_name
-		if n.Relation != nil {
-			parts = append(parts, n.Relation.SqlString())
-		} else if n.Object != nil {
-			// Use the helper function to format domain name properly
-			parts = append(parts, formatRenameObjectName(n.RenameType, n.Object))
-		}
-		parts = append(parts, "RENAME", "CONSTRAINT", QuoteIdentifier(n.Subname), "TO", QuoteIdentifier(n.Newname))
-	case OBJECT_ATTRIBUTE:
-		// Type attribute rename: ALTER TYPE type_name RENAME ATTRIBUTE old_name TO new_name
-		if n.Relation != nil {
-			parts = append(parts, n.Relation.SqlString())
-		}
-		parts = append(parts, "RENAME", "ATTRIBUTE", QuoteIdentifier(n.Subname), "TO", QuoteIdentifier(n.Newname))
-	default:
-		// Default rename: ALTER <type> old_name RENAME TO new_name
-		if n.Relation != nil {
-			parts = append(parts, n.Relation.SqlString())
-		} else if n.Object != nil {
-			// Use the helper function to format object name based on type
-			parts = append(parts, formatRenameObjectName(n.RenameType, n.Object))
-		} else if n.Subname != "" {
-			// For DATABASE, SCHEMA, ROLE, etc., the old name might be in Subname
-			parts = append(parts, QuoteIdentifier(n.Subname))
-		}
-		parts = append(parts, "RENAME", "TO", QuoteIdentifier(n.Newname))
-	}
-
-	// Add CASCADE behavior if specified
-	if n.Behavior == DropCascade {
-		parts = append(parts, "CASCADE")
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add object type
+
+// Column rename requires the relation type
+
+// Use the generic String() method for any unhandled cases
+
+// Add IF EXISTS if specified (for POLICY/RULE/TRIGGER, it goes after the object name)
+
+// Handle different rename patterns
+
+// These have special syntax: ALTER <type> [IF EXISTS] old_name ON tablename RENAME TO new_name
+
+// Add old name
+
+// Add ON tablename
+
+// Column rename: ALTER <type> tablename RENAME [COLUMN] old_name TO new_name
+
+// Constraint rename: ALTER TABLE tablename RENAME CONSTRAINT old_name TO new_name
+
+// Domain constraint rename: ALTER DOMAIN domain_name RENAME CONSTRAINT old_name TO new_name
+
+// Use the helper function to format domain name properly
+
+// Type attribute rename: ALTER TYPE type_name RENAME ATTRIBUTE old_name TO new_name
+
+// Default rename: ALTER <type> old_name RENAME TO new_name
+
+// Use the helper function to format object name based on type
+
+// For DATABASE, SCHEMA, ROLE, etc., the old name might be in Subname
+
+// Add CASCADE behavior if specified
 
 // NewRenameStmt creates a new RenameStmt node
 func NewRenameStmt(renameType ObjectType, newname string) *RenameStmt {
-	return &RenameStmt{
-		BaseNode:   BaseNode{Tag: T_RenameStmt},
-		RenameType: renameType,
-		Newname:    newname,
-		Behavior:   DropRestrict,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterOwnerStmt represents ALTER ... OWNER TO statements
@@ -1329,90 +560,36 @@ type AlterOwnerStmt struct {
 	Newowner   *RoleSpec  `json:"newowner"`   // The new owner
 }
 
-func (n *AlterOwnerStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterOwnerStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the AlterOwnerStmt
-func (n *AlterOwnerStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER")
+func (n *AlterOwnerStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add object type
-	parts = append(parts, n.ObjectType.String())
+// Add object type
 
-	// Add object name
-	if n.Relation != nil {
-		parts = append(parts, n.Relation.SqlString())
-	} else if n.Object != nil {
-		// Special handling for NodeList objects
-		if nodeList, ok := n.Object.(*NodeList); ok {
-			if n.ObjectType == OBJECT_OPCLASS || n.ObjectType == OBJECT_OPFAMILY {
-				// Format as "name USING method" where first item is method, rest is name
-				if nodeList.Len() >= 2 {
-					methodStr := ""
-					if str, ok := nodeList.Items[0].(*String); ok {
-						methodStr = str.SVal
-					} else {
-						methodStr = nodeList.Items[0].SqlString()
-					}
+// Add object name
 
-					var nameStr strings.Builder
-					for i := 1; i < nodeList.Len(); i++ {
-						if i > 1 {
-							nameStr.WriteString(".")
-						}
-						if str, ok := nodeList.Items[i].(*String); ok {
-							nameStr.WriteString(QuoteIdentifier(str.SVal))
-						} else {
-							nameStr.WriteString(nodeList.Items[i].SqlString())
-						}
-					}
-					parts = append(parts, nameStr.String(), "USING", methodStr)
-				} else {
-					parts = append(parts, n.Object.SqlString())
-				}
-			} else {
-				// For other object types, handle as qualified identifier names
-				var nameParts []string
-				for _, item := range nodeList.Items {
-					if str, ok := item.(*String); ok {
-						nameParts = append(nameParts, QuoteIdentifier(str.SVal))
-					} else {
-						nameParts = append(nameParts, item.SqlString())
-					}
-				}
-				parts = append(parts, strings.Join(nameParts, "."))
-			}
-		} else if str, ok := n.Object.(*String); ok {
-			// Handle simple string identifiers
-			parts = append(parts, QuoteIdentifier(str.SVal))
-		} else {
-			parts = append(parts, n.Object.SqlString())
-		}
-	}
+// Special handling for NodeList objects
 
-	// Add OWNER TO clause
-	parts = append(parts, "OWNER TO")
-	if n.Newowner != nil {
-		parts = append(parts, n.Newowner.SqlString())
-	}
+// Format as "name USING method" where first item is method, rest is name
 
-	return strings.Join(parts, " ")
-}
+// For other object types, handle as qualified identifier names
+
+// Handle simple string identifiers
+
+// Add OWNER TO clause
 
 // StatementType returns the statement type
 func (n *AlterOwnerStmt) StatementType() string {
-	return "ALTER"
+	_ = "STUB: not implemented"
+
+	// NewAlterOwnerStmt creates a new AlterOwnerStmt node
+	return ""
 }
 
-// NewAlterOwnerStmt creates a new AlterOwnerStmt node
 func NewAlterOwnerStmt(objectType ObjectType, newowner *RoleSpec) *AlterOwnerStmt {
-	return &AlterOwnerStmt{
-		BaseNode:   BaseNode{Tag: T_AlterOwnerStmt},
-		ObjectType: objectType,
-		Newowner:   newowner,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RuleStmt represents CREATE RULE statements
@@ -1428,80 +605,26 @@ type RuleStmt struct {
 	Replace     bool      `json:"replace"`     // OR REPLACE
 }
 
-func (n *RuleStmt) String() string {
-	var parts []string
-	parts = append(parts, "CREATE")
+func (n *RuleStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Replace {
-		parts = append(parts, "OR REPLACE")
-	}
+// Use SqlString() for proper expression deparsing
 
-	tableName := FormatFullyQualifiedName(n.Relation.CatalogName, n.Relation.SchemaName, n.Relation.RelName)
+func (n *RuleStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "RULE", QuoteIdentifier(n.Rulename), "AS ON", n.Event.String(), "TO", tableName)
+func (n *RuleStmt) Location() int { _ = "STUB: not implemented"; return 0 }
 
-	if n.WhereClause != nil {
-		// Use SqlString() for proper expression deparsing
-		if sqlStringer, ok := n.WhereClause.(interface{ SqlString() string }); ok {
-			parts = append(parts, "WHERE", sqlStringer.SqlString())
-		} else {
-			parts = append(parts, "WHERE", n.WhereClause.String())
-		}
-	}
-
-	parts = append(parts, "DO")
-
-	if n.Instead {
-		parts = append(parts, "INSTEAD")
-	}
-
-	if n.Actions == nil || n.Actions.Len() == 0 {
-		parts = append(parts, "NOTHING")
-	} else if n.Actions.Len() == 1 {
-		if stmt, ok := n.Actions.Items[0].(Stmt); ok {
-			parts = append(parts, stmt.SqlString())
-		} else {
-			parts = append(parts, n.Actions.Items[0].String())
-		}
-	} else {
-		actions := make([]string, n.Actions.Len())
-		for i, action := range n.Actions.Items {
-			if stmt, ok := action.(Stmt); ok {
-				actions[i] = stmt.SqlString()
-			} else {
-				actions[i] = action.String()
-			}
-		}
-		parts = append(parts, "("+strings.Join(actions, "; ")+")")
-	}
-
-	return strings.Join(parts, " ")
-}
-
-func (n *RuleStmt) StatementType() string {
-	return "CREATE RULE"
-}
-
-func (n *RuleStmt) Location() int {
-	return n.Loc
-}
-
-func (n *RuleStmt) NodeTag() NodeTag {
-	return T_RuleStmt
-}
+func (n *RuleStmt) NodeTag() NodeTag { _ = "STUB: not implemented"; return *new(NodeTag) }
 
 func (n *RuleStmt) SqlString() string {
-	return n.String()
+	_ = "STUB: not implemented"
+
+	// NewRuleStmt creates a new RuleStmt node
+	return ""
 }
 
-// NewRuleStmt creates a new RuleStmt node
 func NewRuleStmt(relation *RangeVar, rulename string, event CmdType) *RuleStmt {
-	return &RuleStmt{
-		BaseNode: BaseNode{Tag: T_RuleStmt},
-		Relation: relation,
-		Rulename: rulename,
-		Event:    event,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Lock mode constants based on PostgreSQL's LOCKMODE
@@ -1529,101 +652,24 @@ type LockStmt struct {
 	Nowait    bool      `json:"nowait"`    // No wait mode
 }
 
-func (n *LockStmt) String() string {
-	var parts []string
-	parts = append(parts, "LOCK TABLE")
+func (n *LockStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Relations != nil && n.Relations.Len() > 0 {
-		relations := make([]string, n.Relations.Len())
-		for i, item := range n.Relations.Items {
-			relations[i] = item.String()
-		}
-		parts = append(parts, strings.Join(relations, ", "))
-	}
-
-	// Add lock mode
-	switch n.Mode {
-	case AccessShareLock:
-		parts = append(parts, "IN ACCESS SHARE MODE")
-	case RowShareLock:
-		parts = append(parts, "IN ROW SHARE MODE")
-	case RowExclusiveLock:
-		parts = append(parts, "IN ROW EXCLUSIVE MODE")
-	case ShareUpdateExclusiveLock:
-		parts = append(parts, "IN SHARE UPDATE EXCLUSIVE MODE")
-	case ShareLock:
-		parts = append(parts, "IN SHARE MODE")
-	case ShareRowExclusiveLock:
-		parts = append(parts, "IN SHARE ROW EXCLUSIVE MODE")
-	case ExclusiveLock:
-		parts = append(parts, "IN EXCLUSIVE MODE")
-	case AccessExclusiveLock:
-		parts = append(parts, "IN ACCESS EXCLUSIVE MODE")
-	default:
-		parts = append(parts, "IN ACCESS EXCLUSIVE MODE")
-	}
-
-	if n.Nowait {
-		parts = append(parts, "NOWAIT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add lock mode
 
 // NewLockStmt creates a new LockStmt node
 func NewLockStmt(relations *NodeList, mode LockMode) *LockStmt {
-	return &LockStmt{
-		BaseNode:  BaseNode{Tag: T_LockStmt},
-		Relations: relations,
-		Mode:      mode,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StatementType implements the Stmt interface
 func (n *LockStmt) StatementType() string {
-	return "LOCK"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the LOCK statement
+	return ""
 }
 
-// SqlString returns the SQL representation of the LOCK statement
-func (n *LockStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "LOCK TABLE")
+func (n *LockStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Relations != nil && n.Relations.Len() > 0 {
-		relations := make([]string, n.Relations.Len())
-		for i, item := range n.Relations.Items {
-			if rangeVar, ok := item.(*RangeVar); ok {
-				relations[i] = rangeVar.SqlString()
-			}
-		}
-		parts = append(parts, strings.Join(relations, ", "))
-	}
-
-	// Add lock mode
-	switch n.Mode {
-	case AccessShareLock:
-		parts = append(parts, "IN ACCESS SHARE MODE")
-	case RowShareLock:
-		parts = append(parts, "IN ROW SHARE MODE")
-	case RowExclusiveLock:
-		parts = append(parts, "IN ROW EXCLUSIVE MODE")
-	case ShareUpdateExclusiveLock:
-		parts = append(parts, "IN SHARE UPDATE EXCLUSIVE MODE")
-	case ShareLock:
-		parts = append(parts, "IN SHARE MODE")
-	case ShareRowExclusiveLock:
-		parts = append(parts, "IN SHARE ROW EXCLUSIVE MODE")
-	case ExclusiveLock:
-		parts = append(parts, "IN EXCLUSIVE MODE")
-	case AccessExclusiveLock:
-		parts = append(parts, "IN ACCESS EXCLUSIVE MODE")
-	default:
-		parts = append(parts, "IN ACCESS EXCLUSIVE MODE")
-	}
-
-	if n.Nowait {
-		parts = append(parts, "NOWAIT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add lock mode

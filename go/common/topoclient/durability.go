@@ -15,28 +15,15 @@
 package topoclient
 
 import (
-	"fmt"
-
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
 // AtLeastN returns a DurabilityPolicy that requires at least n nodes to acknowledge writes.
-func AtLeastN(n int32) *clustermetadatapb.DurabilityPolicy {
-	return &clustermetadatapb.DurabilityPolicy{
-		PolicyName:    fmt.Sprintf("AT_LEAST_%d", n),
-		QuorumType:    clustermetadatapb.QuorumType_QUORUM_TYPE_AT_LEAST_N,
-		RequiredCount: n,
-		Description:   fmt.Sprintf("At least %d nodes must acknowledge", n),
-	}
-}
+func AtLeastN(n int32) *clustermetadatapb.DurabilityPolicy { _ = "STUB: not implemented"; return nil }
 
 // MultiCellAtLeastN returns a DurabilityPolicy that requires acknowledgement from nodes in
 // at least n distinct cells.
 func MultiCellAtLeastN(n int32) *clustermetadatapb.DurabilityPolicy {
-	return &clustermetadatapb.DurabilityPolicy{
-		PolicyName:    fmt.Sprintf("MULTI_CELL_AT_LEAST_%d", n),
-		QuorumType:    clustermetadatapb.QuorumType_QUORUM_TYPE_MULTI_CELL_AT_LEAST_N,
-		RequiredCount: n,
-		Description:   fmt.Sprintf("At least %d nodes from different cells must acknowledge", n),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

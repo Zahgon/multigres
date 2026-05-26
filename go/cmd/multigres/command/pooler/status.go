@@ -15,90 +15,22 @@
 package pooler
 
 import (
-	"context"
-	"fmt"
-	"time"
-
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // AddGetPoolerStatusCommand adds the getpoolerstatus subcommand
-func AddGetPoolerStatusCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getpoolerstatus",
-		Short: "Get status of a specific pooler",
-		Long: `Retrieve unified status information from a pooler via the multiadmin server.
-
-Works for both PRIMARY and REPLICA poolers. Returns initialization state,
-PostgreSQL process status, replication position, and consensus term.
-
-Key fields returned:
-  - pooler_type: Whether this is a PRIMARY or REPLICA pooler
-  - postgres_running: Whether the PostgreSQL process is running
-  - postgres_ready: Whether the PostgreSQL process is running and accepting connections
-  - postgres_status: Observed server state (PRIMARY, STANDBY, PROMOTING, STARTING, UNKNOWN)
-  - is_initialized: Whether the pooler has been fully initialized
-  - wal_position: Current WAL position (for replication tracking)
-  - consensus_term: Current consensus term for failover coordination
-
-Note: Basic status fields are available even when the database connection
-is unavailable. Role-specific details (primary_status, replication_status)
-require an active database connection.`,
-		RunE: runGetPoolerStatus,
-	}
-
-	cmd.Flags().String("cell", "", "Cell name where the pooler resides (required)")
-	cmd.Flags().String("service-id", "", "Service ID (name) of the pooler (required)")
-	cmd.Flags().String("admin-server", "", "gRPC address of the multiadmin server (e.g., localhost:18070)")
-
-	_ = cmd.MarkFlagRequired("cell")
-	_ = cmd.MarkFlagRequired("service-id")
-
-	return cmd
-}
+func AddGetPoolerStatusCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }
 
 // runGetPoolerStatus executes the getpoolerstatus command
 func runGetPoolerStatus(cmd *cobra.Command, args []string) error {
-	cell, _ := cmd.Flags().GetString("cell")
-	serviceID, _ := cmd.Flags().GetString("service-id")
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	// Create context with timeout and call GetPoolerStatus RPC
-	ctx, cancel := context.WithTimeout(cmd.Context(), 10*time.Second)
-	defer cancel()
-
-	response, err := client.GetPoolerStatus(ctx, &multiadminpb.GetPoolerStatusRequest{
-		PoolerId: &clustermetadatapb.ID{
-			Cell: cell,
-			Name: serviceID,
-		},
-	})
-	if err != nil {
-		return fmt.Errorf("GetPoolerStatus RPC failed: %w", err)
-	}
-
-	// Output the response in JSON format using protojson to properly render enums as strings
-	marshaler := protojson.MarshalOptions{
-		Indent:          "  ",
-		EmitUnpopulated: false,
-		UseProtoNames:   true, // Use snake_case field names from proto instead of camelCase
-	}
-	jsonData, err := marshaler.Marshal(response)
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Create admin client
+
+// Create context with timeout and call GetPoolerStatus RPC
+
+// Output the response in JSON format using protojson to properly render enums as strings
+
+// Use snake_case field names from proto instead of camelCase

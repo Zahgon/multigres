@@ -16,14 +16,9 @@
 package s3mock
 
 import (
-	"crypto/md5" // #nosec G501 - MD5 used for S3 ETag calculation (non-cryptographic use)
-	"crypto/rand"
-	"encoding/hex"
+	// #nosec G501 - MD5 used for S3 ETag calculation (non-cryptographic use)
+
 	"errors"
-	"fmt"
-	"os"
-	"sort"
-	"strings"
 	"sync"
 	"time"
 )
@@ -68,9 +63,7 @@ type Object struct {
 }
 
 // ReadData reads the object's data from disk
-func (o *Object) ReadData() ([]byte, error) {
-	return os.ReadFile(o.filePath)
-}
+func (o *Object) ReadData() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Bucket represents an S3 bucket
 type Bucket struct {
@@ -87,341 +80,99 @@ type Storage struct {
 }
 
 // NewStorage creates a new disk-based storage backend
-func NewStorage() *Storage {
-	tempDir, err := os.MkdirTemp("", "s3mock-*")
-	if err != nil {
-		panic(fmt.Sprintf("failed to create temp directory: %v", err))
-	}
-	return &Storage{
-		buckets:          make(map[string]*Bucket),
-		tempDir:          tempDir,
-		multipartUploads: make(map[string]*MultipartUpload),
-	}
-}
+func NewStorage() *Storage { _ = "STUB: not implemented"; return nil }
 
 // Close cleans up the storage, removing all temporary files
-func (s *Storage) Close() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if s.tempDir == "" {
-		return nil
-	}
-
-	err := os.RemoveAll(s.tempDir)
-	s.tempDir = ""
-	return err
-}
+func (s *Storage) Close() error { _ = "STUB: not implemented"; return nil }
 
 // CreateBucket creates a new bucket
-func (s *Storage) CreateBucket(name string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, exists := s.buckets[name]; exists {
-		return ErrBucketAlreadyExists
-	}
-
-	s.buckets[name] = &Bucket{
-		objects: make(map[string]*Object),
-	}
-	return nil
-}
+func (s *Storage) CreateBucket(name string) error { _ = "STUB: not implemented"; return nil }
 
 // BucketExists checks if a bucket exists
-func (s *Storage) BucketExists(name string) bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	_, exists := s.buckets[name]
-	return exists
-}
+func (s *Storage) BucketExists(name string) bool { _ = "STUB: not implemented"; return false }
 
 // PutObject stores an object on disk
 func (s *Storage) PutObject(bucket, key string, data []byte) error {
-	s.mu.RLock()
-	b, exists := s.buckets[bucket]
-	tempDir := s.tempDir
-	s.mu.RUnlock()
-
-	if !exists {
-		return ErrBucketNotFound
-	}
-
-	// Calculate ETag (MD5 of data)
-	hash := md5.Sum(data) // #nosec G401 - MD5 used for S3 ETag calculation (non-cryptographic use)
-	etag := hex.EncodeToString(hash[:])
-
-	// Write data to temp file
-	tempFile, err := os.CreateTemp(tempDir, "obj-*")
-	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
-	defer tempFile.Close()
-
-	if _, err := tempFile.Write(data); err != nil {
-		os.Remove(tempFile.Name())
-		return fmt.Errorf("failed to write data: %w", err)
-	}
-
-	obj := &Object{
-		Key:          key,
-		filePath:     tempFile.Name(),
-		ETag:         etag,
-		LastModified: time.Now(),
-		Size:         int64(len(data)),
-	}
-
-	b.mu.Lock()
-	// Delete old file if object already exists
-	if oldObj, exists := b.objects[key]; exists && oldObj.filePath != "" {
-		os.Remove(oldObj.filePath)
-	}
-	b.objects[key] = obj
-	b.mu.Unlock()
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Calculate ETag (MD5 of data)
+// #nosec G401 - MD5 used for S3 ETag calculation (non-cryptographic use)
+
+// Write data to temp file
+
+// Delete old file if object already exists
 
 // GetObject retrieves an object
 func (s *Storage) GetObject(bucket, key string) (*Object, error) {
-	s.mu.RLock()
-	b, exists := s.buckets[bucket]
-	s.mu.RUnlock()
-
-	if !exists {
-		return nil, ErrBucketNotFound
-	}
-
-	b.mu.RLock()
-	obj, exists := b.objects[key]
-	b.mu.RUnlock()
-
-	if !exists {
-		return nil, ErrObjectNotFound
-	}
-
-	return obj, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // DeleteObject deletes an object
-func (s *Storage) DeleteObject(bucket, key string) error {
-	s.mu.RLock()
-	b, exists := s.buckets[bucket]
-	s.mu.RUnlock()
-
-	if !exists {
-		return ErrBucketNotFound
-	}
-
-	b.mu.Lock()
-	obj, exists := b.objects[key]
-	if exists && obj.filePath != "" {
-		os.Remove(obj.filePath)
-	}
-	delete(b.objects, key)
-	b.mu.Unlock()
-
-	return nil
-}
+func (s *Storage) DeleteObject(bucket, key string) error { _ = "STUB: not implemented"; return nil }
 
 // ListObjects returns objects in a bucket with optional prefix and start-after filtering
 func (s *Storage) ListObjects(bucket, prefix, startAfter string) []*Object {
-	s.mu.RLock()
-	b, exists := s.buckets[bucket]
-	s.mu.RUnlock()
-
-	if !exists {
-		return nil
-	}
-
-	b.mu.RLock()
-	defer b.mu.RUnlock()
-
-	var result []*Object
-	for _, obj := range b.objects {
-		// Filter by prefix
-		if prefix != "" && !strings.HasPrefix(obj.Key, prefix) {
-			continue
-		}
-
-		// Filter by start-after (lexicographically greater than)
-		if startAfter != "" && obj.Key <= startAfter {
-			continue
-		}
-
-		result = append(result, obj)
-	}
-
-	// Sort by key for consistent ordering
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Key < result[j].Key
-	})
-
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Filter by prefix
+
+// Filter by start-after (lexicographically greater than)
+
+// Sort by key for consistent ordering
 
 // CreateMultipartUpload initiates a multipart upload
 func (s *Storage) CreateMultipartUpload(bucket, key string) (string, error) {
-	s.mu.RLock()
-	_, exists := s.buckets[bucket]
-	s.mu.RUnlock()
-
-	if !exists {
-		return "", ErrBucketNotFound
-	}
-
-	// Generate unique upload ID (16 random bytes as hex)
-	uploadIDBytes := make([]byte, 16)
-	if _, err := rand.Read(uploadIDBytes); err != nil {
-		return "", fmt.Errorf("failed to generate upload ID: %w", err)
-	}
-	uploadID := hex.EncodeToString(uploadIDBytes)
-
-	upload := &MultipartUpload{
-		uploadID: uploadID,
-		bucket:   bucket,
-		key:      key,
-		parts:    make(map[int]*UploadPart),
-	}
-
-	s.mu.Lock()
-	s.multipartUploads[uploadID] = upload
-	s.mu.Unlock()
-
-	return uploadID, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Generate unique upload ID (16 random bytes as hex)
 
 // UploadPart uploads a part of a multipart upload
 func (s *Storage) UploadPart(bucket, key, uploadID string, partNumber int, data []byte) (string, error) {
-	s.mu.RLock()
-	upload, exists := s.multipartUploads[uploadID]
-	s.mu.RUnlock()
-
-	if !exists {
-		return "", ErrUploadNotFound
-	}
-
-	// Verify bucket and key match
-	if upload.bucket != bucket || upload.key != key {
-		return "", ErrUploadNotFound
-	}
-
-	// Calculate ETag for this part (MD5)
-	hash := md5.Sum(data) // #nosec G401 - MD5 used for S3 ETag calculation
-	etag := hex.EncodeToString(hash[:])
-
-	part := &UploadPart{
-		partNumber: partNumber,
-		etag:       etag,
-		size:       int64(len(data)),
-		data:       data,
-	}
-
-	upload.mu.Lock()
-	upload.parts[partNumber] = part
-	upload.mu.Unlock()
-
-	return etag, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Verify bucket and key match
+
+// Calculate ETag for this part (MD5)
+// #nosec G401 - MD5 used for S3 ETag calculation
 
 // CompleteMultipartUpload completes a multipart upload by assembling parts
 func (s *Storage) CompleteMultipartUpload(bucket, key, uploadID string, parts []CompletedPart) (string, error) {
-	s.mu.RLock()
-	upload, exists := s.multipartUploads[uploadID]
-	tempDir := s.tempDir
-	s.mu.RUnlock()
-
-	if !exists {
-		return "", ErrUploadNotFound
-	}
-
-	// Verify bucket and key match
-	if upload.bucket != bucket || upload.key != key {
-		return "", ErrUploadNotFound
-	}
-
-	// Assemble parts in order
-	upload.mu.Lock()
-	var assembledData []byte
-	for _, completedPart := range parts {
-		part, exists := upload.parts[completedPart.PartNumber]
-		if !exists {
-			upload.mu.Unlock()
-			return "", fmt.Errorf("part %d not found", completedPart.PartNumber)
-		}
-		// Verify ETag matches
-		if part.etag != completedPart.ETag {
-			upload.mu.Unlock()
-			return "", fmt.Errorf("part %d ETag mismatch", completedPart.PartNumber)
-		}
-		assembledData = append(assembledData, part.data...)
-	}
-	upload.mu.Unlock()
-
-	// Calculate final ETag (MD5 of assembled data)
-	hash := md5.Sum(assembledData) // #nosec G401 - MD5 used for S3 ETag calculation
-	etag := hex.EncodeToString(hash[:])
-
-	// Write assembled data to disk
-	tempFile, err := os.CreateTemp(tempDir, "obj-*")
-	if err != nil {
-		return "", fmt.Errorf("failed to create temp file: %w", err)
-	}
-	defer tempFile.Close()
-
-	if _, err := tempFile.Write(assembledData); err != nil {
-		os.Remove(tempFile.Name())
-		return "", fmt.Errorf("failed to write data: %w", err)
-	}
-
-	obj := &Object{
-		Key:          key,
-		filePath:     tempFile.Name(),
-		ETag:         etag,
-		LastModified: time.Now(),
-		Size:         int64(len(assembledData)),
-	}
-
-	// Store object
-	s.mu.RLock()
-	b := s.buckets[bucket]
-	s.mu.RUnlock()
-
-	b.mu.Lock()
-	// Delete old file if object already exists
-	if oldObj, exists := b.objects[key]; exists && oldObj.filePath != "" {
-		os.Remove(oldObj.filePath)
-	}
-	b.objects[key] = obj
-	b.mu.Unlock()
-
-	// Remove multipart upload
-	s.mu.Lock()
-	delete(s.multipartUploads, uploadID)
-	s.mu.Unlock()
-
-	return etag, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Verify bucket and key match
+
+// Assemble parts in order
+
+// Verify ETag matches
+
+// Calculate final ETag (MD5 of assembled data)
+// #nosec G401 - MD5 used for S3 ETag calculation
+
+// Write assembled data to disk
+
+// Store object
+
+// Delete old file if object already exists
+
+// Remove multipart upload
 
 // AbortMultipartUpload aborts a multipart upload
 func (s *Storage) AbortMultipartUpload(bucket, key, uploadID string) error {
-	s.mu.RLock()
-	upload, exists := s.multipartUploads[uploadID]
-	s.mu.RUnlock()
-
-	if !exists {
-		return ErrUploadNotFound
-	}
-
-	// Verify bucket and key match
-	if upload.bucket != bucket || upload.key != key {
-		return ErrUploadNotFound
-	}
-
-	// Remove multipart upload
-	s.mu.Lock()
-	delete(s.multipartUploads, uploadID)
-	s.mu.Unlock()
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Verify bucket and key match
+
+// Remove multipart upload

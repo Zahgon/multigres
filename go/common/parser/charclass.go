@@ -119,77 +119,54 @@ func init() {
 // Optimized character classification functions using lookup table
 
 // IsDigit checks if a byte is a decimal digit (0-9)
-func IsDigit(b byte) bool {
-	return charClassTable[b]&ClassDigit != 0
-}
+func IsDigit(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsAlpha checks if a byte is alphabetic (a-z, A-Z)
-func IsAlpha(b byte) bool {
-	return charClassTable[b]&ClassAlpha != 0
-}
+func IsAlpha(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsIdentStart checks if a byte can start an identifier
 // Equivalent to PostgreSQL's ident_start: [A-Za-z\200-\377_] - postgres/src/backend/parser/scan.l:346
-func IsIdentStart(b byte) bool {
-	return charClassTable[b]&ClassIdentStart != 0
-}
+func IsIdentStart(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsIdentCont checks if a byte can continue an identifier
 // Equivalent to PostgreSQL's ident_cont: [A-Za-z\200-\377_0-9\$] - postgres/src/backend/parser/scan.l:347
-func IsIdentCont(b byte) bool {
-	return charClassTable[b]&ClassIdentCont != 0
-}
+func IsIdentCont(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsWhitespace checks if a byte is whitespace
 // Equivalent to PostgreSQL's space: [ \t\n\r\f\v] - postgres/src/backend/parser/scan.l:222
-func IsWhitespace(b byte) bool {
-	return charClassTable[b]&ClassWhitespace != 0
-}
+func IsWhitespace(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsHexDigit checks if a byte is a hexadecimal digit (0-9, a-f, A-F)
-func IsHexDigit(b byte) bool {
-	return charClassTable[b]&ClassHexDigit != 0
-}
+func IsHexDigit(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsOctalDigit checks if a byte is an octal digit (0-7)
-func IsOctalDigit(b byte) bool {
-	return charClassTable[b]&ClassOctalDigit != 0
-}
+func IsOctalDigit(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsBinaryDigit checks if a byte is a binary digit (0-1)
-func IsBinaryDigit(b byte) bool {
-	return charClassTable[b]&ClassBinaryDigit != 0
-}
+func IsBinaryDigit(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsSelfChar checks if a byte is a PostgreSQL "self" character (single-char token)
 // Equivalent to PostgreSQL's self: [,()\[\].;\:\+\-\*\/\%\^\<\>\=] - postgres/src/backend/parser/scan.l:380
-func IsSelfChar(b byte) bool {
-	return charClassTable[b]&ClassSelfChar != 0
-}
+func IsSelfChar(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsOpChar checks if a byte can be part of a PostgreSQL operator
 // Equivalent to PostgreSQL's op_chars: [\~\!\@\#\^\&\|\`\?\+\-\*\/\%\<\>\=] - postgres/src/backend/parser/scan.l:381
-func IsOpChar(b byte) bool {
-	return charClassTable[b]&ClassOpChar != 0
-}
+func IsOpChar(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsAlphaNumeric checks if a byte is alphanumeric (for backward compatibility)
-func IsAlphaNumeric(b byte) bool {
-	return charClassTable[b]&(ClassAlpha|ClassDigit) != 0
-}
+func IsAlphaNumeric(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // IsHighBit checks if a byte has the high bit set (>= 0x80)
-func IsHighBit(b byte) bool {
-	return charClassTable[b]&ClassHighBit != 0
-}
+func IsHighBit(b byte) bool { _ = "STUB: not implemented"; return false }
 
 // GetCharClass returns the character class flags for a byte
 // This can be used for more complex character classification logic
 func GetCharClass(b byte) CharClass {
-	return charClassTable[b]
+	_ = "STUB: not implemented"
+	return *
+
+	// HasCharClass checks if a byte has any of the specified character class flags
+	new(CharClass)
 }
 
-// HasCharClass checks if a byte has any of the specified character class flags
-func HasCharClass(b byte, class CharClass) bool {
-	return charClassTable[b]&class != 0
-}
+func HasCharClass(b byte, class CharClass) bool { _ = "STUB: not implemented"; return false }

@@ -16,7 +16,6 @@ package topoclient
 
 import (
 	"context"
-	"sort"
 	"time"
 )
 
@@ -308,25 +307,17 @@ type DirEntry struct {
 
 // DirEntriesToStringArray is a helper method to extract the names
 // from an []DirEntry
-func DirEntriesToStringArray(entries []DirEntry) []string {
-	result := make([]string, len(entries))
-	for i, e := range entries {
-		result[i] = e.Name
-	}
-	return result
-}
+func DirEntriesToStringArray(entries []DirEntry) []string { _ = "STUB: not implemented"; return nil }
 
 // dirEntries is used for sorting.
 type dirEntries []DirEntry
 
-func (e dirEntries) Len() int           { return len(e) }
-func (e dirEntries) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
-func (e dirEntries) Less(i, j int) bool { return e[i].Name < e[j].Name }
+func (e dirEntries) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (e dirEntries) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (e dirEntries) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 // DirEntriesSortByName sorts a slice of DirEntry objects by Name.
-func DirEntriesSortByName(entries []DirEntry) {
-	sort.Sort(dirEntries(entries))
-}
+func DirEntriesSortByName(entries []DirEntry) { _ = "STUB: not implemented"; return }
 
 // Version is an interface that describes a file version.
 type Version interface {

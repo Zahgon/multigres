@@ -21,12 +21,11 @@
 package clustermetadata
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -67,32 +66,27 @@ var (
 	}
 )
 
-func (x PoolerType) Enum() *PoolerType {
-	p := new(PoolerType)
-	*p = x
-	return p
-}
+func (x PoolerType) Enum() *PoolerType { _ = "STUB: not implemented"; return nil }
 
-func (x PoolerType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x PoolerType) String() string { _ = "STUB: not implemented"; return "" }
 
 func (PoolerType) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (PoolerType) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x PoolerType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use PoolerType.Descriptor instead.
-func (PoolerType) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{0}
-}
+func (PoolerType) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // PoolerServingStatus represents the serving status of the given MultiPooler.
 type PoolerServingStatus int32
@@ -128,31 +122,29 @@ var (
 	}
 )
 
-func (x PoolerServingStatus) Enum() *PoolerServingStatus {
-	p := new(PoolerServingStatus)
-	*p = x
-	return p
-}
+func (x PoolerServingStatus) Enum() *PoolerServingStatus { _ = "STUB: not implemented"; return nil }
 
-func (x PoolerServingStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x PoolerServingStatus) String() string { _ = "STUB: not implemented"; return "" }
 
 func (PoolerServingStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[1].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (PoolerServingStatus) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[1]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x PoolerServingStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use PoolerServingStatus.Descriptor instead.
 func (PoolerServingStatus) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // QuorumType enumerates supported quorum algorithms
@@ -182,32 +174,27 @@ var (
 	}
 )
 
-func (x QuorumType) Enum() *QuorumType {
-	p := new(QuorumType)
-	*p = x
-	return p
-}
+func (x QuorumType) Enum() *QuorumType { _ = "STUB: not implemented"; return nil }
 
-func (x QuorumType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x QuorumType) String() string { _ = "STUB: not implemented"; return "" }
 
 func (QuorumType) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[2].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (QuorumType) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[2]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x QuorumType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use QuorumType.Descriptor instead.
-func (QuorumType) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{2}
-}
+func (QuorumType) EnumDescriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 // LeadershipSignal describes a leader's self-reported status for its current term.
 // Only published by nodes that are or were the consensus leader (leader_term != 0).
@@ -244,31 +231,29 @@ var (
 	}
 )
 
-func (x LeadershipSignal) Enum() *LeadershipSignal {
-	p := new(LeadershipSignal)
-	*p = x
-	return p
-}
+func (x LeadershipSignal) Enum() *LeadershipSignal { _ = "STUB: not implemented"; return nil }
 
-func (x LeadershipSignal) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x LeadershipSignal) String() string { _ = "STUB: not implemented"; return "" }
 
 func (LeadershipSignal) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[3].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (LeadershipSignal) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[3]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x LeadershipSignal) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use LeadershipSignal.Descriptor instead.
 func (LeadershipSignal) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{3}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CohortEligibilitySignal describes a pooler's self-reported willingness to
@@ -302,30 +287,31 @@ var (
 )
 
 func (x CohortEligibilitySignal) Enum() *CohortEligibilitySignal {
-	p := new(CohortEligibilitySignal)
-	*p = x
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (x CohortEligibilitySignal) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x CohortEligibilitySignal) String() string { _ = "STUB: not implemented"; return "" }
 
 func (CohortEligibilitySignal) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[4].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (CohortEligibilitySignal) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[4]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x CohortEligibilitySignal) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use CohortEligibilitySignal.Descriptor instead.
 func (CohortEligibilitySignal) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{4}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ComponentType represents the type of Multigres component
@@ -358,31 +344,29 @@ var (
 	}
 )
 
-func (x ID_ComponentType) Enum() *ID_ComponentType {
-	p := new(ID_ComponentType)
-	*p = x
-	return p
-}
+func (x ID_ComponentType) Enum() *ID_ComponentType { _ = "STUB: not implemented"; return nil }
 
-func (x ID_ComponentType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x ID_ComponentType) String() string { _ = "STUB: not implemented"; return "" }
 
 func (ID_ComponentType) Descriptor() protoreflect.EnumDescriptor {
-	return file_clustermetadata_proto_enumTypes[5].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (ID_ComponentType) Type() protoreflect.EnumType {
-	return &file_clustermetadata_proto_enumTypes[5]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x ID_ComponentType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use ID_ComponentType.Descriptor instead.
 func (ID_ComponentType) EnumDescriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{12, 0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // TopoConfig defines the connection parameters for a topology service.
@@ -405,56 +389,25 @@ type GlobalTopoConfig struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GlobalTopoConfig) Reset() {
-	*x = GlobalTopoConfig{}
-	mi := &file_clustermetadata_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GlobalTopoConfig) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GlobalTopoConfig) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GlobalTopoConfig) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GlobalTopoConfig) ProtoMessage() {}
+func (*GlobalTopoConfig) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GlobalTopoConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GlobalTopoConfig.ProtoReflect.Descriptor instead.
-func (*GlobalTopoConfig) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{0}
-}
+func (*GlobalTopoConfig) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *GlobalTopoConfig) GetImplementation() string {
-	if x != nil {
-		return x.Implementation
-	}
-	return ""
-}
+func (x *GlobalTopoConfig) GetImplementation() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GlobalTopoConfig) GetServerAddresses() []string {
-	if x != nil {
-		return x.ServerAddresses
-	}
-	return nil
-}
+func (x *GlobalTopoConfig) GetServerAddresses() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *GlobalTopoConfig) GetRoot() string {
-	if x != nil {
-		return x.Root
-	}
-	return ""
-}
+func (x *GlobalTopoConfig) GetRoot() string { _ = "STUB: not implemented"; return "" }
 
 // Cell describes how to connect to a cell topology.
 // These records are stored in the global topology server.
@@ -471,56 +424,25 @@ type Cell struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Cell) Reset() {
-	*x = Cell{}
-	mi := &file_clustermetadata_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Cell) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Cell) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Cell) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Cell) ProtoMessage() {}
+func (*Cell) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Cell) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Cell.ProtoReflect.Descriptor instead.
-func (*Cell) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{1}
-}
+func (*Cell) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Cell) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *Cell) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Cell) GetServerAddresses() []string {
-	if x != nil {
-		return x.ServerAddresses
-	}
-	return nil
-}
+func (x *Cell) GetServerAddresses() []string { _ = "STUB: not implemented"; return nil }
 
-func (x *Cell) GetRoot() string {
-	if x != nil {
-		return x.Root
-	}
-	return ""
-}
+func (x *Cell) GetRoot() string { _ = "STUB: not implemented"; return "" }
 
 type Database struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -537,61 +459,28 @@ type Database struct {
 	sizeCache                 protoimpl.SizeCache
 }
 
-func (x *Database) Reset() {
-	*x = Database{}
-	mi := &file_clustermetadata_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Database) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Database) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Database) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Database) ProtoMessage() {}
+func (*Database) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Database) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Database.ProtoReflect.Descriptor instead.
-func (*Database) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{2}
-}
+func (*Database) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Database) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *Database) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Database) GetBackupLocation() *BackupLocation {
-	if x != nil {
-		return x.BackupLocation
-	}
-	return nil
-}
+func (x *Database) GetBackupLocation() *BackupLocation { _ = "STUB: not implemented"; return nil }
 
-func (x *Database) GetCells() []string {
-	if x != nil {
-		return x.Cells
-	}
-	return nil
-}
+func (x *Database) GetCells() []string { _ = "STUB: not implemented"; return nil }
 
 func (x *Database) GetBootstrapDurabilityPolicy() *DurabilityPolicy {
-	if x != nil {
-		return x.BootstrapDurabilityPolicy
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -609,49 +498,23 @@ type ShardInitClaim struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ShardInitClaim) Reset() {
-	*x = ShardInitClaim{}
-	mi := &file_clustermetadata_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ShardInitClaim) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ShardInitClaim) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ShardInitClaim) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ShardInitClaim) ProtoMessage() {}
+func (*ShardInitClaim) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ShardInitClaim) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ShardInitClaim.ProtoReflect.Descriptor instead.
-func (*ShardInitClaim) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{3}
-}
+func (*ShardInitClaim) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ShardInitClaim) GetClaimerId() *ID {
-	if x != nil {
-		return x.ClaimerId
-	}
-	return nil
-}
+func (x *ShardInitClaim) GetClaimerId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardInitClaim) GetCohortMembers() []*ID {
-	if x != nil {
-		return x.CohortMembers
-	}
-	return nil
-}
+func (x *ShardInitClaim) GetCohortMembers() []*ID { _ = "STUB: not implemented"; return nil }
 
 // BackupLocation specifies where backups are stored
 type BackupLocation struct {
@@ -665,60 +528,28 @@ type BackupLocation struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BackupLocation) Reset() {
-	*x = BackupLocation{}
-	mi := &file_clustermetadata_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *BackupLocation) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *BackupLocation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *BackupLocation) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*BackupLocation) ProtoMessage() {}
+func (*BackupLocation) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *BackupLocation) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use BackupLocation.ProtoReflect.Descriptor instead.
-func (*BackupLocation) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{4}
-}
+func (*BackupLocation) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *BackupLocation) GetLocation() isBackupLocation_Location {
-	if x != nil {
-		return x.Location
-	}
-	return nil
+	_ = "STUB: not implemented"
+	return *new(isBackupLocation_Location)
 }
 
-func (x *BackupLocation) GetFilesystem() *FilesystemBackup {
-	if x != nil {
-		if x, ok := x.Location.(*BackupLocation_Filesystem); ok {
-			return x.Filesystem
-		}
-	}
-	return nil
-}
+func (x *BackupLocation) GetFilesystem() *FilesystemBackup { _ = "STUB: not implemented"; return nil }
 
-func (x *BackupLocation) GetS3() *S3Backup {
-	if x != nil {
-		if x, ok := x.Location.(*BackupLocation_S3); ok {
-			return x.S3
-		}
-	}
-	return nil
-}
+func (x *BackupLocation) GetS3() *S3Backup { _ = "STUB: not implemented"; return nil }
 
 type isBackupLocation_Location interface {
 	isBackupLocation_Location()
@@ -732,11 +563,15 @@ type BackupLocation_S3 struct {
 	S3 *S3Backup `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
 }
 
-func (*BackupLocation_Filesystem) isBackupLocation_Location() {}
+func (*BackupLocation_Filesystem) isBackupLocation_Location() { _ = "STUB: not implemented"; return }
 
-func (*BackupLocation_S3) isBackupLocation_Location() {}
+func (*BackupLocation_S3) isBackupLocation_Location() {
+	_ = "STUB: not implemented"
 
-// FilesystemBackup stores backups on local filesystem
+	// FilesystemBackup stores backups on local filesystem
+	return
+}
+
 type FilesystemBackup struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Absolute path to backup directory
@@ -745,42 +580,21 @@ type FilesystemBackup struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FilesystemBackup) Reset() {
-	*x = FilesystemBackup{}
-	mi := &file_clustermetadata_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *FilesystemBackup) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *FilesystemBackup) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *FilesystemBackup) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*FilesystemBackup) ProtoMessage() {}
+func (*FilesystemBackup) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *FilesystemBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use FilesystemBackup.ProtoReflect.Descriptor instead.
-func (*FilesystemBackup) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{5}
-}
+func (*FilesystemBackup) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *FilesystemBackup) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
+func (x *FilesystemBackup) GetPath() string { _ = "STUB: not implemented"; return "" }
 
 // S3Backup stores backups in AWS S3 or S3-compatible storage
 type S3Backup struct {
@@ -806,70 +620,29 @@ type S3Backup struct {
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *S3Backup) Reset() {
-	*x = S3Backup{}
-	mi := &file_clustermetadata_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *S3Backup) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *S3Backup) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *S3Backup) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*S3Backup) ProtoMessage() {}
+func (*S3Backup) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *S3Backup) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use S3Backup.ProtoReflect.Descriptor instead.
-func (*S3Backup) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{6}
-}
+func (*S3Backup) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *S3Backup) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
+func (x *S3Backup) GetBucket() string { _ = "STUB: not implemented"; return "" }
 
-func (x *S3Backup) GetRegion() string {
-	if x != nil {
-		return x.Region
-	}
-	return ""
-}
+func (x *S3Backup) GetRegion() string { _ = "STUB: not implemented"; return "" }
 
-func (x *S3Backup) GetEndpoint() string {
-	if x != nil {
-		return x.Endpoint
-	}
-	return ""
-}
+func (x *S3Backup) GetEndpoint() string { _ = "STUB: not implemented"; return "" }
 
-func (x *S3Backup) GetKeyPrefix() string {
-	if x != nil {
-		return x.KeyPrefix
-	}
-	return ""
-}
+func (x *S3Backup) GetKeyPrefix() string { _ = "STUB: not implemented"; return "" }
 
-func (x *S3Backup) GetUseEnvCredentials() bool {
-	if x != nil {
-		return x.UseEnvCredentials
-	}
-	return false
-}
+func (x *S3Backup) GetUseEnvCredentials() bool { _ = "STUB: not implemented"; return false }
 
 // PoolerAddress identifies a pooler and carries the connection information a
 // peer needs to reach its postgres. Used wherever consensus references a
@@ -888,56 +661,25 @@ type PoolerAddress struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PoolerAddress) Reset() {
-	*x = PoolerAddress{}
-	mi := &file_clustermetadata_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PoolerAddress) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PoolerAddress) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PoolerAddress) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PoolerAddress) ProtoMessage() {}
+func (*PoolerAddress) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PoolerAddress) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PoolerAddress.ProtoReflect.Descriptor instead.
-func (*PoolerAddress) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{7}
-}
+func (*PoolerAddress) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PoolerAddress) GetId() *ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *PoolerAddress) GetId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *PoolerAddress) GetHost() string {
-	if x != nil {
-		return x.Host
-	}
-	return ""
-}
+func (x *PoolerAddress) GetHost() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PoolerAddress) GetPostgresPort() int32 {
-	if x != nil {
-		return x.PostgresPort
-	}
-	return 0
-}
+func (x *PoolerAddress) GetPostgresPort() int32 { _ = "STUB: not implemented"; return 0 }
 
 // MultiPooler represents metadata about a running multipooler component instance in the cluster.
 type MultiPooler struct {
@@ -969,98 +711,40 @@ type MultiPooler struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MultiPooler) Reset() {
-	*x = MultiPooler{}
-	mi := &file_clustermetadata_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *MultiPooler) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *MultiPooler) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *MultiPooler) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*MultiPooler) ProtoMessage() {}
+func (*MultiPooler) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *MultiPooler) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use MultiPooler.ProtoReflect.Descriptor instead.
-func (*MultiPooler) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{8}
-}
+func (*MultiPooler) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *MultiPooler) GetId() *ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *MultiPooler) GetId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiPooler) GetShardKey() *ShardKey {
-	if x != nil {
-		return x.ShardKey
-	}
-	return nil
-}
+func (x *MultiPooler) GetShardKey() *ShardKey { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiPooler) GetKeyRange() *KeyRange {
-	if x != nil {
-		return x.KeyRange
-	}
-	return nil
-}
+func (x *MultiPooler) GetKeyRange() *KeyRange { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiPooler) GetType() PoolerType {
-	if x != nil {
-		return x.Type
-	}
-	return PoolerType_UNKNOWN
-}
+func (x *MultiPooler) GetType() PoolerType { _ = "STUB: not implemented"; return *new(PoolerType) }
 
 func (x *MultiPooler) GetServingStatus() PoolerServingStatus {
-	if x != nil {
-		return x.ServingStatus
-	}
-	return PoolerServingStatus_SERVING
+	_ = "STUB: not implemented"
+	return *new(PoolerServingStatus)
 }
 
-func (x *MultiPooler) GetHostname() string {
-	if x != nil {
-		return x.Hostname
-	}
-	return ""
-}
+func (x *MultiPooler) GetHostname() string { _ = "STUB: not implemented"; return "" }
 
-func (x *MultiPooler) GetPortMap() map[string]int32 {
-	if x != nil {
-		return x.PortMap
-	}
-	return nil
-}
+func (x *MultiPooler) GetPortMap() map[string]int32 { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiPooler) GetPoolerDir() string {
-	if x != nil {
-		return x.PoolerDir
-	}
-	return ""
-}
+func (x *MultiPooler) GetPoolerDir() string { _ = "STUB: not implemented"; return "" }
 
-func (x *MultiPooler) GetPgDataDir() string {
-	if x != nil {
-		return x.PgDataDir
-	}
-	return ""
-}
+func (x *MultiPooler) GetPgDataDir() string { _ = "STUB: not implemented"; return "" }
 
 // MultiGateway represents metadata about a running multigateway component instance in the cluster.
 type MultiGateway struct {
@@ -1078,63 +762,27 @@ type MultiGateway struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MultiGateway) Reset() {
-	*x = MultiGateway{}
-	mi := &file_clustermetadata_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *MultiGateway) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *MultiGateway) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *MultiGateway) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*MultiGateway) ProtoMessage() {}
+func (*MultiGateway) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *MultiGateway) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use MultiGateway.ProtoReflect.Descriptor instead.
-func (*MultiGateway) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{9}
-}
+func (*MultiGateway) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *MultiGateway) GetId() *ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *MultiGateway) GetId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiGateway) GetHostname() string {
-	if x != nil {
-		return x.Hostname
-	}
-	return ""
-}
+func (x *MultiGateway) GetHostname() string { _ = "STUB: not implemented"; return "" }
 
-func (x *MultiGateway) GetPortMap() map[string]int32 {
-	if x != nil {
-		return x.PortMap
-	}
-	return nil
-}
+func (x *MultiGateway) GetPortMap() map[string]int32 { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiGateway) GetPidPrefix() uint32 {
-	if x != nil {
-		return x.PidPrefix
-	}
-	return 0
-}
+func (x *MultiGateway) GetPidPrefix() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // ShardKey uniquely identifies a shard in the cluster.
 // This is a centralized message used across all services to identify shards.
@@ -1150,56 +798,25 @@ type ShardKey struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ShardKey) Reset() {
-	*x = ShardKey{}
-	mi := &file_clustermetadata_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ShardKey) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ShardKey) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ShardKey) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ShardKey) ProtoMessage() {}
+func (*ShardKey) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ShardKey) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ShardKey.ProtoReflect.Descriptor instead.
-func (*ShardKey) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{10}
-}
+func (*ShardKey) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ShardKey) GetDatabase() string {
-	if x != nil {
-		return x.Database
-	}
-	return ""
-}
+func (x *ShardKey) GetDatabase() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ShardKey) GetTableGroup() string {
-	if x != nil {
-		return x.TableGroup
-	}
-	return ""
-}
+func (x *ShardKey) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ShardKey) GetShard() string {
-	if x != nil {
-		return x.Shard
-	}
-	return ""
-}
+func (x *ShardKey) GetShard() string { _ = "STUB: not implemented"; return "" }
 
 // MultiOrch represents information about a running instance of multiorch.
 type MultiOrch struct {
@@ -1214,56 +831,25 @@ type MultiOrch struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MultiOrch) Reset() {
-	*x = MultiOrch{}
-	mi := &file_clustermetadata_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *MultiOrch) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *MultiOrch) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *MultiOrch) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*MultiOrch) ProtoMessage() {}
+func (*MultiOrch) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *MultiOrch) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use MultiOrch.ProtoReflect.Descriptor instead.
-func (*MultiOrch) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{11}
-}
+func (*MultiOrch) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *MultiOrch) GetId() *ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *MultiOrch) GetId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *MultiOrch) GetHostname() string {
-	if x != nil {
-		return x.Hostname
-	}
-	return ""
-}
+func (x *MultiOrch) GetHostname() string { _ = "STUB: not implemented"; return "" }
 
-func (x *MultiOrch) GetPortMap() map[string]int32 {
-	if x != nil {
-		return x.PortMap
-	}
-	return nil
-}
+func (x *MultiOrch) GetPortMap() map[string]int32 { _ = "STUB: not implemented"; return nil }
 
 // ID is a globally unique pooler identifier.
 type ID struct {
@@ -1279,56 +865,28 @@ type ID struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ID) Reset() {
-	*x = ID{}
-	mi := &file_clustermetadata_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ID) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ID) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ID) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ID) ProtoMessage() {}
+func (*ID) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ID) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ID.ProtoReflect.Descriptor instead.
-func (*ID) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{12}
-}
+func (*ID) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *ID) GetComponent() ID_ComponentType {
-	if x != nil {
-		return x.Component
-	}
-	return ID_UNKNOWN
+	_ = "STUB: not implemented"
+	return *new(ID_ComponentType)
 }
 
-func (x *ID) GetCell() string {
-	if x != nil {
-		return x.Cell
-	}
-	return ""
-}
+func (x *ID) GetCell() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ID) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *ID) GetName() string { _ = "STUB: not implemented"; return "" }
 
 // KeyRange represents a range of keys for sharding
 type KeyRange struct {
@@ -1341,49 +899,23 @@ type KeyRange struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *KeyRange) Reset() {
-	*x = KeyRange{}
-	mi := &file_clustermetadata_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *KeyRange) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *KeyRange) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *KeyRange) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*KeyRange) ProtoMessage() {}
+func (*KeyRange) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *KeyRange) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use KeyRange.ProtoReflect.Descriptor instead.
-func (*KeyRange) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{13}
-}
+func (*KeyRange) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *KeyRange) GetStart() []byte {
-	if x != nil {
-		return x.Start
-	}
-	return nil
-}
+func (x *KeyRange) GetStart() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *KeyRange) GetEnd() []byte {
-	if x != nil {
-		return x.End
-	}
-	return nil
-}
+func (x *KeyRange) GetEnd() []byte { _ = "STUB: not implemented"; return nil }
 
 // DurabilityPolicy defines consensus quorum rules for a shard.
 // These policies are stored locally in each shard's postgres database
@@ -1407,70 +939,32 @@ type DurabilityPolicy struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DurabilityPolicy) Reset() {
-	*x = DurabilityPolicy{}
-	mi := &file_clustermetadata_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DurabilityPolicy) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DurabilityPolicy) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DurabilityPolicy) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DurabilityPolicy) ProtoMessage() {}
+func (*DurabilityPolicy) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DurabilityPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DurabilityPolicy.ProtoReflect.Descriptor instead.
-func (*DurabilityPolicy) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{14}
-}
+func (*DurabilityPolicy) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *DurabilityPolicy) GetPolicyName() string {
-	if x != nil {
-		return x.PolicyName
-	}
-	return ""
-}
+func (x *DurabilityPolicy) GetPolicyName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *DurabilityPolicy) GetPolicyVersion() int64 {
-	if x != nil {
-		return x.PolicyVersion
-	}
-	return 0
-}
+func (x *DurabilityPolicy) GetPolicyVersion() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *DurabilityPolicy) GetQuorumType() QuorumType {
-	if x != nil {
-		return x.QuorumType
-	}
-	return QuorumType_QUORUM_TYPE_UNKNOWN
+	_ = "STUB: not implemented"
+	return *new(QuorumType)
 }
 
-func (x *DurabilityPolicy) GetRequiredCount() int32 {
-	if x != nil {
-		return x.RequiredCount
-	}
-	return 0
-}
+func (x *DurabilityPolicy) GetRequiredCount() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *DurabilityPolicy) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
+func (x *DurabilityPolicy) GetDescription() string { _ = "STUB: not implemented"; return "" }
 
 // RuleNumber uniquely identifies a shard rule — the outcome of a coordinator
 // writing a cluster state change to rule_history. Every change (promotion,
@@ -1488,49 +982,23 @@ type RuleNumber struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *RuleNumber) Reset() {
-	*x = RuleNumber{}
-	mi := &file_clustermetadata_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *RuleNumber) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *RuleNumber) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *RuleNumber) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*RuleNumber) ProtoMessage() {}
+func (*RuleNumber) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *RuleNumber) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use RuleNumber.ProtoReflect.Descriptor instead.
-func (*RuleNumber) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{15}
-}
+func (*RuleNumber) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *RuleNumber) GetCoordinatorTerm() int64 {
-	if x != nil {
-		return x.CoordinatorTerm
-	}
-	return 0
-}
+func (x *RuleNumber) GetCoordinatorTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *RuleNumber) GetLeaderSubterm() int64 {
-	if x != nil {
-		return x.LeaderSubterm
-	}
-	return 0
-}
+func (x *RuleNumber) GetLeaderSubterm() int64 { _ = "STUB: not implemented"; return 0 }
 
 // ShardRule is the complete, authoritative description of shard state at a
 // specific rule number. Leader identity, cohort membership, and durability
@@ -1554,77 +1022,31 @@ type ShardRule struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ShardRule) Reset() {
-	*x = ShardRule{}
-	mi := &file_clustermetadata_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ShardRule) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ShardRule) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ShardRule) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ShardRule) ProtoMessage() {}
+func (*ShardRule) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ShardRule) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ShardRule.ProtoReflect.Descriptor instead.
-func (*ShardRule) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{16}
-}
+func (*ShardRule) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ShardRule) GetRuleNumber() *RuleNumber {
-	if x != nil {
-		return x.RuleNumber
-	}
-	return nil
-}
+func (x *ShardRule) GetRuleNumber() *RuleNumber { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardRule) GetLeaderId() *ID {
-	if x != nil {
-		return x.LeaderId
-	}
-	return nil
-}
+func (x *ShardRule) GetLeaderId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardRule) GetCohortMembers() []*ID {
-	if x != nil {
-		return x.CohortMembers
-	}
-	return nil
-}
+func (x *ShardRule) GetCohortMembers() []*ID { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardRule) GetDurabilityPolicy() *DurabilityPolicy {
-	if x != nil {
-		return x.DurabilityPolicy
-	}
-	return nil
-}
+func (x *ShardRule) GetDurabilityPolicy() *DurabilityPolicy { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardRule) GetCoordinatorId() *ID {
-	if x != nil {
-		return x.CoordinatorId
-	}
-	return nil
-}
+func (x *ShardRule) GetCoordinatorId() *ID { _ = "STUB: not implemented"; return nil }
 
-func (x *ShardRule) GetCreationTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreationTime
-	}
-	return nil
-}
+func (x *ShardRule) GetCreationTime() *timestamppb.Timestamp { _ = "STUB: not implemented"; return nil }
 
 // PoolerPosition describes a pooler's committed position in logical and physical
 // time. It captures the highest ShardRule this pooler has replicated (or written,
@@ -1648,49 +1070,23 @@ type PoolerPosition struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PoolerPosition) Reset() {
-	*x = PoolerPosition{}
-	mi := &file_clustermetadata_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PoolerPosition) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PoolerPosition) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PoolerPosition) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PoolerPosition) ProtoMessage() {}
+func (*PoolerPosition) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PoolerPosition) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PoolerPosition.ProtoReflect.Descriptor instead.
-func (*PoolerPosition) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{17}
-}
+func (*PoolerPosition) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PoolerPosition) GetRule() *ShardRule {
-	if x != nil {
-		return x.Rule
-	}
-	return nil
-}
+func (x *PoolerPosition) GetRule() *ShardRule { _ = "STUB: not implemented"; return nil }
 
-func (x *PoolerPosition) GetLsn() string {
-	if x != nil {
-		return x.Lsn
-	}
-	return ""
-}
+func (x *PoolerPosition) GetLsn() string { _ = "STUB: not implemented"; return "" }
 
 // ReplicationPrimary advertises the primary this pooler believes it should be
 // pointed at for replication, along with the rule under which that primary
@@ -1719,49 +1115,23 @@ type ReplicationPrimary struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReplicationPrimary) Reset() {
-	*x = ReplicationPrimary{}
-	mi := &file_clustermetadata_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReplicationPrimary) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReplicationPrimary) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReplicationPrimary) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReplicationPrimary) ProtoMessage() {}
+func (*ReplicationPrimary) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReplicationPrimary) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReplicationPrimary.ProtoReflect.Descriptor instead.
-func (*ReplicationPrimary) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{18}
-}
+func (*ReplicationPrimary) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ReplicationPrimary) GetRule() *ShardRule {
-	if x != nil {
-		return x.Rule
-	}
-	return nil
-}
+func (x *ReplicationPrimary) GetRule() *ShardRule { _ = "STUB: not implemented"; return nil }
 
-func (x *ReplicationPrimary) GetPrimary() *PoolerAddress {
-	if x != nil {
-		return x.Primary
-	}
-	return nil
-}
+func (x *ReplicationPrimary) GetPrimary() *PoolerAddress { _ = "STUB: not implemented"; return nil }
 
 // TermRevocation records that this pooler has revoked participation in all terms
 // strictly below revoked_below_term. Two things are revoked:
@@ -1805,63 +1175,30 @@ type TermRevocation struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TermRevocation) Reset() {
-	*x = TermRevocation{}
-	mi := &file_clustermetadata_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *TermRevocation) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *TermRevocation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *TermRevocation) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*TermRevocation) ProtoMessage() {}
+func (*TermRevocation) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *TermRevocation) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use TermRevocation.ProtoReflect.Descriptor instead.
-func (*TermRevocation) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{19}
-}
+func (*TermRevocation) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *TermRevocation) GetRevokedBelowTerm() int64 {
-	if x != nil {
-		return x.RevokedBelowTerm
-	}
-	return 0
-}
+func (x *TermRevocation) GetRevokedBelowTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *TermRevocation) GetAcceptedCoordinatorId() *ID {
-	if x != nil {
-		return x.AcceptedCoordinatorId
-	}
-	return nil
-}
+func (x *TermRevocation) GetAcceptedCoordinatorId() *ID { _ = "STUB: not implemented"; return nil }
 
 func (x *TermRevocation) GetCoordinatorInitiatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CoordinatorInitiatedAt
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *TermRevocation) GetOutgoingRule() *RuleNumber {
-	if x != nil {
-		return x.OutgoingRule
-	}
-	return nil
-}
+func (x *TermRevocation) GetOutgoingRule() *RuleNumber { _ = "STUB: not implemented"; return nil }
 
 // ExternallyCertifiedRevocation certifies that the outgoing cohort's revocation
 // has been established by an external agent rather than through normal Recruit
@@ -1893,49 +1230,29 @@ type ExternallyCertifiedRevocation struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ExternallyCertifiedRevocation) Reset() {
-	*x = ExternallyCertifiedRevocation{}
-	mi := &file_clustermetadata_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ExternallyCertifiedRevocation) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ExternallyCertifiedRevocation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ExternallyCertifiedRevocation) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ExternallyCertifiedRevocation) ProtoMessage() {}
+func (*ExternallyCertifiedRevocation) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ExternallyCertifiedRevocation) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ExternallyCertifiedRevocation.ProtoReflect.Descriptor instead.
 func (*ExternallyCertifiedRevocation) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{20}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ExternallyCertifiedRevocation) GetTermRevocation() *TermRevocation {
-	if x != nil {
-		return x.TermRevocation
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *ExternallyCertifiedRevocation) GetFrozenLsn() string {
-	if x != nil {
-		return x.FrozenLsn
-	}
-	return ""
-}
+func (x *ExternallyCertifiedRevocation) GetFrozenLsn() string { _ = "STUB: not implemented"; return "" }
 
 // ConsensusStatus is a pooler's complete view of its position in the distributed
 // system. It combines three layers with different durability and precision guarantees:
@@ -1971,63 +1288,36 @@ type ConsensusStatus struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConsensusStatus) Reset() {
-	*x = ConsensusStatus{}
-	mi := &file_clustermetadata_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConsensusStatus) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConsensusStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConsensusStatus) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConsensusStatus) ProtoMessage() {}
+func (*ConsensusStatus) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConsensusStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConsensusStatus.ProtoReflect.Descriptor instead.
-func (*ConsensusStatus) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{21}
-}
+func (*ConsensusStatus) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *ConsensusStatus) GetTermRevocation() *TermRevocation {
-	if x != nil {
-		return x.TermRevocation
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConsensusStatus) GetCurrentPosition() *PoolerPosition {
-	if x != nil {
-		return x.CurrentPosition
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConsensusStatus) GetReplicationPrimary() *ReplicationPrimary {
-	if x != nil {
-		return x.ReplicationPrimary
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *ConsensusStatus) GetId() *ID {
-	if x != nil {
-		return x.Id
-	}
-	return nil
-}
+func (x *ConsensusStatus) GetId() *ID { _ = "STUB: not implemented"; return nil }
 
 // LeadershipStatus is published only by nodes that are or have been the consensus leader.
 // It lets the coordinator distinguish an actively healthy leader, a leader
@@ -2042,48 +1332,25 @@ type LeadershipStatus struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LeadershipStatus) Reset() {
-	*x = LeadershipStatus{}
-	mi := &file_clustermetadata_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *LeadershipStatus) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *LeadershipStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *LeadershipStatus) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*LeadershipStatus) ProtoMessage() {}
+func (*LeadershipStatus) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *LeadershipStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use LeadershipStatus.ProtoReflect.Descriptor instead.
-func (*LeadershipStatus) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{22}
-}
+func (*LeadershipStatus) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *LeadershipStatus) GetLeaderTerm() int64 {
-	if x != nil {
-		return x.LeaderTerm
-	}
-	return 0
-}
+func (x *LeadershipStatus) GetLeaderTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *LeadershipStatus) GetSignal() LeadershipSignal {
-	if x != nil {
-		return x.Signal
-	}
-	return LeadershipSignal_LEADERSHIP_SIGNAL_UNKNOWN
+	_ = "STUB: not implemented"
+	return *new(LeadershipSignal)
 }
 
 // AvailabilityStatus carries best-effort operational fitness signals for a pooler.
@@ -2115,47 +1382,27 @@ type AvailabilityStatus struct {
 	sizeCache               protoimpl.SizeCache
 }
 
-func (x *AvailabilityStatus) Reset() {
-	*x = AvailabilityStatus{}
-	mi := &file_clustermetadata_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *AvailabilityStatus) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *AvailabilityStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *AvailabilityStatus) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*AvailabilityStatus) ProtoMessage() {}
+func (*AvailabilityStatus) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *AvailabilityStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use AvailabilityStatus.ProtoReflect.Descriptor instead.
-func (*AvailabilityStatus) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{23}
-}
+func (*AvailabilityStatus) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *AvailabilityStatus) GetLeadershipStatus() *LeadershipStatus {
-	if x != nil {
-		return x.LeadershipStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *AvailabilityStatus) GetCohortEligibilityStatus() *CohortEligibilityStatus {
-	if x != nil {
-		return x.CohortEligibilityStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -2170,41 +1417,26 @@ type CohortEligibilityStatus struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CohortEligibilityStatus) Reset() {
-	*x = CohortEligibilityStatus{}
-	mi := &file_clustermetadata_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *CohortEligibilityStatus) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *CohortEligibilityStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *CohortEligibilityStatus) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*CohortEligibilityStatus) ProtoMessage() {}
+func (*CohortEligibilityStatus) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *CohortEligibilityStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_clustermetadata_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use CohortEligibilityStatus.ProtoReflect.Descriptor instead.
 func (*CohortEligibilityStatus) Descriptor() ([]byte, []int) {
-	return file_clustermetadata_proto_rawDescGZIP(), []int{24}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *CohortEligibilityStatus) GetSignal() CohortEligibilitySignal {
-	if x != nil {
-		return x.Signal
-	}
-	return CohortEligibilitySignal_COHORT_ELIGIBILITY_SIGNAL_UNKNOWN
+	_ = "STUB: not implemented"
+	return *new(CohortEligibilitySignal)
 }
 
 var File_clustermetadata_proto protoreflect.FileDescriptor
@@ -2377,12 +1609,7 @@ var (
 	file_clustermetadata_proto_rawDescData []byte
 )
 
-func file_clustermetadata_proto_rawDescGZIP() []byte {
-	file_clustermetadata_proto_rawDescOnce.Do(func() {
-		file_clustermetadata_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_clustermetadata_proto_rawDesc), len(file_clustermetadata_proto_rawDesc)))
-	})
-	return file_clustermetadata_proto_rawDescData
-}
+func file_clustermetadata_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_clustermetadata_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_clustermetadata_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
@@ -2471,31 +1698,5 @@ var file_clustermetadata_proto_depIdxs = []int32{
 	0,  // [0:40] is the sub-list for field type_name
 }
 
-func init() { file_clustermetadata_proto_init() }
-func file_clustermetadata_proto_init() {
-	if File_clustermetadata_proto != nil {
-		return
-	}
-	file_clustermetadata_proto_msgTypes[4].OneofWrappers = []any{
-		(*BackupLocation_Filesystem)(nil),
-		(*BackupLocation_S3)(nil),
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_clustermetadata_proto_rawDesc), len(file_clustermetadata_proto_rawDesc)),
-			NumEnums:      6,
-			NumMessages:   28,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_clustermetadata_proto_goTypes,
-		DependencyIndexes: file_clustermetadata_proto_depIdxs,
-		EnumInfos:         file_clustermetadata_proto_enumTypes,
-		MessageInfos:      file_clustermetadata_proto_msgTypes,
-	}.Build()
-	File_clustermetadata_proto = out.File
-	file_clustermetadata_proto_goTypes = nil
-	file_clustermetadata_proto_depIdxs = nil
-}
+func init()                            { file_clustermetadata_proto_init() }
+func file_clustermetadata_proto_init() { _ = "STUB: not implemented"; return }

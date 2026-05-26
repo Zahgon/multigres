@@ -15,32 +15,12 @@
 package pgctld
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
 	"net"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"runtime"
-	"strconv"
-	"strings"
-	"syscall"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
-
-	"github.com/multigres/multigres/go/cmd/pgctld/command"
-	"github.com/multigres/multigres/go/cmd/pgctld/testutil"
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/pb/pgctldservice"
-	"github.com/multigres/multigres/go/provisioner/local"
-	"github.com/multigres/multigres/go/test/endtoend/shardsetup"
-	"github.com/multigres/multigres/go/test/utils"
 	"github.com/multigres/multigres/go/tools/executil"
-	"github.com/multigres/multigres/go/tools/grpccommon"
 )
 
 // TestSetup holds all configuration for pgBackRest server tests
@@ -56,298 +36,124 @@ type TestSetup struct {
 // setupPgBackRestTest creates a complete test environment for pgBackRest server tests
 // Returns TestSetup with all paths and ports configured
 func setupPgBackRestTest(t *testing.T) *TestSetup {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Create temp directory
-	tempDir, cleanup := testutil.TempDir(t, "pgbackrest_server_test")
-	t.Cleanup(cleanup)
-
-	dataDir := filepath.Join(tempDir, "data")
-	certDir := filepath.Join(tempDir, "certs")
-
-	// Setup mock PostgreSQL binaries
-	binDir := filepath.Join(tempDir, "bin")
-	err := os.MkdirAll(binDir, 0o755)
-	require.NoError(t, err)
-	testutil.CreateMockPostgreSQLBinaries(t, binDir)
-
-	// Set PATH for PostgreSQL binaries
-	t.Setenv(constants.PgDataDirEnvVar, filepath.Join(dataDir, "pg_data"))
-	t.Setenv("PATH", binDir+":"+os.Getenv("PATH"))
-
-	// Generate TLS certificates
-	certPaths, err := local.GeneratePgBackRestCerts(certDir)
-	require.NoError(t, err, "Failed to generate pgBackRest certificates")
-	t.Logf("Generated certificates in %s", certDir)
-
-	// Ensure cert files exist
-	require.FileExists(t, certPaths.CACertFile)
-	require.FileExists(t, certPaths.ServerCertFile)
-	require.FileExists(t, certPaths.ServerKeyFile)
-
-	// Allocate dynamic ports (port 0 = let OS choose)
-	pgPort := 15432 // PostgreSQL needs a specific port for mock binaries
-
-	// Find a free port for pgBackRest
-	pgbackrestLis, err := net.Listen("tcp", "localhost:0")
-	require.NoError(t, err, "Failed to allocate pgBackRest port")
-	pgbackrestPort := pgbackrestLis.Addr().(*net.TCPAddr).Port
-	pgbackrestLis.Close() // Close immediately - pgctld will bind to it
-
-	return &TestSetup{
-		TempDir:        tempDir,
-		PoolerDir:      dataDir,
-		CertDir:        certDir,
-		PgPort:         pgPort,
-		PgBackRestPort: pgbackrestPort,
-		BinDir:         binDir,
-	}
+	return nil
 }
+
+// Setup mock PostgreSQL binaries
+
+// Set PATH for PostgreSQL binaries
+
+// Generate TLS certificates
+
+// Ensure cert files exist
+
+// Allocate dynamic ports (port 0 = let OS choose)
+// PostgreSQL needs a specific port for mock binaries
+
+// Find a free port for pgBackRest
+
+// Close immediately - pgctld will bind to it
 
 // verifyServerRunning polls socket connection until success or timeout
 // Returns true if server responds, false if timeout reached
 func verifyServerRunning(t *testing.T, port int, timeout time.Duration) bool {
-	t.Helper()
-
-	deadline := time.Now().Add(timeout)
-	ticker := time.NewTicker(500 * time.Millisecond)
-	defer ticker.Stop()
-
-	for time.Now().Before(deadline) {
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("localhost:%d", port), 3*time.Second)
-		if err == nil {
-			conn.Close()
-			return true
-		}
-
-		select {
-		case <-ticker.C:
-			// Continue polling
-		case <-time.After(time.Until(deadline)):
-			return false
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return false
 }
+
+// Continue polling
 
 // verifyServerStopped verifies socket connection fails (server not listening)
 // Returns true if port is closed, false if still accepting connections
-func verifyServerStopped(t *testing.T, port int) bool {
-	t.Helper()
+func verifyServerStopped(t *testing.T, port int) bool { _ = "STUB: not implemented"; return false }
 
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("localhost:%d", port), 1*time.Second)
-	if err != nil {
-		// Connection failed - server is stopped
-		return true
-	}
+// Connection failed - server is stopped
 
-	// Connection succeeded - server still running
-	conn.Close()
-	return false
-}
+// Connection succeeded - server still running
 
 // getPgBackRestPID finds the pgbackrest server process ID for a specific config path
 // Returns PID or 0 if not found
 func getPgBackRestPID(t *testing.T, configPath string) int {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Get all pgbackrest server processes
-	cmd := exec.Command("pgrep", "-f", "pgbackrest server")
-	output, err := cmd.Output()
-	if err != nil {
-		// Process not found
-		return 0
-	}
-
-	pidStr := strings.TrimSpace(string(output))
-	if pidStr == "" {
-		return 0
-	}
-
-	// Check each PID to find one using our specific config
-	for pidLine := range strings.SplitSeq(pidStr, "\n") {
-		var pid int
-		_, err = fmt.Sscanf(pidLine, "%d", &pid)
-		if err != nil {
-			continue
-		}
-
-		// Check if this process is using our config by checking environment
-		envCmd := exec.Command("sh", "-c", fmt.Sprintf("ps eww -p %d | grep -o 'PGBACKREST_CONFIG=[^[:space:]]*'", pid))
-		envOutput, err := envCmd.Output()
-		if err != nil {
-			continue
-		}
-
-		envStr := strings.TrimSpace(string(envOutput))
-		if strings.Contains(envStr, configPath) {
-			return pid
-		}
-	}
-
 	return 0
 }
 
+// Process not found
+
+// Check each PID to find one using our specific config
+
+// Check if this process is using our config by checking environment
+
 // killProcess sends SIGKILL to process by PID
-func killProcess(t *testing.T, pid int) {
-	t.Helper()
+func killProcess(t *testing.T, pid int) { _ = "STUB: not implemented"; return }
 
-	require.Greater(t, pid, 0, "PID must be positive")
-
-	// Send SIGKILL
-	err := syscall.Kill(pid, syscall.SIGKILL)
-	require.NoError(t, err, "Failed to kill process %d", pid)
-
-	t.Logf("Killed process with PID %d", pid)
-}
+// Send SIGKILL
 
 // createTestGRPCServerWithPgBackRest creates and starts a gRPC server with pgBackRest support
 // Returns the listener and a cleanup function
 func createTestGRPCServerWithPgBackRest(t *testing.T, setup *TestSetup) (net.Listener, func()) {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Find a free port
-	lis, err := net.Listen("tcp", "localhost:0")
-	require.NoError(t, err)
-
-	// Create gRPC server
-	grpcServer := grpc.NewServer()
-
-	// Create the pgctld service with pgBackRest configuration
-	cfg := command.PgCtldServiceConfig{
-		Port:           setup.PgPort,
-		User:           constants.DefaultPostgresUser,
-		Database:       constants.DefaultPostgresDatabase,
-		Password:       shardsetup.TestPostgresPassword,
-		PasswordSource: command.PasswordSourceEnv,
-	}
-	service, err := command.NewPgCtldService(
-		slog.Default(),
-		cfg,
-		30,
-		setup.PoolerDir,
-		"localhost",
-		setup.PgBackRestPort,
-		setup.CertDir,
-	)
-	require.NoError(t, err)
-
-	// Start pgBackRest management (runs in background goroutine)
-	service.StartPgBackRestManagement()
-
-	// Register the service
-	pgctldservice.RegisterPgCtldServer(grpcServer, service)
-
-	// Start server in background
-	go func() {
-		if err := grpcServer.Serve(lis); err != nil {
-			t.Logf("gRPC server error: %v", err)
-		}
-	}()
-
-	// Give server time to start
-	time.Sleep(100 * time.Millisecond)
-
-	// Return cleanup function that stops server and closes service
-	cleanup := func() {
-		service.Close()
-		grpcServer.Stop()
-	}
-
-	return lis, cleanup
+	return *new(net.Listener), nil
 }
+
+// Create gRPC server
+
+// Create the pgctld service with pgBackRest configuration
+
+// Start pgBackRest management (runs in background goroutine)
+
+// Register the service
+
+// Start server in background
+
+// Give server time to start
+
+// Return cleanup function that stops server and closes service
 
 // createPgCtldClient creates a gRPC client for pgctld
 func createPgCtldClient(t *testing.T, addr string) pgctldservice.PgCtldClient {
-	t.Helper()
-
-	conn, err := grpc.NewClient(addr, grpccommon.LocalClientDialOptions()...)
-	require.NoError(t, err, "Failed to create gRPC connection")
-
-	t.Cleanup(func() { conn.Close() })
-
-	return pgctldservice.NewPgCtldClient(conn)
+	_ = "STUB: not implemented"
+	return *new(pgctldservice.PgCtldClient)
 }
 
 // initAndStartPostgreSQL initializes and starts PostgreSQL via gRPC
 func initAndStartPostgreSQL(t *testing.T, client pgctldservice.PgCtldClient) {
-	t.Helper()
-
-	ctx := context.Background()
-
-	// Initialize data directory
-	_, err := client.InitDataDir(ctx, &pgctldservice.InitDataDirRequest{})
-	require.NoError(t, err, "InitDataDir should succeed")
-
-	// Start PostgreSQL
-	_, err = client.Start(ctx, &pgctldservice.StartRequest{})
-	require.NoError(t, err, "Start should succeed")
-
-	// Wait for PostgreSQL to be ready
-	deadline := time.Now().Add(30 * time.Second)
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-
-	for time.Now().Before(deadline) {
-		resp, err := client.Status(ctx, &pgctldservice.StatusRequest{})
-		if err == nil && resp.Status == pgctldservice.ServerStatus_RUNNING && resp.Ready {
-			t.Log("PostgreSQL is ready")
-			return
-		}
-		<-ticker.C
-	}
-
-	require.Fail(t, "Timeout waiting for PostgreSQL to be ready")
+	_ = "STUB: not implemented"
+	return
 }
+
+// Initialize data directory
+
+// Start PostgreSQL
+
+// Wait for PostgreSQL to be ready
 
 // getPgBackRestStatus gets pgBackRest status from pgctld
 func getPgBackRestStatus(t *testing.T, client pgctldservice.PgCtldClient) *pgctldservice.PgBackRestStatus {
-	t.Helper()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	resp, err := client.Status(ctx, &pgctldservice.StatusRequest{})
-	require.NoError(t, err, "Status call should succeed")
-	require.NotNil(t, resp.PgbackrestStatus, "PgbackrestStatus should not be nil")
-
-	return resp.PgbackrestStatus
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // mockBinEnv returns the base environment for tests that use mock PostgreSQL
 // binaries. It includes PATH pointing at binDir, PGDATA, POSTGRES_PASSWORD and
 // PGPASSWORD so pgctld init/start/stop subprocesses can satisfy the scram-sha-256
 // requirement without needing a real PostgreSQL instance.
-func mockBinEnv(binDir, pgDataDir string) []string {
-	env := append(os.Environ(),
-		"PATH="+binDir+":"+os.Getenv("PATH"),
-		constants.PgDataDirEnvVar+"="+pgDataDir,
-		constants.PgPasswordEnvVar+"=test-password",
-		"PGPASSWORD=test-password",
-	)
-	if runtime.GOOS == "darwin" {
-		env = append(env, "LC_ALL=en_US.UTF-8")
-	}
-	return env
-}
+func mockBinEnv(binDir, pgDataDir string) []string { _ = "STUB: not implemented"; return nil }
 
 // setupTestEnv sets common environment variables for pgctld subprocesses.
 // Includes a default POSTGRES_PASSWORD because pgctld now refuses to init or
 // serve without one (pg_hba.conf requires scram-sha-256 for all connections).
 // Also sets PGPASSWORD so psql subprocesses can authenticate.
-func setupTestEnv(cmd *executil.Cmd, poolerDir string) {
-	cmd.AddEnv(
-		"PGCONNECT_TIMEOUT=5",
-		constants.PgDataDirEnvVar+"="+filepath.Join(poolerDir, "pg_data"),
-		constants.PgPasswordEnvVar+"=test-password",
-		"PGPASSWORD=test-password",
-	)
-	if runtime.GOOS == "darwin" {
-		// Required to avoid "postmaster became multithreaded during startup" on macOS.
-		cmd.AddEnv("LC_ALL=en_US.UTF-8")
-	}
-}
+func setupTestEnv(cmd *executil.Cmd, poolerDir string) { _ = "STUB: not implemented"; return }
+
+// Required to avoid "postmaster became multithreaded during startup" on macOS.
 
 // pgCtldServer holds the ports and process handle for a running pgctld server.
 type pgCtldServer struct {
@@ -367,48 +173,8 @@ type pgCtldServer struct {
 // The returned Cmd may also be used directly (e.g. to kill the process
 // mid-test for orphan-detection tests).
 func startPgCtldServer(t *testing.T, poolerDir, configFile string, extraEnv ...string) *pgCtldServer {
-	t.Helper()
-
-	grpcPort := utils.GetFreePort(t)
-	httpPort := utils.GetFreePort(t)
-	pgPort := utils.GetFreePort(t)
-
-	args := []string{
-		"server",
-		"--pooler-dir", poolerDir,
-		"--grpc-port", strconv.Itoa(grpcPort),
-		"--http-port", strconv.Itoa(httpPort),
-		"--pg-port", strconv.Itoa(pgPort),
-		"--timeout", "30",
-	}
-	if configFile != "" {
-		args = append(args, "--config-file", configFile)
-	}
-
-	cmd := executil.Command(t.Context(), "pgctld", args...).WithProcessGroup()
-	cmd.AddEnv("MULTIGRES_TESTDATA_DIR=" + poolerDir)
-	setupTestEnv(cmd, poolerDir)
-	for _, e := range extraEnv {
-		cmd.AddEnv(e)
-	}
-
-	require.NoError(t, cmd.Start(), "pgctld server should start")
-	t.Cleanup(func() { _ = cmd.Wait() })
-
-	// Wait for gRPC port to accept connections.
-	require.Eventually(t, func() bool {
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("localhost:%d", grpcPort), 100*time.Millisecond)
-		if err != nil {
-			return false
-		}
-		conn.Close()
-		return true
-	}, 20*time.Second, 100*time.Millisecond, "pgctld gRPC server should be ready on port %d", grpcPort)
-
-	return &pgCtldServer{
-		GrpcPort: grpcPort,
-		HttpPort: httpPort,
-		PgPort:   pgPort,
-		Cmd:      cmd,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Wait for gRPC port to accept connections.

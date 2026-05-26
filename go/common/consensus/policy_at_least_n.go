@@ -15,13 +15,9 @@
 package consensus
 
 import (
-	"fmt"
 	"log/slog"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	mtrpcpb "github.com/multigres/multigres/go/pb/mtrpc"
-	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 )
 
 // AtLeastNPolicy requires any N poolers from the cohort to acknowledge writes.
@@ -31,10 +27,7 @@ type AtLeastNPolicy struct {
 
 // CheckAchievable returns nil iff the proposed cohort has at least N poolers.
 func (p AtLeastNPolicy) CheckAchievable(proposedCohort []*clustermetadatapb.ID) error {
-	if len(proposedCohort) < p.N {
-		return fmt.Errorf("durability not achievable: proposed cohort has %d poolers, required %d",
-			len(proposedCohort), p.N)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -51,39 +44,29 @@ func (p AtLeastNPolicy) CheckAchievable(proposedCohort []*clustermetadatapb.ID) 
 // proposal-specific concern handled by the leader-appointment layer via
 // CheckAchievable.
 func (p AtLeastNPolicy) CheckSufficientRecruitment(cohort, recruited []*clustermetadatapb.ID) error {
-	if err := validateRecruitedSubset(cohort, recruited); err != nil {
-		return err
-	}
-
-	// The two obligations below combine into a single binding threshold:
-	//
-	//   |recruited| >= max(
-	//     len(cohort)/2 + 1,   // majority — any two recruitments must share a pooler
-	//     len(cohort) - N + 1, // revocation — un-recruited cannot form an N-quorum
-	//   )
-	//
-	// We check each separately so failures report the specific reason.
-
-	// Majority: prevents two coordinators from recruiting disjoint sets at the same term.
-	if err := validateMajority(cohort, recruited); err != nil {
-		return err
-	}
-
-	// Revocation: if N or more cohort poolers are un-recruited, they could form a
-	// quorum on their own. Example: AT_LEAST_N with N=2 and a cohort of 5 poolers.
-	// After recruiting pooler-1, pooler-2, and pooler-3, we still need to recruit
-	// pooler-4 OR pooler-5 — otherwise the 2 unrecruited poolers could form their
-	// own 2-pooler quorum that still satisfies the durability policy.
-	//
-	// Relies on validateRecruitedSubset above: recruited ⊆ cohort, so the
-	// length difference equals the un-recruited count.
-	unrecruited := len(cohort) - len(recruited)
-	if unrecruited >= p.N {
-		return fmt.Errorf("revocation not satisfied: %d cohort poolers not recruited, another possible quorum could be formed of %d",
-			unrecruited, p.N)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// The two obligations below combine into a single binding threshold:
+//
+//   |recruited| >= max(
+//     len(cohort)/2 + 1,   // majority — any two recruitments must share a pooler
+//     len(cohort) - N + 1, // revocation — un-recruited cannot form an N-quorum
+//   )
+//
+// We check each separately so failures report the specific reason.
+
+// Majority: prevents two coordinators from recruiting disjoint sets at the same term.
+
+// Revocation: if N or more cohort poolers are un-recruited, they could form a
+// quorum on their own. Example: AT_LEAST_N with N=2 and a cohort of 5 poolers.
+// After recruiting pooler-1, pooler-2, and pooler-3, we still need to recruit
+// pooler-4 OR pooler-5 — otherwise the 2 unrecruited poolers could form their
+// own 2-pooler quorum that still satisfies the durability policy.
+//
+// Relies on validateRecruitedSubset above: recruited ⊆ cohort, so the
+// length difference equals the un-recruited count.
 
 // BuildSyncReplicationConfig returns the Postgres-level config the primary
 // must apply to satisfy AT_LEAST_N. The standby list is the full cohort —
@@ -97,44 +80,14 @@ func (p AtLeastNPolicy) BuildSyncReplicationConfig(
 	cohort []*clustermetadatapb.ID,
 	primary *clustermetadatapb.ID,
 ) (*SyncReplicationConfig, error) {
+	_ = "STUB: not implemented"
 	// N==1 means the primary alone satisfies durability — return an explicit
 	// "no sync standbys" config so the new primary clears any stale
 	// synchronous_standby_names instead of silently inheriting them.
-	if p.N == 1 {
-		logger.Info("Configuring leader for local-only durability",
-			"policy", "AT_LEAST_N",
-			"required_count", p.N)
-		return &SyncReplicationConfig{
-			SyncCommit:     multipoolermanagerdatapb.SynchronousCommitLevel_SYNCHRONOUS_COMMIT_LOCAL,
-			SyncMethod:     multipoolermanagerdatapb.SynchronousMethod_SYNCHRONOUS_METHOD_ANY,
-			NumSync:        1,
-			SyncStandbyIDs: nil,
-		}, nil
-	}
-
-	// num_sync = required_count - 1: the primary's own write counts as 1 ack.
-	requiredNumSync := p.N - 1
-	if requiredNumSync > len(cohort) {
-		return nil, mterrors.New(mtrpcpb.Code_FAILED_PRECONDITION,
-			fmt.Sprintf("cannot establish synchronous replication: insufficient cohort members (required %d standbys, available %d)",
-				requiredNumSync, len(cohort)))
-	}
-
-	logger.Info("Configuring synchronous replication",
-		"policy", "AT_LEAST_N",
-		"required_count", p.N,
-		"num_sync", requiredNumSync,
-		"standbys", len(cohort))
-
-	return &SyncReplicationConfig{
-		SyncCommit:     multipoolermanagerdatapb.SynchronousCommitLevel_SYNCHRONOUS_COMMIT_ON,
-		SyncMethod:     multipoolermanagerdatapb.SynchronousMethod_SYNCHRONOUS_METHOD_ANY,
-		NumSync:        requiredNumSync,
-		SyncStandbyIDs: cohort,
-	}, nil
+	return nil, nil
 }
+
+// num_sync = required_count - 1: the primary's own write counts as 1 ack.
 
 // Description returns a human-readable summary of the policy.
-func (p AtLeastNPolicy) Description() string {
-	return fmt.Sprintf("AT_LEAST_N(N=%d)", p.N)
-}
+func (p AtLeastNPolicy) Description() string { _ = "STUB: not implemented"; return "" }

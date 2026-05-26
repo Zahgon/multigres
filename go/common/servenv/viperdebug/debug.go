@@ -22,16 +22,13 @@ import (
 
 // Debug provides the Debug functionality normally accessible to a given viper
 // instance, but for a combination of the static and dynamic registries.
-func Debug(reg *viperutil.Registry) {
-	reg.Combined().Debug()
-}
+func Debug(reg *viperutil.Registry) { _ = "STUB: not implemented"; return }
 
 // WriteConfigAs writes the config into the given filename.
 func WriteConfigAs(reg *viperutil.Registry, filename string) error {
-	return reg.Combined().WriteConfigAs(filename)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AllSettings gets all the settings in the configuration.
-func AllSettings(reg *viperutil.Registry) map[string]any {
-	return reg.Combined().AllSettings()
-}
+func AllSettings(reg *viperutil.Registry) map[string]any { _ = "STUB: not implemented"; return nil }

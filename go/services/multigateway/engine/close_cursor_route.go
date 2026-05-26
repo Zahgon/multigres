@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -59,22 +58,14 @@ type CloseCursorRoute struct {
 
 // NewCloseCursorRoute creates a CloseCursorRoute for `CLOSE <name>`.
 func NewCloseCursorRoute(tableGroup, shard, sql, cursorName string) *CloseCursorRoute {
-	return &CloseCursorRoute{
-		TableGroup: tableGroup,
-		Shard:      shard,
-		Query:      sql,
-		CursorName: cursorName,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewCloseAllCursorRoute creates a CloseCursorRoute for `CLOSE ALL`.
 func NewCloseAllCursorRoute(tableGroup, shard, sql string) *CloseCursorRoute {
-	return &CloseCursorRoute{
-		TableGroup: tableGroup,
-		Shard:      shard,
-		Query:      sql,
-		CloseAll:   true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute schedules portal releases for any HOLD cursors that match the
@@ -97,14 +88,7 @@ func (c *CloseCursorRoute) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	targets := c.targets(state)
-	state.AppendPendingReleasePortals(targets...)
-	if err := exec.StreamExecute(ctx, conn, c.TableGroup, c.Shard, c.Query, nil, state, callback); err != nil {
-		return err
-	}
-	for _, name := range targets {
-		state.RemoveOpenHoldCursor(name)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -119,29 +103,20 @@ func (c *CloseCursorRoute) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return c.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CloseCursorRoute) GetTableGroup() string { return c.TableGroup }
+func (c *CloseCursorRoute) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CloseCursorRoute) GetQuery() string { return c.Query }
+func (c *CloseCursorRoute) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CloseCursorRoute) String() string {
-	if c.CloseAll {
-		return "CloseCursorRoute(ALL)"
-	}
-	return fmt.Sprintf("CloseCursorRoute(%s)", c.CursorName)
-}
+func (c *CloseCursorRoute) String() string { _ = "STUB: not implemented"; return "" }
 
 // targets resolves the CLOSE statement to the list of currently-tracked HOLD
 // cursor names that should be unpinned on the multipooler.
 func (c *CloseCursorRoute) targets(state *handler.MultiGatewayConnectionState) []string {
-	if c.CloseAll {
-		return state.OpenHoldCursorNames()
-	}
-	if state.HasOpenHoldCursor(c.CursorName) {
-		return []string{c.CursorName}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 

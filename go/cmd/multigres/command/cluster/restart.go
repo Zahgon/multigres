@@ -15,42 +15,17 @@
 package cluster
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 // restart handles the cluster restart command by stopping then starting
-func restart(cmd *cobra.Command, args []string) error {
-	fmt.Println("Restarting Multigres cluster...")
-	fmt.Println()
+func restart(cmd *cobra.Command, args []string) error { _ = "STUB: not implemented"; return nil }
 
-	// Stop the cluster first (reuse down handler logic)
-	if err := down(cmd, args); err != nil {
-		return fmt.Errorf("failed to stop cluster: %w", err)
-	}
+// Stop the cluster first (reuse down handler logic)
 
-	fmt.Println()
-
-	// Start the cluster (reuse start handler)
-	if err := start(cmd, args); err != nil {
-		return fmt.Errorf("failed to start cluster: %w", err)
-	}
-
-	return nil
-}
+// Start the cluster (reuse start handler)
 
 // AddRestartCommand adds the restart subcommand to the cluster command
-func AddRestartCommand(clusterCmd *cobra.Command) {
-	restartCmd := &cobra.Command{
-		Use:   "restart",
-		Short: "Restart local cluster",
-		Long:  "Restart the local Multigres cluster by stopping it (if running) then starting it again.",
-		RunE:  restart,
-	}
+func AddRestartCommand(clusterCmd *cobra.Command) { _ = "STUB: not implemented"; return }
 
-	// Add clean flag since down() expects it
-	restartCmd.Flags().Bool("clean", false, "Fully tear down all cluster resources before restarting")
-
-	clusterCmd.AddCommand(restartCmd)
-}
+// Add clean flag since down() expects it

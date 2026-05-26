@@ -25,13 +25,12 @@
 package multigatewaymanagerdata
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -92,161 +91,79 @@ type QueryStatSnapshot struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *QueryStatSnapshot) Reset() {
-	*x = QueryStatSnapshot{}
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *QueryStatSnapshot) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *QueryStatSnapshot) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *QueryStatSnapshot) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*QueryStatSnapshot) ProtoMessage() {}
+func (*QueryStatSnapshot) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *QueryStatSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use QueryStatSnapshot.ProtoReflect.Descriptor instead.
-func (*QueryStatSnapshot) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerdata_proto_rawDescGZIP(), []int{0}
-}
+func (*QueryStatSnapshot) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *QueryStatSnapshot) GetFingerprint() string {
-	if x != nil {
-		return x.Fingerprint
-	}
-	return ""
-}
+func (x *QueryStatSnapshot) GetFingerprint() string { _ = "STUB: not implemented"; return "" }
 
-func (x *QueryStatSnapshot) GetNormalizedSql() string {
-	if x != nil {
-		return x.NormalizedSql
-	}
-	return ""
-}
+func (x *QueryStatSnapshot) GetNormalizedSql() string { _ = "STUB: not implemented"; return "" }
 
-func (x *QueryStatSnapshot) GetCalls() uint64 {
-	if x != nil {
-		return x.Calls
-	}
-	return 0
-}
+func (x *QueryStatSnapshot) GetCalls() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *QueryStatSnapshot) GetErrors() uint64 {
-	if x != nil {
-		return x.Errors
-	}
-	return 0
-}
+func (x *QueryStatSnapshot) GetErrors() uint64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *QueryStatSnapshot) GetTotalDuration() *durationpb.Duration {
-	if x != nil {
-		return x.TotalDuration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetAverageDuration() *durationpb.Duration {
-	if x != nil {
-		return x.AverageDuration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetMinDuration() *durationpb.Duration {
-	if x != nil {
-		return x.MinDuration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetMaxDuration() *durationpb.Duration {
-	if x != nil {
-		return x.MaxDuration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetP50Duration() *durationpb.Duration {
-	if x != nil {
-		return x.P50Duration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetP99Duration() *durationpb.Duration {
-	if x != nil {
-		return x.P99Duration
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *QueryStatSnapshot) GetTotalRows() uint64 {
-	if x != nil {
-		return x.TotalRows
-	}
-	return 0
-}
+func (x *QueryStatSnapshot) GetTotalRows() uint64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *QueryStatSnapshot) GetLastSeen() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastSeen
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryStatSnapshot) GetSampleInterval() *durationpb.Duration {
-	if x != nil {
-		return x.SampleInterval
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *QueryStatSnapshot) GetCallRateTrends() []float64 {
-	if x != nil {
-		return x.CallRateTrends
-	}
-	return nil
-}
+func (x *QueryStatSnapshot) GetCallRateTrends() []float64 { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryStatSnapshot) GetTotalTimeMsTrends() []float64 {
-	if x != nil {
-		return x.TotalTimeMsTrends
-	}
-	return nil
-}
+func (x *QueryStatSnapshot) GetTotalTimeMsTrends() []float64 { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryStatSnapshot) GetP50MsTrends() []float64 {
-	if x != nil {
-		return x.P50MsTrends
-	}
-	return nil
-}
+func (x *QueryStatSnapshot) GetP50MsTrends() []float64 { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryStatSnapshot) GetP99MsTrends() []float64 {
-	if x != nil {
-		return x.P99MsTrends
-	}
-	return nil
-}
+func (x *QueryStatSnapshot) GetP99MsTrends() []float64 { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryStatSnapshot) GetRowsRateTrends() []float64 {
-	if x != nil {
-		return x.RowsRateTrends
-	}
-	return nil
-}
+func (x *QueryStatSnapshot) GetRowsRateTrends() []float64 { _ = "STUB: not implemented"; return nil }
 
 // QueryRegistrySnapshot is the full registry response, suitable for rendering
 // a per-gateway "Top Queries" page.
@@ -261,47 +178,30 @@ type QueryRegistrySnapshot struct {
 	sizeCache           protoimpl.SizeCache
 }
 
-func (x *QueryRegistrySnapshot) Reset() {
-	*x = QueryRegistrySnapshot{}
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *QueryRegistrySnapshot) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *QueryRegistrySnapshot) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *QueryRegistrySnapshot) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*QueryRegistrySnapshot) ProtoMessage() {}
+func (*QueryRegistrySnapshot) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *QueryRegistrySnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use QueryRegistrySnapshot.ProtoReflect.Descriptor instead.
 func (*QueryRegistrySnapshot) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerdata_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *QueryRegistrySnapshot) GetQueries() []*QueryStatSnapshot {
-	if x != nil {
-		return x.Queries
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *QueryRegistrySnapshot) GetTrackedFingerprints() uint32 {
-	if x != nil {
-		return x.TrackedFingerprints
-	}
+	_ = "STUB: not implemented"
 	return 0
 }
 
@@ -319,56 +219,28 @@ type ConsolidatorPreparedStatement struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConsolidatorPreparedStatement) Reset() {
-	*x = ConsolidatorPreparedStatement{}
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConsolidatorPreparedStatement) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConsolidatorPreparedStatement) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConsolidatorPreparedStatement) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConsolidatorPreparedStatement) ProtoMessage() {}
+func (*ConsolidatorPreparedStatement) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConsolidatorPreparedStatement) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConsolidatorPreparedStatement.ProtoReflect.Descriptor instead.
 func (*ConsolidatorPreparedStatement) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerdata_proto_rawDescGZIP(), []int{2}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *ConsolidatorPreparedStatement) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *ConsolidatorPreparedStatement) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ConsolidatorPreparedStatement) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
+func (x *ConsolidatorPreparedStatement) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ConsolidatorPreparedStatement) GetRefs() uint32 {
-	if x != nil {
-		return x.Refs
-	}
-	return 0
-}
+func (x *ConsolidatorPreparedStatement) GetRefs() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // ConsolidatorStats is a snapshot of the prepared-statement consolidator,
 // suitable for rendering a per-gateway diagnostic page.
@@ -389,61 +261,28 @@ type ConsolidatorStats struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *ConsolidatorStats) Reset() {
-	*x = ConsolidatorStats{}
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConsolidatorStats) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConsolidatorStats) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConsolidatorStats) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConsolidatorStats) ProtoMessage() {}
+func (*ConsolidatorStats) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConsolidatorStats) ProtoReflect() protoreflect.Message {
-	mi := &file_multigatewaymanagerdata_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConsolidatorStats.ProtoReflect.Descriptor instead.
-func (*ConsolidatorStats) Descriptor() ([]byte, []int) {
-	return file_multigatewaymanagerdata_proto_rawDescGZIP(), []int{3}
-}
+func (*ConsolidatorStats) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ConsolidatorStats) GetUniqueStatements() uint32 {
-	if x != nil {
-		return x.UniqueStatements
-	}
-	return 0
-}
+func (x *ConsolidatorStats) GetUniqueStatements() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ConsolidatorStats) GetTotalReferences() uint32 {
-	if x != nil {
-		return x.TotalReferences
-	}
-	return 0
-}
+func (x *ConsolidatorStats) GetTotalReferences() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ConsolidatorStats) GetConnectionCount() uint32 {
-	if x != nil {
-		return x.ConnectionCount
-	}
-	return 0
-}
+func (x *ConsolidatorStats) GetConnectionCount() uint32 { _ = "STUB: not implemented"; return 0 }
 
 func (x *ConsolidatorStats) GetPreparedStatements() []*ConsolidatorPreparedStatement {
-	if x != nil {
-		return x.PreparedStatements
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -491,12 +330,7 @@ var (
 	file_multigatewaymanagerdata_proto_rawDescData []byte
 )
 
-func file_multigatewaymanagerdata_proto_rawDescGZIP() []byte {
-	file_multigatewaymanagerdata_proto_rawDescOnce.Do(func() {
-		file_multigatewaymanagerdata_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_multigatewaymanagerdata_proto_rawDesc), len(file_multigatewaymanagerdata_proto_rawDesc)))
-	})
-	return file_multigatewaymanagerdata_proto_rawDescData
-}
+func file_multigatewaymanagerdata_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_multigatewaymanagerdata_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_multigatewaymanagerdata_proto_goTypes = []any{
@@ -525,26 +359,5 @@ var file_multigatewaymanagerdata_proto_depIdxs = []int32{
 	0,  // [0:10] is the sub-list for field type_name
 }
 
-func init() { file_multigatewaymanagerdata_proto_init() }
-func file_multigatewaymanagerdata_proto_init() {
-	if File_multigatewaymanagerdata_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multigatewaymanagerdata_proto_rawDesc), len(file_multigatewaymanagerdata_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   4,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_multigatewaymanagerdata_proto_goTypes,
-		DependencyIndexes: file_multigatewaymanagerdata_proto_depIdxs,
-		MessageInfos:      file_multigatewaymanagerdata_proto_msgTypes,
-	}.Build()
-	File_multigatewaymanagerdata_proto = out.File
-	file_multigatewaymanagerdata_proto_goTypes = nil
-	file_multigatewaymanagerdata_proto_depIdxs = nil
-}
+func init()                                    { file_multigatewaymanagerdata_proto_init() }
+func file_multigatewaymanagerdata_proto_init() { _ = "STUB: not implemented"; return }

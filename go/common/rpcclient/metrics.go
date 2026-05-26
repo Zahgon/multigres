@@ -18,10 +18,8 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // DialPath represents the possible paths for dialing a connection.
@@ -51,7 +49,8 @@ type CacheSize struct {
 
 // Inst returns the underlying metric instrument for callback registration.
 func (m CacheSize) Inst() metric.Int64ObservableGauge {
-	return m.Int64ObservableGauge
+	_ = "STUB: not implemented"
+	return *new(metric.Int64ObservableGauge)
 }
 
 // DialDuration wraps a Float64Histogram for recording dial operation durations.
@@ -73,114 +72,43 @@ func (m DialDuration) Record(
 	path DialPath,
 	attrs ...attribute.KeyValue,
 ) {
-	m.Float64Histogram.Record(ctx, val,
-		metric.WithAttributes(
-			append(
-				attrs,
-				attribute.String("path", string(path)),
-			)...,
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // NewMetrics initializes OpenTelemetry metrics for the rpcclient connection cache.
 // For the cacheSize observable gauge, use RegisterCacheSizeCallback() to register a callback.
-func NewMetrics() *Metrics {
-	m := &Metrics{
-		meter: otel.Meter("github.com/multigres/multigres/go/common/rpcclient"),
-	}
+func NewMetrics() *Metrics { _ = "STUB: not implemented"; return nil }
 
-	var err error
+// Counter for connection reuse
 
-	// Counter for connection reuse
-	m.connReuse, err = m.meter.Int64Counter(
-		"rpcclient.connection.reuses",
-		metric.WithDescription("Number of connection reuse events"),
-		metric.WithUnit("{reuse}"),
-	)
-	if err != nil {
-		m.connReuse = noop.Int64Counter{}
-	}
+// Counter for new connections
 
-	// Counter for new connections
-	m.connNew, err = m.meter.Int64Counter(
-		"rpcclient.connection.creates",
-		metric.WithDescription("Number of connection creation events"),
-		metric.WithUnit("{create}"),
-	)
-	if err != nil {
-		m.connNew = noop.Int64Counter{}
-	}
+// Counter for dial timeouts
 
-	// Counter for dial timeouts
-	m.dialTimeouts, err = m.meter.Int64Counter(
-		"rpcclient.connection.dial.timeouts",
-		metric.WithDescription("Number of connection dial timeout events"),
-		metric.WithUnit("{timeout}"),
-	)
-	if err != nil {
-		m.dialTimeouts = noop.Int64Counter{}
-	}
+// Observable gauge for cache size
 
-	// Observable gauge for cache size
-	cacheSizeGauge, err := m.meter.Int64ObservableGauge(
-		"rpcclient.connection.cache.size",
-		metric.WithDescription("Current number of cached connections"),
-		metric.WithUnit("{connection}"),
-	)
-	if err != nil {
-		m.cacheSize = CacheSize{noop.Int64ObservableGauge{}}
-	} else {
-		m.cacheSize = CacheSize{cacheSizeGauge}
-	}
-
-	// Histogram for dial duration
-	dialDurationHistogram, err := m.meter.Float64Histogram(
-		"rpcclient.connection.dial.duration",
-		metric.WithDescription("Duration of connection dial operations"),
-		metric.WithUnit("s"),
-	)
-	if err != nil {
-		m.dialDuration = DialDuration{noop.Float64Histogram{}}
-	} else {
-		m.dialDuration = DialDuration{dialDurationHistogram}
-	}
-
-	return m
-}
+// Histogram for dial duration
 
 // RegisterCacheSizeCallback registers a callback for the cache size observable gauge.
 // The cacheGetter function is called periodically to observe the current cache size.
 // Returns an error if callback registration fails.
 func (m *Metrics) RegisterCacheSizeCallback(cacheGetter func() int) error {
-	if cacheGetter == nil {
-		return nil
-	}
-	_, err := m.meter.RegisterCallback(
-		func(ctx context.Context, observer metric.Observer) error {
-			observer.ObserveInt64(m.cacheSize.Inst(), int64(cacheGetter()))
-			return nil
-		},
-		m.cacheSize.Inst(),
-	)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddConnReuse increments the connection reuse counter.
-func (m *Metrics) AddConnReuse(ctx context.Context) {
-	m.connReuse.Add(ctx, 1)
-}
+func (m *Metrics) AddConnReuse(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 // AddConnNew increments the new connection counter.
-func (m *Metrics) AddConnNew(ctx context.Context) {
-	m.connNew.Add(ctx, 1)
-}
+func (m *Metrics) AddConnNew(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 // AddDialTimeout increments the dial timeout counter.
-func (m *Metrics) AddDialTimeout(ctx context.Context) {
-	m.dialTimeouts.Add(ctx, 1)
-}
+func (m *Metrics) AddDialTimeout(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 // RecordDialDuration records a dial operation duration with the specified path.
 func (m *Metrics) RecordDialDuration(ctx context.Context, duration time.Duration, path DialPath) {
-	m.dialDuration.Record(ctx, duration.Seconds(), path)
+	_ = "STUB: not implemented"
+	return
 }

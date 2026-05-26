@@ -14,13 +14,6 @@
 
 package ast
 
-import (
-	"fmt"
-	"strings"
-
-	"github.com/cespare/xxhash/v2"
-)
-
 // NormalizeResult holds the output of AST normalization.
 type NormalizeResult struct {
 	// NormalizedSQL is the SQL string with literals replaced by $1, $2, ...
@@ -37,25 +30,19 @@ type NormalizeResult struct {
 }
 
 // WasNormalized reports whether any literals were replaced during normalization.
-func (r *NormalizeResult) WasNormalized() bool {
-	return len(r.BindValues) > 0
-}
+func (r *NormalizeResult) WasNormalized() bool { _ = "STUB: not implemented"; return false }
 
 // Fingerprint returns a stable 16-character hex hash of the normalized SQL.
 // Two queries with the same NormalizedSQL produce identical fingerprints,
 // which makes the fingerprint suitable as a per-query-shape identifier for
 // metrics aggregation and cache keys.
-func (r *NormalizeResult) Fingerprint() string {
-	return FingerprintSQL(r.NormalizedSQL)
-}
+func (r *NormalizeResult) Fingerprint() string { _ = "STUB: not implemented"; return "" }
 
 // FingerprintSQL returns a stable 16-character hex hash of the given SQL
 // string. Useful for callers that already have a normalized or
 // placeholder-form SQL (e.g. extended-protocol queries whose Parse text
 // already contains $N placeholders) and don't need to run the normalizer.
-func FingerprintSQL(sql string) string {
-	return fmt.Sprintf("%016x", xxhash.Sum64String(sql))
-}
+func FingerprintSQL(sql string) string { _ = "STUB: not implemented"; return "" }
 
 // Normalize replaces literal A_Const values in the AST with ParamRef ($1, $2, ...)
 // placeholders and returns the normalized SQL string along with the extracted values.
@@ -73,66 +60,23 @@ func FingerprintSQL(sql string) string {
 //
 // NULL constants (A_Const with Isnull=true) are NOT normalized because NULL
 // is a keyword that affects query semantics (e.g., IS NULL vs IS $1).
-func Normalize(stmt Stmt) *NormalizeResult {
-	cloned := CloneNode(stmt).(Stmt)
+func Normalize(stmt Stmt) *NormalizeResult { _ = "STUB: not implemented"; return nil }
 
-	var (
-		counter    int
-		bindValues []*A_Const
-	)
+// replaceLiteral converts an A_Const literal into a $N placeholder and
+// records the original value. Shared between the top-level walker and
+// the per-arg recursion below so they mint placeholders from the same
+// counter sequence.
 
-	// replaceLiteral converts an A_Const literal into a $N placeholder and
-	// records the original value. Shared between the top-level walker and
-	// the per-arg recursion below so they mint placeholders from the same
-	// counter sequence.
-	replaceLiteral := func(cursor *Cursor) bool {
-		aConst, ok := cursor.Node().(*A_Const)
-		if !ok {
-			return true
-		}
-		if aConst.Isnull {
-			return true
-		}
-		counter++
-		bindValues = append(bindValues, aConst)
-		cursor.Replace(NewParamRef(counter, aConst.Location()))
-		return false
-	}
+// Skip subtrees where literal values carry semantic meaning that
+// affects planning (e.g., SET timezone = 'UTC') — don't normalize them.
 
-	normalizedAST := Rewrite(cloned, func(cursor *Cursor) bool {
-		node := cursor.Node()
-
-		// Skip subtrees where literal values carry semantic meaning that
-		// affects planning (e.g., SET timezone = 'UTC') — don't normalize them.
-		switch n := node.(type) {
-		case *VariableSetStmt, *VariableShowStmt, *DefElem:
-			return false
-		case *FuncCall:
-			if isPlannerLiteralFunc(n.Funcname) {
-				// set_config(name, value, is_local). The planner needs to
-				// read is_local literally to decide whether to track the
-				// call, so args[2] must stay an A_Const regardless. For the
-				// is_local=true case we still want to parameterize name and
-				// value so a hot per-request pattern (PostgREST-style)
-				// collapses into a single plan-cache fingerprint; we walk
-				// only those two arg slots and skip the rest.
-				if setConfigIsLocalLiteralTrue(n) && n.Args != nil && n.Args.Len() == 3 {
-					n.Args.Items[0] = Rewrite(n.Args.Items[0], replaceLiteral, nil)
-					n.Args.Items[1] = Rewrite(n.Args.Items[1], replaceLiteral, nil)
-				}
-				return false
-			}
-		}
-
-		return replaceLiteral(cursor)
-	}, nil).(Stmt)
-
-	return &NormalizeResult{
-		NormalizedSQL: normalizedAST.SqlString(),
-		NormalizedAST: normalizedAST,
-		BindValues:    bindValues,
-	}
-}
+// set_config(name, value, is_local). The planner needs to
+// read is_local literally to decide whether to track the
+// call, so args[2] must stay an A_Const regardless. For the
+// is_local=true case we still want to parameterize name and
+// value so a hot per-request pattern (PostgREST-style)
+// collapses into a single plan-cache fingerprint; we walk
+// only those two arg slots and skip the rest.
 
 // isPlannerLiteralFunc reports whether the planner inspects this function
 // call's arguments as literal values and therefore needs normalization
@@ -142,30 +86,12 @@ func Normalize(stmt Stmt) *NormalizeResult {
 // Keeping this predicate in the ast package (next to the normalizer) trades
 // a little co-location for avoiding an import cycle — the planner package
 // imports ast, not the other way around.
-func isPlannerLiteralFunc(funcname *NodeList) bool {
-	if funcname == nil {
-		return false
-	}
-	switch funcname.Len() {
-	case 1:
-		return funcNamePartEquals(funcname.Items[0], "set_config")
-	case 2:
-		return funcNamePartEquals(funcname.Items[0], "pg_catalog") &&
-			funcNamePartEquals(funcname.Items[1], "set_config")
-	}
-	return false
-}
+func isPlannerLiteralFunc(funcname *NodeList) bool { _ = "STUB: not implemented"; return false }
 
 // funcNamePartEquals returns true iff the node is a *String whose value,
 // lowercased, equals want. Used for FuncCall.Funcname items, which are
 // always *String in a well-formed parse tree.
-func funcNamePartEquals(n Node, want string) bool {
-	s, ok := n.(*String)
-	if !ok {
-		return false
-	}
-	return strings.EqualFold(s.SVal, want)
-}
+func funcNamePartEquals(n Node, want string) bool { _ = "STUB: not implemented"; return false }
 
 // setConfigIsLocalLiteralTrue reports whether fc is a 3-arg call whose
 // third argument is the literal boolean true. The normalizer uses this
@@ -179,20 +105,7 @@ func funcNamePartEquals(n Node, want string) bool {
 // non-literal expression, TypeCast over a literal) returns false — the
 // safe direction, since the planner-side validator can then still see
 // the original literals and reject or accept on its own terms.
-func setConfigIsLocalLiteralTrue(fc *FuncCall) bool {
-	if fc == nil || fc.Args == nil || fc.Args.Len() != 3 {
-		return false
-	}
-	c, ok := fc.Args.Items[2].(*A_Const)
-	if !ok || c.Isnull {
-		return false
-	}
-	b, ok := c.Val.(*Boolean)
-	if !ok {
-		return false
-	}
-	return b.BoolVal
-}
+func setConfigIsLocalLiteralTrue(fc *FuncCall) bool { _ = "STUB: not implemented"; return false }
 
 // ReconstructSQL takes a normalized AST and bind values, and produces the
 // final SQL with values substituted back in. This is used by Route at
@@ -200,19 +113,8 @@ func setConfigIsLocalLiteralTrue(fc *FuncCall) bool {
 //
 // The normalized AST is cloned before modification — it is not mutated.
 func ReconstructSQL(normalizedAST Stmt, bindValues []*A_Const) string {
-	cloned := CloneNode(normalizedAST).(Stmt)
-
-	result := Rewrite(cloned, func(cursor *Cursor) bool {
-		paramRef, ok := cursor.Node().(*ParamRef)
-		if !ok {
-			return true
-		}
-		idx := paramRef.Number - 1 // ParamRef is 1-based
-		if idx >= 0 && idx < len(bindValues) {
-			cursor.Replace(bindValues[idx])
-		}
-		return false
-	}, nil)
-
-	return result.(Stmt).SqlString()
+	_ = "STUB: not implemented"
+	return ""
 }
+
+// ParamRef is 1-based

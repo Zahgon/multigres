@@ -15,71 +15,23 @@
 package topo
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // runGetOrchs handles the getorchs command
 func runGetOrchs(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Get flag values
-	cellsFlag, err := cmd.Flags().GetString("cells")
-	if err != nil {
-		return fmt.Errorf("failed to read cells flag: %w", err)
-	}
-
-	// Parse cells flag
-	var cells []string
-	if cellsFlag != "" {
-		cells = strings.Split(cellsFlag, ",")
-		// Trim whitespace from each cell name
-		for i, cell := range cells {
-			cells[i] = strings.TrimSpace(cell)
-		}
-	}
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	request := &multiadminpb.GetOrchsRequest{
-		Cells: cells,
-	}
-
-	response, err := client.GetOrchs(cmd.Context(), request)
-	if err != nil {
-		return fmt.Errorf("failed to get orchestrators: %w", err)
-	}
-
-	// Convert to JSON and output
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
 
+// Parse cells flag
+
+// Trim whitespace from each cell name
+
+// Create admin client
+
+// Convert to JSON and output
+
 // AddGetOrchsCommand adds the getorchs subcommand
-func AddGetOrchsCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getorchs",
-		Short: "Get orchestrators filtered by cells",
-		Long:  "Retrieve orchestrators from specified cells. If no cells are specified, all cells will be queried.",
-		RunE:  runGetOrchs,
-	}
-
-	cmd.Flags().String("admin-server", "", "Address of the multiadmin server (overrides config)")
-	cmd.Flags().String("cells", "", "Comma-separated list of cell names to query (optional)")
-
-	return cmd
-}
+func AddGetOrchsCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }

@@ -16,12 +16,8 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
-	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
 	"github.com/multigres/multigres/go/common/sqltypes"
@@ -38,11 +34,8 @@ type CopyStatement struct {
 
 // NewCopyStatement creates a new CopyStatement primitive.
 func NewCopyStatement(tableGroup, query string, copyStmt *ast.CopyStmt) *CopyStatement {
-	return &CopyStatement{
-		TableGroup: tableGroup,
-		Query:      query,
-		CopyStmt:   copyStmt,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute implements the Primitive interface.
@@ -55,89 +48,31 @@ func (c *CopyStatement) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
+	_ = "STUB: not implemented"
 	// For now, use DefaultShard (unsharded). When sharding is supported,
 	// this will need to be determined from the COPY target table.
-	shard := constants.DefaultShard
-
-	// Phase 1: INITIATE - Send COPY command to pooler
-	// CopyInitiate stores reserved connection info in state.ShardStates internally
-	format, columnFormats, err := exec.CopyInitiate(ctx, conn, c.TableGroup, shard, c.Query, state, func(ctx context.Context, result *sqltypes.Result) error {
-		return nil
-	})
-	if err != nil {
-		return fmt.Errorf("failed to initiate COPY: %w", err)
-	}
-
-	// Ensure cleanup on any exit path after successful initiate
-	completed := false
-	defer func() {
-		if !completed {
-			_ = exec.CopyAbort(ctx, conn, c.TableGroup, shard, state)
-		}
-	}()
-
-	// Send CopyInResponse to client
-	if err := conn.WriteCopyInResponse(format, columnFormats); err != nil {
-		return fmt.Errorf("failed to write CopyInResponse: %w", err)
-	}
-	if err := conn.Flush(); err != nil {
-		return fmt.Errorf("failed to flush CopyInResponse: %w", err)
-	}
-
-	// Phase 2: DATA - Read from client and send chunks to pooler
-	for {
-		msgType, err := conn.ReadMessageType()
-		if err != nil {
-			return fmt.Errorf("failed to read message: %w", err)
-		}
-
-		length, err := conn.ReadMessageLength()
-		if err != nil {
-			return fmt.Errorf("failed to read message length: %w", err)
-		}
-
-		switch msgType {
-		case protocol.MsgCopyData:
-			data, err := conn.ReadCopyDataMessage(length)
-			if err != nil {
-				return err
-			}
-			if err := exec.CopySendData(ctx, conn, c.TableGroup, shard, state, data); err != nil {
-				return fmt.Errorf("failed to send COPY data: %w", err)
-			}
-
-		case protocol.MsgCopyDone:
-			if err := conn.ReadCopyDoneMessage(length); err != nil {
-				return err
-			}
-			// Phase 3: DONE - Finalize (no buffered data in streaming mode).
-			// CopyFinalize owns the full lifecycle of the COPY's tail end:
-			// it sends CopyDone to PG, reads the response, and on a PG-level
-			// error (e.g., constraint violation) drains ReadyForQuery and
-			// updates the gateway's reserved-state tracking with whatever
-			// state the multipooler returned. Mark the COPY completed before
-			// returning the error so the deferred CopyAbort doesn't run on
-			// top of an already-cleaned-up flow — running it would clear
-			// gateway state for a connection the multipooler intentionally
-			// kept alive (e.g., because a transaction reason remains).
-			finalizeErr := exec.CopyFinalize(ctx, conn, c.TableGroup, shard, state, nil, callback)
-			completed = true
-			return finalizeErr
-
-		case protocol.MsgCopyFail:
-			errMsg, err := conn.ReadCopyFailMessage(length)
-			if err != nil {
-				return err
-			}
-			return mterrors.NewPgError("ERROR", mterrors.PgSSProtocolViolation,
-				"COPY failed: "+errMsg, "")
-
-		default:
-			return mterrors.NewPgError("ERROR", mterrors.PgSSProtocolViolation,
-				fmt.Sprintf("unexpected message type during COPY: %c", msgType), "")
-		}
-	}
+	return nil
 }
+
+// Phase 1: INITIATE - Send COPY command to pooler
+// CopyInitiate stores reserved connection info in state.ShardStates internally
+
+// Ensure cleanup on any exit path after successful initiate
+
+// Send CopyInResponse to client
+
+// Phase 2: DATA - Read from client and send chunks to pooler
+
+// Phase 3: DONE - Finalize (no buffered data in streaming mode).
+// CopyFinalize owns the full lifecycle of the COPY's tail end:
+// it sends CopyDone to PG, reads the response, and on a PG-level
+// error (e.g., constraint violation) drains ReadyForQuery and
+// updates the gateway's reserved-state tracking with whatever
+// state the multipooler returned. Mark the COPY completed before
+// returning the error so the deferred CopyAbort doesn't run on
+// top of an already-cleaned-up flow — running it would clear
+// gateway state for a connection the multipooler intentionally
+// kept alive (e.g., because a transaction reason remains).
 
 // PortalStreamExecute satisfies the Primitive interface for the
 // extended-protocol path. COPY FROM STDIN is simple-protocol only —
@@ -155,27 +90,22 @@ func (c *CopyStatement) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return c.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup implements the Primitive interface.
-func (c *CopyStatement) GetTableGroup() string {
-	return c.TableGroup
-}
+func (c *CopyStatement) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
 // GetQuery implements the Primitive interface.
 func (c *CopyStatement) GetQuery() string {
-	return c.Query
+	_ = "STUB: not implemented"
+
+	// String implements the Primitive interface.
+	return ""
 }
 
-// String implements the Primitive interface.
-func (c *CopyStatement) String() string {
-	direction := "FROM STDIN"
-	if !c.CopyStmt.IsFrom {
-		direction = "TO STDOUT"
-	}
-	return fmt.Sprintf("CopyStatement(%s %s)", c.CopyStmt.Relation.RelName, direction)
-}
+func (c *CopyStatement) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure CopyStatement implements Primitive interface.
 var _ Primitive = (*CopyStatement)(nil)

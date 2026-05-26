@@ -14,12 +14,6 @@
 
 package pgctld
 
-import (
-	"errors"
-	"os"
-	"path/filepath"
-)
-
 // PostgresCtlConfig holds all PostgreSQL control configuration parameters
 // It contains a PostgresServerConfig for all PostgreSQL-specific settings
 // plus additional connection parameters for control operations
@@ -38,38 +32,13 @@ type PostgresCtlConfig struct {
 
 // NewPostgresCtlConfig creates a PostgresCtlConfig with the given parameters
 func NewPostgresCtlConfig(port int, user string, database string, timeout int, postgresDataDir string, postgresConfigFile string, poolerDir string, listenAddresses string, unixSocketDirectories string) (*PostgresCtlConfig, error) {
-	if postgresDataDir == "" {
-		return nil, errors.New("postgres-data-dir needs to be set")
-	}
-
-	if poolerDir == "" {
-		return nil, errors.New("pooler-dir needs to be set")
-	}
-
-	if port == 0 {
-		return nil, errors.New("port needs to be set")
-	}
-	if postgresConfigFile == "" {
-		return nil, errors.New("postgres-config-file needs to be set")
-	}
-
-	return &PostgresCtlConfig{
-		Port:                  port,
-		User:                  user,
-		Database:              database,
-		PostgresDataDir:       postgresDataDir,
-		Timeout:               timeout,
-		PostgresConfigFile:    postgresConfigFile,
-		PoolerDir:             poolerDir,
-		ListenAddresses:       listenAddresses,
-		UnixSocketDirectories: unixSocketDirectories,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // IsDataDirInitialized checks if the PostgreSQL data directory (PGDATA) has been initialized
 func IsDataDirInitialized() bool {
+	_ = "STUB: not implemented"
 	// Check if PG_VERSION file exists (indicates initialized data directory)
-	pgVersionFile := filepath.Join(PostgresDataDir(), "PG_VERSION")
-	_, err := os.Stat(pgVersionFile)
-	return err == nil
+	return false
 }

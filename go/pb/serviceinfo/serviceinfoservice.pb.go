@@ -21,12 +21,11 @@
 package serviceinfo
 
 import (
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -42,34 +41,21 @@ type GetBuildInfoRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetBuildInfoRequest) Reset() {
-	*x = GetBuildInfoRequest{}
-	mi := &file_serviceinfoservice_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetBuildInfoRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetBuildInfoRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetBuildInfoRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetBuildInfoRequest) ProtoMessage() {}
+func (*GetBuildInfoRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetBuildInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_serviceinfoservice_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetBuildInfoRequest.ProtoReflect.Descriptor instead.
 func (*GetBuildInfoRequest) Descriptor() ([]byte, []int) {
-	return file_serviceinfoservice_proto_rawDescGZIP(), []int{0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type GetBuildInfoResponse struct {
@@ -79,42 +65,24 @@ type GetBuildInfoResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetBuildInfoResponse) Reset() {
-	*x = GetBuildInfoResponse{}
-	mi := &file_serviceinfoservice_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetBuildInfoResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetBuildInfoResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetBuildInfoResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetBuildInfoResponse) ProtoMessage() {}
+func (*GetBuildInfoResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetBuildInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_serviceinfoservice_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetBuildInfoResponse.ProtoReflect.Descriptor instead.
 func (*GetBuildInfoResponse) Descriptor() ([]byte, []int) {
-	return file_serviceinfoservice_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetBuildInfoResponse) GetBuildInfo() *BuildInfo {
-	if x != nil {
-		return x.BuildInfo
-	}
-	return nil
-}
+func (x *GetBuildInfoResponse) GetBuildInfo() *BuildInfo { _ = "STUB: not implemented"; return nil }
 
 // BuildInfo describes the source revision and build settings of the
 // running binary. Fields are populated from runtime/debug.BuildInfo,
@@ -143,70 +111,29 @@ type BuildInfo struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *BuildInfo) Reset() {
-	*x = BuildInfo{}
-	mi := &file_serviceinfoservice_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *BuildInfo) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *BuildInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *BuildInfo) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*BuildInfo) ProtoMessage() {}
+func (*BuildInfo) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *BuildInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_serviceinfoservice_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use BuildInfo.ProtoReflect.Descriptor instead.
-func (*BuildInfo) Descriptor() ([]byte, []int) {
-	return file_serviceinfoservice_proto_rawDescGZIP(), []int{2}
-}
+func (*BuildInfo) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *BuildInfo) GetRevision() string {
-	if x != nil {
-		return x.Revision
-	}
-	return ""
-}
+func (x *BuildInfo) GetRevision() string { _ = "STUB: not implemented"; return "" }
 
-func (x *BuildInfo) GetModified() bool {
-	if x != nil {
-		return x.Modified
-	}
-	return false
-}
+func (x *BuildInfo) GetModified() bool { _ = "STUB: not implemented"; return false }
 
-func (x *BuildInfo) GetCommitTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CommitTime
-	}
-	return nil
-}
+func (x *BuildInfo) GetCommitTime() *timestamppb.Timestamp { _ = "STUB: not implemented"; return nil }
 
-func (x *BuildInfo) GetGoVersion() string {
-	if x != nil {
-		return x.GoVersion
-	}
-	return ""
-}
+func (x *BuildInfo) GetGoVersion() string { _ = "STUB: not implemented"; return "" }
 
-func (x *BuildInfo) GetMainPath() string {
-	if x != nil {
-		return x.MainPath
-	}
-	return ""
-}
+func (x *BuildInfo) GetMainPath() string { _ = "STUB: not implemented"; return "" }
 
 var File_serviceinfoservice_proto protoreflect.FileDescriptor
 
@@ -233,12 +160,7 @@ var (
 	file_serviceinfoservice_proto_rawDescData []byte
 )
 
-func file_serviceinfoservice_proto_rawDescGZIP() []byte {
-	file_serviceinfoservice_proto_rawDescOnce.Do(func() {
-		file_serviceinfoservice_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_serviceinfoservice_proto_rawDesc), len(file_serviceinfoservice_proto_rawDesc)))
-	})
-	return file_serviceinfoservice_proto_rawDescData
-}
+func file_serviceinfoservice_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_serviceinfoservice_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_serviceinfoservice_proto_goTypes = []any{
@@ -259,26 +181,5 @@ var file_serviceinfoservice_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_serviceinfoservice_proto_init() }
-func file_serviceinfoservice_proto_init() {
-	if File_serviceinfoservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_serviceinfoservice_proto_rawDesc), len(file_serviceinfoservice_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   3,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_serviceinfoservice_proto_goTypes,
-		DependencyIndexes: file_serviceinfoservice_proto_depIdxs,
-		MessageInfos:      file_serviceinfoservice_proto_msgTypes,
-	}.Build()
-	File_serviceinfoservice_proto = out.File
-	file_serviceinfoservice_proto_goTypes = nil
-	file_serviceinfoservice_proto_depIdxs = nil
-}
+func init()                               { file_serviceinfoservice_proto_init() }
+func file_serviceinfoservice_proto_init() { _ = "STUB: not implemented"; return }

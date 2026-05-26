@@ -18,13 +18,7 @@ package regular
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strings"
-	"time"
 
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/client"
 	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
 	"github.com/multigres/multigres/go/common/sqltypes"
@@ -57,42 +51,25 @@ type Conn struct {
 // NewConn creates a new regular connection wrapping the given client connection.
 // The connection's state is stored in conn.state as *connstate.ConnectionState.
 func NewConn(conn *client.Conn, adminPool *admin.Pool) *Conn {
+	_ = "STUB: not implemented"
 	// Initialize connection state if not already set.
-	if conn.GetConnectionState() == nil {
-		conn.SetConnectionState(connstate.NewConnectionState())
-	}
-
-	return &Conn{
-		conn:      conn,
-		adminPool: adminPool,
-	}
+	return nil
 }
 
 // --- connpool.Connection interface ---
 
 // Settings returns the current settings applied to this connection.
 // Returns nil if the connection has no settings applied (clean connection).
-func (c *Conn) Settings() *connstate.Settings {
-	state := c.State()
-	if state == nil {
-		return nil
-	}
-	return state.GetSettings()
-}
+func (c *Conn) Settings() *connstate.Settings { _ = "STUB: not implemented"; return nil }
 
 // IsClosed returns true if the connection has been closed.
-func (c *Conn) IsClosed() bool {
-	return c.conn.IsClosed()
-}
+func (c *Conn) IsClosed() bool { _ = "STUB: not implemented"; return false }
 
 // Close closes the underlying connection.
 func (c *Conn) Close() error {
+	_ = "STUB: not implemented"
 	// Clean up state.
-	if state := c.State(); state != nil {
-		state.Close()
-	}
-
-	return c.conn.Close()
+	return nil
 }
 
 // ApplySettings transitions the connection to the desired settings state.
@@ -101,57 +78,22 @@ func (c *Conn) Close() error {
 // variables. This is safe inside transactions (individual RESETs don't destroy
 // SET LOCAL settings, unlike RESET ALL).
 func (c *Conn) ApplySettings(ctx context.Context, desired *connstate.Settings) error {
-	current := c.State().GetSettings()
-
-	// If desired is nil/empty, reset all current settings to reach a clean state.
-	if desired == nil || desired.IsEmpty() {
-		if current == nil || current.IsEmpty() {
-			return nil
-		}
-		return c.ResetAllSettings(ctx)
-	}
-
-	// Build SQL: RESET removed variables, then SET desired variables.
-	var b strings.Builder
-
-	// RESET variables present in current but absent from desired.
-	// Note: "role" and "session_authorization" have GUC_NO_RESET_ALL in
-	// PostgreSQL, so they MUST be reset individually — RESET ALL won't
-	// touch them. We handle them here with explicit RESET commands.
-	if current != nil {
-		for name := range current.Vars {
-			if _, ok := desired.Vars[name]; !ok {
-				if b.Len() > 0 {
-					b.WriteString("; ")
-				}
-				b.WriteString("RESET ")
-				b.WriteString(ast.QuoteQualifiedIdentifier(name))
-			}
-		}
-	}
-
-	// SET all desired variables.
-	applySQL := desired.ApplyQuery()
-	if applySQL != "" {
-		if b.Len() > 0 {
-			b.WriteString("; ")
-		}
-		b.WriteString(applySQL)
-	}
-
-	if b.Len() == 0 {
-		return nil
-	}
-
-	_, err := c.Query(ctx, b.String())
-	if err != nil {
-		return fmt.Errorf("failed to apply settings: %w", err)
-	}
-
-	// Update tracked state.
-	c.State().SetSettings(desired)
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// If desired is nil/empty, reset all current settings to reach a clean state.
+
+// Build SQL: RESET removed variables, then SET desired variables.
+
+// RESET variables present in current but absent from desired.
+// Note: "role" and "session_authorization" have GUC_NO_RESET_ALL in
+// PostgreSQL, so they MUST be reset individually — RESET ALL won't
+// touch them. We handle them here with explicit RESET commands.
+
+// SET all desired variables.
+
+// Update tracked state.
 
 // ResetAllSettings resets the connection to a clean state.
 //
@@ -170,41 +112,18 @@ func (c *Conn) ApplySettings(ctx context.Context, desired *connstate.Settings) e
 // This matches what DISCARD ALL does internally
 // (src/backend/commands/discard.c), but works inside transactions
 // where DISCARD ALL cannot be used.
-func (c *Conn) ResetAllSettings(ctx context.Context) error {
-	state := c.State()
-	if state == nil {
-		return nil
-	}
+func (c *Conn) ResetAllSettings(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	settings := state.GetSettings()
-	if settings == nil || settings.IsEmpty() {
-		return nil
-	}
+// Use the settings' ResetQuery which includes RESET ROLE and
+// RESET SESSION AUTHORIZATION before RESET ALL (GUC_NO_RESET_ALL).
 
-	// Use the settings' ResetQuery which includes RESET ROLE and
-	// RESET SESSION AUTHORIZATION before RESET ALL (GUC_NO_RESET_ALL).
-	_, err := c.Query(ctx, settings.ResetQuery())
-	if err != nil {
-		return fmt.Errorf("failed to reset settings: %w", err)
-	}
-
-	// Update state.
-	state.SetSettings(nil)
-	return nil
-}
+// Update state.
 
 // --- State management ---
 
 // State returns the connection's state.
 // This is stored in the underlying client.Conn.state field.
-func (c *Conn) State() *connstate.ConnectionState {
-	state := c.conn.GetConnectionState()
-	if state == nil {
-		c.conn.SetConnectionState(connstate.NewConnectionState())
-		state = c.conn.GetConnectionState()
-	}
-	return state.(*connstate.ConnectionState)
-}
+func (c *Conn) State() *connstate.ConnectionState { _ = "STUB: not implemented"; return nil }
 
 // --- Query execution ---
 
@@ -215,26 +134,23 @@ func (c *Conn) State() *connstate.ConnectionState {
 // pg_stat_activity. Must be re-applied on every client hand-off for pooled
 // connections since the backend is shared across clients.
 func (c *Conn) SetApplicationName(ctx context.Context, name string) error {
-	_, err := c.conn.Query(ctx, "SET application_name = "+ast.QuoteStringLiteral(name))
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Query executes a simple query and returns all results.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) Query(ctx context.Context, sql string) ([]*sqltypes.Result, error) {
-	return execWithContextCancel(c, ctx, func() ([]*sqltypes.Result, error) {
-		return c.conn.Query(ctx, sql)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // QueryStreaming executes a query with streaming results via callback.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) QueryStreaming(ctx context.Context, sql string, callback func(context.Context, *sqltypes.Result) error) error {
+	_ = "STUB: not implemented"
 	// Use a struct{} as the value type since we only care about the error.
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.QueryStreaming(ctx, sql, callback)
-	})
-	return err
+	return nil
 }
 
 // --- Extended query protocol ---
@@ -242,27 +158,23 @@ func (c *Conn) QueryStreaming(ctx context.Context, sql string, callback func(con
 // Parse sends a Parse message to prepare a statement.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) Parse(ctx context.Context, name, queryStr string, paramTypes []uint32) error {
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.Parse(ctx, name, queryStr, paramTypes)
-	})
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // BindAndExecute binds parameters and executes atomically.
 // Returns true if the execution completed (CommandComplete), false if suspended (PortalSuspended).
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) BindAndExecute(ctx context.Context, portalName, stmtName string, params [][]byte, paramFormats, resultFormats []int16, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (completed bool, err error) {
-	return execWithContextCancel(c, ctx, func() (bool, error) {
-		return c.conn.BindAndExecute(ctx, portalName, stmtName, params, paramFormats, resultFormats, maxRows, callback)
-	})
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // BindAndDescribe binds parameters and describes the resulting portal.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) BindAndDescribe(ctx context.Context, stmtName string, params [][]byte, paramFormats, resultFormats []int16) (*query.StatementDescription, error) {
-	return execWithContextCancel(c, ctx, func() (*query.StatementDescription, error) {
-		return c.conn.BindAndDescribe(ctx, stmtName, params, paramFormats, resultFormats)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // BindDescribeAndExecute fuses Bind+Describe(P)+Execute+Sync into a single
@@ -271,54 +183,41 @@ func (c *Conn) BindAndDescribe(ctx context.Context, stmtName string, params [][]
 // standalone Describe path delivers it.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) BindDescribeAndExecute(ctx context.Context, portalName, stmtName string, params [][]byte, paramFormats, resultFormats []int16, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (bool, error) {
-	return execWithContextCancel(c, ctx, func() (bool, error) {
-		return c.conn.BindDescribeAndExecute(ctx, portalName, stmtName, params, paramFormats, resultFormats, maxRows, callback)
-	})
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // DescribePrepared describes a prepared statement.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) DescribePrepared(ctx context.Context, name string) (*query.StatementDescription, error) {
-	return execWithContextCancel(c, ctx, func() (*query.StatementDescription, error) {
-		return c.conn.DescribePrepared(ctx, name)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CloseStatement closes a prepared statement.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) CloseStatement(ctx context.Context, name string) error {
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.CloseStatement(ctx, name)
-	})
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ClosePortal closes a portal.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) ClosePortal(ctx context.Context, name string) error {
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.ClosePortal(ctx, name)
-	})
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Sync sends a Sync message to synchronize the extended query protocol.
 // If the context is cancelled, the backend query is cancelled via adminPool.
-func (c *Conn) Sync(ctx context.Context) error {
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.Sync(ctx)
-	})
-	return err
-}
+func (c *Conn) Sync(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // PrepareAndExecute is a convenience method that prepares and executes in one round trip.
 // name is the statement/portal name (use "" for unnamed, which is cleared after Sync).
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) PrepareAndExecute(ctx context.Context, name, queryStr string, params [][]byte, callback func(ctx context.Context, result *sqltypes.Result) error) error {
-	_, err := execWithContextCancel(c, ctx, func() (struct{}, error) {
-		return struct{}{}, c.conn.PrepareAndExecute(ctx, name, queryStr, params, callback)
-	})
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // QueryArgs executes a parameterized query using the extended query protocol.
@@ -326,9 +225,8 @@ func (c *Conn) PrepareAndExecute(ctx context.Context, name, queryStr string, par
 // them to the appropriate text format for PostgreSQL.
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) QueryArgs(ctx context.Context, queryStr string, args ...any) ([]*sqltypes.Result, error) {
-	return execWithContextCancel(c, ctx, func() ([]*sqltypes.Result, error) {
-		return c.conn.QueryArgs(ctx, queryStr, args...)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Execute continues execution of a previously bound portal.
@@ -337,9 +235,8 @@ func (c *Conn) QueryArgs(ctx context.Context, queryStr string, args ...any) ([]*
 // Returns true if the portal completed (CommandComplete), false if suspended (PortalSuspended).
 // If the context is cancelled, the backend query is cancelled via adminPool.
 func (c *Conn) Execute(ctx context.Context, portalName string, maxRows int32, callback func(ctx context.Context, result *sqltypes.Result) error) (completed bool, err error) {
-	return execWithContextCancel(c, ctx, func() (bool, error) {
-		return c.conn.Execute(ctx, portalName, maxRows, callback)
-	})
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // --- Transaction status ---
@@ -347,53 +244,40 @@ func (c *Conn) Execute(ctx context.Context, portalName string, maxRows int32, ca
 // TxnStatus returns the current transaction status.
 // Returns one of: 'I' (idle), 'T' (in transaction), 'E' (error).
 func (c *Conn) TxnStatus() protocol.TransactionStatus {
-	return c.conn.TxnStatus()
+	_ = "STUB: not implemented"
+	return *new(protocol.TransactionStatus)
 }
 
 // IsIdle returns true if the connection is idle (not in a transaction).
-func (c *Conn) IsIdle() bool {
-	return c.conn.TxnStatus() == protocol.TxnStatusIdle
-}
+func (c *Conn) IsIdle() bool { _ = "STUB: not implemented"; return false }
 
 // IsInTransaction returns true if the connection is in a transaction.
-func (c *Conn) IsInTransaction() bool {
-	status := c.conn.TxnStatus()
-	return status == protocol.TxnStatusInBlock || status == protocol.TxnStatusFailed
-}
+func (c *Conn) IsInTransaction() bool { _ = "STUB: not implemented"; return false }
 
 // --- Backend info ---
 
 // ProcessID returns the backend process ID.
-func (c *Conn) ProcessID() uint32 {
-	return c.conn.ProcessID()
-}
+func (c *Conn) ProcessID() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // SecretKey returns the backend secret key for query cancellation.
-func (c *Conn) SecretKey() uint32 {
-	return c.conn.SecretKey()
-}
+func (c *Conn) SecretKey() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // --- Kill capability ---
 
 // Kill terminates this connection's backend process using pg_terminate_backend().
 // Requires adminPool to be set; returns error if adminPool is nil.
-func (c *Conn) Kill(ctx context.Context) error {
-	if c.adminPool == nil {
-		return errors.New("cannot kill connection: admin pool not configured")
-	}
-	_, err := c.adminPool.TerminateBackend(ctx, c.ProcessID())
-	return err
-}
+func (c *Conn) Kill(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // --- Underlying connection access ---
 
 // RawConn returns the underlying client.Conn.
 // Use with caution - prefer the wrapped methods.
 func (c *Conn) RawConn() *client.Conn {
-	return c.conn
-}
+	_ = "STUB: not implemented"
 
-// --- Reconnect ---
+	// --- Reconnect ---
+	return nil
+}
 
 // Reconnect closes the underlying connection and establishes a fresh one,
 // preserving the same *Conn identity. After reconnecting the socket and
@@ -401,38 +285,21 @@ func (c *Conn) RawConn() *client.Conn {
 // session settings are re-applied. Prepared statements are cleared since
 // they don't survive a PostgreSQL session reset.
 func (c *Conn) Reconnect(ctx context.Context) error {
+	_ = "STUB: not implemented"
 	// Save settings before reconnecting. The PostgreSQL session will be
 	// brand new, so we need to re-apply them after startup.
-	settings := c.State().GetSettings()
-
-	// Reconnect the underlying socket in-place.
-	if err := c.conn.Reconnect(ctx); err != nil {
-		return err
-	}
-
-	// Reset connection state (new session = clean slate).
-	// Prepared statements don't survive reconnection.
-	c.conn.SetConnectionState(connstate.NewConnectionState())
-
-	// Re-apply settings on the fresh connection via SET commands.
-	// We use execOnce (not execWithContextCancel) so that a failure here
-	// doesn't close the connection—the caller's retry loop can attempt
-	// another reconnect instead.
-	if settings != nil && !settings.IsEmpty() {
-		sql := settings.ApplyQuery()
-		if sql != "" {
-			_, err := execOnce(c, ctx, func() ([]*sqltypes.Result, error) {
-				return c.conn.Query(ctx, sql)
-			})
-			if err != nil {
-				return fmt.Errorf("failed to re-apply settings after reconnect: %w", err)
-			}
-			c.State().SetSettings(settings)
-		}
-	}
-
 	return nil
 }
+
+// Reconnect the underlying socket in-place.
+
+// Reset connection state (new session = clean slate).
+// Prepared statements don't survive reconnection.
+
+// Re-apply settings on the fresh connection via SET commands.
+// We use execOnce (not execWithContextCancel) so that a failure here
+// doesn't close the connection—the caller's retry loop can attempt
+// another reconnect instead.
 
 // --- Stateless query retry ---
 //
@@ -448,9 +315,8 @@ func (c *Conn) Reconnect(ctx context.Context) error {
 
 // QueryWithRetry executes a simple query with automatic retry on connection error.
 func (c *Conn) QueryWithRetry(ctx context.Context, sql string) ([]*sqltypes.Result, error) {
-	return retryOnConnectionError(c, ctx, func() ([]*sqltypes.Result, error) {
-		return c.conn.Query(ctx, sql)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // QueryStreamingWithRetry executes a streaming query with automatic retry on
@@ -458,39 +324,25 @@ func (c *Conn) QueryWithRetry(ctx context.Context, sql string) ([]*sqltypes.Resu
 // has started delivering results), the error is returned without retry to
 // avoid sending duplicate rows to the caller.
 func (c *Conn) QueryStreamingWithRetry(ctx context.Context, sql string, callback func(context.Context, *sqltypes.Result) error) error {
-	var callbackInvoked bool
-	var streamErr error
-	wrappedCallback := func(ctx context.Context, result *sqltypes.Result) error {
-		callbackInvoked = true
-		return callback(ctx, result)
-	}
-	_, err := retryOnConnectionError(c, ctx, func() (struct{}, error) {
-		if callbackInvoked {
-			// Callback was already called in a previous attempt — retrying
-			// would replay the query and send duplicate rows. Return the
-			// sentinel to stop the retry loop; we swap it for the real
-			// error below.
-			return struct{}{}, errStreamingAlreadyStarted
-		}
-		streamErr = c.conn.QueryStreaming(ctx, sql, wrappedCallback)
-		return struct{}{}, streamErr
-	})
-	// Replace the internal sentinel with the actual PostgreSQL error so
-	// callers can inspect it via errors.As / errors.Is.
-	if errors.Is(err, errStreamingAlreadyStarted) {
-		return mterrors.Wrapf(streamErr, "streaming already started, cannot retry")
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Callback was already called in a previous attempt — retrying
+// would replay the query and send duplicate rows. Return the
+// sentinel to stop the retry loop; we swap it for the real
+// error below.
+
+// Replace the internal sentinel with the actual PostgreSQL error so
+// callers can inspect it via errors.As / errors.Is.
 
 // QueryArgsWithRetry executes a parameterized query (via the extended query
 // protocol) with automatic retry on connection error, like QueryWithRetry.
 // Safe to retry because QueryArgs uses PrepareAndExecute which is a single
 // atomic round trip with an unnamed statement—no multi-step state to lose.
 func (c *Conn) QueryArgsWithRetry(ctx context.Context, sql string, args ...any) ([]*sqltypes.Result, error) {
-	return retryOnConnectionError(c, ctx, func() ([]*sqltypes.Result, error) {
-		return c.conn.QueryArgs(ctx, sql, args...)
-	})
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // retryOnConnectionError executes op with automatic retry on connection error.
@@ -498,41 +350,12 @@ func (c *Conn) QueryArgsWithRetry(ctx context.Context, sql string, args ...any) 
 // retried, up to constants.MaxConnPoolRetryAttempts total. The connection is closed after
 // exhausting all attempts or if reconnection fails.
 func retryOnConnectionError[T any](c *Conn, ctx context.Context, op func() (T, error)) (T, error) {
-	for attempt := 1; attempt <= constants.MaxConnPoolRetryAttempts; attempt++ {
-		val, err := execOnce(c, ctx, op)
-		switch {
-		case err == nil:
-			return val, nil
-		case !mterrors.IsConnectionError(err):
-			var zero T
-			return zero, err
-		case attempt == constants.MaxConnPoolRetryAttempts:
-			c.conn.Close()
-			var zero T
-			return zero, err
-		}
-		if ctx.Err() != nil {
-			var zero T
-			return zero, context.Cause(ctx)
-		}
-		// Brief backoff before reconnecting to give PostgreSQL time to
-		// finish starting up if the error is due to a restart.
-		backoffTimer := time.NewTimer(constants.ConnPoolRetryBackoff)
-		select {
-		case <-backoffTimer.C:
-		case <-ctx.Done():
-			backoffTimer.Stop()
-			var zero T
-			return zero, context.Cause(ctx)
-		}
-		if reconnectErr := c.Reconnect(ctx); reconnectErr != nil {
-			c.conn.Close()
-			var zero T
-			return zero, reconnectErr
-		}
-	}
-	panic("unreachable")
+	_ = "STUB: not implemented"
+	return *new(T), nil
 }
+
+// Brief backoff before reconnecting to give PostgreSQL time to
+// finish starting up if the error is due to a restart.
 
 // --- Context-aware execution helpers ---
 
@@ -544,48 +367,22 @@ func retryOnConnectionError[T any](c *Conn, ctx context.Context, op func() (T, e
 // ForceClose is used instead of Close because the op goroutine may be holding
 // bufmu and writing to the buffered writer; Close would race by also writing
 // a Terminate message to the same writer without the lock.
-func (c *Conn) handleContextCancellation() {
-	if c.adminPool == nil {
-		c.conn.ForceClose()
-		return
-	}
-	// Use the connection's context with a timeout for the cancel operation.
-	// If the connection is closed, there's no need to cancel the query.
-	cancelCtx, cancel := context.WithTimeout(c.conn.Context(), admin.DefaultCancelTimeout)
-	defer cancel()
-	ok, err := c.adminPool.CancelBackend(cancelCtx, c.ProcessID())
-	if err != nil || !ok {
-		c.conn.ForceClose()
-	}
-}
+func (c *Conn) handleContextCancellation() { _ = "STUB: not implemented"; return }
+
+// Use the connection's context with a timeout for the cancel operation.
+// If the connection is closed, there's no need to cancel the query.
 
 // execOnce executes an operation with context cancellation support.
 // Unlike execWithContextCancel, it does NOT close the connection on error,
 // allowing the caller (retry loop) to reconnect and retry.
 func execOnce[T any](c *Conn, ctx context.Context, op func() (T, error)) (T, error) {
-	type result struct {
-		val T
-		err error
-	}
-
-	ch := make(chan result, 1)
-	go func() {
-		val, err := op()
-		ch <- result{val: val, err: err}
-	}()
-
-	select {
-	case <-ctx.Done():
-		// Context cancelled - cancel the backend query.
-		c.handleContextCancellation()
-		// Wait for the operation to complete (it should return quickly after cancel).
-		<-ch
-		var zero T
-		return zero, context.Cause(ctx)
-	case res := <-ch:
-		return res.val, res.err
-	}
+	_ = "STUB: not implemented"
+	return *new(T), nil
 }
+
+// Context cancelled - cancel the backend query.
+
+// Wait for the operation to complete (it should return quickly after cancel).
 
 // execWithContextCancel executes an operation with context cancellation support.
 // If the context is cancelled while the operation is in progress, the backend
@@ -595,69 +392,46 @@ func execOnce[T any](c *Conn, ctx context.Context, op func() (T, error)) (T, err
 // This is used by the non-retrying methods (Query, QueryStreaming, etc.) where
 // the pool handles replacement of broken connections.
 func execWithContextCancel[T any](c *Conn, ctx context.Context, op func() (T, error)) (T, error) {
-	type result struct {
-		val T
-		err error
-	}
-
-	ch := make(chan result, 1)
-	go func() {
-		val, err := op()
-		ch <- result{val: val, err: err}
-	}()
-
-	select {
-	case <-ctx.Done():
-		// Context cancelled - cancel the backend query.
-		c.handleContextCancellation()
-		// Wait for the operation to complete (it should return quickly after cancel).
-		res := <-ch
-		// If the operation had a connection error, close the connection.
-		if mterrors.IsConnectionError(res.err) {
-			c.conn.Close()
-		}
-		var zero T
-		return zero, context.Cause(ctx)
-	case res := <-ch:
-		// Operation completed - check for connection errors.
-		if mterrors.IsConnectionError(res.err) {
-			c.conn.Close()
-		}
-		return res.val, res.err
-	}
+	_ = "STUB: not implemented"
+	return *new(T), nil
 }
+
+// Context cancelled - cancel the backend query.
+
+// Wait for the operation to complete (it should return quickly after cancel).
+
+// If the operation had a connection error, close the connection.
+
+// Operation completed - check for connection errors.
 
 // --- COPY FROM STDIN operations ---
 
 // InitiateCopyFromStdin sends a COPY FROM STDIN command and reads the CopyInResponse.
 // Returns the COPY format and column formats.
 func (c *Conn) InitiateCopyFromStdin(ctx context.Context, copyQuery string) (format int16, columnFormats []int16, err error) {
-	return c.conn.InitiateCopyFromStdin(ctx, copyQuery)
+	_ = "STUB: not implemented"
+	return 0, nil, nil
 }
 
 // WriteCopyData writes a CopyData message to PostgreSQL.
-func (c *Conn) WriteCopyData(data []byte) error {
-	return c.conn.WriteCopyData(data)
-}
+func (c *Conn) WriteCopyData(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // WriteCopyDone sends a CopyDone message to signal completion of COPY data.
-func (c *Conn) WriteCopyDone() error {
-	return c.conn.WriteCopyDone()
-}
+func (c *Conn) WriteCopyDone() error { _ = "STUB: not implemented"; return nil }
 
 // ReadCopyDoneResponse reads the CommandComplete and ReadyForQuery after CopyDone.
 // Returns the command tag and rows affected.
 func (c *Conn) ReadCopyDoneResponse(ctx context.Context) (string, uint64, error) {
-	return c.conn.ReadCopyDoneResponse(ctx)
+	_ = "STUB: not implemented"
+	return "", 0, nil
 }
 
 // ReadCopyFailResponse reads the expected ErrorResponse + ReadyForQuery
 // sequence after sending CopyFail, leaving the connection in a clean state.
 func (c *Conn) ReadCopyFailResponse(ctx context.Context) error {
-	return c.conn.ReadCopyFailResponse(ctx)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WriteCopyFail sends a CopyFail message to abort the COPY operation.
-func (c *Conn) WriteCopyFail(errorMsg string) error {
-	return c.conn.WriteCopyFail(errorMsg)
-}
+func (c *Conn) WriteCopyFail(errorMsg string) error { _ = "STUB: not implemented"; return nil }

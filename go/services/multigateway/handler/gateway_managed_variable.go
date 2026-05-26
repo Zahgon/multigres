@@ -52,123 +52,78 @@ type gmvSnapshot[T comparable] struct {
 
 // NewGatewayManagedVariable creates a variable with the given default value.
 func NewGatewayManagedVariable[T comparable](defaultValue T) GatewayManagedVariable[T] {
-	return GatewayManagedVariable[T]{defaultValue: defaultValue}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Set stores a session-level override and clears any active transaction-local
 // override. Matches PostgreSQL: a non-LOCAL SET issued inside a transaction
 // that has a prior SET LOCAL supersedes the LOCAL — effective value
 // immediately becomes the new session value.
-func (g *GatewayManagedVariable[T]) Set(v T) {
-	g.currentValue = v
-	g.isSet = true
-	var zero T
-	g.localValue = zero
-	g.isLocalSet = false
-}
+func (g *GatewayManagedVariable[T]) Set(v T) { _ = "STUB: not implemented"; return }
 
 // Reset clears both the session override and any active transaction-local
 // override, reverting to the default. Matches PostgreSQL: RESET issued inside
 // a transaction that has a prior SET LOCAL supersedes the LOCAL — effective
 // value immediately becomes the default.
-func (g *GatewayManagedVariable[T]) Reset() {
-	var zero T
-	g.currentValue = zero
-	g.isSet = false
-	g.localValue = zero
-	g.isLocalSet = false
-}
+func (g *GatewayManagedVariable[T]) Reset() { _ = "STUB: not implemented"; return }
 
 // SetLocal stores a transaction-local override. Cleared by ResetLocal at
 // transaction end (COMMIT or ROLLBACK).
-func (g *GatewayManagedVariable[T]) SetLocal(v T) {
-	g.localValue = v
-	g.isLocalSet = true
-}
+func (g *GatewayManagedVariable[T]) SetLocal(v T) { _ = "STUB: not implemented"; return }
 
 // SetLocalToDefault is the LOCAL form of SET ... TO DEFAULT: a transaction-
 // scoped override whose value is the server default. It masks any session-level
 // override for the duration of the transaction without destroying it. Matches
 // PostgreSQL's behavior for `SET LOCAL var TO DEFAULT` — after the transaction
 // ends and ResetLocal fires, the session-level value (if any) is restored.
-func (g *GatewayManagedVariable[T]) SetLocalToDefault() {
-	g.localValue = g.defaultValue
-	g.isLocalSet = true
-}
+func (g *GatewayManagedVariable[T]) SetLocalToDefault() { _ = "STUB: not implemented"; return }
 
 // ResetLocal clears any transaction-local override. Called at COMMIT/ROLLBACK
 // to revert the value to the session-level (or default) value.
-func (g *GatewayManagedVariable[T]) ResetLocal() {
-	var zero T
-	g.localValue = zero
-	g.isLocalSet = false
-}
+func (g *GatewayManagedVariable[T]) ResetLocal() { _ = "STUB: not implemented"; return }
 
 // GetEffective returns the active value with priority:
 // transaction-local > session > default.
-func (g *GatewayManagedVariable[T]) GetEffective() T {
-	if g.isLocalSet {
-		return g.localValue
-	}
-	if g.isSet {
-		return g.currentValue
-	}
-	return g.defaultValue
-}
+func (g *GatewayManagedVariable[T]) GetEffective() T { _ = "STUB: not implemented"; return *new(T) }
 
 // IsSet returns whether a session-level override is active.
 func (g *GatewayManagedVariable[T]) IsSet() bool {
-	return g.isSet
+	_ = "STUB: not implemented"
+
+	// IsLocalSet returns whether a transaction-local override is active.
+	return false
 }
 
-// IsLocalSet returns whether a transaction-local override is active.
-func (g *GatewayManagedVariable[T]) IsLocalSet() bool {
-	return g.isLocalSet
-}
+func (g *GatewayManagedVariable[T]) IsLocalSet() bool { _ = "STUB: not implemented"; return false }
 
 // Snapshot pushes the current (currentValue, isSet, localValue, isLocalSet) tuple
 // onto the snapshot stack. Called by MultiGatewayConnectionState when a SAVEPOINT
 // is opened (or at BEGIN-level frame creation).
-func (g *GatewayManagedVariable[T]) Snapshot() {
-	g.snapshots = append(g.snapshots, gmvSnapshot[T]{
-		currentValue: g.currentValue,
-		isSet:        g.isSet,
-		localValue:   g.localValue,
-		isLocalSet:   g.isLocalSet,
-	})
-}
+func (g *GatewayManagedVariable[T]) Snapshot() { _ = "STUB: not implemented"; return }
 
 // RestoreFromDepth restores from the snapshot at index `depth`, then truncates the
 // stack to depth+1 so the frame at `depth` remains. Used for ROLLBACK TO sp:
 // PostgreSQL leaves `sp` active after the rollback, so its snapshot must stay so a
 // subsequent ROLLBACK TO sp can be issued again. Precondition: depth < len(snapshots).
-func (g *GatewayManagedVariable[T]) RestoreFromDepth(depth int) {
-	s := g.snapshots[depth]
-	g.currentValue = s.currentValue
-	g.isSet = s.isSet
-	g.localValue = s.localValue
-	g.isLocalSet = s.isLocalSet
-	g.snapshots = g.snapshots[:depth+1]
-}
+func (g *GatewayManagedVariable[T]) RestoreFromDepth(depth int) { _ = "STUB: not implemented"; return }
 
 // PopFrom drops snapshot frames at index `depth` and above, keeping the current
 // in-memory values untouched. Used for RELEASE sp: PG merges sub-transaction
 // changes into the parent, so we drop sp's frame (and any nested ones) but
 // preserve current state.
-func (g *GatewayManagedVariable[T]) PopFrom(depth int) {
-	g.snapshots = g.snapshots[:depth]
-}
+func (g *GatewayManagedVariable[T]) PopFrom(depth int) { _ = "STUB: not implemented"; return }
 
 // ClearSnapshots drops all snapshot frames. Called at COMMIT (current values
 // become persistent session state) and after RollbackTransaction has restored
 // from the BEGIN-level frame.
 func (g *GatewayManagedVariable[T]) ClearSnapshots() {
-	g.snapshots = nil
+	_ = "STUB: not implemented"
+
+	// SnapshotDepth returns the current size of the snapshot stack. Used by tests
+	// and as an internal sanity check that connection-state and variable stacks
+	// stay in lockstep.
+	return
 }
 
-// SnapshotDepth returns the current size of the snapshot stack. Used by tests
-// and as an internal sanity check that connection-state and variable stacks
-// stay in lockstep.
-func (g *GatewayManagedVariable[T]) SnapshotDepth() int {
-	return len(g.snapshots)
-}
+func (g *GatewayManagedVariable[T]) SnapshotDepth() int { _ = "STUB: not implemented"; return 0 }

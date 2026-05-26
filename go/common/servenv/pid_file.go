@@ -16,44 +16,8 @@
 
 package servenv
 
-import (
-	"fmt"
-	"log/slog"
-	"os"
-)
+func (sv *ServEnv) registerPidFile() { _ = "STUB: not implemented"; return }
 
-func (sv *ServEnv) registerPidFile() {
-	pidFileCreated := false
+// Create pid file after flags are parsed.
 
-	// Create pid file after flags are parsed.
-	sv.OnInit(func() {
-		pidFile := sv.pidFile.Get()
-		if pidFile == "" {
-			return
-		}
-
-		file, err := os.OpenFile(pidFile, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o666)
-		if err != nil {
-			slog.Error(fmt.Sprintf("Unable to create pid file '%s': %v", pidFile, err))
-			return
-		}
-		pidFileCreated = true
-		fmt.Fprintln(file, os.Getpid())
-		_ = file.Close()
-	})
-
-	// Remove pid file on graceful shutdown.
-	sv.OnClose(func() {
-		pidFile := sv.pidFile.Get()
-		if pidFile == "" {
-			return
-		}
-		if !pidFileCreated {
-			return
-		}
-
-		if err := os.Remove(pidFile); err != nil {
-			slog.Error(fmt.Sprintf("Unable to remove pid file '%s': %v", pidFile, err))
-		}
-	})
-}
+// Remove pid file on graceful shutdown.

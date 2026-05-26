@@ -19,8 +19,6 @@ import (
 	"log/slog"
 	"sync"
 
-	"golang.org/x/sync/errgroup"
-
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -60,31 +58,22 @@ func NewStateManager(
 	multipooler *clustermetadatapb.MultiPooler,
 	components ...StateAware,
 ) *StateManager {
-	return &StateManager{
-		logger:      logger,
-		multipooler: multipooler,
-		components:  components,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Register adds a component to be notified on state changes.
 // This is used for components created after the manager (e.g., ReplTracker).
 // Must not be called concurrently with SetState.
-func (ssm *StateManager) Register(component StateAware) {
-	ssm.mu.Lock()
-	defer ssm.mu.Unlock()
-	ssm.components = append(ssm.components, component)
-}
+func (ssm *StateManager) Register(component StateAware) { _ = "STUB: not implemented"; return }
 
 // RegisterAndSync adds a component and immediately syncs it to the current state.
 // This is used for components created after the initial state transition (e.g.,
 // ReplTracker is created after Open() has already transitioned to SERVING).
 // The component is initialized from the multipooler record, which is the source of truth.
 func (ssm *StateManager) RegisterAndSync(ctx context.Context, component StateAware) error {
-	ssm.mu.Lock()
-	defer ssm.mu.Unlock()
-	ssm.components = append(ssm.components, component)
-	return component.OnStateChange(ctx, ssm.multipooler.Type, ssm.multipooler.ServingStatus)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetState transitions all components to the given state in parallel.
@@ -92,35 +81,8 @@ func (ssm *StateManager) RegisterAndSync(ctx context.Context, component StateAwa
 // Returns an error if any component fails to transition.
 // No-op if the state hasn't changed.
 func (ssm *StateManager) SetState(ctx context.Context, poolerType clustermetadatapb.PoolerType, servingStatus clustermetadatapb.PoolerServingStatus) error {
-	ssm.mu.Lock()
-	defer ssm.mu.Unlock()
-
-	if ssm.multipooler.Type == poolerType && ssm.multipooler.ServingStatus == servingStatus {
-		ssm.logger.InfoContext(ctx, "Serving state unchanged, skipping",
-			"type", poolerType, "status", servingStatus)
-		return nil
-	}
-
-	ssm.logger.InfoContext(ctx, "Setting serving state",
-		"target_type", poolerType, "target_status", servingStatus,
-		"current_type", ssm.multipooler.Type, "current_status", ssm.multipooler.ServingStatus)
-
-	g, ctx := errgroup.WithContext(ctx)
-	for _, c := range ssm.components {
-		g.Go(func() error {
-			return c.OnStateChange(ctx, poolerType, servingStatus)
-		})
-	}
-	if err := g.Wait(); err != nil {
-		return err
-	}
-
-	// All components converged — update the multipooler record (current state).
-	ssm.multipooler.Type = poolerType
-	ssm.multipooler.ServingStatus = servingStatus
-
-	ssm.logger.InfoContext(ctx, "Serving state converged",
-		"type", poolerType, "status", servingStatus)
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// All components converged — update the multipooler record (current state).

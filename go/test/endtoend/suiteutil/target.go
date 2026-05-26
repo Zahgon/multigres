@@ -21,9 +21,6 @@ package suiteutil
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -43,19 +40,7 @@ type Target struct {
 
 // DSN returns a libpq-style connection string for this target with
 // sslmode=disable. Any extra key=value fragments are appended verbatim.
-func (t Target) DSN(extra ...string) string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		t.Host, t.Port, t.User, t.Pass, t.DB)
-	for _, e := range extra {
-		if e == "" {
-			continue
-		}
-		b.WriteByte(' ')
-		b.WriteString(e)
-	}
-	return b.String()
-}
+func (t Target) DSN(extra ...string) string { _ = "STUB: not implemented"; return "" }
 
 // ResetPublicSchema drops and recreates the public schema, restoring the
 // default grants. Suites call this between corpus files so each file starts
@@ -76,29 +61,13 @@ func (t Target) DSN(extra ...string) string {
 // extended-MG = 32ms") in the sqllogictest suite. SchemaResetter holds one
 // pgx connection open for the whole batch so the connection that emits the
 // invals is also the one that processes them, keeping the queue bounded.
-func ResetPublicSchema(ctx context.Context, t Target) error {
-	conn, err := pgx.Connect(ctx, t.DSN())
-	if err != nil {
-		return fmt.Errorf("connect to %s for schema reset: %w", t.Name, err)
-	}
-	defer conn.Close(ctx)
-	return resetPublicSchemaOnConn(ctx, conn)
-}
+func ResetPublicSchema(ctx context.Context, t Target) error { _ = "STUB: not implemented"; return nil }
 
 // resetPublicSchemaOnConn runs the three DROP/CREATE/GRANT statements on an
 // already-open connection. Shared between ResetPublicSchema and
 // SchemaResetter so the SQL stays in one place.
 func resetPublicSchemaOnConn(ctx context.Context, conn *pgx.Conn) error {
-	stmts := []string{
-		`DROP SCHEMA IF EXISTS public CASCADE`,
-		`CREATE SCHEMA public`,
-		`GRANT ALL ON SCHEMA public TO public`,
-	}
-	for _, s := range stmts {
-		if _, err := conn.Exec(ctx, s); err != nil {
-			return fmt.Errorf("exec %q: %w", s, err)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -145,76 +114,40 @@ type SchemaResetter struct {
 // (dirty=false): callers wanting an upfront reset can MarkDirty before
 // the first ResetIfDirty.
 func NewSchemaResetter(ctx context.Context, target Target) (*SchemaResetter, error) {
-	conn, err := pgx.Connect(ctx, target.DSN())
-	if err != nil {
-		return nil, fmt.Errorf("connect to %s for schema resetter: %w", target.Name, err)
-	}
-	return &SchemaResetter{target: target, conn: conn}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MarkDirty records that the schema may have been mutated since the last
 // reset. Idempotent. Callers flip this on after any run that actually
 // reached the database — that's the signal ResetIfDirty consults.
 func (r *SchemaResetter) MarkDirty() {
-	r.dirty = true
+	_ = "STUB: not implemented"
+
+	// ResetIfDirty runs Reset only when MarkDirty was called since the last
+	// reset. Use this in tight per-file loops to avoid the
+	// catalog-invalidation pileup described on SchemaResetter.
+	return
 }
 
-// ResetIfDirty runs Reset only when MarkDirty was called since the last
-// reset. Use this in tight per-file loops to avoid the
-// catalog-invalidation pileup described on SchemaResetter.
 func (r *SchemaResetter) ResetIfDirty(ctx context.Context) error {
-	if !r.dirty {
-		return nil
-	}
-	if err := r.Reset(ctx); err != nil {
-		return err
-	}
-	r.dirty = false
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Reset runs the DROP/CREATE/GRANT cycle on the held connection. If the
 // connection has died, Reset reopens it once before retrying.
-func (r *SchemaResetter) Reset(ctx context.Context) error {
-	if r.conn == nil || r.conn.IsClosed() {
-		if err := r.reconnect(ctx); err != nil {
-			return err
-		}
-	}
-	if err := resetPublicSchemaOnConn(ctx, r.conn); err != nil {
-		// Distinguish a dead-connection error from a SQL error. pgx returns
-		// errors via the underlying conn.Conn().IsClosed() flag after a
-		// network-level failure; reconnect once and retry.
-		if r.conn.IsClosed() {
-			if rerr := r.reconnect(ctx); rerr != nil {
-				return errors.Join(fmt.Errorf("reset on stale connection: %w", err), rerr)
-			}
-			return resetPublicSchemaOnConn(ctx, r.conn)
-		}
-		return err
-	}
-	return nil
-}
+func (r *SchemaResetter) Reset(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
+
+// Distinguish a dead-connection error from a SQL error. pgx returns
+// errors via the underlying conn.Conn().IsClosed() flag after a
+// network-level failure; reconnect once and retry.
 
 // Close closes the held connection. Safe to call on a nil receiver and
 // idempotent. Always defer this from the caller.
-func (r *SchemaResetter) Close(ctx context.Context) {
-	if r == nil || r.conn == nil {
-		return
-	}
-	_ = r.conn.Close(ctx)
-	r.conn = nil
-}
+func (r *SchemaResetter) Close(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 func (r *SchemaResetter) reconnect(ctx context.Context) error {
-	if r.conn != nil {
-		_ = r.conn.Close(ctx)
-		r.conn = nil
-	}
-	conn, err := pgx.Connect(ctx, r.target.DSN())
-	if err != nil {
-		return fmt.Errorf("reopen %s connection for schema resetter: %w", r.target.Name, err)
-	}
-	r.conn = conn
+	_ = "STUB: not implemented"
 	return nil
 }

@@ -14,16 +14,6 @@
 
 package queryregistry
 
-import (
-	"context"
-
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
-
-	"github.com/multigres/multigres/go/common/cache/theine"
-)
-
 // meterName is the OTel meter scope for query-registry metrics.
 const meterName = "github.com/multigres/multigres/go/services/multigateway/handler/queryregistry"
 
@@ -34,48 +24,13 @@ const meterName = "github.com/multigres/multigres/go/services/multigateway/handl
 // lets dashboards label series by SQL text instead of opaque hashes.
 //
 // Safe to call on a nil or disabled registry (returns nil without registering).
-func (r *Registry) RegisterMetrics() error {
-	if r == nil || r.store == nil {
-		return nil
-	}
+func (r *Registry) RegisterMetrics() error { _ = "STUB: not implemented"; return nil }
 
-	meter := otel.Meter(meterName)
+// normalizedSQL is already capped at r.maxSQLLen when the
+// registry admits the entry (see Record); reuse that cap as
+// the single source of truth for the exposed label too.
 
-	info, err := meter.Int64ObservableGauge(
-		"mg.gateway.query.info",
-		metric.WithDescription("One series per tracked query fingerprint, exposing fingerprint→normalized SQL mapping for join queries"),
-	)
-	if err != nil {
-		return err
-	}
-
-	_, err = meter.RegisterCallback(
-		func(_ context.Context, o metric.Observer) error {
-			r.store.Range(0, func(_ theine.StringKey, v *QueryStats) bool {
-				// normalizedSQL is already capped at r.maxSQLLen when the
-				// registry admits the entry (see Record); reuse that cap as
-				// the single source of truth for the exposed label too.
-				o.ObserveInt64(info, 1, metric.WithAttributes(
-					attribute.String("query.fingerprint", v.fingerprint),
-					attribute.String("query.normalized_sql", v.normalizedSQL),
-				))
-				return true
-			})
-			// Synthetic entries for the aggregated buckets so table joins against
-			// mg_gateway_query_info resolve for every label value emitted on the
-			// duration/errors/rows metrics — otherwise __utility__ and __other__
-			// rows would have an empty SQL column in the dashboard.
-			o.ObserveInt64(info, 1, metric.WithAttributes(
-				attribute.String("query.fingerprint", UtilityLabel),
-				attribute.String("query.normalized_sql", "(utility statements: BEGIN, COMMIT, SET, DDL, …)"),
-			))
-			o.ObserveInt64(info, 1, metric.WithAttributes(
-				attribute.String("query.fingerprint", OtherLabel),
-				attribute.String("query.normalized_sql", "(long-tail query shapes not in tracked top set)"),
-			))
-			return nil
-		},
-		info,
-	)
-	return err
-}
+// Synthetic entries for the aggregated buckets so table joins against
+// mg_gateway_query_info resolve for every label value emitted on the
+// duration/errors/rows metrics — otherwise __utility__ and __other__
+// rows would have an empty SQL column in the dashboard.

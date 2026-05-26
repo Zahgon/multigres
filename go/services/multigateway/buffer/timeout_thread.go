@@ -14,13 +14,6 @@
 
 package buffer
 
-import (
-	"time"
-
-	"github.com/multigres/multigres/go/common/mterrors"
-	commontypes "github.com/multigres/multigres/go/common/types"
-)
-
 // timeoutThread is a single goroutine that monitors the head of the global
 // queue and evicts entries whose window deadline has passed.
 type timeoutThread struct {
@@ -29,115 +22,42 @@ type timeoutThread struct {
 	stopCh   chan struct{} // Closed to stop the goroutine
 }
 
-func newTimeoutThread(buf *Buffer) *timeoutThread {
-	return &timeoutThread{
-		buf:      buf,
-		notifyCh: make(chan struct{}, 1),
-		stopCh:   make(chan struct{}),
-	}
-}
+func newTimeoutThread(buf *Buffer) *timeoutThread { _ = "STUB: not implemented"; return nil }
 
-func (tt *timeoutThread) start() {
-	go tt.run()
-}
+func (tt *timeoutThread) start() { _ = "STUB: not implemented"; return }
 
 func (tt *timeoutThread) stop() {
-	close(tt.stopCh)
+	_ = "STUB: not implemented"
+
+	// notify signals the timeout thread to re-check the queue head.
+	// Non-blocking: if a notification is already pending, this is a no-op.
+	return
 }
 
-// notify signals the timeout thread to re-check the queue head.
-// Non-blocking: if a notification is already pending, this is a no-op.
-func (tt *timeoutThread) notify() {
-	select {
-	case tt.notifyCh <- struct{}{}:
-	default:
-	}
-}
+func (tt *timeoutThread) notify() { _ = "STUB: not implemented"; return }
 
-func (tt *timeoutThread) run() {
-	var timer *time.Timer
-	defer func() {
-		if timer != nil {
-			timer.Stop()
-		}
-	}()
+func (tt *timeoutThread) run() { _ = "STUB: not implemented"; return }
 
-	for {
-		// Check the head of the queue.
-		tt.buf.mu.Lock()
-		if len(tt.buf.queue) == 0 {
-			tt.buf.mu.Unlock()
-			// Queue is empty — wait for a notification or stop.
-			select {
-			case <-tt.notifyCh:
-				continue
-			case <-tt.stopCh:
-				return
-			}
-		}
+// Check the head of the queue.
 
-		head := tt.buf.queue[0]
-		tt.buf.mu.Unlock()
+// Queue is empty — wait for a notification or stop.
 
-		// Calculate time until the head entry's deadline.
-		delay := head.deadline.Sub(tt.buf.now())
-		if delay <= 0 {
-			// Deadline already passed — evict immediately.
-			tt.evictHead()
-			continue
-		}
+// Calculate time until the head entry's deadline.
 
-		// Wait for the deadline, a notification, or stop.
-		if timer == nil {
-			timer = time.NewTimer(delay)
-		} else {
-			// Reset the timer. We drain it first to avoid races.
-			if !timer.Stop() {
-				select {
-				case <-timer.C:
-				default:
-				}
-			}
-			timer.Reset(delay)
-		}
+// Deadline already passed — evict immediately.
 
-		select {
-		case <-timer.C:
-			// Head entry's deadline reached — evict it.
-			tt.evictHead()
-		case <-tt.notifyCh:
-			// Queue changed — re-check head.
-			continue
-		case <-tt.stopCh:
-			return
-		}
-	}
-}
+// Wait for the deadline, a notification, or stop.
+
+// Reset the timer. We drain it first to avoid races.
+
+// Head entry's deadline reached — evict it.
+
+// Queue changed — re-check head.
 
 // evictHead removes the first entry from the queue if it's past its deadline.
-func (tt *timeoutThread) evictHead() {
-	tt.buf.mu.Lock()
-	if len(tt.buf.queue) == 0 {
-		tt.buf.mu.Unlock()
-		return
-	}
+func (tt *timeoutThread) evictHead() { _ = "STUB: not implemented"; return }
 
-	head := tt.buf.queue[0]
-	if tt.buf.now().Before(head.deadline) {
-		// Not yet expired — the original head may have been removed by
-		// context cancellation or drain, leaving a newer entry at head.
-		tt.buf.mu.Unlock()
-		return
-	}
+// Not yet expired — the original head may have been removed by
+// context cancellation or drain, leaving a newer entry at head.
 
-	tt.buf.queue = tt.buf.queue[1:]
-	tt.buf.mu.Unlock()
-
-	head.err = mterrors.MTB02.New()
-	// Decrement before close so waiters never see a stale gauge.
-	tt.buf.bufferSizeSema.Release(1)
-	tt.buf.stats.addQueueDepth(tt.buf.ctx, -1)
-	close(head.done)
-	tt.buf.stats.recordEvicted(tt.buf.ctx, string(commontypes.FormatShardKey(head.shardKey)), "window_exceeded")
-	tt.buf.logger.Debug("evicted entry: window exceeded", "shard_key", commontypes.FormatShardKey(head.shardKey))
-}
+// Decrement before close so waiters never see a stale gauge.

@@ -15,12 +15,6 @@
 package analysis
 
 import (
-	"errors"
-	"fmt"
-	"time"
-
-	"github.com/multigres/multigres/go/common/topoclient"
-	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 )
 
@@ -49,76 +43,37 @@ type CohortMismatchAnalyzer struct {
 }
 
 func (a *CohortMismatchAnalyzer) Name() types.CheckName {
-	return "CohortMismatch"
+	_ = "STUB: not implemented"
+	return *new(types.CheckName)
 }
 
 func (a *CohortMismatchAnalyzer) ProblemCode() types.ProblemCode {
+	_ = "STUB: not implemented"
 	// This analyzer can produce two problem codes; ProblemCode() returns the
 	// primary one. The recovery loop uses this for routing/logging — the
 	// per-problem code on each emitted Problem is what matters at execution.
-	return types.ProblemPoolerNotInCohort
+	return *new(types.ProblemCode)
 }
 
 func (a *CohortMismatchAnalyzer) RecoveryAction() types.RecoveryAction {
-	return a.factory.NewReconcileCohortAction()
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 func (a *CohortMismatchAnalyzer) Analyze(sa *ShardAnalysis) ([]types.Problem, error) {
-	if a.factory == nil {
-		return nil, errors.New("recovery action factory not initialized")
-	}
-
-	// We only act when the shard has a reachable, ready leader to receive the
-	// rule update. Bootstrap and failover paths set up the cohort separately.
-	if sa.HighestTermDiscoveredLeaderID == nil || !sa.LeaderReachable || !sa.LeaderPostgresReady {
-		return nil, nil
-	}
-
-	// Build a set of current cohort member ID strings for O(1) lookup.
-	cohortIDs := make(map[string]struct{}, len(sa.LeaderStandbyIDs))
-	for _, id := range sa.LeaderStandbyIDs {
-		cohortIDs[topoclient.MultiPoolerIDString(id)] = struct{}{}
-	}
-
-	var problems []types.Problem
-	for _, pa := range sa.Analyses {
-		// Removal candidates: current cohort members signaling INELIGIBLE.
-		if _, inCohort := cohortIDs[topoclient.MultiPoolerIDString(pa.PoolerID)]; inCohort {
-			if types.PoolerIsCohortIneligible(pa.AvailabilityStatus) {
-				problems = append(problems, types.Problem{
-					Code:           types.ProblemCohortMemberIneligible,
-					CheckName:      "CohortMismatch",
-					PoolerID:       pa.PoolerID,
-					ShardKey:       pa.ShardKey,
-					Description:    fmt.Sprintf("Cohort member %s self-reported INELIGIBLE", pa.PoolerID.Name),
-					Priority:       types.PriorityNormal,
-					Scope:          types.ScopePooler,
-					DetectedAt:     time.Now(),
-					RecoveryAction: a.factory.NewReconcileCohortAction(),
-				})
-			}
-			continue
-		}
-
-		// Addition candidates: replicas not currently in the cohort that are
-		// healthy enough to be added.
-		if !a.isAdditionCandidate(sa, pa) {
-			continue
-		}
-		problems = append(problems, types.Problem{
-			Code:           types.ProblemPoolerNotInCohort,
-			CheckName:      "CohortMismatch",
-			PoolerID:       pa.PoolerID,
-			ShardKey:       pa.ShardKey,
-			Description:    fmt.Sprintf("Pooler %s is replicating and eligible but not in the cohort", pa.PoolerID.Name),
-			Priority:       types.PriorityNormal,
-			Scope:          types.ScopePooler,
-			DetectedAt:     time.Now(),
-			RecoveryAction: a.factory.NewReconcileCohortAction(),
-		})
-	}
-	return problems, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// We only act when the shard has a reachable, ready leader to receive the
+// rule update. Bootstrap and failover paths set up the cohort separately.
+
+// Build a set of current cohort member ID strings for O(1) lookup.
+
+// Removal candidates: current cohort members signaling INELIGIBLE.
+
+// Addition candidates: replicas not currently in the cohort that are
+// healthy enough to be added.
 
 // isAdditionCandidate reports whether a non-cohort pooler is healthy enough to
 // be added: it must be a non-leader REPLICA, initialized, replicating, and not
@@ -136,25 +91,9 @@ func (a *CohortMismatchAnalyzer) Analyze(sa *ShardAnalysis) ([]types.Problem, er
 // problem an acting primary adding itself to the cohort. This may be useful
 // in some propagation scenarios.
 func (a *CohortMismatchAnalyzer) isAdditionCandidate(sa *ShardAnalysis, pa *PoolerAnalysis) bool {
-	if pa.IsLeader {
-		return false
-	}
-	if !pa.LastCheckValid {
-		return false
-	}
-	if !pa.IsInitialized {
-		return false
-	}
-	if pa.PoolerType != clustermetadatapb.PoolerType_REPLICA {
-		return false
-	}
-	// Replication must be configured and not stopped — otherwise the standby
-	// can't acknowledge writes and adding it would degrade durability.
-	if pa.PrimaryConnInfoHost == "" || pa.ReplicationStopped {
-		return false
-	}
-	if types.PoolerIsCohortIneligible(pa.AvailabilityStatus) {
-		return false
-	}
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
+
+// Replication must be configured and not stopped — otherwise the standby
+// can't acknowledge writes and adding it would degrade durability.

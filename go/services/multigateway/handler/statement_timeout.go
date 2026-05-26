@@ -15,9 +15,6 @@
 package handler
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/multigres/multigres/go/common/mterrors"
@@ -29,10 +26,8 @@ import (
 // A nil directive means no directive was found; a non-nil directive (including 0,
 // which disables timeouts) takes priority over everything else.
 func ResolveStatementTimeout(directive *time.Duration, effective time.Duration) time.Duration {
-	if directive != nil {
-		return *directive
-	}
-	return effective
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // ParseStatementTimeoutDirective is a placeholder for per-query directive parsing.
@@ -40,52 +35,35 @@ func ResolveStatementTimeout(directive *time.Duration, effective time.Duration) 
 // in the future by parsing them in the SQL grammar (similar to Vitess).
 // For now, this always returns nil (no directive found).
 func ParseStatementTimeoutDirective(query ast.Stmt) *time.Duration {
+	_ = "STUB: not implemented"
+
+	// ParsePostgresInterval parses a PostgreSQL-style interval value for statement_timeout
+	// into a time.Duration. Returns PgDiagnostic errors matching PostgreSQL's error format.
+	// Supports:
+	//   - Plain integers as milliseconds (e.g., "5000" -> 5s) — PostgreSQL's default unit
+	//   - Go-compatible duration strings (e.g., "30s", "200ms", "1m")
 	return nil
 }
 
-// ParsePostgresInterval parses a PostgreSQL-style interval value for statement_timeout
-// into a time.Duration. Returns PgDiagnostic errors matching PostgreSQL's error format.
-// Supports:
-//   - Plain integers as milliseconds (e.g., "5000" -> 5s) — PostgreSQL's default unit
-//   - Go-compatible duration strings (e.g., "30s", "200ms", "1m")
 func ParsePostgresInterval(paramName, value string) (time.Duration, error) {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return 0, invalidParamError(paramName, value, "")
-	}
-
-	// Try parsing as plain integer (milliseconds) first — this is the common PG case.
-	if ms, err := strconv.ParseInt(value, 10, 64); err == nil {
-		if ms < 0 {
-			return 0, outOfRangeParamError(paramName, value)
-		}
-		return time.Duration(ms) * time.Millisecond, nil
-	}
-
-	// Try Go duration format (e.g., "30s", "200ms", "1m").
-	d, err := time.ParseDuration(value)
-	if err != nil {
-		return 0, invalidParamError(paramName, value,
-			`Valid units for this parameter are "us", "ms", "s", "m", "h".`)
-	}
-	if d < 0 {
-		return 0, outOfRangeParamError(paramName, value)
-	}
-	return d, nil
+	_ = "STUB: not implemented"
+	return *new(time.Duration), nil
 }
+
+// Try parsing as plain integer (milliseconds) first — this is the common PG case.
+
+// Try Go duration format (e.g., "30s", "200ms", "1m").
 
 // invalidParamError returns a PgDiagnostic for an invalid parameter value (SQLSTATE 22023).
 func invalidParamError(paramName, value, hint string) *mterrors.PgDiagnostic {
-	diag := mterrors.NewPgError("ERROR", mterrors.PgSSInvalidParameterValue,
-		fmt.Sprintf("invalid value for parameter %q: %q", paramName, value), "")
-	diag.Hint = hint
-	return diag
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // outOfRangeParamError returns a PgDiagnostic for an out-of-range parameter value (SQLSTATE 22023).
 func outOfRangeParamError(paramName, value string) *mterrors.PgDiagnostic {
-	return mterrors.NewPgError("ERROR", mterrors.PgSSInvalidParameterValue,
-		fmt.Sprintf("%s is outside the valid range for parameter %q (0 .. 2147483647)", value, paramName), "")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // formatDurationPg formats a time.Duration using PostgreSQL's GUC_UNIT_MS display
@@ -100,20 +78,4 @@ func outOfRangeParamError(paramName, value string) *mterrors.PgDiagnostic {
 //
 // Values that don't divide evenly into the next-larger unit stay in the smaller unit
 // (e.g., 1500ms → "1500ms", not "1.5s").
-func formatDurationPg(d time.Duration) string {
-	ms := d.Milliseconds()
-	if ms == 0 {
-		return "0"
-	}
-
-	switch {
-	case ms%(3600*1000) == 0:
-		return strconv.FormatInt(ms/(3600*1000), 10) + "h"
-	case ms%(60*1000) == 0:
-		return strconv.FormatInt(ms/(60*1000), 10) + "min"
-	case ms%1000 == 0:
-		return strconv.FormatInt(ms/1000, 10) + "s"
-	default:
-		return strconv.FormatInt(ms, 10) + "ms"
-	}
-}
+func formatDurationPg(d time.Duration) string { _ = "STUB: not implemented"; return "" }

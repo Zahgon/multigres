@@ -16,8 +16,6 @@ package connpoolmanager
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
@@ -101,147 +99,68 @@ type UserPoolConfig struct {
 // The pool connects directly as the user using trust/peer authentication.
 // Returns an error if demand tracker configuration is invalid.
 func NewUserPool(ctx context.Context, config *UserPoolConfig) (*UserPool, error) {
-	logger := config.Logger
-	if logger == nil {
-		logger = slog.Default()
-	}
-	logger = logger.With("user", config.ClientConfig.User)
-
-	// Wire OnBorrow/OnRecycle callbacks into both regular and reserved pool configs.
-	if config.OnBorrow != nil {
-		config.RegularPoolConfig.OnBorrow = config.OnBorrow
-	}
-	if config.OnRecycle != nil {
-		config.RegularPoolConfig.OnRecycle = config.OnRecycle
-	}
-
-	// Create regular pool for this user
-	regularPool := regular.NewPool(ctx, &regular.PoolConfig{
-		ClientConfig:   config.ClientConfig,
-		ConnPoolConfig: config.RegularPoolConfig,
-		AdminPool:      config.AdminPool,
-	})
-	regularPool.Open()
-
-	// Create reserved pool for this user (it manages its own internal regular pool)
-	// InactivityTimeout kills reserved connections if the client that reserved them
-	// hasn't used them for this duration (typically aggressive, e.g., 30s).
-	// The ReservedPoolConfig.IdleTimeout is for the underlying pool (less aggressive, e.g., 5min).
-	reservedPool := reserved.NewPool(ctx, &reserved.PoolConfig{
-		InactivityTimeout: config.ReservedInactivityTimeout,
-		Logger:            logger,
-		OnReserve:         config.OnReserve,
-		OnRelease:         config.OnRelease,
-		RegularPoolConfig: &regular.PoolConfig{
-			ClientConfig:   config.ClientConfig,
-			ConnPoolConfig: config.ReservedPoolConfig,
-			AdminPool:      config.AdminPool,
-		},
-	})
-
-	// Create demand trackers for rebalancer (if demand tracking is enabled).
-	// We use PeakRequestedAndReset instead of Requested to capture burst demand that
-	// point-in-time sampling would miss (e.g., short-lived queries that complete between samples).
-	var regularDemandTracker, reservedDemandTracker *DemandTracker
-	if config.DemandWindow > 0 && config.RebalanceInterval > 0 {
-		var err error
-		regularDemandTracker, err = NewDemandTracker(&DemandTrackerConfig{
-			DemandWindow:      config.DemandWindow,
-			RebalanceInterval: config.RebalanceInterval,
-			Sampler:           regularPool.PeakRequestedAndReset,
-		})
-		if err != nil {
-			regularPool.Close()
-			reservedPool.Close()
-			return nil, fmt.Errorf("create regular demand tracker: %w", err)
-		}
-
-		reservedDemandTracker, err = NewDemandTracker(&DemandTrackerConfig{
-			DemandWindow:      config.DemandWindow,
-			RebalanceInterval: config.RebalanceInterval,
-			Sampler:           reservedPool.PeakRequestedAndReset,
-		})
-		if err != nil {
-			regularPool.Close()
-			reservedPool.Close()
-			return nil, fmt.Errorf("create reserved demand tracker: %w", err)
-		}
-	}
-
-	logger.InfoContext(ctx, "user pool created",
-		"regular_capacity", config.RegularPoolConfig.Capacity,
-		"reserved_capacity", config.ReservedPoolConfig.Capacity)
-
-	up := &UserPool{
-		username:              config.ClientConfig.User,
-		regularPool:           regularPool,
-		reservedPool:          reservedPool,
-		adminPool:             config.AdminPool,
-		logger:                logger,
-		regularDemandTracker:  regularDemandTracker,
-		reservedDemandTracker: reservedDemandTracker,
-	}
-	up.lastActivity.Store(time.Now().UnixNano())
-	return up, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Wire OnBorrow/OnRecycle callbacks into both regular and reserved pool configs.
+
+// Create regular pool for this user
+
+// Create reserved pool for this user (it manages its own internal regular pool)
+// InactivityTimeout kills reserved connections if the client that reserved them
+// hasn't used them for this duration (typically aggressive, e.g., 30s).
+// The ReservedPoolConfig.IdleTimeout is for the underlying pool (less aggressive, e.g., 5min).
+
+// Create demand trackers for rebalancer (if demand tracking is enabled).
+// We use PeakRequestedAndReset instead of Requested to capture burst demand that
+// point-in-time sampling would miss (e.g., short-lived queries that complete between samples).
 
 // Username returns the username for this pool.
 func (p *UserPool) Username() string {
-	return p.username
+	_ = "STUB: not implemented"
+
+	// touchActivity updates the last activity timestamp.
+	// Called internally when a connection is acquired.
+	return ""
 }
 
-// touchActivity updates the last activity timestamp.
-// Called internally when a connection is acquired.
-func (p *UserPool) touchActivity() {
-	p.lastActivity.Store(time.Now().UnixNano())
-}
+func (p *UserPool) touchActivity() { _ = "STUB: not implemented"; return }
 
 // LastActivity returns the last activity timestamp (Unix nanos).
 // Used by the rebalancer for garbage collection.
-func (p *UserPool) LastActivity() int64 {
-	return p.lastActivity.Load()
-}
+func (p *UserPool) LastActivity() int64 { _ = "STUB: not implemented"; return 0 }
 
 // RegularDemand returns the peak demand for regular connections over the sliding window.
 // It also rotates the demand tracker to the next bucket, aging out old data.
 // This should be called once per rebalance cycle. Returns 0 if demand tracking is disabled.
-func (p *UserPool) RegularDemand() int64 {
-	if p.regularDemandTracker == nil {
-		return 0
-	}
-	return p.regularDemandTracker.GetPeakAndRotate()
-}
+func (p *UserPool) RegularDemand() int64 { _ = "STUB: not implemented"; return 0 }
 
 // ReservedDemand returns the peak demand for reserved connections over the sliding window.
 // It also rotates the demand tracker to the next bucket, aging out old data.
 // This should be called once per rebalance cycle. Returns 0 if demand tracking is disabled.
-func (p *UserPool) ReservedDemand() int64 {
-	if p.reservedDemandTracker == nil {
-		return 0
-	}
-	return p.reservedDemandTracker.GetPeakAndRotate()
-}
+func (p *UserPool) ReservedDemand() int64 { _ = "STUB: not implemented"; return 0 }
 
 // GetRegularConn acquires a regular connection from the pool.
 // The connection is already authenticated as the pool's user.
 func (p *UserPool) GetRegularConn(ctx context.Context) (regular.PooledConn, error) {
-	p.touchActivity()
-	return p.regularPool.Get(ctx)
+	_ = "STUB: not implemented"
+	return *new(regular.PooledConn), nil
 }
 
 // GetRegularConnWithSettings acquires a regular connection with the given settings.
 // The connection is already authenticated as the pool's user.
 func (p *UserPool) GetRegularConnWithSettings(ctx context.Context, settings *connstate.Settings) (regular.PooledConn, error) {
-	p.touchActivity()
-	return p.regularPool.GetWithSettings(ctx, settings)
+	_ = "STUB: not implemented"
+	return *new(regular.PooledConn), nil
 }
 
 // NewReservedConn creates a new reserved connection for transactions or portal operations.
 // The connection is already authenticated as the pool's user. Optional
 // ReservedConnOption values configure validate-with-retry behavior.
 func (p *UserPool) NewReservedConn(ctx context.Context, settings *connstate.Settings, opts ...reserved.ReservedConnOption) (*reserved.Conn, error) {
-	p.touchActivity()
-	return p.reservedPool.NewConn(ctx, settings, opts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // NewLogicalReplicationConn returns a Postgres connection opened with
@@ -251,97 +170,46 @@ func (p *UserPool) NewReservedConn(ctx context.Context, settings *connstate.Sett
 // replication=database startup parameter is rejected for roles without the
 // REPLICATION attribute.
 func (p *UserPool) NewLogicalReplicationConn(ctx context.Context) (*reserved.Conn, error) {
-	p.touchActivity()
-	return p.reservedPool.NewLogicalReplicationConn(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetReservedConn retrieves an existing reserved connection by ID.
 // Returns nil, false if the connection is not found or has timed out.
 func (p *UserPool) GetReservedConn(connID int64) (*reserved.Conn, bool) {
-	p.touchActivity()
-	return p.reservedPool.Get(connID)
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 // CloseReservedConnections kills all active reserved connections.
 // Used during graceful shutdown when the drain grace period has expired.
 func (p *UserPool) CloseReservedConnections(ctx context.Context) int {
-	return p.reservedPool.KillAll(ctx)
+	_ = "STUB: not implemented"
+	return 0
 }
 
 // Close closes both regular and reserved pools.
-func (p *UserPool) Close() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+func (p *UserPool) Close() { _ = "STUB: not implemented"; return }
 
-	if p.closed {
-		return
-	}
-	p.closed = true
+// Close reserved pool first (it has its own internal regular pool)
 
-	// Close reserved pool first (it has its own internal regular pool)
-	p.reservedPool.Close()
-
-	// Close regular pool
-	p.regularPool.Close()
-
-	p.logger.Info("user pool closed")
-}
+// Close regular pool
 
 // Stats returns statistics for both pools.
-func (p *UserPool) Stats() UserPoolStats {
-	var regularDemand, reservedDemand int64
-	if p.regularDemandTracker != nil {
-		regularDemand = p.regularDemandTracker.Peak()
-	}
-	if p.reservedDemandTracker != nil {
-		reservedDemand = p.reservedDemandTracker.Peak()
-	}
-
-	regularStats := p.regularPool.Stats()
-	reservedStats := p.reservedPool.Stats()
-
-	return UserPoolStats{
-		Username:       p.username,
-		Regular:        regularStats,
-		Reserved:       reservedStats,
-		RegularDemand:  regularDemand,
-		ReservedDemand: reservedDemand,
-		LastActivity:   p.lastActivity.Load(),
-		WaitCount:      p.regularPool.WaitCount() + p.reservedPool.WaitCount(),
-		WaitTime:       p.regularPool.WaitTime() + p.reservedPool.WaitTime(),
-		GetCount:       p.regularPool.GetCount() + p.reservedPool.GetCount(),
-		Waiting:        regularStats.Waiting + reservedStats.RegularPool.Waiting,
-	}
-}
+func (p *UserPool) Stats() UserPoolStats { _ = "STUB: not implemented"; return *new(UserPoolStats) }
 
 // SetCapacity updates the capacity of both regular and reserved pools.
 // This is a non-blocking operation: capacity is set immediately, idle connections
 // are closed aggressively, and any remaining over-capacity connections are closed
 // when they are recycled back to the pool.
 func (p *UserPool) SetCapacity(ctx context.Context, regularCap, reservedCap int64) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	if p.closed {
-		return errors.New("pool is closed")
-	}
-
-	// Set regular pool capacity
-	if err := p.regularPool.SetCapacity(ctx, regularCap); err != nil {
-		return fmt.Errorf("regular pool: %w", err)
-	}
-
-	// Set reserved pool capacity
-	if err := p.reservedPool.SetCapacity(ctx, reservedCap); err != nil {
-		return fmt.Errorf("reserved pool: %w", err)
-	}
-
-	p.logger.InfoContext(ctx, "user pool capacity updated",
-		"regular_capacity", regularCap,
-		"reserved_capacity", reservedCap)
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Set regular pool capacity
+
+// Set reserved pool capacity
 
 // UserPoolStats holds statistics for a user's pools.
 type UserPoolStats struct {

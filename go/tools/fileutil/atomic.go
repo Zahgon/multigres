@@ -15,9 +15,7 @@
 package fileutil
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 )
 
 // AtomicWriteFile writes data to a file atomically by writing to a temporary
@@ -29,37 +27,6 @@ import (
 // target path. This provides durability guarantees and prevents readers from
 // seeing partial writes.
 func AtomicWriteFile(path string, data []byte, perm os.FileMode) error {
-	dir := filepath.Dir(path)
-	tmpFile, err := os.CreateTemp(dir, ".tmp-*")
-	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
-	tmpPath := tmpFile.Name()
-
-	defer func() {
-		tmpFile.Close()
-		os.Remove(tmpPath)
-	}()
-
-	if err := tmpFile.Chmod(perm); err != nil {
-		return fmt.Errorf("failed to set permissions: %w", err)
-	}
-
-	if _, err := tmpFile.Write(data); err != nil {
-		return fmt.Errorf("failed to write temp file: %w", err)
-	}
-
-	if err := tmpFile.Sync(); err != nil {
-		return fmt.Errorf("failed to sync temp file: %w", err)
-	}
-
-	if err := tmpFile.Close(); err != nil {
-		return fmt.Errorf("failed to close temp file: %w", err)
-	}
-
-	if err := os.Rename(tmpPath, path); err != nil {
-		return fmt.Errorf("failed to rename temp file: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }

@@ -15,49 +15,17 @@
 package topo
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // runGetCellNames handles the getcellnames command
 func runGetCellNames(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	response, err := client.GetCellNames(cmd.Context(), &multiadminpb.GetCellNamesRequest{})
-	if err != nil {
-		return fmt.Errorf("failed to get cell names: %w", err)
-	}
-
-	// Convert to JSON and output
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
 
+// Convert to JSON and output
+
 // AddGetCellNamesCommand adds the getcellnames subcommand
-func AddGetCellNamesCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getcellnames",
-		Short: "Get all cell names in the cluster",
-		Long:  "Retrieve a list of all cell names in the Multigres cluster.",
-		RunE:  runGetCellNames,
-	}
-
-	cmd.Flags().String("admin-server", "", "Address of the multiadmin server (overrides config)")
-
-	return cmd
-}
+func AddGetCellNamesCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }

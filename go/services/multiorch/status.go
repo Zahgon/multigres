@@ -15,11 +15,8 @@
 package multiorch
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
-
-	"github.com/multigres/multigres/go/common/web"
 )
 
 // Link represents a link on the status page.
@@ -45,14 +42,6 @@ type Status struct {
 
 // handleIndex serves the index page
 func (mo *MultiOrch) handleIndex(w http.ResponseWriter, r *http.Request) {
-	mo.serverStatus.mu.Lock()
-	defer mo.serverStatus.mu.Unlock()
-
-	mo.serverStatus.Cell = mo.cfg.GetCell()
-	mo.serverStatus.TopoStatus = mo.ts.Status()
-	err := web.Templates.ExecuteTemplate(w, "orch_index.html", &mo.serverStatus)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to execute template: %v", err), http.StatusInternalServerError)
-		return
-	}
+	_ = "STUB: not implemented"
+	return
 }

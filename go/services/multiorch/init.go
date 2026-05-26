@@ -16,24 +16,16 @@
 package multiorch
 
 import (
-	"context"
-	"errors"
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/rpcclient"
 	"github.com/multigres/multigres/go/common/servenv"
 	"github.com/multigres/multigres/go/common/servenv/toporeg"
-	"github.com/multigres/multigres/go/common/timeouts"
 	"github.com/multigres/multigres/go/common/topoclient"
 	"github.com/multigres/multigres/go/services/multiorch/config"
-	"github.com/multigres/multigres/go/services/multiorch/consensus"
 	"github.com/multigres/multigres/go/services/multiorch/grpcserver"
 	"github.com/multigres/multigres/go/services/multiorch/recovery"
-	"github.com/multigres/multigres/go/tools/viperutil"
 )
 
 // maxPoolerConnections is the maximum number of simultaneous RPC connections
@@ -61,160 +53,36 @@ type MultiOrch struct {
 	multiorchServer *grpcserver.MultiOrchServer
 }
 
-func (mo *MultiOrch) CobraPreRunE(cmd *cobra.Command) error {
-	return mo.senv.CobraPreRunE(cmd)
-}
+func (mo *MultiOrch) CobraPreRunE(cmd *cobra.Command) error { _ = "STUB: not implemented"; return nil }
 
-func (mo *MultiOrch) RunDefault() error {
-	return mo.senv.RunDefault(mo.grpcServer)
-}
+func (mo *MultiOrch) RunDefault() error { _ = "STUB: not implemented"; return nil }
 
 // Register flags that are specific to multiorch.
-func (mo *MultiOrch) RegisterFlags(fs *pflag.FlagSet) {
-	mo.cfg.RegisterFlags(fs)
-	mo.senv.RegisterFlags(fs)
-	mo.grpcServer.RegisterFlags(fs)
-	mo.topoConfig.RegisterFlags(fs)
-	mo.connConfig.RegisterFlags(fs)
-}
+func (mo *MultiOrch) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
-func NewMultiOrch() *MultiOrch {
-	reg := viperutil.NewRegistry()
-	return &MultiOrch{
-		cfg:        config.NewConfig(reg),
-		grpcServer: servenv.NewGrpcServer(reg),
-		senv:       servenv.NewServEnv(reg),
-		topoConfig: topoclient.NewTopoConfig(reg),
-		connConfig: rpcclient.NewConnConfig(reg),
-		serverStatus: Status{
-			Title: "Multiorch",
-			Links: []Link{
-				{"Config", "Server configuration details", "/config"},
-				{"Live", "URL for liveness check", "/live"},
-				{"Ready", "URL for readiness check", "/ready"},
-			},
-		},
-	}
-}
+func NewMultiOrch() *MultiOrch { _ = "STUB: not implemented"; return nil }
 
 // Init initializes the multiorch. If any services fail to start,
 // or if some connections fail, it launches goroutines that retry
 // until successful.
 func (mo *MultiOrch) Init() error {
+	_ = "STUB: not implemented"
 	// Get service ID from config, or generate random one if not specified
-	serviceID := mo.cfg.GetServiceID()
-	if serviceID == "" {
-		serviceID = servenv.GenerateRandomServiceID()
-	}
-	cell := mo.cfg.GetCell()
-
-	if err := mo.senv.Init(servenv.ServiceIdentity{
-		ServiceName:       constants.ServiceMultiorch,
-		ServiceInstanceID: serviceID,
-		Cell:              cell,
-	}); err != nil {
-		return fmt.Errorf("servenv init: %w", err)
-	}
-	// Get the configured logger
-	logger := mo.senv.GetLogger()
-
-	var err error
-	mo.ts, err = mo.topoConfig.Open()
-	if err != nil {
-		return fmt.Errorf("topo open: %w", err)
-	}
-
-	// Validate and parse shard watch targets
-	targetsRaw := mo.cfg.GetShardWatchTargets()
-	if len(targetsRaw) == 0 {
-		return errors.New("watch-targets is required")
-	}
-
-	targets, err := config.ParseShardWatchTargets(targetsRaw)
-	if err != nil {
-		return fmt.Errorf("failed to parse watch-targets: %w", err)
-	}
-
-	logger.Info("multiorch starting up",
-		"cell", mo.cfg.GetCell(),
-		"service_id", mo.cfg.GetServiceID(),
-		"http_port", mo.senv.GetHTTPPort(),
-		"grpc_port", mo.grpcServer.Port(),
-		"watch_targets", targets,
-	)
-
-	// Create multiorch record with all fields now that servenv.Init() has set them up
-	multiorch := topoclient.NewMultiOrch(serviceID, cell, mo.senv.GetHostname())
-	multiorch.PortMap["grpc"] = int32(mo.grpcServer.Port())
-	multiorch.PortMap["http"] = int32(mo.senv.GetHTTPPort())
-
-	mo.tr = toporeg.Register(
-		func(ctx context.Context) error { return mo.ts.RegisterMultiOrch(ctx, multiorch, true) },
-		func(ctx context.Context) error { return mo.ts.UnregisterMultiOrch(ctx, multiorch.Id) },
-		func(s string) {
-			mo.serverStatus.mu.Lock()
-			defer mo.serverStatus.mu.Unlock()
-			mo.serverStatus.InitError = s
-		},
-	)
-
-	mo.senv.HTTPHandleFunc("/", mo.handleIndex)
-	mo.senv.RegisterReadyCheck(func() error {
-		mo.serverStatus.mu.Lock()
-		defer mo.serverStatus.mu.Unlock()
-		if len(mo.serverStatus.InitError) > 0 {
-			return errors.New(mo.serverStatus.InitError)
-		}
-		return nil
-	})
-	mo.senv.RegisterReadyCheck(func() error {
-		ctx, cancel := context.WithTimeout(context.TODO(), timeouts.ReadyTopoCheckTimeout)
-		defer cancel()
-		_, err := mo.ts.GetCellNames(ctx)
-		return err
-	})
-
-	// Create RPC client for recovery engine health checks
-	transportCreds, err := mo.connConfig.TransportCredentials(logger)
-	if err != nil {
-		return fmt.Errorf("failed to configure multipooler TLS: %w", err)
-	}
-	rpcClient := rpcclient.NewMultiPoolerClient(maxPoolerConnections, transportCreds)
-
-	// Create coordinator for consensus operations
-	coord := consensus.NewCoordinator(multiorch.Id, mo.ts, rpcClient, logger, mo.cfg.GetUseNewConsensusFlow())
-
-	// Create and start recovery engine
-	mo.recoveryEngine = recovery.NewEngine(
-		mo.ts,
-		logger,
-		mo.cfg,
-		targets,
-		rpcClient,
-		coord,
-	)
-
-	if err := mo.recoveryEngine.Start(); err != nil {
-		return fmt.Errorf("failed to start recovery engine: %w", err)
-	}
-
-	// Register gRPC service after recovery engine is ready
-	mo.senv.OnRun(func() {
-		mo.multiorchServer = grpcserver.NewMultiOrchServer(mo.recoveryEngine, coord, logger)
-		mo.multiorchServer.RegisterWithGRPCServer(mo.grpcServer.Server)
-	})
-
-	mo.senv.OnClose(func() {
-		mo.Shutdown()
-	})
 	return nil
 }
 
-func (mo *MultiOrch) Shutdown() {
-	mo.senv.GetLogger().Info("multiorch shutting down")
-	if mo.recoveryEngine != nil {
-		mo.recoveryEngine.Stop()
-	}
-	mo.tr.Unregister()
-	mo.ts.Close()
-}
+// Get the configured logger
+
+// Validate and parse shard watch targets
+
+// Create multiorch record with all fields now that servenv.Init() has set them up
+
+// Create RPC client for recovery engine health checks
+
+// Create coordinator for consensus operations
+
+// Create and start recovery engine
+
+// Register gRPC service after recovery engine is ready
+
+func (mo *MultiOrch) Shutdown() { _ = "STUB: not implemented"; return }

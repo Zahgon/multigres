@@ -71,13 +71,7 @@
 package poolserver
 
 import (
-	"bufio"
-	"errors"
-	"fmt"
 	"net"
-	"os"
-	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -93,144 +87,57 @@ type Server struct {
 // NewServer creates a pool server that listens on socketPath.
 // Any stale socket file at that path is removed before binding.
 func NewServer(socketPath string) (*Server, error) {
-	_ = os.Remove(socketPath) // remove stale socket; ignore error if absent
-	l, err := net.Listen("unix", socketPath)
-	if err != nil {
-		return nil, fmt.Errorf("pool server listen on %s: %w", socketPath, err)
-	}
-	return &Server{
-		socketPath: socketPath,
-		listener:   l,
-		allocated:  make(map[int]struct{}),
-	}, nil
+	_ = "STUB: not implemented"
+	return nil,
+		// remove stale socket; ignore error if absent
+		nil
 }
 
 // Serve accepts connections and handles requests until Stop is called.
 // It blocks until the server listener is closed.
-func (s *Server) Serve() {
-	defer os.Remove(s.socketPath)
-	for {
-		conn, err := s.listener.Accept()
-		if err != nil {
-			return
-		}
-		go s.handleConn(conn)
-	}
-}
+func (s *Server) Serve() { _ = "STUB: not implemented"; return }
 
 // Stop shuts down the server.
 func (s *Server) Stop() {
-	s.listener.Close()
+	_ = "STUB: not implemented"
+
+	// SocketPath returns the Unix socket path this server is listening on.
+	return
 }
 
-// SocketPath returns the Unix socket path this server is listening on.
-func (s *Server) SocketPath() string {
-	return s.socketPath
-}
+func (s *Server) SocketPath() string { _ = "STUB: not implemented"; return "" }
 
 // handleRequest processes a single client request and returns the response.
 // clientPorts is updated in place for ALLOC (append) and RETURN (remove).
 // The response is empty for blank lines (no reply should be sent).
 func (s *Server) handleRequest(request string, clientPorts *[]int) string {
-	fields := strings.Fields(request)
-
-	// Ignore empty lines; don't send an error response since some clients
-	// may use newlines as delimiters.
-	if len(fields) == 0 {
-		return ""
-	}
-
-	switch fields[0] {
-	case cmdPing:
-		return respPong
-
-	case cmdAlloc:
-		if port, err := s.allocPort(); err != nil {
-			return respPrefixErr + " " + err.Error()
-		} else {
-			*clientPorts = append(*clientPorts, port)
-			return fmt.Sprintf(respPrefixPort+" %d", port)
-		}
-
-	case cmdReturn:
-		if len(fields) < 2 {
-			return respPrefixErr + " missing port"
-		}
-		if port, err := strconv.Atoi(fields[1]); err != nil {
-			return respPrefixErr + " invalid port"
-		} else {
-			s.returnPort(port)
-			*clientPorts = removePort(*clientPorts, port)
-			return respOK
-		}
-	}
-	return respPrefixErr + " unknown command: " + fields[0]
+	_ = "STUB: not implemented"
+	return ""
 }
+
+// Ignore empty lines; don't send an error response since some clients
+// may use newlines as delimiters.
 
 // reclaimAllocatedPorts removes all ports in clientPorts from the registry.
-func (s *Server) reclaimAllocatedPorts(clientPorts []int) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for _, port := range clientPorts {
-		delete(s.allocated, port)
-	}
-}
+func (s *Server) reclaimAllocatedPorts(clientPorts []int) { _ = "STUB: not implemented"; return }
 
 // handleConn serves requests from a single client connection until it disconnects.
-func (s *Server) handleConn(conn net.Conn) {
-	defer conn.Close()
+func (s *Server) handleConn(conn net.Conn) { _ = "STUB: not implemented"; return }
 
-	var clientPorts []int // ports allocated to this connection, not yet returned
-	scanner := bufio.NewScanner(conn)
-	w := bufio.NewWriter(conn)
+// ports allocated to this connection, not yet returned
 
-	for scanner.Scan() {
-		if response := s.handleRequest(scanner.Text(), &clientPorts); response != "" {
-			fmt.Fprintln(w, response)
-			_ = w.Flush()
-		}
-	}
-
-	// On disconnect: reclaim all ports still owned by this connection.
-	// A test process may crash after allocating ports but before calling Return,
-	// which would otherwise block those port numbers from being re-allocated for
-	// the lifetime of the server.
-	s.reclaimAllocatedPorts(clientPorts)
-}
+// On disconnect: reclaim all ports still owned by this connection.
+// A test process may crash after allocating ports but before calling Return,
+// which would otherwise block those port numbers from being re-allocated for
+// the lifetime of the server.
 
 // allocPort finds a free port, records it in the registry, and returns it.
 // The listener is closed immediately so the port can be bound by callers.
-func (s *Server) allocPort() (int, error) {
-	l, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		return 0, fmt.Errorf("open listener: %w", err)
-	}
-	port := l.Addr().(*net.TCPAddr).Port
-	l.Close()
+func (s *Server) allocPort() (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// Rare collision: OS returned a port already in our registry.
-	if _, exists := s.allocated[port]; exists {
-		return 0, errors.New("port collision, retry")
-	}
-	s.allocated[port] = struct{}{}
-	return port, nil
-}
+// Rare collision: OS returned a port already in our registry.
 
 // returnPort removes port from the registry.
-func (s *Server) returnPort(port int) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.allocated, port)
-}
+func (s *Server) returnPort(port int) { _ = "STUB: not implemented"; return }
 
-func removePort(ports []int, port int) []int {
-	for i, p := range ports {
-		if p == port {
-			return append(ports[:i], ports[i+1:]...)
-		}
-	}
-	return ports
-}
+func removePort(ports []int, port int) []int { _ = "STUB: not implemented"; return nil }

@@ -15,10 +15,6 @@
 package analysis
 
 import (
-	"errors"
-	"fmt"
-	"time"
-
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 )
 
@@ -33,36 +29,21 @@ type LeaderResignedAnalyzer struct {
 }
 
 func (a *LeaderResignedAnalyzer) Name() types.CheckName {
-	return "LeaderResigned"
+	_ = "STUB: not implemented"
+	return *new(types.CheckName)
 }
 
 func (a *LeaderResignedAnalyzer) ProblemCode() types.ProblemCode {
-	return types.ProblemLeaderResigned
+	_ = "STUB: not implemented"
+	return *new(types.ProblemCode)
 }
 
 func (a *LeaderResignedAnalyzer) RecoveryAction() types.RecoveryAction {
-	return a.factory.NewAppointLeaderAction()
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 func (a *LeaderResignedAnalyzer) Analyze(sa *ShardAnalysis) ([]types.Problem, error) {
-	if a.factory == nil {
-		return nil, errors.New("recovery action factory not initialized")
-	}
-	if sa.HighestTermDiscoveredLeaderID == nil {
-		return nil, nil
-	}
-	if !sa.LeaderHasResigned {
-		return nil, nil
-	}
-	return []types.Problem{{
-		Code:           types.ProblemLeaderResigned,
-		CheckName:      a.Name(),
-		PoolerID:       sa.HighestTermDiscoveredLeaderID,
-		ShardKey:       sa.ShardKey,
-		Description:    fmt.Sprintf("Leader for shard %s has requested demotion", sa.ShardKey),
-		Priority:       types.PriorityEmergency,
-		Scope:          types.ScopeShard,
-		DetectedAt:     time.Now(),
-		RecoveryAction: a.factory.NewAppointLeaderAction(),
-	}}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

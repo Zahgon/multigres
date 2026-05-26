@@ -20,7 +20,6 @@ package types
 // should move to go/common/consensus or a similar shared package.
 
 import (
-	commonconsensus "github.com/multigres/multigres/go/common/consensus"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	multiorchdatapb "github.com/multigres/multigres/go/pb/multiorchdata"
 )
@@ -39,17 +38,11 @@ import (
 // coordinator-synthesized signals (e.g. TEMPORARILY_UNAVAILABLE for unreachable
 // nodes) are handled here too.
 func LeaderNeedsReplacement(p *multiorchdatapb.PoolerHealthState) bool {
-	leadershipStatus := p.GetAvailabilityStatus().GetLeadershipStatus()
-	if leadershipStatus == nil {
-		return false
-	}
-	if leadershipStatus.Signal != clustermetadatapb.LeadershipSignal_LEADERSHIP_SIGNAL_REQUESTING_DEMOTION {
-		return false
-	}
-	// Verify the signal is for the current primary term, not a stale one.
-	primaryTerm := commonconsensus.LeaderTerm(p.GetConsensusStatus())
-	return leadershipStatus.LeaderTerm != 0 && leadershipStatus.LeaderTerm == primaryTerm
+	_ = "STUB: not implemented"
+	return false
 }
+
+// Verify the signal is for the current primary term, not a stale one.
 
 // PoolerIsCohortIneligible reports whether a pooler has self-reported that it
 // is unwilling to serve as a consensus cohort member. UNKNOWN (the default for
@@ -57,6 +50,6 @@ func LeaderNeedsReplacement(p *multiorchdatapb.PoolerHealthState) bool {
 // return false. Eligibility is a current preference and not term-gated;
 // staleness comes from the freshness of the surrounding health snapshot.
 func PoolerIsCohortIneligible(av *clustermetadatapb.AvailabilityStatus) bool {
-	signal := av.GetCohortEligibilityStatus().GetSignal()
-	return signal == clustermetadatapb.CohortEligibilitySignal_COHORT_ELIGIBILITY_SIGNAL_INELIGIBLE
+	_ = "STUB: not implemented"
+	return false
 }

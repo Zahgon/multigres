@@ -36,47 +36,27 @@
 
 package parser
 
-import "unicode/utf16"
-
 // isUTF16SurrogateFirst checks if a Unicode code point is the first part of a UTF-16 surrogate pair
 // Equivalent to postgres/src/include/mb/pg_wchar.h:541-544 (is_utf16_surrogate_first function)
-func isUTF16SurrogateFirst(c rune) bool {
-	return c >= 0xD800 && c <= 0xDBFF
-}
+func isUTF16SurrogateFirst(c rune) bool { _ = "STUB: not implemented"; return false }
 
 // isUTF16SurrogateSecond checks if a Unicode code point is the second part of a UTF-16 surrogate pair
 // Equivalent to postgres/src/include/mb/pg_wchar.h:547-550 (is_utf16_surrogate_second function)
-func isUTF16SurrogateSecond(c rune) bool {
-	return c >= 0xDC00 && c <= 0xDFFF
-}
+func isUTF16SurrogateSecond(c rune) bool { _ = "STUB: not implemented"; return false }
 
 // isValidUnicodeCodepoint checks if a Unicode code point is valid
 // Follows PostgreSQL's unicode validation rules
 func isValidUnicodeCodepoint(c rune) bool {
+	_ = "STUB: not implemented"
 	// Check for valid Unicode range (0 to 0x10FFFF)
-	if c < 0 || c > 0x10FFFF {
-		return false
-	}
-
-	// Surrogate pairs are not valid standalone code points
-	if isUTF16SurrogateFirst(c) || isUTF16SurrogateSecond(c) {
-		return false
-	}
-
-	return true
+	return false
 }
+
+// Surrogate pairs are not valid standalone code points
 
 // validateSurrogatePair validates that two code points form a valid UTF-16 surrogate pair
 // Returns the combined code point and whether the pair is valid
 func validateSurrogatePair(first, second rune) (rune, bool) {
-	if !isUTF16SurrogateFirst(first) {
-		return 0, false
-	}
-
-	if !isUTF16SurrogateSecond(second) {
-		return 0, false
-	}
-
-	combined := utf16.DecodeRune(first, second)
-	return combined, isValidUnicodeCodepoint(combined)
+	_ = "STUB: not implemented"
+	return 0, false
 }

@@ -73,11 +73,7 @@ in doc/viper/.
 package viperutil
 
 import (
-	"strings"
-
 	"github.com/spf13/viper"
-
-	"github.com/multigres/multigres/go/tools/viperutil/internal/value"
 )
 
 // Options represents the various options used to control how Values are
@@ -147,28 +143,8 @@ type Options[T any] struct {
 //	    FlagName: "pooler-dir",
 //	})
 func Configure[T any](reg *Registry, key string, opts Options[T]) (v Value[T]) {
-	getfunc := opts.GetFunc
-	if getfunc == nil {
-		getfunc = GetFuncForType[T]()
-	}
-
-	base := &value.Base[T]{
-		KeyName:    key,
-		DefaultVal: opts.Default,
-		GetFunc:    getfunc,
-		Aliases:    opts.Aliases,
-		FlagName:   opts.FlagName,
-		EnvVars:    opts.EnvVars,
-	}
-
-	switch {
-	case opts.Dynamic:
-		v = value.NewDynamic(reg.dynamic, base)
-	default:
-		v = value.NewStatic(reg.static, base)
-	}
-
-	return v
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // KeyPrefixFunc is a helper function to allow modules to extract a common key
@@ -181,17 +157,6 @@ func Configure[T any](reg *Registry, key string, opts Options[T]) (v Value[T]) {
 //	watch := viperutil.Configure(moduleKey("watch_interval"), ...) // => "vttablet.schema.watch_interval"
 //	// ... and so on
 func KeyPrefixFunc(prefix string) func(subkey string) (fullkey string) {
-	var keyParts []string
-	if prefix != "" {
-		keyParts = append(keyParts, prefix)
-	}
-
-	return func(subkey string) (fullkey string) {
-		tmp := keyParts
-		if subkey != "" {
-			tmp = append(tmp, subkey)
-		}
-
-		return strings.Join(tmp, ".")
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

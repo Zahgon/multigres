@@ -47,62 +47,32 @@ type ProtoStore[K comparable, V proto.Message] struct {
 
 // NewProtoStore creates a new proto store.
 func NewProtoStore[K comparable, V proto.Message]() *ProtoStore[K, V] {
-	return &ProtoStore[K, V]{
-		items: make(map[K]V),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Get retrieves a value by key. Returns a deep clone of the value and a boolean
 // indicating if the key exists. The returned value is safe to mutate without
 // affecting the stored copy.
-func (s *ProtoStore[K, V]) Get(key K) (V, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *ProtoStore[K, V]) Get(key K) (V, bool) { _ = "STUB: not implemented"; return *new(V), false }
 
-	v, ok := s.items[key]
-	if !ok {
-		var zero V
-		return zero, false
-	}
-
-	// Return a deep clone so callers get an isolated copy
-	cloned := proto.Clone(v).(V)
-	return cloned, true
-}
+// Return a deep clone so callers get an isolated copy
 
 // Set stores a deep clone of the value for the given key. If the key already
 // exists, it will be overwritten. The store keeps its own copy, so the caller
 // can continue to mutate the passed value without affecting the stored copy.
-func (s *ProtoStore[K, V]) Set(key K, value V) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *ProtoStore[K, V]) Set(key K, value V) { _ = "STUB: not implemented"; return }
 
-	// Store a deep clone so the canonical copy only lives inside the store
-	s.items[key] = proto.Clone(value).(V)
-}
+// Store a deep clone so the canonical copy only lives inside the store
 
 // Delete removes a value by key. Returns true if the key existed, false otherwise.
-func (s *ProtoStore[K, V]) Delete(key K) bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	_, existed := s.items[key]
-	delete(s.items, key)
-	return existed
-}
+func (s *ProtoStore[K, V]) Delete(key K) bool { _ = "STUB: not implemented"; return false }
 
 // Len returns the number of items in the store.
-func (s *ProtoStore[K, V]) Len() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return len(s.items)
-}
+func (s *ProtoStore[K, V]) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // Clear removes all items from the store.
-func (s *ProtoStore[K, V]) Clear() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.items = make(map[K]V)
-}
+func (s *ProtoStore[K, V]) Clear() { _ = "STUB: not implemented"; return }
 
 // Range iterates over all key-value pairs in the store while holding the lock.
 // Each value passed to the callback is a deep clone, safe to mutate.
@@ -114,18 +84,9 @@ func (s *ProtoStore[K, V]) Clear() {
 //	    // Process key and value (value is a clone, safe to mutate)
 //	    return true  // continue iteration
 //	})
-func (s *ProtoStore[K, V]) Range(fn func(key K, value V) bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *ProtoStore[K, V]) Range(fn func(key K, value V) bool) { _ = "STUB: not implemented"; return }
 
-	for k, v := range s.items {
-		// Clone each value so the callback gets an isolated copy
-		cloned := proto.Clone(v).(V)
-		if !fn(k, cloned) {
-			return
-		}
-	}
-}
+// Clone each value so the callback gets an isolated copy
 
 // DoUpdateRange iterates over all key-value pairs while holding the lock and
 // allows in-place updates.
@@ -148,19 +109,8 @@ func (s *ProtoStore[K, V]) Range(fn func(key K, value V) bool) {
 //	    return value, false // write updated value and stop
 //	})
 func (s *ProtoStore[K, V]) DoUpdateRange(fn func(key K, value V) (V, bool)) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for k, v := range s.items {
-		var zero V
-		newValue, cont := fn(k, v)
-		if any(newValue) != any(zero) {
-			s.items[k] = newValue
-		}
-		if !cont {
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // DoUpdate performs an atomic read-modify-write operation for a given key.
@@ -184,16 +134,7 @@ func (s *ProtoStore[K, V]) DoUpdateRange(fn func(key K, value V) (V, bool)) {
 // Right now we are holding a lock on the entire store for the duration of the
 // update function, but an improvement for the future could be to implement
 // finer-grained locking (e.g., per-key locks) if contention becomes an issue.
-func (s *ProtoStore[K, V]) DoUpdate(key K, fn func(value V) V) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *ProtoStore[K, V]) DoUpdate(key K, fn func(value V) V) { _ = "STUB: not implemented"; return }
 
-	// Skip the update if the key doesn't exist to avoid accidentally creating
-	// new entries.
-	if v, ok := s.items[key]; ok {
-		var zero V
-		if newValue := fn(v); any(newValue) != any(zero) {
-			s.items[key] = newValue
-		}
-	}
-}
+// Skip the update if the key doesn't exist to avoid accidentally creating
+// new entries.

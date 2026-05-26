@@ -15,9 +15,6 @@
 package config
 
 import (
-	"errors"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -36,53 +33,30 @@ type WatchTarget struct {
 }
 
 // String returns the string representation of the target.
-func (t WatchTarget) String() string {
-	if t.Shard != "" {
-		return fmt.Sprintf("%s/%s/%s", t.Database, t.TableGroup, t.Shard)
-	}
-	if t.TableGroup != "" {
-		return fmt.Sprintf("%s/%s", t.Database, t.TableGroup)
-	}
-	return t.Database
-}
+func (t WatchTarget) String() string { _ = "STUB: not implemented"; return "" }
 
 // MatchesDatabase returns true if this target watches the given database.
-func (t WatchTarget) MatchesDatabase(db string) bool {
-	return t.Database == db
-}
+func (t WatchTarget) MatchesDatabase(db string) bool { _ = "STUB: not implemented"; return false }
 
 // MatchesTableGroup returns true if this target watches the given database/tablegroup.
 // Returns true if watching entire database or specific tablegroup.
 func (t WatchTarget) MatchesTableGroup(db, tablegroup string) bool {
-	if t.Database != db {
-		return false
-	}
-	// Watching entire database matches all tablegroups
-	if t.TableGroup == "" {
-		return true
-	}
-	return t.TableGroup == tablegroup
+	_ = "STUB: not implemented"
+	return false
 }
+
+// Watching entire database matches all tablegroups
 
 // MatchesShard returns true if this target watches the given database/tablegroup/shard.
 // Returns true if watching entire database, entire tablegroup, or specific shard.
 func (t WatchTarget) MatchesShard(db, tablegroup, shard string) bool {
-	if t.Database != db {
-		return false
-	}
-	// Watching entire database matches all shards
-	if t.TableGroup == "" {
-		return true
-	}
-	if t.TableGroup != tablegroup {
-		return false
-	}
-	// Watching entire tablegroup matches all shards
-	if t.Shard == "" {
-		return true
-	}
-	return t.Shard == shard
+	_ = "STUB: not implemented"
+	return false
 }
+
+// Watching entire database matches all shards
+
+// Watching entire tablegroup matches all shards
 
 // ParseShardWatchTarget parses a shard watch target string.
 // Format: "database" or "database/tablegroup" or "database/tablegroup/shard"
@@ -92,55 +66,20 @@ func (t WatchTarget) MatchesShard(db, tablegroup, shard string) bool {
 // - If shard is provided, tablegroup must be provided
 // - Empty parts are not allowed
 func ParseShardWatchTarget(s string) (WatchTarget, error) {
-	if s == "" {
-		return WatchTarget{}, errors.New("empty shard watch target")
-	}
-
-	parts := strings.Split(s, "/")
-	if len(parts) > 3 {
-		return WatchTarget{}, fmt.Errorf("invalid shard watch target format: %s (expected db, db/tablegroup, or db/tablegroup/shard)", s)
-	}
-
-	// Database is always required
-	if parts[0] == "" {
-		return WatchTarget{}, errors.New("database cannot be empty")
-	}
-
-	target := WatchTarget{Database: parts[0]}
-
-	// Validate and set tablegroup if provided
-	if len(parts) >= 2 {
-		if parts[1] == "" {
-			return WatchTarget{}, errors.New("tablegroup cannot be empty when specified")
-		}
-		target.TableGroup = parts[1]
-	}
-
-	// Validate and set shard if provided
-	if len(parts) == 3 {
-		if parts[2] == "" {
-			return WatchTarget{}, errors.New("shard cannot be empty when specified")
-		}
-		if target.TableGroup == "" {
-			return WatchTarget{}, errors.New("tablegroup must be specified when shard is provided")
-		}
-		target.Shard = parts[2]
-	}
-
-	return target, nil
+	_ = "STUB: not implemented"
+	return *new(WatchTarget), nil
 }
+
+// Database is always required
+
+// Validate and set tablegroup if provided
+
+// Validate and set shard if provided
 
 // ParseShardWatchTargets parses multiple shard watch target strings.
 func ParseShardWatchTargets(targets []string) ([]WatchTarget, error) {
-	result := make([]WatchTarget, 0, len(targets))
-	for _, t := range targets {
-		parsed, err := ParseShardWatchTarget(t)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, parsed)
-	}
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Config encapsulates all multiorch configuration.
@@ -168,288 +107,151 @@ const (
 )
 
 // NewConfig creates a new Config with all viperutil values configured.
-func NewConfig(reg *viperutil.Registry) *Config {
-	return &Config{
-		cell: viperutil.Configure(reg, "cell", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "cell",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_CELL"},
-		}),
-		serviceID: viperutil.Configure(reg, "service-id", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "service-id",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_SERVICE_ID"},
-		}),
-		shardWatchTargets: viperutil.Configure(reg, "watch-targets", viperutil.Options[[]string]{
-			FlagName: "watch-targets",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_SHARD_WATCH_TARGETS"},
-		}),
-		bookkeepingInterval: viperutil.Configure(reg, "bookkeeping-interval", viperutil.Options[time.Duration]{
-			Default:  1 * time.Minute,
-			FlagName: "bookkeeping-interval",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_BOOKKEEPING_INTERVAL"},
-		}),
-		poolerHealthCheckInterval: viperutil.Configure(reg, "pooler-health-check-interval", viperutil.Options[time.Duration]{
-			Default:  5 * time.Second,
-			FlagName: "pooler-health-check-interval",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_POOLER_HEALTH_CHECK_INTERVAL"},
-		}),
-		healthCheckWorkers: viperutil.Configure(reg, "health-check-workers", viperutil.Options[int]{
-			Default:  300,
-			FlagName: "health-check-workers",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_HEALTH_CHECK_WORKERS"},
-		}),
-		recoveryCycleInterval: viperutil.Configure(reg, "recovery-cycle-interval", viperutil.Options[time.Duration]{
-			Default:  1 * time.Second,
-			FlagName: "recovery-cycle-interval",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_RECOVERY_CYCLE_INTERVAL"},
-		}),
-		leaderFailoverGracePeriodBase: viperutil.Configure(reg, "leader-failover-grace-period-base", viperutil.Options[time.Duration]{
-			Default:  4 * time.Second,
-			FlagName: "leader-failover-grace-period-base",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_LEADER_FAILOVER_GRACE_PERIOD_BASE"},
-		}),
-		leaderFailoverGracePeriodMaxJitter: viperutil.Configure(reg, "leader-failover-grace-period-max-jitter", viperutil.Options[time.Duration]{
-			Default:  8 * time.Second,
-			FlagName: "leader-failover-grace-period-max-jitter",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_LEADER_FAILOVER_GRACE_PERIOD_MAX_JITTER"},
-		}),
-		verifyReplicationTimeout: viperutil.Configure(reg, "verify-replication-timeout", viperutil.Options[time.Duration]{
-			Default:  5 * time.Second,
-			FlagName: "verify-replication-timeout",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_VERIFY_REPLICATION_TIMEOUT"},
-		}),
-		leaderPostgresResponseThreshold: viperutil.Configure(reg, "leader-postgres-response-threshold", viperutil.Options[time.Duration]{
-			Default:  30 * time.Second,
-			FlagName: "leader-postgres-response-threshold",
-			Dynamic:  true,
-			EnvVars:  []string{"MT_LEADER_POSTGRES_RESPONSE_THRESHOLD"},
-		}),
-		useNewConsensusFlow: viperutil.Configure(reg, "use-new-consensus-flow", viperutil.Options[bool]{
-			Default:  true,
-			FlagName: "use-new-consensus-flow",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_USE_NEW_CONSENSUS_FLOW"},
-		}),
-	}
-}
+func NewConfig(reg *viperutil.Registry) *Config { _ = "STUB: not implemented"; return nil }
 
 // Getter methods
 
-func (c *Config) GetCell() string {
-	return c.cell.Get()
-}
+func (c *Config) GetCell() string { _ = "STUB: not implemented"; return "" }
 
-func (c *Config) GetServiceID() string {
-	return c.serviceID.Get()
-}
+func (c *Config) GetServiceID() string { _ = "STUB: not implemented"; return "" }
 
-func (c *Config) GetShardWatchTargets() []string {
-	return c.shardWatchTargets.Get()
-}
+func (c *Config) GetShardWatchTargets() []string { _ = "STUB: not implemented"; return nil }
 
 func (c *Config) GetBookkeepingInterval() time.Duration {
-	return c.bookkeepingInterval.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) GetPoolerHealthCheckInterval() time.Duration {
-	return c.poolerHealthCheckInterval.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (c *Config) GetHealthCheckWorkers() int {
-	return c.healthCheckWorkers.Get()
-}
+func (c *Config) GetHealthCheckWorkers() int { _ = "STUB: not implemented"; return 0 }
 
 func (c *Config) GetRecoveryCycleInterval() time.Duration {
-	return c.recoveryCycleInterval.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) GetLeaderFailoverGracePeriodBase() time.Duration {
-	return c.leaderFailoverGracePeriodBase.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) GetLeaderFailoverGracePeriodMaxJitter() time.Duration {
-	return c.leaderFailoverGracePeriodMaxJitter.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) GetVerifyReplicationTimeout() time.Duration {
-	return c.verifyReplicationTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) GetLeaderPostgresResponseThreshold() time.Duration {
-	return c.leaderPostgresResponseThreshold.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (c *Config) GetUseNewConsensusFlow() bool {
-	return c.useNewConsensusFlow.Get()
-}
+func (c *Config) GetUseNewConsensusFlow() bool { _ = "STUB: not implemented"; return false }
 
 // Defaults for flags (used in RegisterFlags)
 
-func (c *Config) DefaultCell() string {
-	return c.cell.Default()
-}
+func (c *Config) DefaultCell() string { _ = "STUB: not implemented"; return "" }
 
-func (c *Config) DefaultServiceID() string {
-	return c.serviceID.Default()
-}
+func (c *Config) DefaultServiceID() string { _ = "STUB: not implemented"; return "" }
 
-func (c *Config) DefaultShardWatchTargets() []string {
-	return c.shardWatchTargets.Default()
-}
+func (c *Config) DefaultShardWatchTargets() []string { _ = "STUB: not implemented"; return nil }
 
 func (c *Config) DefaultBookkeepingInterval() time.Duration {
-	return c.bookkeepingInterval.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) DefaultPoolerHealthCheckInterval() time.Duration {
-	return c.poolerHealthCheckInterval.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (c *Config) DefaultHealthCheckWorkers() int {
-	return c.healthCheckWorkers.Default()
-}
+func (c *Config) DefaultHealthCheckWorkers() int { _ = "STUB: not implemented"; return 0 }
 
 func (c *Config) DefaultRecoveryCycleInterval() time.Duration {
-	return c.recoveryCycleInterval.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) DefaultLeaderFailoverGracePeriodBase() time.Duration {
-	return c.leaderFailoverGracePeriodBase.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) DefaultLeaderFailoverGracePeriodMaxJitter() time.Duration {
-	return c.leaderFailoverGracePeriodMaxJitter.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) DefaultVerifyReplicationTimeout() time.Duration {
-	return c.verifyReplicationTimeout.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (c *Config) DefaultLeaderPostgresResponseThreshold() time.Duration {
-	return c.leaderPostgresResponseThreshold.Default()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (c *Config) DefaultUseNewConsensusFlow() bool {
-	return c.useNewConsensusFlow.Default()
-}
+func (c *Config) DefaultUseNewConsensusFlow() bool { _ = "STUB: not implemented"; return false }
 
 // RegisterFlags registers the config flags with pflag.
-func (c *Config) RegisterFlags(fs *pflag.FlagSet) {
-	fs.String("cell", c.DefaultCell(), "cell to use")
-	fs.String("service-id", c.DefaultServiceID(), "optional service ID (if empty, a random ID will be generated)")
-	fs.StringSlice("watch-targets", c.DefaultShardWatchTargets(), "list of db/tablegroup/shard targets to watch")
-	fs.Duration("bookkeeping-interval", c.DefaultBookkeepingInterval(), "interval for bookkeeping tasks")
-	fs.Duration("pooler-health-check-interval", c.DefaultPoolerHealthCheckInterval(), "interval between health checks for a single pooler")
-	fs.Int("health-check-workers", c.DefaultHealthCheckWorkers(), "number of concurrent workers polling pooler health")
-	fs.Duration("recovery-cycle-interval", c.DefaultRecoveryCycleInterval(), "interval between recovery cycles")
-	fs.Duration("leader-failover-grace-period-base", c.DefaultLeaderFailoverGracePeriodBase(), "base grace period before executing leader failover")
-	fs.Duration("leader-failover-grace-period-max-jitter", c.DefaultLeaderFailoverGracePeriodMaxJitter(), "max jitter added to leader failover grace period")
-	fs.Duration("verify-replication-timeout", c.DefaultVerifyReplicationTimeout(), "timeout for verifying replication started after fix")
-	fs.Duration("leader-postgres-response-threshold", c.DefaultLeaderPostgresResponseThreshold(), "max age of primary postgres last-responded timestamp before replicas-connected suppression of failover is lifted")
-	fs.Bool("use-new-consensus-flow", c.DefaultUseNewConsensusFlow(), "use the new Recruit/Propose consensus flow instead of BeginTerm/EstablishLeadership (temporary transition flag)")
-	viperutil.BindFlags(fs,
-		c.cell,
-		c.serviceID,
-		c.shardWatchTargets,
-		c.bookkeepingInterval,
-		c.poolerHealthCheckInterval,
-		c.healthCheckWorkers,
-		c.recoveryCycleInterval,
-		c.leaderFailoverGracePeriodBase,
-		c.leaderFailoverGracePeriodMaxJitter,
-		c.verifyReplicationTimeout,
-		c.leaderPostgresResponseThreshold,
-		c.useNewConsensusFlow)
-}
+func (c *Config) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // Test helper functions
 
 // NewTestConfig creates a Config for testing with optional custom values.
 // Sets safe defaults for grace period (0 base, 0 jitter) so tests execute immediately.
-func NewTestConfig(opts ...func(*Config)) *Config {
-	reg := viperutil.NewRegistry()
-	cfg := NewConfig(reg)
+func NewTestConfig(opts ...func(*Config)) *Config { _ = "STUB: not implemented"; return nil }
 
-	// Set safe defaults for tests - no grace period by default
-	cfg.leaderFailoverGracePeriodBase.Set(0)
-	cfg.leaderFailoverGracePeriodMaxJitter.Set(0)
-
-	for _, opt := range opts {
-		opt(cfg)
-	}
-	return cfg
-}
+// Set safe defaults for tests - no grace period by default
 
 // WithCell sets the cell value for testing.
-func WithCell(cell string) func(*Config) {
-	return func(cfg *Config) {
-		cfg.cell.Set(cell)
-	}
-}
+func WithCell(cell string) func(*Config) { _ = "STUB: not implemented"; return nil }
 
 // WithUseNewConsensusFlow toggles the Recruit/Propose/SetTermPrimary consensus flow.
-func WithUseNewConsensusFlow(enabled bool) func(*Config) {
-	return func(cfg *Config) {
-		cfg.useNewConsensusFlow.Set(enabled)
-	}
-}
+func WithUseNewConsensusFlow(enabled bool) func(*Config) { _ = "STUB: not implemented"; return nil }
 
 // WithBookkeepingInterval sets the bookkeeping interval for testing.
-func WithBookkeepingInterval(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.bookkeepingInterval.Set(d)
-	}
-}
+func WithBookkeepingInterval(d time.Duration) func(*Config) { _ = "STUB: not implemented"; return nil }
 
 // WithPoolerHealthCheckInterval sets the pooler health check interval for testing.
 func WithPoolerHealthCheckInterval(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.poolerHealthCheckInterval.Set(d)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WithHealthCheckWorkers sets the number of health check workers for testing.
-func WithHealthCheckWorkers(n int) func(*Config) {
-	return func(cfg *Config) {
-		cfg.healthCheckWorkers.Set(n)
-	}
-}
+func WithHealthCheckWorkers(n int) func(*Config) { _ = "STUB: not implemented"; return nil }
 
 // WithRecoveryCycleInterval sets the recovery cycle interval for testing.
 func WithRecoveryCycleInterval(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.recoveryCycleInterval.Set(d)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WithLeaderFailoverGracePeriodBase sets the leader failover grace period base for testing.
 func WithLeaderFailoverGracePeriodBase(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.leaderFailoverGracePeriodBase.Set(d)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WithLeaderFailoverGracePeriodMaxJitter sets the leader failover grace period max jitter for testing.
 func WithLeaderFailoverGracePeriodMaxJitter(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.leaderFailoverGracePeriodMaxJitter.Set(d)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WithLeaderPostgresResponseThreshold sets the primary postgres responded threshold for testing.
 func WithLeaderPostgresResponseThreshold(d time.Duration) func(*Config) {
-	return func(cfg *Config) {
-		cfg.leaderPostgresResponseThreshold.Set(d)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

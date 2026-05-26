@@ -28,71 +28,16 @@ const LocalCellName = "test"
 // The factory method should return a topoclient.Server that has a single cell
 // called LocalCellName.
 func TopoServerTestSuite(t *testing.T, ctx context.Context, factory func() topoclient.Store) {
-	var ts topoclient.Store
+	_ = "STUB: not implemented"
+	return
 
 	// Lock and TryLock are part of the Lock API.
-	t.Log("=== (Lock) checkLock")
-	ts = factory()
-	checkLock(t, ctx, ts)
-	_ = ts.Close()
-
-	t.Log("=== (Lock) checkTryLock")
-	ts = factory()
-	checkTryLock(t, ctx, ts)
-	_ = ts.Close()
-
-	t.Log("=== (Lock) checkLockName")
-	ts = factory()
-	checkLockName(t, ctx, ts)
-	_ = ts.Close()
-
-	t.Log("=== (Lock) checkLockNameWithTTL")
-	ts = factory()
-	checkLockNameWithTTL(t, ctx, ts)
-	_ = ts.Close()
-
-	t.Log("=== (Lock) checkTryLockName")
-	ts = factory()
-	checkTryLockName(t, ctx, ts)
-	_ = ts.Close()
-
-	// Directory is part of the Directory API.
-	t.Log("=== (Directory) checkDirectory")
-	ts = factory()
-	checkDirectory(t, ctx, ts)
-	_ = ts.Close()
-
-	// Watch and WatchRecursive are part of the Watch API.
-	t.Log("=== (Watch) checkWatch")
-	ts = factory()
-	checkWatch(t, ctx, ts)
-	_ = ts.Close()
-
-	t.Log("=== (Watch) checkWatchInterrupt")
-	ts = factory()
-	checkWatchInterrupt(t, ctx, ts)
-	_ = ts.Close()
-
-	ts = factory()
-	t.Log("=== (Watch) checkWatchRecursive")
-	checkWatchRecursive(t, ctx, ts)
-	_ = ts.Close()
-
-	// File is part of the File API.
-
-	t.Log("=== (File) checkFile")
-	ts = factory()
-	checkFile(t, ctx, ts)
-	_ = ts.Close()
-
-	ts = factory()
-	t.Log("=== checkList")
-	checkList(t, ctx, ts)
-	_ = ts.Close()
-
-	// ShardInitClaim is part of the shard initialization API.
-	t.Log("=== (ShardInitClaim) checkShardInitClaim")
-	ts = factory()
-	checkShardInitClaim(t, ctx, ts)
-	_ = ts.Close()
 }
+
+// Directory is part of the Directory API.
+
+// Watch and WatchRecursive are part of the Watch API.
+
+// File is part of the File API.
+
+// ShardInitClaim is part of the shard initialization API.

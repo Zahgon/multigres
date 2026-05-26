@@ -40,9 +40,7 @@
 package parser
 
 import (
-	"fmt"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 )
@@ -89,22 +87,7 @@ const (
 )
 
 // String returns the string representation of error severity
-func (es ErrorSeverity) String() string {
-	switch es {
-	case ErrorSeverityNotice:
-		return "NOTICE"
-	case ErrorSeverityWarning:
-		return "WARNING"
-	case ErrorSeverityError:
-		return "ERROR"
-	case ErrorSeverityFatal:
-		return "FATAL"
-	case ErrorSeverityPanic:
-		return "PANIC"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (es ErrorSeverity) String() string { _ = "STUB: not implemented"; return "" }
 
 // ParseError represents a unified error structure for both lexer and parser errors
 // Combines LexerError and ParseError from the original contexts
@@ -129,14 +112,7 @@ type ParseError struct {
 }
 
 // Error implements the error interface
-func (pe *ParseError) Error() string {
-	if pe.Line > 0 && pe.Column > 0 {
-		return fmt.Sprintf("%s at line %d, column %d: %s", pe.Severity, pe.Line, pe.Column, pe.Message)
-	} else if pe.Position >= 0 {
-		return fmt.Sprintf("%s at position %d: %s", pe.Severity, pe.Position, pe.Message)
-	}
-	return fmt.Sprintf("%s: %s", pe.Severity, pe.Message)
-}
+func (pe *ParseError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // ParseOptions contains unified configuration options for both lexer and parser
 // Combines configuration from both original contexts
@@ -165,29 +141,23 @@ type ParseOptions struct {
 
 // DefaultParseOptions returns default parsing options
 // Based on standard PostgreSQL default settings
-func DefaultParseOptions() *ParseOptions {
-	return &ParseOptions{
-		// Standard PostgreSQL defaults
-		StandardConformingStrings: true,                       // Default in modern PostgreSQL
-		EscapeStringWarning:       true,                       // Default warning setting
-		BackslashQuote:            BackslashQuoteSafeEncoding, // safe_encoding (default)
+func DefaultParseOptions() *ParseOptions { _ = "STUB: not implemented"; return nil }
 
-		// Parser limits - based on PostgreSQL defaults
-		MaxIdentifierLength: 63,          // NAMEDATALEN - 1 (default PostgreSQL)
-		MaxExpressionDepth:  1000,        // Reasonable expression nesting limit
-		MaxStatementLength:  1024 * 1024, // 1MB statement limit
+// Standard PostgreSQL defaults
+// Default in modern PostgreSQL
+// Default warning setting
+// safe_encoding (default)
 
-		// Error handling
-		StopOnFirstError: false, // Collect multiple errors for better UX
-		CollectAllErrors: true,  // Collect all errors by default
+// Parser limits - based on PostgreSQL defaults
+// NAMEDATALEN - 1 (default PostgreSQL)
+// Reasonable expression nesting limit
+// 1MB statement limit
 
-		// Feature flags - all enabled by default for full PostgreSQL compatibility
-		EnableExtensions:   true,
-		EnableWindowFuncs:  true,
-		EnablePartitioning: true,
-		EnableMergeStmt:    true,
-	}
-}
+// Error handling
+// Collect multiple errors for better UX
+// Collect all errors by default
+
+// Feature flags - all enabled by default for full PostgreSQL compatibility
 
 // ParseContext provides unified context for PostgreSQL parsing operations
 // This eliminates all global state and combines both lexer and parser functionality
@@ -253,744 +223,375 @@ type ParseContext struct {
 // NewParseContext creates a new unified thread-safe parsing context
 // This is the main entry point for creating parser instances
 func NewParseContext(input string, options *ParseOptions) *ParseContext {
-	if options == nil {
-		options = DefaultParseOptions()
-	}
-
-	ctx := &ParseContext{
-		// Configuration
-		options: options,
-
-		// Initialize source and scan buffer
-		sourceText: input,
-		scanBuf:    []byte(input),
-		scanBufLen: len(input),
-		scanPos:    0,
-
-		// Initialize position tracking
-		currentPosition: 0,
-		lineNumber:      1,
-		columnNumber:    1,
-
-		// Initialize lexer state
-		lexerState: StateInitial,
-
-		// Initialize literal buffer
-		literalActive: false,
-
-		// Initialize parser state
-		currentDepth: 0,
-
-		// Initialize error collections
-		errors:   make([]ParseError, 0),
-		warnings: make([]ParseError, 0),
-
-		// Initialize statement boundaries
-		statementStart: 0,
-		statementEnd:   0,
-
-		// Generate unique context ID
-		contextID: fmt.Sprintf("parse_ctx_%p", &ParseContext{}),
-	}
-
-	return ctx
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Configuration
+
+// Initialize source and scan buffer
+
+// Initialize position tracking
+
+// Initialize lexer state
+
+// Initialize literal buffer
+
+// Initialize parser state
+
+// Initialize error collections
+
+// Initialize statement boundaries
+
+// Generate unique context ID
 
 // GetOptions returns the parsing options (read-only)
 func (ctx *ParseContext) GetOptions() *ParseOptions {
-	return ctx.options // Options are immutable after creation
+	_ = "STUB: not implemented"
+	// Options are immutable after creation
+	return nil
 }
 
 // GetSourceText returns the current source text being parsed
-func (ctx *ParseContext) GetSourceText() string {
-	return ctx.sourceText
-}
+func (ctx *ParseContext) GetSourceText() string { _ = "STUB: not implemented"; return "" }
 
 // SetSourceText initializes the parser with new source text to parse
 // This resets the parser state for a new parsing operation
-func (ctx *ParseContext) SetSourceText(sourceText string) {
-	ctx.sourceText = sourceText
-	ctx.scanBuf = []byte(sourceText)
-	ctx.scanBufLen = len(sourceText)
-	ctx.scanPos = 0
-	ctx.currentPosition = 0
-	ctx.lineNumber = 1
-	ctx.columnNumber = 1
-	ctx.parseTree = nil
-	ctx.currentDepth = 0
-	ctx.statementStart = 0
-	ctx.statementEnd = 0
+func (ctx *ParseContext) SetSourceText(sourceText string) { _ = "STUB: not implemented"; return }
 
-	// Reset lexer state
-	ctx.lexerState = StateInitial
-	ctx.literalBuf.Reset()
-	ctx.literalActive = false
+// Reset lexer state
 
-	// Clear previous errors and warnings
-	ctx.errors = ctx.errors[:0]
-	ctx.warnings = ctx.warnings[:0]
-}
+// Clear previous errors and warnings
 
 // GetCurrentPosition returns the current parsing position
 func (ctx *ParseContext) GetCurrentPosition() (pos int, line int, col int) {
-	return ctx.currentPosition, ctx.lineNumber, ctx.columnNumber
+	_ = "STUB: not implemented"
+	return 0, 0, 0
 }
 
 // SetCurrentPosition updates the current parsing position
 func (ctx *ParseContext) SetCurrentPosition(pos int, line int, col int) {
-	ctx.currentPosition = pos
-	ctx.lineNumber = line
-	ctx.columnNumber = col
+	_ = "STUB: not implemented"
+	return
 }
 
 // SaveCurrentPosition saves the current position for error recovery
 // Equivalent to PostgreSQL's PUSH_YYLLOC() macro
 // postgres/src/backend/parser/scan.l:121
-func (ctx *ParseContext) SaveCurrentPosition() int {
-	ctx.savePosition = ctx.currentPosition
-	return ctx.currentPosition
-}
+func (ctx *ParseContext) SaveCurrentPosition() int { _ = "STUB: not implemented"; return 0 }
 
 // RestoreSavedPosition restores a previously saved position
 // Equivalent to PostgreSQL's POP_YYLLOC() macro
 // postgres/src/backend/parser/scan.l:122
-func (ctx *ParseContext) RestoreSavedPosition() {
-	if ctx.savePosition < 0 || ctx.savePosition > len(ctx.sourceText) {
-		return
-	}
+func (ctx *ParseContext) RestoreSavedPosition() { _ = "STUB: not implemented"; return }
 
-	// Calculate how many bytes to go back
-	diff := ctx.currentPosition - ctx.savePosition
-	if diff > 0 {
-		ctx.putBackInternal(diff)
+// Calculate how many bytes to go back
 
-		// Recalculate line and column numbers from the beginning
-		// This is expensive but ensures accuracy after position restoration
-		ctx.recalculateLineColumn()
-	}
-}
+// Recalculate line and column numbers from the beginning
+// This is expensive but ensures accuracy after position restoration
 
 // putBackInternal moves the scan position back by n bytes (internal, no mutex)
-func (ctx *ParseContext) putBackInternal(n int) {
-	if n <= 0 {
-		return
-	}
+func (ctx *ParseContext) putBackInternal(n int) { _ = "STUB: not implemented"; return }
 
-	// Ensure we don't go before the start
-	if n > ctx.scanPos {
-		n = ctx.scanPos
-	}
+// Ensure we don't go before the start
 
-	// Move position back
-	ctx.scanPos -= n
-	ctx.currentPosition -= n
-}
+// Move position back
 
 // recalculateLineColumn recalculates line and column numbers from current position
 // Used after position restoration to ensure accuracy
-func (ctx *ParseContext) recalculateLineColumn() {
-	line, col := CalculateLineColumn([]byte(ctx.sourceText), ctx.currentPosition)
-	ctx.lineNumber = line
-	ctx.columnNumber = col
-}
+func (ctx *ParseContext) recalculateLineColumn() { _ = "STUB: not implemented"; return }
 
 // Lexer-specific methods (migrated from LexerContext)
 
 // StartLiteral starts accumulating a literal value
-func (ctx *ParseContext) StartLiteral() {
-	ctx.literalBuf.Reset()
-	ctx.literalActive = true
-}
+func (ctx *ParseContext) StartLiteral() { _ = "STUB: not implemented"; return }
 
 // AddLiteral adds text to the current literal being accumulated
-func (ctx *ParseContext) AddLiteral(text string) {
-	if ctx.literalActive {
-		ctx.literalBuf.WriteString(text)
-	}
-}
+func (ctx *ParseContext) AddLiteral(text string) { _ = "STUB: not implemented"; return }
 
 // AddLiteralByte adds a single byte to the current literal
-func (ctx *ParseContext) AddLiteralByte(b byte) {
-	if ctx.literalActive {
-		ctx.literalBuf.WriteByte(b)
-	}
-}
+func (ctx *ParseContext) AddLiteralByte(b byte) { _ = "STUB: not implemented"; return }
 
 // GetLiteral returns the accumulated literal value and resets the buffer
-func (ctx *ParseContext) GetLiteral() string {
-	if !ctx.literalActive {
-		return ""
-	}
-
-	result := ctx.literalBuf.String()
-	ctx.literalBuf.Reset()
-	ctx.literalActive = false
-	return result
-}
+func (ctx *ParseContext) GetLiteral() string { _ = "STUB: not implemented"; return "" }
 
 // CurrentChar returns the current character at ScanPos
-func (ctx *ParseContext) CurrentChar() rune {
-	if ctx.scanPos >= len(ctx.scanBuf) {
-		return 0
-	}
-	r, _ := utf8.DecodeRune(ctx.scanBuf[ctx.scanPos:])
-	return r
-}
+func (ctx *ParseContext) CurrentChar() rune { _ = "STUB: not implemented"; return 0 }
 
 // CurrentRune returns the current character at ScanPos along with its byte
 // length. Unlike CurrentChar + utf8.RuneLen, this preserves the size that
 // utf8.DecodeRune actually consumed, so invalid UTF-8 sequences advance by
 // exactly one byte instead of overshooting by re-encoding U+FFFD as 3 bytes.
-func (ctx *ParseContext) CurrentRune() (rune, int) {
-	if ctx.scanPos >= len(ctx.scanBuf) {
-		return 0, 0
-	}
-	return utf8.DecodeRune(ctx.scanBuf[ctx.scanPos:])
-}
+func (ctx *ParseContext) CurrentRune() (rune, int) { _ = "STUB: not implemented"; return 0, 0 }
 
 // PeekChar returns the next character without advancing
-func (ctx *ParseContext) PeekChar() rune {
-	if ctx.scanPos >= len(ctx.scanBuf) {
-		return 0
-	}
-	// First decode the current rune to find its size
-	_, currentSize := utf8.DecodeRune(ctx.scanBuf[ctx.scanPos:])
-	// Then decode the next rune
-	if ctx.scanPos+currentSize >= len(ctx.scanBuf) {
-		return 0
-	}
-	r, _ := utf8.DecodeRune(ctx.scanBuf[ctx.scanPos+currentSize:])
-	return r
-}
+func (ctx *ParseContext) PeekChar() rune { _ = "STUB: not implemented"; return 0 }
+
+// First decode the current rune to find its size
+
+// Then decode the next rune
 
 // getByteAt returns the byte at the specified offset from current position
 func (ctx *ParseContext) getByteAt(offset int) (byte, bool) {
-	pos := ctx.scanPos + offset
-	if pos >= ctx.scanBufLen {
-		return 0, false
-	}
-	return ctx.scanBuf[pos], true
+	_ = "STUB: not implemented"
+	return 0, false
 }
 
 // CurrentByte returns the byte at the current position without advancing
 func (ctx *ParseContext) CurrentByte() (byte, bool) {
-	return ctx.getByteAt(0)
+	_ = "STUB: not implemented"
+	return 0,
+
+		// NextByte returns the current byte and advances the position
+		false
 }
 
-// NextByte returns the current byte and advances the position
-func (ctx *ParseContext) NextByte() (byte, bool) {
-	b, ok := ctx.getByteAt(0)
-	if !ok {
-		return 0, false
-	}
-	ctx.advancePosition(b)
-	return b, true
-}
+func (ctx *ParseContext) NextByte() (byte, bool) { _ = "STUB: not implemented"; return 0, false }
 
 // PeekBytes returns n bytes starting at the current position without advancing
-func (ctx *ParseContext) PeekBytes(n int) []byte {
-	end := min(ctx.scanPos+n, ctx.scanBufLen)
-
-	result := make([]byte, end-ctx.scanPos)
-	copy(result, ctx.scanBuf[ctx.scanPos:end])
-	return result
-}
+func (ctx *ParseContext) PeekBytes(n int) []byte { _ = "STUB: not implemented"; return nil }
 
 // PeekToEnd returns the remaining entire buffer.
-func (ctx *ParseContext) PeekToEnd() []byte {
-	end := ctx.scanBufLen
-	result := make([]byte, end-ctx.scanPos)
-	copy(result, ctx.scanBuf[ctx.scanPos:end])
-	return result
-}
+func (ctx *ParseContext) PeekToEnd() []byte { _ = "STUB: not implemented"; return nil }
 
 // AdvanceBy moves the scan position forward by n bytes
-func (ctx *ParseContext) AdvanceBy(n int) {
-	for i := 0; i < n && ctx.scanPos < ctx.scanBufLen; i++ {
-		b := ctx.scanBuf[ctx.scanPos]
-		ctx.advancePosition(b)
-	}
-}
+func (ctx *ParseContext) AdvanceBy(n int) { _ = "STUB: not implemented"; return }
 
 // advancePosition updates position tracking when consuming a byte
-func (ctx *ParseContext) advancePosition(b byte) {
-	ctx.scanPos++
-	ctx.currentPosition++
+func (ctx *ParseContext) advancePosition(b byte) { _ = "STUB: not implemented"; return }
 
-	if b == '\n' {
-		ctx.lineNumber++
-		ctx.columnNumber = 1
-	} else {
-		// Only advance column for valid UTF-8 sequence starts
-		if utf8.RuneStart(b) {
-			ctx.columnNumber++
-		}
-	}
-}
+// Only advance column for valid UTF-8 sequence starts
 
 // AdvanceRune moves forward by one Unicode character (rune)
-func (ctx *ParseContext) AdvanceRune() rune {
-	if ctx.AtEOF() {
-		return 0
-	}
+func (ctx *ParseContext) AdvanceRune() rune { _ = "STUB: not implemented"; return 0 }
 
-	r, size := utf8.DecodeRune(ctx.scanBuf[ctx.scanPos:])
-
-	// Update position tracking for each byte of the rune
-	for range size {
-		ctx.advancePosition(ctx.scanBuf[ctx.scanPos])
-	}
-
-	return r
-}
+// Update position tracking for each byte of the rune
 
 // PeekRune returns the next rune without advancing position
-func (ctx *ParseContext) PeekRune() rune {
-	if ctx.AtEOF() {
-		return 0
-	}
-
-	r, _ := utf8.DecodeRune(ctx.scanBuf[ctx.scanPos:])
-	return r
-}
+func (ctx *ParseContext) PeekRune() rune { _ = "STUB: not implemented"; return 0 }
 
 // AtEOF returns true if we're at the end of input
-func (ctx *ParseContext) AtEOF() bool {
-	return ctx.scanPos >= ctx.scanBufLen
-}
+func (ctx *ParseContext) AtEOF() bool { _ = "STUB: not implemented"; return false }
 
 // GetCurrentText returns the text from start position to current position
-func (ctx *ParseContext) GetCurrentText(startPos int) string {
-	if startPos < 0 || startPos > ctx.scanPos {
-		return ""
-	}
-	return string(ctx.scanBuf[startPos:ctx.scanPos])
-}
+func (ctx *ParseContext) GetCurrentText(startPos int) string { _ = "STUB: not implemented"; return "" }
 
 // SetState changes the lexer state
-func (ctx *ParseContext) SetState(state LexerState) {
-	ctx.lexerState = state
-}
+func (ctx *ParseContext) SetState(state LexerState) { _ = "STUB: not implemented"; return }
 
 // GetState returns the current lexer state
 func (ctx *ParseContext) GetState() LexerState {
-	return ctx.lexerState
-}
+	_ = "STUB: not implemented"
+	return *
 
-// Parser-specific methods (migrated from ParserContext)
+	// Parser-specific methods (migrated from ParserContext)
+	new(LexerState)
+}
 
 // SetParseTree sets the root of the parse tree
-func (ctx *ParseContext) SetParseTree(tree ast.Node) {
-	ctx.parseTree = tree
-}
+func (ctx *ParseContext) SetParseTree(tree ast.Node) { _ = "STUB: not implemented"; return }
 
 // GetParseTree returns the root of the parse tree
 func (ctx *ParseContext) GetParseTree() ast.Node {
-	return ctx.parseTree
+	_ = "STUB: not implemented"
+	return *
+
+	// IncrementDepth increments the expression nesting depth
+	new(ast.Node)
 }
 
-// IncrementDepth increments the expression nesting depth
-func (ctx *ParseContext) IncrementDepth() error {
-	ctx.currentDepth++
-	if ctx.currentDepth > ctx.options.MaxExpressionDepth {
-		return fmt.Errorf("expression too complex (maximum depth %d exceeded)",
-			ctx.options.MaxExpressionDepth)
-	}
-	return nil
-}
+func (ctx *ParseContext) IncrementDepth() error { _ = "STUB: not implemented"; return nil }
 
 // DecrementDepth decrements the expression nesting depth
-func (ctx *ParseContext) DecrementDepth() {
-	if ctx.currentDepth > 0 {
-		ctx.currentDepth--
-	}
-}
+func (ctx *ParseContext) DecrementDepth() { _ = "STUB: not implemented"; return }
 
 // GetDepth returns the current expression nesting depth
-func (ctx *ParseContext) GetDepth() int {
-	return ctx.currentDepth
-}
+func (ctx *ParseContext) GetDepth() int { _ = "STUB: not implemented"; return 0 }
 
 // SetStatementBoundaries sets the boundaries of the current statement
 func (ctx *ParseContext) SetStatementBoundaries(start int, end int) {
-	ctx.statementStart = start
-	ctx.statementEnd = end
+	_ = "STUB: not implemented"
+	return
 }
 
 // GetStatementBoundaries returns the boundaries of the current statement
 func (ctx *ParseContext) GetStatementBoundaries() (int, int) {
-	return ctx.statementStart, ctx.statementEnd
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 // Unified error handling methods
 
 // AddError adds a parsing error to the context
 func (ctx *ParseContext) AddError(message string, location int) *ParseError {
-	return ctx.addErrorWithSeverity(ErrorSeverityError, message, location, "", "")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddErrorWithType adds a lexer error with specific error type
 func (ctx *ParseContext) AddErrorWithType(errorType LexerErrorType, message string) *ParseError {
-	location := ctx.currentPosition
-
-	return ctx.addLexerError(errorType, message, location)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddErrorWithHint adds a parsing error with a helpful hint
 func (ctx *ParseContext) AddErrorWithHint(message string, location int, hint string) *ParseError {
-	return ctx.addErrorWithSeverity(ErrorSeverityError, message, location, "", hint)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddWarning adds a parsing warning to the context
 func (ctx *ParseContext) AddWarning(message string, location int) *ParseError {
-	return ctx.addErrorWithSeverity(ErrorSeverityWarning, message, location, "", "")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // addErrorWithSeverity is the internal error adding function
 func (ctx *ParseContext) addErrorWithSeverity(severity ErrorSeverity, message string, location int, context string, hint string) *ParseError {
+	_ = "STUB: not implemented"
 	// Calculate line and column from location
-	line, col := ctx.calculateLineColumn(location)
-
-	parseError := &ParseError{
-		Message:    message,
-		Severity:   severity,
-		Position:   location,
-		Line:       line,
-		Column:     col,
-		Context:    context,
-		HintText:   hint,
-		SourceText: ctx.sourceText,
-		NearText:   ctx.extractNearText(location),
-		AtEOF:      location >= len(ctx.sourceText),
-	}
-
-	if severity == ErrorSeverityWarning {
-		ctx.warnings = append(ctx.warnings, *parseError)
-	} else {
-		ctx.errors = append(ctx.errors, *parseError)
-	}
-
-	return parseError
+	return nil
 }
 
 // addLexerError adds a lexer-specific error with enhanced context
 func (ctx *ParseContext) addLexerError(errorType LexerErrorType, message string, location int) *ParseError {
+	_ = "STUB: not implemented"
 	// Calculate line and column from location
-	line, col := ctx.calculateLineColumn(location)
-
-	parseError := &ParseError{
-		Type:        errorType,
-		Message:     message,
-		Severity:    ErrorSeverityError,
-		Position:    location,
-		Line:        line,
-		Column:      col,
-		NearText:    ctx.extractNearText(location),
-		AtEOF:       location >= len(ctx.sourceText),
-		Context:     ctx.getErrorContext(),
-		HintText:    ctx.getErrorHint(errorType),
-		ErrorLength: ctx.calculateErrorLength(errorType),
-		SourceText:  ctx.sourceText,
-	}
-
-	ctx.errors = append(ctx.errors, *parseError)
-	return parseError
+	return nil
 }
 
 // calculateLineColumn calculates line and column numbers from byte offset
 func (ctx *ParseContext) calculateLineColumn(location int) (int, int) {
-	if location < 0 || location > len(ctx.sourceText) {
-		return -1, -1
-	}
-
-	line := 1
-	col := 1
-
-	for i := 0; i < location && i < len(ctx.sourceText); i++ {
-		if ctx.sourceText[i] == '\n' {
-			line++
-			col = 1
-		} else {
-			col++
-		}
-	}
-
-	return line, col
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 // extractNearText extracts text near the specified position for error context
 // Based on PostgreSQL's error message formatting, uses savePosition when available
-func (ctx *ParseContext) extractNearText(location int) string {
-	const maxNearTextLen = 20
+func (ctx *ParseContext) extractNearText(location int) string { _ = "STUB: not implemented"; return "" }
 
-	// For errors, we want to show text from where the problematic token starts
-	// Use savePosition if available (which tracks the start of the current token)
-	start := ctx.savePosition
-	if start < 0 || start >= len(ctx.sourceText) {
-		start = location
-	}
+// For errors, we want to show text from where the problematic token starts
+// Use savePosition if available (which tracks the start of the current token)
 
-	// Handle EOF cases
-	if start >= len(ctx.sourceText) {
-		// Try to show the last part of the input
-		if len(ctx.sourceText) > maxNearTextLen {
-			start = len(ctx.sourceText) - maxNearTextLen
-		} else {
-			start = 0
-		}
-		if start < len(ctx.sourceText) {
-			nearText := ctx.sourceText[start:len(ctx.sourceText)]
-			return SanitizeNearText(nearText, maxNearTextLen)
-		}
-		return ""
-	}
+// Handle EOF cases
 
-	end := min(start+maxNearTextLen, len(ctx.sourceText))
-
-	nearText := ctx.sourceText[start:end]
-	return SanitizeNearText(nearText, maxNearTextLen)
-}
+// Try to show the last part of the input
 
 // getErrorContext provides context information based on current lexer state
-func (ctx *ParseContext) getErrorContext() string {
-	switch ctx.lexerState {
-	case StateXQ:
-		return "in quoted string"
-	case StateXE:
-		return "in extended string with escapes"
-	case StateXDolQ:
-		return "in dollar-quoted string"
-	case StateXC:
-		return "in comment"
-	case StateXD:
-		return "in delimited identifier"
-	case StateXB:
-		return "in bit string literal"
-	case StateXH:
-		return "in hexadecimal string literal"
-	case StateXUI:
-		return "in Unicode identifier"
-	case StateXUS:
-		return "in Unicode string"
-	case StateXEU:
-		return "in extended Unicode string"
-	default:
-		return ""
-	}
-}
+func (ctx *ParseContext) getErrorContext() string { _ = "STUB: not implemented"; return "" }
 
 // getErrorHint provides recovery hints based on error type and context
 func (ctx *ParseContext) getErrorHint(errorType LexerErrorType) string {
-	switch errorType {
-	case UnterminatedString:
-		switch ctx.lexerState {
-		case StateXQ:
-			return "Add a closing single quote (') to terminate the string"
-		case StateXE:
-			return "Add a closing single quote (') to terminate the extended string"
-		case StateXDolQ:
-			return fmt.Sprintf("Add the closing delimiter %s to terminate the dollar-quoted string", ctx.dolQStart)
-		}
-	case UnterminatedComment:
-		return "Add */ to close the comment"
-	case UnterminatedIdentifier:
-		return "Add a closing double quote (\") to terminate the identifier"
-	case TrailingJunk:
-		return "Separate the number and following text with whitespace or an operator"
-	case InvalidEscape:
-		return "Use a valid escape sequence like \\n, \\t, \\\\, or \\'"
-	}
+	_ = "STUB: not implemented"
 	return ""
 }
 
 // calculateErrorLength estimates the length of problematic text
 func (ctx *ParseContext) calculateErrorLength(errorType LexerErrorType) int {
-	switch errorType {
-	case TrailingJunk:
-		pos := ctx.currentPosition
-		for pos < len(ctx.sourceText) && !IsWhitespace(byte(ctx.sourceText[pos])) {
-			pos++
-		}
-		return pos - ctx.currentPosition
-	case InvalidEscape:
-		return 2 // Typically backslash + one character
-	default:
-		return 1
-	}
+	_ = "STUB: not implemented"
+	return 0
 }
+
+// Typically backslash + one character
 
 // GetErrors returns all collected parsing errors
 func (ctx *ParseContext) GetErrors() []ParseError {
+	_ = "STUB: not implemented"
 	// Return copy to prevent external modification
-	errors := make([]ParseError, len(ctx.errors))
-	copy(errors, ctx.errors)
-	return errors
+	return nil
 }
 
 // GetWarnings returns all collected parsing warnings
 func (ctx *ParseContext) GetWarnings() []ParseError {
+	_ = "STUB: not implemented"
 	// Return copy to prevent external modification
-	warnings := make([]ParseError, len(ctx.warnings))
-	copy(warnings, ctx.warnings)
-	return warnings
+	return nil
 }
 
 // HasErrors returns true if there are any parsing errors
-func (ctx *ParseContext) HasErrors() bool {
-	return len(ctx.errors) > 0
-}
+func (ctx *ParseContext) HasErrors() bool { _ = "STUB: not implemented"; return false }
 
 // HasWarnings returns true if there are any parsing warnings
-func (ctx *ParseContext) HasWarnings() bool {
-	return len(ctx.warnings) > 0
-}
+func (ctx *ParseContext) HasWarnings() bool { _ = "STUB: not implemented"; return false }
 
 // ClearErrors clears all collected errors and warnings
-func (ctx *ParseContext) ClearErrors() {
-	ctx.errors = ctx.errors[:0]
-	ctx.warnings = ctx.warnings[:0]
-}
+func (ctx *ParseContext) ClearErrors() { _ = "STUB: not implemented"; return }
 
 // Additional utility methods
 
 // PutBack moves the scan position back by n bytes
-func (ctx *ParseContext) PutBack(n int) {
-	if n <= 0 {
-		return
-	}
+func (ctx *ParseContext) PutBack(n int) { _ = "STUB: not implemented"; return }
 
-	// Ensure we don't go before the start
-	if n > ctx.scanPos {
-		n = ctx.scanPos
-	}
+// Ensure we don't go before the start
 
-	// Move position back
-	ctx.scanPos -= n
-	ctx.currentPosition -= n
-}
+// Move position back
 
 // GetContextID returns a unique identifier for this parser context
-func (ctx *ParseContext) GetContextID() string {
-	return ctx.contextID
-}
+func (ctx *ParseContext) GetContextID() string { _ = "STUB: not implemented"; return "" }
 
 // Clone creates a copy of the parser context for use in another goroutine
-func (ctx *ParseContext) Clone() *ParseContext {
-	sourceText := ctx.sourceText
+func (ctx *ParseContext) Clone() *ParseContext { _ = "STUB: not implemented"; return nil }
 
-	// Options are immutable, so we can share them safely
-	return NewParseContext(sourceText, ctx.options)
-}
+// Options are immutable, so we can share them safely
 
 // String returns a string representation of the parser context for debugging
-func (ctx *ParseContext) String() string {
-	return fmt.Sprintf("ParseContext{id: %s, pos: %d/%d, line: %d, col: %d, errors: %d, warnings: %d, state: %d, depth: %d}",
-		ctx.contextID,
-		ctx.currentPosition,
-		len(ctx.sourceText),
-		ctx.lineNumber,
-		ctx.columnNumber,
-		len(ctx.errors),
-		len(ctx.warnings),
-		ctx.lexerState,
-		ctx.currentDepth)
-}
+func (ctx *ParseContext) String() string { _ = "STUB: not implemented"; return "" }
 
 // Compatibility methods for smooth migration
 
 // Legacy LexerContext compatibility methods
-func (ctx *ParseContext) GetScanPos() int {
-	return ctx.scanPos
-}
+func (ctx *ParseContext) GetScanPos() int { _ = "STUB: not implemented"; return 0 }
 
 func (ctx *ParseContext) GetScanBuf() []byte {
+	_ = "STUB: not implemented"
 	// Return copy for safety
-	buf := make([]byte, len(ctx.scanBuf))
-	copy(buf, ctx.scanBuf)
-	return buf
+	return nil
 }
 
-func (ctx *ParseContext) GetScanBufLen() int {
-	return ctx.scanBufLen
-}
+func (ctx *ParseContext) GetScanBufLen() int { _ = "STUB: not implemented"; return 0 }
 
 // Legacy ParserContext compatibility method
-func (ctx *ParseContext) GetCurrentPos() int {
-	return ctx.currentPosition
-}
+func (ctx *ParseContext) GetCurrentPos() int { _ = "STUB: not implemented"; return 0 }
 
 // Getters for private fields (for compatibility)
-func (ctx *ParseContext) CurrentPosition() int {
-	return ctx.currentPosition
-}
+func (ctx *ParseContext) CurrentPosition() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) ColumnNumber() int {
-	return ctx.columnNumber
-}
+func (ctx *ParseContext) ColumnNumber() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) XCDepth() int {
-	return ctx.xcDepth
-}
+func (ctx *ParseContext) XCDepth() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) SetXCDepth(depth int) {
-	ctx.xcDepth = depth
-}
+func (ctx *ParseContext) SetXCDepth(depth int) { _ = "STUB: not implemented"; return }
 
 // Getters and setters for lexer fields that were previously public
-func (ctx *ParseContext) StandardConformingStrings() bool {
-	return ctx.options.StandardConformingStrings
-}
+func (ctx *ParseContext) StandardConformingStrings() bool { _ = "STUB: not implemented"; return false }
 
-func (ctx *ParseContext) UTF16FirstPart() int32 {
-	return ctx.utf16FirstPart
-}
+func (ctx *ParseContext) UTF16FirstPart() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) SetUTF16FirstPart(value int32) {
-	ctx.utf16FirstPart = value
-}
+func (ctx *ParseContext) SetUTF16FirstPart(value int32) { _ = "STUB: not implemented"; return }
 
-func (ctx *ParseContext) DolQStart() string {
-	return ctx.dolQStart
-}
+func (ctx *ParseContext) DolQStart() string { _ = "STUB: not implemented"; return "" }
 
-func (ctx *ParseContext) SetDolQStart(value string) {
-	ctx.dolQStart = value
-}
+func (ctx *ParseContext) SetDolQStart(value string) { _ = "STUB: not implemented"; return }
 
 // More compatibility getters and setters
-func (ctx *ParseContext) ScanPos() int {
-	return ctx.scanPos
-}
+func (ctx *ParseContext) ScanPos() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) State() LexerState {
-	return ctx.lexerState
-}
+func (ctx *ParseContext) State() LexerState { _ = "STUB: not implemented"; return *new(LexerState) }
 
-func (ctx *ParseContext) LineNumber() int {
-	return ctx.lineNumber
-}
+func (ctx *ParseContext) LineNumber() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) SetLineNumber(line int) {
-	ctx.lineNumber = line
-}
+func (ctx *ParseContext) SetLineNumber(line int) { _ = "STUB: not implemented"; return }
 
-func (ctx *ParseContext) SetColumnNumber(col int) {
-	ctx.columnNumber = col
-}
+func (ctx *ParseContext) SetColumnNumber(col int) { _ = "STUB: not implemented"; return }
 
-func (ctx *ParseContext) InMultiDotSequence() bool {
-	return ctx.inMultiDotSequence
-}
+func (ctx *ParseContext) InMultiDotSequence() bool { _ = "STUB: not implemented"; return false }
 
-func (ctx *ParseContext) SetInMultiDotSequence(value bool) {
-	ctx.inMultiDotSequence = value
-}
+func (ctx *ParseContext) SetInMultiDotSequence(value bool) { _ = "STUB: not implemented"; return }
 
 func (ctx *ParseContext) ScanBuf() []byte {
+	_ = "STUB: not implemented"
 	// Return copy for safety
-	buf := make([]byte, len(ctx.scanBuf))
-	copy(buf, ctx.scanBuf)
-	return buf
+	return nil
 }
 
 // HasPrefixAtScanPos reports whether scanBuf at the current scan position
@@ -1000,48 +601,32 @@ func (ctx *ParseContext) ScanBuf() []byte {
 // `string(byteSlice) == stringLit` lowers to a direct memcmp in the Go
 // compiler with no heap allocation.
 func (ctx *ParseContext) HasPrefixAtScanPos(needle string) bool {
-	pos := ctx.scanPos
-	if len(ctx.scanBuf)-pos < len(needle) {
-		return false
-	}
-	return string(ctx.scanBuf[pos:pos+len(needle)]) == needle
+	_ = "STUB: not implemented"
+	return false
 }
 
-func (ctx *ParseContext) SetScanPos(pos int) {
-	ctx.scanPos = pos
-}
+func (ctx *ParseContext) SetScanPos(pos int) { _ = "STUB: not implemented"; return }
 
 func (ctx *ParseContext) GetState2() LexerState {
-	return ctx.lexerState
+	_ = "STUB: not implemented"
+	return *
+
+	// Legacy getter for tests
+	new(LexerState)
 }
 
-// Legacy getter for tests
-func (ctx *ParseContext) Errors() []ParseError {
-	return ctx.GetErrors()
-}
+func (ctx *ParseContext) Errors() []ParseError { _ = "STUB: not implemented"; return nil }
 
 // Compatibility function for tests
-func NewLexerContext(input string) *ParseContext {
-	return NewParseContext(input, nil)
-}
+func NewLexerContext(input string) *ParseContext { _ = "STUB: not implemented"; return nil }
 
 // More compatibility methods for tests
-func (ctx *ParseContext) ScanBufLen() int {
-	return ctx.GetScanBufLen()
-}
+func (ctx *ParseContext) ScanBufLen() int { _ = "STUB: not implemented"; return 0 }
 
-func (ctx *ParseContext) LiteralActive() bool {
-	return ctx.literalActive
-}
+func (ctx *ParseContext) LiteralActive() bool { _ = "STUB: not implemented"; return false }
 
-func (ctx *ParseContext) SetCurrentPosition2(pos int) {
-	ctx.currentPosition = pos
-}
+func (ctx *ParseContext) SetCurrentPosition2(pos int) { _ = "STUB: not implemented"; return }
 
-func (ctx *ParseContext) SetLineNumber2(line int) {
-	ctx.lineNumber = line
-}
+func (ctx *ParseContext) SetLineNumber2(line int) { _ = "STUB: not implemented"; return }
 
-func (ctx *ParseContext) SetColumnNumber2(col int) {
-	ctx.columnNumber = col
-}
+func (ctx *ParseContext) SetColumnNumber2(col int) { _ = "STUB: not implemented"; return }

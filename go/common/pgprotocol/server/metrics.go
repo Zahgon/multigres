@@ -99,22 +99,42 @@ type AuthMetricsRecorder interface {
 // unconditionally. Eliminates per-call nil checks at every emission site.
 type noopAuthMetrics struct{}
 
-func (noopAuthMetrics) RecordSCRAMDuration(context.Context, string, time.Duration) {}
-func (noopAuthMetrics) RecordAuthAttempt(context.Context, string)                  {}
-func (noopAuthMetrics) RecordCredentialLookup(context.Context, time.Duration)      {}
-func (noopAuthMetrics) RecordTLSHandshake(context.Context, string, time.Duration)  {}
-func (noopAuthMetrics) RecordTLSConnection(context.Context, uint16, uint16)        {}
-func (noopAuthMetrics) RecordPlaintextRejected(context.Context, string)            {}
-func (noopAuthMetrics) RecordSSLRequestDeclined(context.Context)                   {}
+func (noopAuthMetrics) RecordSCRAMDuration(context.Context, string, time.Duration) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordAuthAttempt(context.Context, string) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordCredentialLookup(context.Context, time.Duration) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordTLSHandshake(context.Context, string, time.Duration) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordTLSConnection(context.Context, uint16, uint16) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordPlaintextRejected(context.Context, string) {
+	_ = "STUB: not implemented"
+	return
+}
+func (noopAuthMetrics) RecordSSLRequestDeclined(context.Context) {
+	_ = "STUB: not implemented"
 
-// metrics returns the connection's auth metrics sink, substituting a noop
-// when none was injected. Tests that construct *Conn directly (rather than
-// going through the listener accept path) leave authMetrics unset; the
-// helper keeps startup-phase call sites free of nil checks without forcing
-// every test fixture to wire a recorder.
+	// metrics returns the connection's auth metrics sink, substituting a noop
+	// when none was injected. Tests that construct *Conn directly (rather than
+	// going through the listener accept path) leave authMetrics unset; the
+	// helper keeps startup-phase call sites free of nil checks without forcing
+	// every test fixture to wire a recorder.
+	return
+}
+
 func (c *Conn) metrics() AuthMetricsRecorder {
-	if c.authMetrics == nil {
-		return noopAuthMetrics{}
-	}
-	return c.authMetrics
+	_ = "STUB: not implemented"
+	return *new(AuthMetricsRecorder)
 }

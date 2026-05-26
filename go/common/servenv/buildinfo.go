@@ -15,7 +15,6 @@
 package servenv
 
 import (
-	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -50,28 +49,6 @@ var (
 
 // readBuildSnapshot returns the cached build snapshot. The first call
 // reads runtime/debug.BuildInfo; subsequent calls return the cached copy.
-func readBuildSnapshot() buildSnapshot {
-	buildSnapshotOnce.Do(loadBuildSnapshot)
-	return buildSnapshotData
-}
+func readBuildSnapshot() buildSnapshot { _ = "STUB: not implemented"; return *new(buildSnapshot) }
 
-func loadBuildSnapshot() {
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return
-	}
-	buildSnapshotData.goVersion = info.GoVersion
-	buildSnapshotData.mainPath = info.Main.Path
-	for _, s := range info.Settings {
-		switch s.Key {
-		case "vcs.revision":
-			buildSnapshotData.revision = s.Value
-		case "vcs.modified":
-			buildSnapshotData.modified = s.Value == "true"
-		case "vcs.time":
-			if t, err := time.Parse(time.RFC3339, s.Value); err == nil {
-				buildSnapshotData.commitTime = t
-			}
-		}
-	}
-}
+func loadBuildSnapshot() { _ = "STUB: not implemented"; return }

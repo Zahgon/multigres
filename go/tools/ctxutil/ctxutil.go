@@ -19,7 +19,6 @@ package ctxutil
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,22 +46,15 @@ type parentSpanContextKey struct{}
 //	bgCtx, span := ctxutil.StartLinkedSpan(bgCtx, tracer, "background-task")
 //	defer span.End()
 func Detach(parent context.Context) context.Context {
+	_ = "STUB: not implemented"
 	// Start fresh - no cancellation inheritance
 	//nolint:gocritic // This is the legitimate entry point for detached contexts
-	ctx := context.Background()
-
-	// Preserve baggage (service metadata, etc.)
-	if bag := baggage.FromContext(parent); bag.Len() > 0 {
-		ctx = baggage.ContextWithBaggage(ctx, bag)
-	}
-
-	// Store parent span context for optional linking (but not as parent span)
-	if span := trace.SpanFromContext(parent); span.SpanContext().IsValid() {
-		ctx = context.WithValue(ctx, parentSpanContextKey{}, span.SpanContext())
-	}
-
-	return ctx
+	return *new(context.Context)
 }
+
+// Preserve baggage (service metadata, etc.)
+
+// Store parent span context for optional linking (but not as parent span)
 
 // ParentSpanContext retrieves the span context from the original parent context,
 // if it was present when Detach was called. This allows callers to link new spans
@@ -71,8 +63,8 @@ func Detach(parent context.Context) context.Context {
 // Returns the parent span context and true if present, or an empty span context
 // and false if no parent span was available when Detach was called.
 func ParentSpanContext(ctx context.Context) (trace.SpanContext, bool) {
-	psc, ok := ctx.Value(parentSpanContextKey{}).(trace.SpanContext)
-	return psc, ok
+	_ = "STUB: not implemented"
+	return *new(trace.SpanContext), false
 }
 
 // StartLinkedSpan creates a new root span that is linked to the parent span context
@@ -89,10 +81,6 @@ func ParentSpanContext(ctx context.Context) (trace.SpanContext, bool) {
 //	bgCtx, span := ctxutil.StartLinkedSpan(bgCtx, tracer, "background-task")
 //	defer span.End()
 func StartLinkedSpan(ctx context.Context, tracer trace.Tracer, name string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
-	spanOpts := []trace.SpanStartOption{trace.WithNewRoot()}
-	if psc, ok := ParentSpanContext(ctx); ok {
-		spanOpts = append(spanOpts, trace.WithLinks(trace.Link{SpanContext: psc}))
-	}
-	spanOpts = append(spanOpts, opts...)
-	return tracer.Start(ctx, name, spanOpts...)
+	_ = "STUB: not implemented"
+	return *new(context.Context), *new(trace.Span)
 }

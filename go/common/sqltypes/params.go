@@ -17,42 +17,17 @@ package sqltypes
 // ParamsToProto converts [][]byte params to proto Portal format (lengths+values).
 // Encoding: -1 = NULL, 0 = empty string, >0 = actual length.
 func ParamsToProto(params [][]byte) (lengths []int64, values []byte) {
-	lengths = make([]int64, len(params))
-	var totalLen int
-	for i, p := range params {
-		if p == nil {
-			lengths[i] = -1
-		} else {
-			lengths[i] = int64(len(p))
-			totalLen += len(p)
-		}
-	}
-
-	values = make([]byte, 0, totalLen)
-	for _, p := range params {
-		if p != nil {
-			values = append(values, p...)
-		}
-	}
-
-	return lengths, values
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ParamsFromProto converts proto Portal params (lengths+values) to [][]byte.
 // Decoding: -1 = NULL, 0 = empty string, >0 = actual length.
 func ParamsFromProto(lengths []int64, values []byte) [][]byte {
-	params := make([][]byte, len(lengths))
-	offset := 0
-	for i, length := range lengths {
-		switch length {
-		case -1:
-			params[i] = nil // NULL
-		case 0:
-			params[i] = []byte{} // empty string, not NULL
-		default:
-			params[i] = values[offset : offset+int(length)]
-			offset += int(length)
-		}
-	}
-	return params
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// NULL
+
+// empty string, not NULL

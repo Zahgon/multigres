@@ -15,13 +15,8 @@
 package shardsetup
 
 import (
-	"context"
-	"fmt"
-	"strings"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/require"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
@@ -31,20 +26,8 @@ import (
 // poolers satisfy the condition, or a slice of failure lines (one per failing pooler)
 // with the reason and FormatPoolerDiagnostics output.
 func checkPoolerCondition(t *testing.T, poolers []*MultipoolerInstance, condition func(r PoolerStatusResult) (bool, string)) []string {
-	t.Helper()
-	statuses := fetchPoolerStatuses(t, poolers)
-	var failures []string
-	for _, r := range statuses {
-		if r.Err != nil {
-			failures = append(failures, fmt.Sprintf("%s: fetch error: %v", r.Name, r.Err))
-			continue
-		}
-		met, reason := condition(r)
-		if !met {
-			failures = append(failures, fmt.Sprintf("%s: %s %s", r.Name, reason, FormatPoolerDiagnostics(r.Status, r.ConsensusStatus)))
-		}
-	}
-	return failures
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PoolerStatusResult holds the fetched status for one pooler instance.
@@ -59,24 +42,8 @@ type PoolerStatusResult struct {
 // fetchPoolerStatuses fetches the status of each pooler in order, returning a slice
 // that preserves the input ordering (no map iteration randomness).
 func fetchPoolerStatuses(t *testing.T, poolers []*MultipoolerInstance) []PoolerStatusResult {
-	results := make([]PoolerStatusResult, 0, len(poolers))
-	for _, inst := range poolers {
-		client, err := NewMultipoolerClient(inst.Multipooler.GrpcPort)
-		if err != nil {
-			results = append(results, PoolerStatusResult{Name: inst.Name, Err: fmt.Errorf("connect: %w", err)})
-			continue
-		}
-		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-		resp, err := client.Manager.Status(ctx, &multipoolermanagerdatapb.StatusRequest{})
-		cancel()
-		client.Close()
-		if err != nil {
-			results = append(results, PoolerStatusResult{Name: inst.Name, Err: fmt.Errorf("status RPC: %w", err)})
-			continue
-		}
-		results = append(results, PoolerStatusResult{Name: inst.Name, Status: resp.Status, ConsensusStatus: resp.ConsensusStatus})
-	}
-	return results
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // EventuallyPoolersCondition is like require.Eventually but fetches all pooler statuses
@@ -92,28 +59,8 @@ func EventuallyPoolersCondition[T any](
 	condition func(statuses []PoolerStatusResult) (value T, met bool, reason string),
 	msgAndArgs ...any,
 ) T {
-	t.Helper()
-	var result T
-	require.Eventually(t, func() bool {
-		statuses := fetchPoolerStatuses(t, poolers)
-		val, met, reason := condition(statuses)
-		if !met {
-			for _, r := range statuses {
-				if r.Err != nil {
-					t.Logf("%s: fetch error: %v", r.Name, r.Err)
-				} else {
-					t.Logf("%s: %s", r.Name, FormatPoolerDiagnostics(r.Status, r.ConsensusStatus))
-				}
-			}
-			if reason != "" {
-				t.Logf("condition not met: %s", reason)
-			}
-		} else {
-			result = val
-		}
-		return met
-	}, timeout, tick, msgAndArgs...)
-	return result
+	_ = "STUB: not implemented"
+	return *new(T)
 }
 
 // EventuallyPoolerCondition is like require.Eventually but automatically fetches status
@@ -130,14 +77,8 @@ func EventuallyPoolerCondition(
 	condition func(r PoolerStatusResult) (bool, string),
 	msgAndArgs ...any,
 ) {
-	t.Helper()
-	require.Eventually(t, func() bool {
-		failures := checkPoolerCondition(t, poolers, condition)
-		for _, f := range failures {
-			t.Log(f)
-		}
-		return len(failures) == 0
-	}, timeout, tick, msgAndArgs...)
+	_ = "STUB: not implemented"
+	return
 }
 
 // RequirePoolerCondition fetches status for each pooler once and immediately fails the
@@ -150,78 +91,21 @@ func RequirePoolerCondition(
 	condition func(r PoolerStatusResult) (bool, string),
 	msgAndArgs ...any,
 ) {
-	t.Helper()
-	failures := checkPoolerCondition(t, poolers, condition)
-	if len(failures) > 0 {
-		require.Fail(t, strings.Join(failures, "\n"), msgAndArgs...)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // WaitForNewPrimary polls all multipoolers in setup until one other than oldPrimaryName
 // reports IsInitialized + PoolerType_PRIMARY + PostgresReady, then returns its name.
 // Fails the test if no new primary is elected within timeout.
 func WaitForNewPrimary(t *testing.T, setup *ShardSetup, oldPrimaryName string, timeout time.Duration) string {
-	t.Helper()
-
-	poolers := make([]*MultipoolerInstance, 0, len(setup.Multipoolers))
-	for _, inst := range setup.Multipoolers {
-		poolers = append(poolers, inst)
-	}
-
-	return EventuallyPoolersCondition(t, poolers, timeout, 2*time.Second,
-		func(statuses []PoolerStatusResult) (string, bool, string) {
-			for _, r := range statuses {
-				if r.Name == oldPrimaryName || r.Err != nil || r.Status == nil {
-					continue
-				}
-				if r.Status.IsInitialized &&
-					r.Status.PoolerType == clustermetadatapb.PoolerType_PRIMARY &&
-					r.Status.PostgresReady {
-					return r.Name, true, ""
-				}
-			}
-			return "", false, fmt.Sprintf("no new primary elected yet (old primary: %s)", oldPrimaryName)
-		},
-		"new primary not elected within %v", timeout,
-	)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // FormatPoolerDiagnostics returns a compact diagnostic string for a pooler status,
 // useful for appending to "not yet ready" log messages to aid flake investigation.
 func FormatPoolerDiagnostics(s *multipoolermanagerdatapb.Status, cs *clustermetadatapb.ConsensusStatus) string {
-	if s == nil {
-		return "[status=nil]"
-	}
-	termNumber := cs.GetTermRevocation().GetRevokedBelowTerm()
-	result := fmt.Sprintf("[postgres_ready=%v, initialized=%v, pooler_type=%v, term=%d",
-		s.PostgresReady, s.IsInitialized, s.PoolerType, termNumber)
-	if s.PostgresAction != multipoolermanagerdatapb.PostgresAction_POSTGRES_ACTION_UNSPECIFIED {
-		dur := time.Duration(0)
-		if s.PostgresActionDuration != nil {
-			dur = s.PostgresActionDuration.AsDuration().Round(time.Second)
-		}
-		result += fmt.Sprintf(", action=%v (%v)", s.PostgresAction, dur)
-	}
-	if s.ReplicationStatus != nil {
-		walStatus := s.ReplicationStatus.WalReceiverStatus
-		if walStatus == "" {
-			walStatus = "none"
-		}
-		result += ", wal_receiver=" + walStatus
-	}
-	if s.PrimaryStatus != nil {
-		var syncStandbys []string
-		if s.PrimaryStatus.SyncReplicationConfig != nil {
-			for _, id := range s.PrimaryStatus.SyncReplicationConfig.StandbyIds {
-				syncStandbys = append(syncStandbys, id.Name)
-			}
-		}
-		var connectedFollowers []string
-		for _, id := range s.PrimaryStatus.ConnectedFollowers {
-			connectedFollowers = append(connectedFollowers, id.Name)
-		}
-		result += fmt.Sprintf(", sync_standbys=%v, connected_followers=%v", syncStandbys, connectedFollowers)
-	}
-	result += "]"
-	return result
+	_ = "STUB: not implemented"
+	return ""
 }

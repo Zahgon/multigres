@@ -24,6 +24,4 @@ type Timer interface {
 // realTimer implements Timer using real time.
 type realTimer struct{}
 
-func (realTimer) After(d time.Duration) <-chan time.Time {
-	return time.After(d)
-}
+func (realTimer) After(d time.Duration) <-chan time.Time { _ = "STUB: not implemented"; return nil }

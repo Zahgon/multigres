@@ -25,9 +25,8 @@ package multigatewayservice
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -54,17 +53,13 @@ type multiGatewayServiceClient struct {
 }
 
 func NewMultiGatewayServiceClient(cc grpc.ClientConnInterface) MultiGatewayServiceClient {
-	return &multiGatewayServiceClient{cc}
+	_ = "STUB: not implemented"
+	return *new(MultiGatewayServiceClient)
 }
 
 func (c *multiGatewayServiceClient) CancelQuery(ctx context.Context, in *CancelQueryRequest, opts ...grpc.CallOption) (*CancelQueryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CancelQueryResponse)
-	err := c.cc.Invoke(ctx, MultiGatewayService_CancelQuery_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiGatewayServiceServer is the server API for MultiGatewayService service.
@@ -86,10 +81,18 @@ type MultiGatewayServiceServer interface {
 type UnimplementedMultiGatewayServiceServer struct{}
 
 func (UnimplementedMultiGatewayServiceServer) CancelQuery(context.Context, *CancelQueryRequest) (*CancelQueryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CancelQuery not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedMultiGatewayServiceServer) mustEmbedUnimplementedMultiGatewayServiceServer() {}
-func (UnimplementedMultiGatewayServiceServer) testEmbeddedByValue()                             {}
+
+func (UnimplementedMultiGatewayServiceServer) mustEmbedUnimplementedMultiGatewayServiceServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedMultiGatewayServiceServer) testEmbeddedByValue() {
+	_ = "STUB: not implemented"
+	return
+}
 
 // UnsafeMultiGatewayServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to MultiGatewayServiceServer will
@@ -99,32 +102,17 @@ type UnsafeMultiGatewayServiceServer interface {
 }
 
 func RegisterMultiGatewayServiceServer(s grpc.ServiceRegistrar, srv MultiGatewayServiceServer) {
+	_ = "STUB: not implemented"
 	// If the following call pancis, it indicates UnimplementedMultiGatewayServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MultiGatewayService_ServiceDesc, srv)
+	return
 }
 
 func _MultiGatewayService_CancelQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CancelQueryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiGatewayServiceServer).CancelQuery(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiGatewayService_CancelQuery_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiGatewayServiceServer).CancelQuery(ctx, req.(*CancelQueryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiGatewayService_ServiceDesc is the grpc.ServiceDesc for MultiGatewayService service.

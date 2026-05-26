@@ -15,49 +15,17 @@
 package topo
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/spf13/cobra"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // runGetDatabaseNames handles the getdatabasenames command
 func runGetDatabaseNames(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	response, err := client.GetDatabaseNames(cmd.Context(), &multiadminpb.GetDatabaseNamesRequest{})
-	if err != nil {
-		return fmt.Errorf("failed to get database names: %w", err)
-	}
-
-	// Convert to JSON and output
-	jsonData, err := json.MarshalIndent(response, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
 
+// Convert to JSON and output
+
 // AddGetDatabaseNamesCommand adds the getdatabasenames subcommand
-func AddGetDatabaseNamesCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getdatabasenames",
-		Short: "Get all database names in the cluster",
-		Long:  "Retrieve a list of all database names in the Multigres cluster.",
-		RunE:  runGetDatabaseNames,
-	}
-
-	cmd.Flags().String("admin-server", "", "Address of the multiadmin server (overrides config)")
-
-	return cmd
-}
+func AddGetDatabaseNamesCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }

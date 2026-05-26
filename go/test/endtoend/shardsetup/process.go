@@ -19,21 +19,10 @@ package shardsetup
 
 import (
 	"context"
-	"fmt"
-	"net"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"syscall"
 	"testing"
 	"time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	"github.com/multigres/multigres/go/pb/pgctldservice"
 	"github.com/multigres/multigres/go/provisioner/local"
 	"github.com/multigres/multigres/go/tools/executil"
 )
@@ -133,12 +122,7 @@ type ProcessInstance struct {
 
 // logLevelOrDefault returns p.LogLevel, falling back to "debug" so tests that
 // don't opt into a quieter level keep the historical verbose output.
-func (p *ProcessInstance) logLevelOrDefault() string {
-	if p.LogLevel == "" {
-		return "debug"
-	}
-	return p.LogLevel
-}
+func (p *ProcessInstance) logLevelOrDefault() string { _ = "STUB: not implemented"; return "" }
 
 // multipoolerArgs returns the multipooler command-line arguments derived
 // from this ProcessInstance. Extracted from startMultipooler so the arg
@@ -147,536 +131,180 @@ func (p *ProcessInstance) logLevelOrDefault() string {
 // p.SocketFile defaults to the standard Unix socket path during instance
 // creation; tests that need to exercise the TCP path (e.g. PG TLS) clear
 // it before Start to omit --socket-file and force a TCP dial.
-func (p *ProcessInstance) multipoolerArgs() []string {
-	args := []string{
-		"--grpc-port", strconv.Itoa(p.GrpcPort),
-		"--http-port", strconv.Itoa(p.HttpPort),
-		"--database", "postgres", // Required parameter
-		"--table-group", "default", // Required parameter (MVP only supports "default")
-		"--shard", "0-inf", // Required parameter (MVP only supports "0-inf")
-		"--pgctld-addr", p.PgctldAddr,
-		"--pooler-dir", p.PoolerDir, // Use the same pooler dir as pgctld
-		"--pg-port", strconv.Itoa(p.PgPort),
-		"--service-map", "grpc-pooler,grpc-poolermanager,grpc-consensus,grpc-backup",
-		"--topo-global-server-addresses", p.EtcdAddr,
-		"--topo-global-root", "/multigres/global",
-		"--cell", p.Cell,
-		"--service-id", p.Name,
-		"--hostname", "localhost",
-		"--log-output", p.LogFile,
-		"--log-level", p.logLevelOrDefault(),
-		// Allow OnTermSync hooks (notably the graceful-shutdown sequence) to
-		// run to completion. The default 10s is shorter than the graceful
-		// shutdown total deadline; without this the hook is cut off mid-flight
-		// on SIGTERM.
-		"--onterm-timeout", "80s",
-	}
-	if p.SocketFile != "" {
-		args = append(args, "--socket-file", p.SocketFile)
-	}
-	if p.PgClientSSLMode != "" {
-		args = append(args, "--pg-client-sslmode", p.PgClientSSLMode)
-	}
-	if p.PgClientSSLRootCert != "" {
-		args = append(args, "--pg-client-sslrootcert", p.PgClientSSLRootCert)
-	}
-	if p.PgBackRestCertPaths != nil {
-		args = append(args,
-			"--pgbackrest-cert-file", p.PgBackRestCertPaths.ServerCertFile,
-			"--pgbackrest-key-file", p.PgBackRestCertPaths.ServerKeyFile,
-			"--pgbackrest-ca-file", p.PgBackRestCertPaths.CACertFile,
-		)
-	}
-	if p.PgBackRestPort > 0 {
-		args = append(args, "--pgbackrest-port", strconv.Itoa(p.PgBackRestPort))
-	}
-	if p.VpidStampEnabled {
-		args = append(args, "--vpid-stamp-enabled=true")
-	}
-	return args
-}
+func (p *ProcessInstance) multipoolerArgs() []string { _ = "STUB: not implemented"; return nil }
+
+// Required parameter
+// Required parameter (MVP only supports "default")
+// Required parameter (MVP only supports "0-inf")
+
+// Use the same pooler dir as pgctld
+
+// Allow OnTermSync hooks (notably the graceful-shutdown sequence) to
+// run to completion. The default 10s is shorter than the graceful
+// shutdown total deadline; without this the hook is cut off mid-flight
+// on SIGTERM.
 
 // Start starts the process instance (pgctld, multipooler, multiorch, or multigateway).
 // Follows the proven pattern from multipooler/setup_test.go.
 func (p *ProcessInstance) Start(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	switch p.Binary {
-	case "pgctld":
-		return p.startPgctld(ctx, t)
-	case "multipooler":
-		return p.startMultipooler(ctx, t)
-	case "multiorch":
-		return p.startMultiOrch(ctx, t)
-	case "multigateway":
-		return p.startMultigateway(ctx, t)
-	case "multiadmin":
-		return p.startMultiadmin(ctx, t)
-	}
-	return fmt.Errorf("unknown binary type: %s", p.Binary)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // buildPgctldServerArgs assembles the argv passed to `pgctld server`
 // from this instance's configuration. Extracted from startPgctld so the
 // flag-forwarding logic (initdb args, extra conf, SQL files/dirs) is
 // unit-testable without spawning a real pgctld binary.
-func buildPgctldServerArgs(p *ProcessInstance) []string {
-	args := []string{
-		"server",
-		"--pooler-dir", p.PoolerDir,
-		"--grpc-port", strconv.Itoa(p.GrpcPort),
-		"--http-port", strconv.Itoa(p.HttpPort),
-		"--pg-port", strconv.Itoa(p.PgPort),
-		"--timeout", "60",
-		"--log-output", p.LogFile,
-	}
-
-	if p.PgBackRestPort > 0 {
-		args = append(args, "--pgbackrest-port", strconv.Itoa(p.PgBackRestPort))
-	}
-	if p.PgBackRestCertDir != "" {
-		args = append(args, "--pgbackrest-cert-dir", p.PgBackRestCertDir)
-	}
-
-	for _, file := range p.InitdbSQLFiles {
-		args = append(args, "--pg-initdb-sql-files", file)
-	}
-	for _, dir := range p.InitdbSQLDirs {
-		args = append(args, "--pg-initdb-sql-dirs", dir)
-	}
-	for _, file := range p.PgInitdbExtraConfFiles {
-		args = append(args, "--pg-initdb-extra-conf", file)
-	}
-	if p.PgInitdbArgs != "" {
-		args = append(args, "--pg-initdb-args", p.PgInitdbArgs)
-	}
-	if p.PgHbaTemplate != "" {
-		args = append(args, "--pg-hba-template", p.PgHbaTemplate)
-	}
-	return args
-}
+func buildPgctldServerArgs(p *ProcessInstance) []string { _ = "STUB: not implemented"; return nil }
 
 // startPgctld starts a pgctld instance (server only, PostgreSQL init/start done separately).
 // Copied from multipooler/setup_test.go.
 func (p *ProcessInstance) startPgctld(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	t.Logf("Starting %s with binary '%s'", p.Name, p.Binary)
-	t.Logf("Data dir: %s, gRPC port: %d, PG port: %d", p.PoolerDir, p.GrpcPort, p.PgPort)
-
-	args := buildPgctldServerArgs(p)
-
-	p.Process = executil.Command(ctx, p.Binary, args...).WithProcessGroup()
-
-	// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
-	if len(p.Environment) > 0 {
-		p.Process.SetEnv(p.Environment)
-	}
-	p.Process.AddEnv("MULTIGRES_TESTDATA_DIR=" + filepath.Dir(p.PoolerDir))
-
-	t.Logf("Running server command: %v", p.Process.Args)
-
-	if err := p.waitForStartup(ctx, t, 20*time.Second, 50); err != nil {
-		return err
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
 
 // startMultipooler starts a multipooler instance.
 // Copied from multipooler/setup_test.go.
 func (p *ProcessInstance) startMultipooler(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	t.Logf("Starting %s: binary '%s', gRPC port %d, cell %s", p.Name, p.Binary, p.GrpcPort, p.Cell)
-
-	args := p.multipoolerArgs()
-
-	// Start the multipooler server
-	p.Process = executil.Command(ctx, p.Binary, args...).WithProcessGroup()
-
-	// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
-	if len(p.Environment) > 0 {
-		p.Process.SetEnv(p.Environment)
-	}
-	p.Process.AddEnv("MULTIGRES_TESTDATA_DIR=" + filepath.Dir(p.PoolerDir))
-
-	t.Logf("Running multipooler command: %v", p.Process.Args)
-
-	return p.waitForStartup(ctx, t, 15*time.Second, 30)
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Start the multipooler server
+
+// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
 
 // startMultiOrch starts a multiorch instance.
 // Follows the pattern from multiorch/multiorch_helpers.go:startMultiOrch.
 func (p *ProcessInstance) startMultiOrch(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	t.Logf("Starting %s: binary '%s', gRPC port %d, HTTP port %d, service-id %s", p.Name, p.Binary, p.GrpcPort, p.HttpPort, p.ServiceID)
-
-	args := []string{
-		"--cell", p.Cell,
-		"--service-id", p.ServiceID,
-		"--watch-targets", strings.Join(p.WatchTargets, ","),
-		"--topo-global-server-addresses", p.EtcdAddr,
-		"--topo-global-root", "/multigres/global",
-		"--grpc-port", strconv.Itoa(p.GrpcPort),
-		"--http-port", strconv.Itoa(p.HttpPort),
-		"--hostname", "localhost",
-		"--bookkeeping-interval", "2s",
-		"--pooler-health-check-interval", "500ms",
-		"--recovery-cycle-interval", "500ms",
-		"--log-level", p.logLevelOrDefault(),
-	}
-
-	// Add grace period flags if configured (defaults to 0 for fast tests)
-	if p.LeaderFailoverGracePeriodBase != "" {
-		args = append(args, "--leader-failover-grace-period-base", p.LeaderFailoverGracePeriodBase)
-	}
-	if p.LeaderFailoverGracePeriodMaxJitter != "" {
-		args = append(args, "--leader-failover-grace-period-max-jitter", p.LeaderFailoverGracePeriodMaxJitter)
-	}
-
-	// Coverage builds are slower — WAL receiver can take 3-10s to connect.
-	// So, we Increase the verify-replication timeout to compensate.
-	if os.Getenv("GOCOVERDIR") != "" {
-		args = append(args, "--verify-replication-timeout", "15s")
-	}
-
-	p.Process = executil.Command(ctx, p.Binary, args...).WithProcessGroup()
-	if p.PoolerDir != "" {
-		p.Process.SetDir(p.PoolerDir)
-	}
-
-	// Set up logging like multiorch_helpers.go does
-	if p.LogFile != "" {
-		logF, err := os.Create(p.LogFile)
-		if err != nil {
-			return fmt.Errorf("failed to create log file: %w", err)
-		}
-		p.Process.SetStdout(logF)
-		p.Process.SetStderr(logF)
-	}
-
-	// Start the process with trace context propagation
-	if err := p.Process.Start(); err != nil {
-		return fmt.Errorf("failed to start multiorch: %w", err)
-	}
-	t.Logf("Started multiorch (pid: %d, grpc: %d, http: %d, log: %s)",
-		p.Process.Process.Pid, p.GrpcPort, p.HttpPort, p.LogFile)
-
-	// Wait for multiorch to be ready (using TCP port check like multiorch_helpers.go)
-	if err := WaitForPortReady(t, "multiorch", p.GrpcPort, 15*time.Second); err != nil {
-		return err
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Add grace period flags if configured (defaults to 0 for fast tests)
+
+// Coverage builds are slower — WAL receiver can take 3-10s to connect.
+// So, we Increase the verify-replication timeout to compensate.
+
+// Set up logging like multiorch_helpers.go does
+
+// Start the process with trace context propagation
+
+// Wait for multiorch to be ready (using TCP port check like multiorch_helpers.go)
 
 // startMultigateway starts a multigateway instance.
 func (p *ProcessInstance) startMultigateway(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	t.Logf("Starting %s: binary '%s', PG port %d, gRPC port %d, HTTP port %d", p.Name, p.Binary, p.PgPort, p.GrpcPort, p.HttpPort)
-
-	args := []string{
-		"--cell", p.Cell,
-		"--service-id", p.ServiceID,
-		"--pg-port", strconv.Itoa(p.PgPort),
-		"--pg-bind-address", "127.0.0.1",
-		"--topo-global-server-addresses", p.EtcdAddr,
-		"--topo-global-root", p.GlobalRoot,
-		"--grpc-port", strconv.Itoa(p.GrpcPort),
-		"--http-port", strconv.Itoa(p.HttpPort),
-		"--hostname", "localhost",
-		"--log-level", p.logLevelOrDefault(),
-	}
-
-	// Add replica port flag if configured
-	if p.ReplicaPgPort > 0 {
-		args = append(args, "--pg-replica-port", strconv.Itoa(p.ReplicaPgPort))
-	}
-
-	// Add TLS certificate flags if configured
-	if p.TLSCertFile != "" && p.TLSKeyFile != "" {
-		args = append(args,
-			"--pg-tls-cert-file", p.TLSCertFile,
-			"--pg-tls-key-file", p.TLSKeyFile,
-		)
-	}
-
-	// Append any extra args (e.g., buffer configuration flags)
-	args = append(args, p.ExtraArgs...)
-
-	p.Process = executil.Command(ctx, p.Binary, args...).WithProcessGroup()
-
-	// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
-	if len(p.Environment) > 0 {
-		p.Process.SetEnv(p.Environment)
-	}
-	p.Process.AddEnv("MULTIGRES_TESTDATA_DIR=" + filepath.Dir(p.LogFile))
-
-	// Set up logging
-	if p.LogFile != "" {
-		logF, err := os.Create(p.LogFile)
-		if err != nil {
-			return fmt.Errorf("failed to create log file: %w", err)
-		}
-		p.Process.SetStdout(logF)
-		p.Process.SetStderr(logF)
-	}
-
-	// Start the process with trace context propagation
-	if err := p.Process.Start(); err != nil {
-		return fmt.Errorf("failed to start multigateway: %w", err)
-	}
-	t.Logf("Started multigateway (pid: %d, pg: %d, grpc: %d, http: %d, log: %s)",
-		p.Process.Process.Pid, p.PgPort, p.GrpcPort, p.HttpPort, p.LogFile)
-
-	// Wait for multigateway to be ready (Status RPC check)
-	if err := WaitForPortReady(t, "multigateway", p.GrpcPort, 3*time.Second); err != nil {
-		return err
-	}
-	t.Logf("Multigateway is ready")
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Add replica port flag if configured
+
+// Add TLS certificate flags if configured
+
+// Append any extra args (e.g., buffer configuration flags)
+
+// Set MULTIGRES_TESTDATA_DIR for directory-deletion triggered cleanup
+
+// Set up logging
+
+// Start the process with trace context propagation
+
+// Wait for multigateway to be ready (Status RPC check)
 
 // startMultiadmin starts a multiadmin instance pointed at the harness's etcd.
 // The HTTP port serves both the JSON API used by the Next.js web UI in
 // web/multiadmin/ and the gRPC-gateway endpoints; the gRPC port is used by
 // the multigres CLI (admin-server flag).
 func (p *ProcessInstance) startMultiadmin(ctx context.Context, t *testing.T) error {
-	t.Helper()
-
-	t.Logf("Starting %s: binary '%s', HTTP port %d, gRPC port %d", p.Name, p.Binary, p.HttpPort, p.GrpcPort)
-
-	args := []string{
-		"--http-port", strconv.Itoa(p.HttpPort),
-		"--grpc-port", strconv.Itoa(p.GrpcPort),
-		"--topo-global-server-addresses", p.EtcdAddr,
-		"--topo-global-root", p.GlobalRoot,
-		"--service-map", "grpc-multiadmin",
-		"--hostname", "localhost",
-		"--log-level", p.logLevelOrDefault(),
-	}
-
-	p.Process = executil.Command(ctx, p.Binary, args...).WithProcessGroup()
-
-	if len(p.Environment) > 0 {
-		p.Process.SetEnv(p.Environment)
-	}
-
-	if p.LogFile != "" {
-		logF, err := os.Create(p.LogFile)
-		if err != nil {
-			return fmt.Errorf("failed to create log file: %w", err)
-		}
-		p.Process.SetStdout(logF)
-		p.Process.SetStderr(logF)
-	}
-
-	if err := p.Process.Start(); err != nil {
-		return fmt.Errorf("failed to start multiadmin: %w", err)
-	}
-	t.Logf("Started multiadmin (pid: %d, http: %d, grpc: %d, log: %s)",
-		p.Process.Process.Pid, p.HttpPort, p.GrpcPort, p.LogFile)
-
-	if err := WaitForPortReady(t, "multiadmin", p.GrpcPort, 15*time.Second); err != nil {
-		return err
-	}
-	t.Logf("Multiadmin is ready")
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // waitForStartup handles the common startup and waiting logic.
 // Copied from multipooler/setup_test.go.
 func (p *ProcessInstance) waitForStartup(ctx context.Context, t *testing.T, timeout time.Duration, logInterval int) error {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Start the process in background with trace context propagation
-	err := p.Process.Start()
-	if err != nil {
-		return fmt.Errorf("failed to start %s: %w", p.Name, err)
-	}
-	t.Logf("%s server process started with PID %d", p.Name, p.Process.Process.Pid)
-
-	// Give the process a moment to potentially fail immediately
-	time.Sleep(500 * time.Millisecond)
-
-	// Check if process died immediately
-	if p.Process.ProcessState != nil {
-		t.Logf("%s process died immediately: exit code %d", p.Name, p.Process.ProcessState.ExitCode())
-		p.LogRecentOutput(t, "Process died immediately")
-		return fmt.Errorf("%s process died immediately: exit code %d", p.Name, p.Process.ProcessState.ExitCode())
-	}
-
-	// Wait for server to be ready
-	deadline := time.Now().Add(timeout)
-	connectAttempts := 0
-	for time.Now().Before(deadline) {
-		// Check if process died during startup
-		if p.Process.ProcessState != nil {
-			t.Logf("%s process died during startup: exit code %d", p.Name, p.Process.ProcessState.ExitCode())
-			p.LogRecentOutput(t, "Process died during startup")
-			return fmt.Errorf("%s process died: exit code %d", p.Name, p.Process.ProcessState.ExitCode())
-		}
-
-		connectAttempts++
-		// Test gRPC connectivity
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("localhost:%d", p.GrpcPort), 100*time.Millisecond)
-		if err == nil {
-			conn.Close()
-			t.Logf("%s started successfully on gRPC port %d (after %d attempts)", p.Name, p.GrpcPort, connectAttempts)
-			return nil
-		}
-		if connectAttempts%logInterval == 0 {
-			t.Logf("Still waiting for %s to start (attempt %d, error: %v)...", p.Name, connectAttempts, err)
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-
-	// If we timed out, try to get process status
-	if p.Process.ProcessState == nil {
-		t.Logf("%s process is still running but not responding on gRPC port %d", p.Name, p.GrpcPort)
-	}
-
-	t.Logf("Timeout waiting for %s after %d connection attempts", p.Name, connectAttempts)
-	p.LogRecentOutput(t, "Timeout waiting for server to start")
-	return fmt.Errorf("timeout: %s failed to start listening on port %d after %d attempts", p.Name, p.GrpcPort, connectAttempts)
+	return nil
 }
+
+// Give the process a moment to potentially fail immediately
+
+// Check if process died immediately
+
+// Wait for server to be ready
+
+// Check if process died during startup
+
+// Test gRPC connectivity
+
+// If we timed out, try to get process status
 
 // LogRecentOutput logs recent output from the process log file.
 // Copied from multipooler/setup_test.go.
 func (p *ProcessInstance) LogRecentOutput(t *testing.T, context string) {
-	t.Helper()
-	if p.LogFile == "" {
-		return
-	}
-
-	content, err := os.ReadFile(p.LogFile)
-	if err != nil {
-		t.Logf("Failed to read log file %s: %v", p.LogFile, err)
-		return
-	}
-
-	if len(content) == 0 {
-		t.Logf("%s log file %s is empty", p.Name, p.LogFile)
-		return
-	}
-
-	logContent := string(content)
-	t.Logf("%s %s - Recent log output from %s:\n%s", p.Name, context, p.LogFile, logContent)
+	_ = "STUB: not implemented"
+	return
 }
 
 // IsRunning checks if the process is still running.
 // Returns false if the process has exited or was never started.
 // Copied from multipooler/setup_test.go.
-func (p *ProcessInstance) IsRunning() bool {
-	if p == nil || p.Process == nil || p.Process.Process == nil {
-		return false
-	}
-	// ProcessState is set after Wait() returns, meaning process has exited
-	if p.Process.ProcessState != nil {
-		return false
-	}
-	// Signal 0 checks if process exists without actually sending a signal
-	err := p.Process.Process.Signal(syscall.Signal(0))
-	return err == nil
-}
+func (p *ProcessInstance) IsRunning() bool { _ = "STUB: not implemented"; return false }
+
+// ProcessState is set after Wait() returns, meaning process has exited
+
+// Signal 0 checks if process exists without actually sending a signal
 
 // StopPostgres stops PostgreSQL via pgctld gRPC (best effort, no error handling).
 // Uses "fast" mode, which takes a checkpoint before stopping.
 // Use this to stop postgres before removing data directories for auto-restore tests.
-func (p *ProcessInstance) StopPostgres(t *testing.T) {
-	t.Helper()
-	p.stopPostgreSQL("fast")
-}
+func (p *ProcessInstance) StopPostgres(t *testing.T) { _ = "STUB: not implemented"; return }
 
 // StopPostgresImmediate stops PostgreSQL via pgctld gRPC with "immediate" mode,
 // which sends SIGQUIT and skips the pre-shutdown checkpoint. Use this when the
 // data directory is about to be wiped anyway, to avoid long graceful-shutdown
 // windows that can leave the postgres listen port in TIME_WAIT and block the
 // next postgres from binding it on restart.
-func (p *ProcessInstance) StopPostgresImmediate(t *testing.T) {
-	t.Helper()
-	p.stopPostgreSQL("immediate")
-}
+func (p *ProcessInstance) StopPostgresImmediate(t *testing.T) { _ = "STUB: not implemented"; return }
 
 // stopPostgreSQL stops PostgreSQL via gRPC (best effort, no error handling).
 // mode is passed through to pg_ctl stop -m (smart | fast | immediate).
-func (p *ProcessInstance) stopPostgreSQL(mode string) {
-	conn, err := grpc.NewClient(
-		fmt.Sprintf("passthrough:///localhost:%d", p.GrpcPort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return // Can't connect, nothing we can do
-	}
-	defer conn.Close()
+func (p *ProcessInstance) stopPostgreSQL(mode string) { _ = "STUB: not implemented"; return }
 
-	client := pgctldservice.NewPgCtldClient(conn)
+// Can't connect, nothing we can do
 
-	// pg_ctl stop -m fast takes a checkpoint before stopping, which can
-	// take several seconds under load. Immediate mode skips the checkpoint.
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	_, _ = client.Stop(ctx, &pgctldservice.StopRequest{Mode: mode})
-}
+// pg_ctl stop -m fast takes a checkpoint before stopping, which can
+// take several seconds under load. Immediate mode skips the checkpoint.
 
 // TerminateGracefully gracefully terminates a process by first sending SIGTERM,
 // waiting for graceful shutdown, and only using SIGKILL if necessary.
 // For pgctld, it first stops PostgreSQL via gRPC so that System V shared memory
 // segments are released (macOS kern.sysv.shmmni defaults to 32).
 func (p *ProcessInstance) TerminateGracefully(logf func(string, ...any), timeout time.Duration) {
-	if p.Process == nil || p.Process.Process == nil {
-		return
-	}
-
-	// For pgctld, stop PostgreSQL first via gRPC. pg_ctl stop -m fast
-	// releases SysV shared memory segments that would otherwise leak.
-	if p.Binary == "pgctld" {
-		p.stopPostgreSQL("fast")
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	exitErr, stopped := p.Process.Stop(ctx)
-	if !stopped {
-		logf("WARNING: %s did not terminate within %v (shared memory segments may leak)", p.Name, timeout)
-	} else if exitErr != nil {
-		logf("%s terminated with error: %v", p.Name, exitErr)
-	} else {
-		logf("%s terminated gracefully", p.Name)
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// For pgctld, stop PostgreSQL first via gRPC. pg_ctl stop -m fast
+// releases SysV shared memory segments that would otherwise leak.
 
 // CleanupFunc returns a cleanup function that gracefully terminates the process.
 func (p *ProcessInstance) CleanupFunc(logf func(string, ...any)) func() {
-	return func() { p.TerminateGracefully(logf, 5*time.Second) }
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WaitForPortReady waits for a process to be ready by checking its gRPC port.
 // Follows the pattern from multiorch/multiorch_helpers.go:waitForProcessReady.
 func WaitForPortReady(t *testing.T, name string, grpcPort int, timeout time.Duration) error {
-	t.Helper()
-
-	deadline := time.Now().Add(timeout)
-	connectAttempts := 0
-	for time.Now().Before(deadline) {
-		connectAttempts++
-		// Test gRPC connectivity
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("localhost:%d", grpcPort), 100*time.Millisecond)
-		if err == nil {
-			conn.Close()
-			t.Logf("%s ready on gRPC port %d (after %d attempts)", name, grpcPort, connectAttempts)
-			return nil
-		}
-		if connectAttempts%10 == 0 {
-			t.Logf("Still waiting for %s to start (attempt %d)...", name, connectAttempts)
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-
-	return fmt.Errorf("timeout: %s failed to start listening on port %d after %d attempts", name, grpcPort, connectAttempts)
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Test gRPC connectivity

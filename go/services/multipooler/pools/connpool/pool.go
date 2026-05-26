@@ -18,12 +18,9 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"math/rand/v2"
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"go.opentelemetry.io/otel/semconv/v1.37.0/dbconv"
 
 	"github.com/multigres/multigres/go/services/multipooler/connstate"
 )
@@ -54,14 +51,14 @@ type Metrics struct {
 	resetState        atomic.Int64
 }
 
-func (m *Metrics) MaxLifetimeClosed() int64 { return m.maxLifetimeClosed.Load() }
-func (m *Metrics) GetCount() int64          { return m.getCount.Load() }
-func (m *Metrics) GetStateCount() int64     { return m.getWithStateCount.Load() }
-func (m *Metrics) WaitCount() int64         { return m.waitCount.Load() }
-func (m *Metrics) WaitTime() time.Duration  { return time.Duration(m.waitTime.Load()) }
-func (m *Metrics) IdleClosed() int64        { return m.idleClosed.Load() }
-func (m *Metrics) DiffStateCount() int64    { return m.diffState.Load() }
-func (m *Metrics) ResetStateCount() int64   { return m.resetState.Load() }
+func (m *Metrics) MaxLifetimeClosed() int64 { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) GetCount() int64          { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) GetStateCount() int64     { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) WaitCount() int64         { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) WaitTime() time.Duration  { _ = "STUB: not implemented"; return *new(time.Duration) }
+func (m *Metrics) IdleClosed() int64        { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) DiffStateCount() int64    { _ = "STUB: not implemented"; return 0 }
+func (m *Metrics) ResetStateCount() int64   { _ = "STUB: not implemented"; return 0 }
 
 // Connector is a function that creates a new connection.
 // ctx is used for the dial/startup operations.
@@ -186,272 +183,115 @@ type Pool[C Connection] struct {
 // The pool must be Pool.Open before it can start giving out connections.
 // The context is used for background pool operations and OTel tracking.
 func NewPool[C Connection](ctx context.Context, config *Config) *Pool[C] {
-	pool := &Pool[C]{}
-	pool.ctx = ctx
-	pool.Name = config.Name
-	pool.config.maxCapacity = config.Capacity
-	pool.config.maxIdleCount = config.MaxIdleCount
-	pool.config.maxLifetime.Store(config.MaxLifetime.Nanoseconds())
-	pool.config.idleTimeout.Store(config.IdleTimeout.Nanoseconds())
-	pool.config.refreshInterval.Store(config.RefreshInterval.Nanoseconds())
-	pool.config.connectTimeout = config.ConnectTimeout
-	pool.config.logWait = config.LogWait
-	pool.config.onBorrow = config.OnBorrow
-	pool.config.onRecycle = config.OnRecycle
-	pool.logger = config.Logger
-	if pool.logger == nil {
-		pool.logger = slog.Default()
-	}
-	pool.otelConnectionCount = config.ConnectionCount
-	pool.wait.init()
-
-	// Set up OTel idle tracking callbacks on all idle stacks.
-	onPush := func() { pool.otelConnectionCount.Add(pool.ctx, 1, pool.Name, dbconv.ClientConnectionStateIdle) }
-	onPop := func() { pool.otelConnectionCount.Add(pool.ctx, -1, pool.Name, dbconv.ClientConnectionStateIdle) }
-	pool.clean.onPush = onPush
-	pool.clean.onPop = onPop
-	for i := range pool.states {
-		pool.states[i].onPush = onPush
-		pool.states[i].onPop = onPop
-	}
-
-	return pool
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Set up OTel idle tracking callbacks on all idle stacks.
 
 func (pool *Pool[C]) runWorker(close <-chan struct{}, interval time.Duration, worker func(now time.Time) bool) {
-	pool.workers.Go(func() {
-		tick := time.NewTicker(interval)
-
-		defer tick.Stop()
-
-		for {
-			select {
-			case now := <-tick.C:
-				if !worker(now) {
-					return
-				}
-			case <-close:
-				return
-			}
-		}
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
-func (pool *Pool[C]) open() {
-	closeChan := make(chan struct{})
-	if !pool.close.CompareAndSwap(nil, &closeChan) {
-		// already open
-		return
-	}
-	pool.capacity.Store(pool.config.maxCapacity)
-	pool.setIdleCount()
+func (pool *Pool[C]) open() { _ = "STUB: not implemented"; return }
 
-	// The expire worker takes care of removing from the waiter list any clients whose
-	// context has been cancelled.
-	pool.runWorker(closeChan, 100*time.Millisecond, func(_ time.Time) bool {
-		maybeStarving := pool.wait.maybeStarvingCount()
+// already open
 
-		// Do not allow connections to starve; if there's waiters in the queue
-		// and connections in the stack, it means we could be starving them.
-		// Try getting out a connection and handing it over directly
-		for n := 0; n < maybeStarving && pool.tryReturnAnyConn(); n++ {
-		}
-		return true
-	})
+// The expire worker takes care of removing from the waiter list any clients whose
+// context has been cancelled.
 
-	idleTimeout := pool.IdleTimeout()
-	if idleTimeout != 0 {
-		// The idle worker takes care of closing connections that have been idle too long
-		pool.runWorker(closeChan, idleTimeout/10, func(now time.Time) bool {
-			pool.closeIdleResources(now)
-			return true
-		})
-	}
+// Do not allow connections to starve; if there's waiters in the queue
+// and connections in the stack, it means we could be starving them.
+// Try getting out a connection and handing it over directly
 
-	refreshInterval := pool.RefreshInterval()
-	if refreshInterval != 0 && pool.config.refresh != nil {
-		// The refresh worker periodically checks the refresh callback in this pool
-		// to decide whether all the connections in the pool need to be cycled
-		pool.runWorker(closeChan, refreshInterval, func(_ time.Time) bool {
-			refresh, err := pool.config.refresh()
-			if err != nil {
-				pool.logger.Error("pool refresh check failed", "pool", pool.Name, "error", err)
-			}
-			if refresh {
-				go pool.reopen()
-				return false
-			}
-			return true
-		})
-	}
-}
+// The idle worker takes care of closing connections that have been idle too long
+
+// The refresh worker periodically checks the refresh callback in this pool
+// to decide whether all the connections in the pool need to be cycled
 
 // Open starts the background workers that manage the pool and gets it ready
 // to start serving out connections.
 func (pool *Pool[C]) Open(connect Connector[C], refresh RefreshCheck) *Pool[C] {
-	pool.config.connect = connect
-	pool.config.refresh = refresh
-	pool.open()
-	return pool
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Close shuts down the pool. No connections will be returned from Pool.Get after calling this,
 // but calling Pool.Put is still allowed. This function will not return until all of the pool's
 // connections have been returned or the default PoolCloseTimeout has elapsed.
-func (pool *Pool[C]) Close() {
-	if pool.ctx == nil {
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(pool.ctx, PoolCloseTimeout)
-	defer cancel()
-
-	if err := pool.CloseWithContext(ctx); err != nil {
-		pool.logger.Error("failed to close pool", "pool", pool.Name, "error", err)
-	}
-}
+func (pool *Pool[C]) Close() { _ = "STUB: not implemented"; return }
 
 // CloseWithContext behaves like Close but allows passing in a Context to time out the
 // pool closing operation.
 func (pool *Pool[C]) CloseWithContext(ctx context.Context) error {
-	pool.capacityMu.Lock()
-	defer pool.capacityMu.Unlock()
-
-	closeChan := pool.close.Load()
-	if closeChan == nil || pool.capacity.Load() == 0 {
-		// already closed
-		return nil
-	}
-
-	// Set capacity to 0 and close all idle connections immediately
-	_ = pool.setCapacity(0)
-
-	// Wait for borrowed connections to be returned (with timeout).
-	// Unlike SetCapacity (which is non-blocking for rebalancer use),
-	// Close should wait for graceful shutdown.
-	err := pool.waitForDrain(ctx)
-
-	close(*closeChan)
-	pool.workers.Wait()
-	pool.close.Store(nil)
-	return err
-}
-
-// waitForDrain waits for all active connections to be closed.
-// This is used during graceful shutdown to wait for borrowed connections.
-func (pool *Pool[C]) waitForDrain(ctx context.Context) error {
-	const delay = 10 * time.Millisecond
-	for pool.active.Load() > 0 {
-		if err := ctx.Err(); err != nil {
-			return errors.New("timed out while waiting for connections to be returned to the pool")
-		}
-		time.Sleep(delay)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (pool *Pool[C]) reopen() {
-	pool.capacityMu.Lock()
-	defer pool.capacityMu.Unlock()
+// already closed
 
-	capacity := pool.capacity.Load()
-	if capacity == 0 {
-		return
-	}
+// Set capacity to 0 and close all idle connections immediately
 
-	ctx, cancel := context.WithTimeout(pool.ctx, PoolCloseTimeout)
-	defer cancel()
+// Wait for borrowed connections to be returned (with timeout).
+// Unlike SetCapacity (which is non-blocking for rebalancer use),
+// Close should wait for graceful shutdown.
 
-	// Set capacity to 0 to close all connections, then wait for drain
-	if err := pool.setCapacity(0); err != nil {
-		pool.logger.Error("failed to reopen pool", "pool", pool.Name, "error", err)
-	}
-	if err := pool.waitForDrain(ctx); err != nil {
-		pool.logger.Error("failed to drain pool during reopen", "pool", pool.Name, "error", err)
-	}
+// waitForDrain waits for all active connections to be closed.
+// This is used during graceful shutdown to wait for borrowed connections.
+func (pool *Pool[C]) waitForDrain(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
-	// Restore original capacity
-	_ = pool.setCapacity(capacity)
-}
+func (pool *Pool[C]) reopen() { _ = "STUB: not implemented"; return }
+
+// Set capacity to 0 to close all connections, then wait for drain
+
+// Restore original capacity
 
 // IsOpen returns whether the pool is open.
-func (pool *Pool[C]) IsOpen() bool {
-	return pool.close.Load() != nil
-}
+func (pool *Pool[C]) IsOpen() bool { _ = "STUB: not implemented"; return false }
 
 // Capacity returns the maximum amount of connections that this pool can maintain open.
-func (pool *Pool[C]) Capacity() int64 {
-	return pool.capacity.Load()
-}
+func (pool *Pool[C]) Capacity() int64 { _ = "STUB: not implemented"; return 0 }
 
 // MaxCapacity returns the maximum value to which Capacity can be set via Pool.SetCapacity.
-func (pool *Pool[C]) MaxCapacity() int64 {
-	return pool.config.maxCapacity
-}
+func (pool *Pool[C]) MaxCapacity() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (pool *Pool[C]) setIdleCount() {
-	capacity := pool.Capacity()
-	maxIdleCount := pool.config.maxIdleCount
-	if maxIdleCount == 0 || maxIdleCount > capacity {
-		pool.idleCount.Store(capacity)
-	} else {
-		pool.idleCount.Store(maxIdleCount)
-	}
-}
+func (pool *Pool[C]) setIdleCount() { _ = "STUB: not implemented"; return }
 
 // InUse returns the number of connections that the pool has lent out to clients and that
 // haven't been returned yet.
-func (pool *Pool[C]) InUse() int64 {
-	return pool.borrowed.Load()
-}
+func (pool *Pool[C]) InUse() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Available returns the number of connections that the pool can immediately lend out to
 // clients without blocking.
-func (pool *Pool[C]) Available() int64 {
-	return pool.capacity.Load() - pool.borrowed.Load()
-}
+func (pool *Pool[C]) Available() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Active returns the number of connections that the pool has currently open.
-func (pool *Pool[C]) Active() int64 {
-	return pool.active.Load()
-}
+func (pool *Pool[C]) Active() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (pool *Pool[D]) IdleTimeout() time.Duration {
-	return time.Duration(pool.config.idleTimeout.Load())
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (pool *Pool[C]) SetIdleTimeout(duration time.Duration) {
-	pool.config.idleTimeout.Store(duration.Nanoseconds())
-}
+func (pool *Pool[C]) SetIdleTimeout(duration time.Duration) { _ = "STUB: not implemented"; return }
 
-func (pool *Pool[D]) IdleCount() int64 {
-	return pool.idleCount.Load()
-}
+func (pool *Pool[D]) IdleCount() int64 { _ = "STUB: not implemented"; return 0 }
 
 func (pool *Pool[D]) RefreshInterval() time.Duration {
-	return time.Duration(pool.config.refreshInterval.Load())
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
-func (pool *Pool[C]) recordWait(start time.Time) {
-	pool.Metrics.waitCount.Add(1)
-	pool.Metrics.waitTime.Add(time.Since(start).Nanoseconds())
-	if pool.config.logWait != nil {
-		pool.config.logWait(start)
-	}
-}
+func (pool *Pool[C]) recordWait(start time.Time) { _ = "STUB: not implemented"; return }
 
 // Get returns a connection from the pool with no state applied.
 // If there are no connections in the pool to be returned, Get blocks until one
 // is returned, or until the given ctx is cancelled.
 // The connection must be returned to the pool once it's not needed by calling Pooled.Recycle.
 func (pool *Pool[C]) Get(ctx context.Context) (*Pooled[C], error) {
-	if ctx.Err() != nil {
-		return nil, ErrCtxTimeout
-	}
-	if pool.capacity.Load() == 0 {
-		return nil, ErrPoolClosed
-	}
-	return pool.get(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetWithSettings returns a connection from the pool with the given settings applied.
@@ -459,88 +299,37 @@ func (pool *Pool[C]) Get(ctx context.Context) (*Pooled[C], error) {
 // is returned, or until the given ctx is cancelled.
 // The connection must be returned to the pool once it's not needed by calling Pooled.Recycle.
 func (pool *Pool[C]) GetWithSettings(ctx context.Context, settings *connstate.Settings) (*Pooled[C], error) {
-	if ctx.Err() != nil {
-		return nil, ErrCtxTimeout
-	}
-	if pool.capacity.Load() == 0 {
-		return nil, ErrPoolClosed
-	}
-	if settings == nil || settings.IsEmpty() {
-		return pool.get(ctx)
-	}
-	return pool.getWithSettings(ctx, settings)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // connectionCtx returns a bounded context for connection operations (dial + startup).
 // When connectTimeout is configured, it returns a context with that timeout derived
 // from the given ctx. When zero, it returns ctx unchanged (backward compat).
 func (pool *Pool[C]) connectionCtx(ctx context.Context) (context.Context, context.CancelFunc) {
-	if pool.config.connectTimeout > 0 {
-		return context.WithTimeout(ctx, pool.config.connectTimeout)
-	}
-	return ctx, func() {}
+	_ = "STUB: not implemented"
+	return *new(context.Context), *new(context.CancelFunc)
 }
 
 // put returns a connection to the pool. This is a private API.
 // Return connections to the pool by calling Pooled.Recycle.
-func (pool *Pool[C]) put(conn *Pooled[C]) {
-	pool.borrowed.Add(-1)
-	if pool.config.onRecycle != nil {
-		pool.config.onRecycle()
-	}
-	pool.requested.Add(-1) // Track demand: decrement on return
-	pool.otelConnectionCount.Add(pool.ctx, -1, pool.Name, dbconv.ClientConnectionStateUsed)
+func (pool *Pool[C]) put(conn *Pooled[C]) { _ = "STUB: not implemented"; return }
 
-	if conn == nil {
-		var err error
-		conn, err = pool.connNew(pool.ctx)
-		if err != nil {
-			pool.closedConn()
-			return
-		}
-	} else {
-		conn.timeUsed.update()
-
-		lifetime := pool.extendedMaxLifetime()
-		if lifetime > 0 && conn.timeCreated.elapsed() > lifetime {
-			pool.Metrics.maxLifetimeClosed.Add(1)
-			conn.Close()
-			if err := pool.connReopen(pool.ctx, conn, conn.timeUsed.get()); err != nil {
-				pool.closedConn()
-				return
-			}
-		}
-	}
-
-	pool.tryReturnConn(conn)
-}
+// Track demand: decrement on return
 
 func (pool *Pool[C]) tryReturnConn(conn *Pooled[C]) bool {
+	_ = "STUB: not implemented"
 	// If we're over capacity, close the connection.
 	// This enables non-blocking SetCapacity - excess connections are closed on recycle.
-	if pool.closeOnOverCapacity(conn) {
-		return false
-	}
-	if pool.wait.tryReturnConn(conn) {
-		// Direct handoff to waiter: used→used, waiter will do otel used +1
-		return true
-	}
-	if pool.closeOnIdleLimitReached(conn) {
-		return false
-	}
-	// Connection goes to idle stack
-	connSettings := conn.Conn.Settings()
-	if connSettings == nil || connSettings.IsEmpty() {
-		pool.clean.Push(conn)
-	} else {
-		bucket := connSettings.Bucket() & stackMask
-		pool.states[bucket].Push(conn)
-		pool.freshStatesStack.Store(int64(bucket))
-	}
 	return false
 }
 
+// Direct handoff to waiter: used→used, waiter will do otel used +1
+
+// Connection goes to idle stack
+
 func (pool *Pool[C]) pop(stack *connStack[C]) *Pooled[C] {
+	_ = "STUB: not implemented"
 	// retry-loop: pop a connection from the stack and atomically check whether
 	// its timeout has elapsed. If the timeout has elapsed, the borrow will fail,
 	// which means that a background worker has already marked this connection
@@ -548,320 +337,107 @@ func (pool *Pool[C]) pop(stack *connStack[C]) *Pooled[C] {
 	// the timeout as borrowed, we know that background workers will not be able
 	// to expire this connection (even if it's still visible to them), so it's
 	// safe to return it
-	for conn, ok := stack.Pop(); ok; conn, ok = stack.Pop() {
-		if conn.timeUsed.borrow() {
-			return conn
-		}
-	}
 	return nil
 }
 
-func (pool *Pool[C]) tryReturnAnyConn() bool {
-	if conn := pool.pop(&pool.clean); conn != nil {
-		conn.timeUsed.update()
-		return pool.tryReturnConn(conn)
-	}
-	for u := 0; u <= stackMask; u++ {
-		if conn := pool.pop(&pool.states[u]); conn != nil {
-			conn.timeUsed.update()
-			return pool.tryReturnConn(conn)
-		}
-	}
-	return false
-}
+func (pool *Pool[C]) tryReturnAnyConn() bool { _ = "STUB: not implemented"; return false }
 
 // closeOnOverCapacity closes a connection if the number of active connections exceeds capacity.
 // This enables non-blocking SetCapacity: capacity is set immediately, and excess connections
 // are closed as they are recycled. Returns true if the connection was closed.
 func (pool *Pool[C]) closeOnOverCapacity(conn *Pooled[C]) bool {
-	for {
-		open := pool.active.Load()
-		if open <= pool.capacity.Load() {
-			return false
-		}
-		if pool.active.CompareAndSwap(open, open-1) {
-			conn.Close()
-			return true
-		}
-	}
+	_ = "STUB: not implemented"
+	return false
 }
 
 // closeOnIdleLimitReached closes a connection if the number of idle connections (active - inuse) in the pool
 // exceeds the idleCount limit. It returns true if the connection is closed, false otherwise.
 func (pool *Pool[C]) closeOnIdleLimitReached(conn *Pooled[C]) bool {
-	for {
-		open := pool.active.Load()
-		idle := open - pool.borrowed.Load()
-		if idle <= pool.idleCount.Load() {
-			return false
-		}
-		if pool.active.CompareAndSwap(open, open-1) {
-			pool.Metrics.idleClosed.Add(1)
-			conn.Close()
-			return true
-		}
-	}
+	_ = "STUB: not implemented"
+	return false
 }
 
 func (pool *Pool[D]) extendedMaxLifetime() time.Duration {
-	maxLifetime := pool.config.maxLifetime.Load()
-	if maxLifetime == 0 {
-		return 0
-	}
-	return time.Duration(maxLifetime) + time.Duration(rand.Uint32N(uint32(maxLifetime)))
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 func (pool *Pool[C]) connReopen(ctx context.Context, dbconn *Pooled[C], now time.Duration) (err error) {
-	connCtx, cancel := pool.connectionCtx(ctx)
-	defer cancel()
-
-	dbconn.Conn, err = pool.config.connect(connCtx, pool.ctx)
-	if err != nil {
-		return err
-	}
-
-	if settings := dbconn.Conn.Settings(); settings != nil && !settings.IsEmpty() {
-		err = dbconn.Conn.ApplySettings(connCtx, settings)
-		if err != nil {
-			dbconn.Close()
-			return err
-		}
-	}
-
-	dbconn.timeCreated.set(now)
-	dbconn.timeUsed.set(now)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (pool *Pool[C]) connNew(ctx context.Context) (*Pooled[C], error) {
-	connCtx, cancel := pool.connectionCtx(ctx)
-	defer cancel()
-
-	conn, err := pool.config.connect(connCtx, pool.ctx)
-	if err != nil {
-		return nil, err
-	}
-	pooled := &Pooled[C]{
-		pool: pool,
-		Conn: conn,
-	}
-	now := monotonicNow()
-	pooled.timeUsed.set(now)
-	pooled.timeCreated.set(now)
-	return pooled, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (pool *Pool[C]) getFromSettingsStack(settings *connstate.Settings) *Pooled[C] {
-	var start uint32
-	if settings == nil {
-		start = uint32(pool.freshStatesStack.Load())
-	} else {
-		start = settings.Bucket() & stackMask
-	}
-
-	for i := uint32(0); i <= stackMask; i++ {
-		pos := (i + start) & stackMask
-		if conn := pool.pop(&pool.states[pos]); conn != nil {
-			return conn
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (pool *Pool[C]) closedConn() {
-	_ = pool.active.Add(-1)
-}
+func (pool *Pool[C]) closedConn() { _ = "STUB: not implemented"; return }
 
 func (pool *Pool[C]) getNew(ctx context.Context) (*Pooled[C], error) {
-	for {
-		open := pool.active.Load()
-		if open >= pool.capacity.Load() {
-			return nil, nil
-		}
-
-		if pool.active.CompareAndSwap(open, open+1) {
-			conn, err := pool.connNew(ctx)
-			if err != nil {
-				pool.closedConn()
-				return nil, err
-			}
-			return conn, nil
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // get returns a pooled connection with no settings applied.
 func (pool *Pool[C]) get(ctx context.Context) (*Pooled[C], error) {
-	pool.Metrics.getCount.Add(1)
+	_ = "STUB: not implemented"
+	return nil,
 
-	// Track demand: increment at start, decrement on error (success decrements in put on Recycle)
-	newRequested := pool.requested.Add(1)
-	// Update peak demand for accurate demand tracking (captures bursts that sampling might miss)
-	for {
-		peak := pool.peakRequested.Load()
-		if newRequested <= peak || pool.peakRequested.CompareAndSwap(peak, newRequested) {
-			break
-		}
-	}
-	returnErr := func(err error) (*Pooled[C], error) {
-		pool.requested.Add(-1)
-		return nil, err
-	}
-
-	// best case: if there's a connection in the clean stack, return it right away
-	if conn := pool.pop(&pool.clean); conn != nil {
-		pool.borrowed.Add(1)
-		if pool.config.onBorrow != nil {
-			pool.config.onBorrow()
-		}
-		pool.otelConnectionCount.Add(ctx, 1, pool.Name, dbconv.ClientConnectionStateUsed)
-		return conn, nil
-	}
-
-	// check if we have enough capacity to open a brand-new connection to return
-	conn, err := pool.getNew(ctx)
-	if err != nil {
-		return returnErr(err)
-	}
-	// if we don't have capacity, try popping a connection from any of the settings stacks
-	if conn == nil {
-		conn = pool.getFromSettingsStack(nil)
-	}
-	// if there are no connections in the settings stacks and we've lent out connections
-	// to other clients, wait until one of the connections is returned
-	if conn == nil {
-		closeChan := pool.close.Load()
-		if closeChan == nil {
-			return returnErr(ErrPoolClosed)
-		}
-
-		start := time.Now()
-		conn, err = pool.wait.waitForConn(ctx, nil, *closeChan)
-		if err != nil {
-			return returnErr(ErrTimeout)
-		}
-		pool.recordWait(start)
-	}
-	// no connections available and no connections to wait for (pool is closed)
-	if conn == nil {
-		return returnErr(ErrTimeout)
-	}
-
-	// if the connection we've acquired has settings applied, we must reset them before returning
-	if settings := conn.Conn.Settings(); settings != nil && !settings.IsEmpty() {
-		pool.Metrics.resetState.Add(1)
-
-		err = conn.Conn.ResetAllSettings(ctx)
-		if err != nil {
-			conn.Close()
-			err = pool.connReopen(ctx, conn, monotonicNow())
-			if err != nil {
-				pool.closedConn()
-				return returnErr(err)
-			}
-		}
-	}
-
-	pool.borrowed.Add(1)
-	if pool.config.onBorrow != nil {
-		pool.config.onBorrow()
-	}
-	pool.otelConnectionCount.Add(ctx, 1, pool.Name, dbconv.ClientConnectionStateUsed)
-	return conn, nil
+		// Track demand: increment at start, decrement on error (success decrements in put on Recycle)
+		nil
 }
+
+// Update peak demand for accurate demand tracking (captures bursts that sampling might miss)
+
+// best case: if there's a connection in the clean stack, return it right away
+
+// check if we have enough capacity to open a brand-new connection to return
+
+// if we don't have capacity, try popping a connection from any of the settings stacks
+
+// if there are no connections in the settings stacks and we've lent out connections
+// to other clients, wait until one of the connections is returned
+
+// no connections available and no connections to wait for (pool is closed)
+
+// if the connection we've acquired has settings applied, we must reset them before returning
 
 // getWithSettings returns a connection from the pool with the given settings applied.
 func (pool *Pool[C]) getWithSettings(ctx context.Context, settings *connstate.Settings) (*Pooled[C], error) {
-	pool.Metrics.getWithStateCount.Add(1)
-
-	// Track demand: increment at start, decrement on error (success decrements in put on Recycle)
-	newRequested := pool.requested.Add(1)
-	// Update peak demand for accurate demand tracking (captures bursts that sampling might miss)
-	for {
-		peak := pool.peakRequested.Load()
-		if newRequested <= peak || pool.peakRequested.CompareAndSwap(peak, newRequested) {
-			break
-		}
-	}
-	returnErr := func(err error) (*Pooled[C], error) {
-		pool.requested.Add(-1)
-		return nil, err
-	}
-
-	bucket := settings.Bucket() & stackMask
-
-	var err error
-	// best case: check if there's a connection in the settings stack where our settings belongs
-	conn := pool.pop(&pool.states[bucket])
-	// if there's no connection with our settings, try popping a clean connection
-	if conn == nil {
-		conn = pool.pop(&pool.clean)
-	}
-	// otherwise try opening a brand new connection and we'll apply the settings to it
-	if conn == nil {
-		conn, err = pool.getNew(ctx)
-		if err != nil {
-			return returnErr(err)
-		}
-	}
-	// try on the _other_ settings stacks, even if we have to reset the settings for the returned
-	// connection
-	if conn == nil {
-		conn = pool.getFromSettingsStack(settings)
-	}
-	// no connections anywhere in the pool; if we've lent out connections to other clients
-	// wait for one of them
-	if conn == nil {
-		closeChan := pool.close.Load()
-		if closeChan == nil {
-			return returnErr(ErrPoolClosed)
-		}
-
-		start := time.Now()
-		conn, err = pool.wait.waitForConn(ctx, settings, *closeChan)
-		if err != nil {
-			return returnErr(ErrTimeout)
-		}
-		pool.recordWait(start)
-	}
-	// no connections available and no connections to wait for (pool is closed)
-	if conn == nil {
-		return returnErr(ErrTimeout)
-	}
-
-	// ensure that the settings applied to the connection matches the one we want
-	connSettings := conn.Conn.Settings()
-	if connSettings != settings {
-		// if there's other settings applied, reset them before applying our settings
-		if connSettings != nil && !connSettings.IsEmpty() {
-			pool.Metrics.diffState.Add(1)
-
-			err = conn.Conn.ResetAllSettings(ctx)
-			if err != nil {
-				conn.Close()
-				err = pool.connReopen(ctx, conn, monotonicNow())
-				if err != nil {
-					pool.closedConn()
-					return returnErr(err)
-				}
-			}
-		}
-		// apply our settings now; if we can't we assume that the conn is broken
-		// and close it without returning to the pool
-		if err := conn.Conn.ApplySettings(ctx, settings); err != nil {
-			conn.Close()
-			pool.closedConn()
-			return returnErr(err)
-		}
-	}
-
-	pool.borrowed.Add(1)
-	if pool.config.onBorrow != nil {
-		pool.config.onBorrow()
-	}
-	pool.otelConnectionCount.Add(ctx, 1, pool.Name, dbconv.ClientConnectionStateUsed)
-	return conn, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Track demand: increment at start, decrement on error (success decrements in put on Recycle)
+
+// Update peak demand for accurate demand tracking (captures bursts that sampling might miss)
+
+// best case: check if there's a connection in the settings stack where our settings belongs
+
+// if there's no connection with our settings, try popping a clean connection
+
+// otherwise try opening a brand new connection and we'll apply the settings to it
+
+// try on the _other_ settings stacks, even if we have to reset the settings for the returned
+// connection
+
+// no connections anywhere in the pool; if we've lent out connections to other clients
+// wait for one of them
+
+// no connections available and no connections to wait for (pool is closed)
+
+// ensure that the settings applied to the connection matches the one we want
+
+// if there's other settings applied, reset them before applying our settings
+
+// apply our settings now; if we can't we assume that the conn is broken
+// and close it without returning to the pool
 
 // SetCapacity changes the capacity (number of open connections) on the pool.
 // This is a non-blocking operation: capacity is set immediately, and idle
@@ -871,157 +447,76 @@ func (pool *Pool[C]) getWithSettings(ctx context.Context, settings *connstate.Se
 // This design ensures the rebalancer is never blocked waiting for borrowed
 // connections to be returned.
 func (pool *Pool[C]) SetCapacity(_ context.Context, newcap int64) error {
-	pool.capacityMu.Lock()
-	defer pool.capacityMu.Unlock()
-	return pool.setCapacity(newcap)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // setCapacity is the internal implementation for SetCapacity; it must be called
 // with pool.capacityMu being held.
-func (pool *Pool[C]) setCapacity(newcap int64) error {
-	if newcap < 0 {
-		panic("negative capacity")
-	}
+func (pool *Pool[C]) setCapacity(newcap int64) error { _ = "STUB: not implemented"; return nil }
 
-	oldcap := pool.capacity.Swap(newcap)
-	if oldcap == newcap {
-		return nil
-	}
+// Update the idle count to match the new capacity
 
-	// Update the idle count to match the new capacity
-	defer pool.setIdleCount()
+// Capacity increased: proactively create connections for any waiters.
+// This ensures waiters don't have to wait for existing connections to be recycled.
 
-	if newcap > oldcap {
-		// Capacity increased: proactively create connections for any waiters.
-		// This ensures waiters don't have to wait for existing connections to be recycled.
-		pool.satisfyWaitersOnCapacityIncrease()
-	} else {
-		// Capacity decreased: close idle connections to get closer to new capacity.
-		// Don't wait for borrowed connections - they will be closed on recycle
-		// via closeOnOverCapacity() in tryReturnConn().
-		for pool.active.Load() > newcap {
-			// Try closing from connections which are currently idle in the stacks
-			conn := pool.getFromSettingsStack(nil)
-			if conn == nil {
-				conn = pool.pop(&pool.clean)
-			}
-			if conn == nil {
-				// No idle connections available to close.
-				// Remaining over-capacity connections will be closed when recycled.
-				break
-			}
-			conn.Close()
-			pool.closedConn()
-		}
-	}
+// Capacity decreased: close idle connections to get closer to new capacity.
+// Don't wait for borrowed connections - they will be closed on recycle
+// via closeOnOverCapacity() in tryReturnConn().
 
-	return nil
-}
+// Try closing from connections which are currently idle in the stacks
+
+// No idle connections available to close.
+// Remaining over-capacity connections will be closed when recycled.
 
 // satisfyWaitersOnCapacityIncrease creates new connections for waiting clients
 // when capacity has been increased. This is called from setCapacity.
 func (pool *Pool[C]) satisfyWaitersOnCapacityIncrease() {
+	_ = "STUB: not implemented"
 	// Create connections for waiters while we have capacity and waiters
-	for pool.wait.waiting() > 0 {
-		conn, err := pool.getNew(pool.ctx)
-		if err != nil {
-			// Connection creation failed, stop trying
-			return
-		}
-		if conn == nil {
-			// No capacity available (active >= capacity), stop
-			return
-		}
-		// Try to hand the connection to a waiter
-		if !pool.wait.tryReturnConn(conn) {
-			// No more waiters, push connection to idle stack
-			pool.clean.Push(conn)
-			return
-		}
-	}
+	return
 }
 
-func (pool *Pool[C]) closeIdleResources(now time.Time) {
-	timeout := pool.IdleTimeout()
-	if timeout == 0 {
-		return
-	}
-	if pool.Capacity() == 0 {
-		return
-	}
+// Connection creation failed, stop trying
 
-	mono := monotonicFromTime(now)
+// No capacity available (active >= capacity), stop
 
-	closeInStack := func(s *connStack[C]) {
-		// Do a read-only best effort iteration of all the connections in this
-		// stack and atomically attempt to mark them as expired.
-		// Any connections that are marked as expired are _not_ removed from
-		// the stack; it's generally unsafe to remove nodes from the stack
-		// besides the head. When clients pop from the stack, they'll immediately
-		// notice the expired connection and ignore it.
-		// see: timestamp.expired
-		var expiredCount int
-		s.ForEach(func(conn *Pooled[C]) bool {
-			if conn.timeUsed.expired(mono, timeout) {
-				pool.Metrics.idleClosed.Add(1)
+// Try to hand the connection to a waiter
 
-				conn.Close()
-				pool.closedConn()
-				expiredCount++
-			}
-			return true // continue iteration
-		})
+// No more waiters, push connection to idle stack
 
-		// Create replacement connections AFTER ForEach releases the stack
-		// mutex. Calling getNew/tryReturnConn inside ForEach would deadlock:
-		// tryReturnConn may Push to the same stack whose mutex ForEach holds,
-		// and sync.Mutex is not reentrant.
-		for range expiredCount {
-			c, err := pool.getNew(pool.ctx)
-			if err != nil || c == nil {
-				return
-			}
-			pool.tryReturnConn(c)
-		}
-	}
+func (pool *Pool[C]) closeIdleResources(now time.Time) { _ = "STUB: not implemented"; return }
 
-	for i := 0; i <= stackMask; i++ {
-		closeInStack(&pool.states[i])
-	}
-	closeInStack(&pool.clean)
-}
+// Do a read-only best effort iteration of all the connections in this
+// stack and atomically attempt to mark them as expired.
+// Any connections that are marked as expired are _not_ removed from
+// the stack; it's generally unsafe to remove nodes from the stack
+// besides the head. When clients pop from the stack, they'll immediately
+// notice the expired connection and ignore it.
+// see: timestamp.expired
+
+// continue iteration
+
+// Create replacement connections AFTER ForEach releases the stack
+// mutex. Calling getNew/tryReturnConn inside ForEach would deadlock:
+// tryReturnConn may Push to the same stack whose mutex ForEach holds,
+// and sync.Mutex is not reentrant.
 
 // Requested returns the current demand (pending connection requests + borrowed connections).
 // This is used for demand tracking: it represents how many connections would be needed
 // if all current requests were served immediately.
-func (pool *Pool[C]) Requested() int64 {
-	return pool.requested.Load()
-}
+func (pool *Pool[C]) Requested() int64 { _ = "STUB: not implemented"; return 0 }
 
 // PeakRequestedAndReset returns the peak demand since the last reset and resets the peak.
 // This captures burst demand that point-in-time sampling might miss. For accurate demand
 // tracking, call this method periodically to get the peak demand over an interval.
-func (pool *Pool[C]) PeakRequestedAndReset() int64 {
-	return pool.peakRequested.Swap(0)
-}
+func (pool *Pool[C]) PeakRequestedAndReset() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Waiting returns the number of clients currently waiting for a connection.
-func (pool *Pool[C]) Waiting() int {
-	return pool.wait.waiting()
-}
+func (pool *Pool[C]) Waiting() int { _ = "STUB: not implemented"; return 0 }
 
 // Stats returns pool statistics.
-func (pool *Pool[C]) Stats() PoolStats {
-	return PoolStats{
-		Active:    pool.active.Load(),
-		Borrowed:  pool.borrowed.Load(),
-		Idle:      pool.active.Load() - pool.borrowed.Load(),
-		Capacity:  pool.capacity.Load(),
-		Available: pool.Available(),
-		Requested: pool.requested.Load(),
-		Waiting:   pool.wait.waiting(),
-	}
-}
+func (pool *Pool[C]) Stats() PoolStats { _ = "STUB: not implemented"; return *new(PoolStats) }
 
 // PoolStats contains pool statistics.
 type PoolStats struct {

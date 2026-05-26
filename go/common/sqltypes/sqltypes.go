@@ -97,10 +97,12 @@ type Value []byte
 
 // IsNull returns true if the value is NULL.
 func (v Value) IsNull() bool {
-	return v == nil
+	_ = "STUB: not implemented"
+
+	// Row represents a row with nullable column values.
+	return false
 }
 
-// Row represents a row with nullable column values.
 type Row struct {
 	// Values contains the column values. nil entry means NULL.
 	Values []Value
@@ -141,114 +143,27 @@ type Result struct {
 }
 
 // ToProto converts Result to proto format for gRPC serialization.
-func (r *Result) ToProto() *query.QueryResult {
-	if r == nil {
-		return nil
-	}
-	protoRows := make([]*query.Row, len(r.Rows))
-	for i, row := range r.Rows {
-		protoRows[i] = row.ToProto()
-	}
-	return &query.QueryResult{
-		Fields:       r.Fields,
-		HasFields:    r.Fields != nil,
-		RowsAffected: r.RowsAffected,
-		Rows:         protoRows,
-		CommandTag:   r.CommandTag,
-	}
-}
+func (r *Result) ToProto() *query.QueryResult { _ = "STUB: not implemented"; return nil }
 
 // ResultFromProto converts proto QueryResult to sqltypes Result.
-func ResultFromProto(pr *query.QueryResult) *Result {
-	if pr == nil {
-		return nil
-	}
-	rows := make([]*Row, len(pr.Rows))
-	for i, row := range pr.Rows {
-		rows[i] = RowFromProto(row)
-	}
-	// Restore nil vs empty Fields distinction lost in protobuf serialization.
-	// Protobuf encodes both nil and empty repeated fields identically (as absent),
-	// so we use HasFields to distinguish "no result set" from "zero-column result".
-	fields := pr.Fields
-	if pr.HasFields && fields == nil {
-		fields = []*query.Field{}
-	}
-	return &Result{
-		Fields:       fields,
-		RowsAffected: pr.RowsAffected,
-		Rows:         rows,
-		CommandTag:   pr.CommandTag,
-	}
-}
+func ResultFromProto(pr *query.QueryResult) *Result { _ = "STUB: not implemented"; return nil }
+
+// Restore nil vs empty Fields distinction lost in protobuf serialization.
+// Protobuf encodes both nil and empty repeated fields identically (as absent),
+// so we use HasFields to distinguish "no result set" from "zero-column result".
 
 // ToProto converts Row to proto format (lengths+values) for gRPC serialization.
 // Encoding: -1 = NULL, 0 = empty string, >0 = actual length.
-func (r *Row) ToProto() *query.Row {
-	if r == nil {
-		return nil
-	}
-
-	lengths := make([]int64, len(r.Values))
-	var totalLen int
-	for i, v := range r.Values {
-		if v == nil {
-			lengths[i] = -1
-		} else {
-			lengths[i] = int64(len(v))
-			totalLen += len(v)
-		}
-	}
-
-	values := make([]byte, 0, totalLen)
-	for _, v := range r.Values {
-		if v != nil {
-			values = append(values, v...)
-		}
-	}
-
-	return &query.Row{
-		Lengths: lengths,
-		Values:  values,
-	}
-}
+func (r *Row) ToProto() *query.Row { _ = "STUB: not implemented"; return nil }
 
 // RowFromProto converts proto Row (lengths+values) to sqltypes Row.
 // Decoding: -1 = NULL, 0 = empty string, >0 = actual length.
-func RowFromProto(pr *query.Row) *Row {
-	if pr == nil {
-		return nil
-	}
+func RowFromProto(pr *query.Row) *Row { _ = "STUB: not implemented"; return nil }
 
-	values := make([]Value, len(pr.Lengths))
-	offset := 0
-	for i, length := range pr.Lengths {
-		switch length {
-		case -1:
-			values[i] = nil // NULL
-		case 0:
-			values[i] = []byte{} // empty string, not NULL
-		default:
-			values[i] = pr.Values[offset : offset+int(length)]
-			offset += int(length)
-		}
-	}
+// NULL
 
-	return &Row{Values: values}
-}
+// empty string, not NULL
 
 // MakeRow creates a new Row from a slice of byte slices.
 // nil entries represent NULL values.
-func MakeRow(values [][]byte) *Row {
-	row := &Row{
-		Values: make([]Value, len(values)),
-	}
-	for i, v := range values {
-		if v == nil {
-			row.Values[i] = nil
-		} else {
-			row.Values[i] = Value(v)
-		}
-	}
-	return row
-}
+func MakeRow(values [][]byte) *Row { _ = "STUB: not implemented"; return nil }

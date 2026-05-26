@@ -16,15 +16,12 @@ package manager
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 )
 
@@ -54,96 +51,44 @@ type ActionLock struct {
 }
 
 // NewActionLock creates a new ActionLock.
-func NewActionLock() *ActionLock {
-	return &ActionLock{
-		sema:   semaphore.NewWeighted(1),
-		nextID: 1, // Start at 1 so 0 can represent "unlocked"
-	}
-}
+func NewActionLock() *ActionLock { _ = "STUB: not implemented"; return nil }
+
+// Start at 1 so 0 can represent "unlocked"
 
 // Acquire acquires the action lock and returns a new context that proves ownership.
 // The operation string is used for debugging/tracking purposes.
 // Returns an error if the lock cannot be acquired (e.g., context cancelled) or
 // if the provided context already holds the lock.
 func (al *ActionLock) Acquire(ctx context.Context, operation string) (context.Context, error) {
+	_ = "STUB: not implemented"
 	// Check if this context already holds the lock
-	if val, ok := ctx.Value(actionLockKey{}).(*actionLockValue); ok {
-		if !val.released.Load() {
-			return ctx, fmt.Errorf("context already holds the action lock (operation: %s)", val.operation)
-		}
-	}
-
-	// Try to acquire the semaphore
-	if err := al.sema.Acquire(ctx, 1); err != nil {
-		return ctx, mterrors.Wrap(err, "failed to acquire action lock")
-	}
-
-	// Generate a unique ID for this acquisition
-	al.mu.Lock()
-	lockID := al.nextID
-	al.nextID++
-	al.currentID = lockID
-	al.mu.Unlock()
-
-	// Create the lock value with a released flag
-	releasedFlag := &atomic.Bool{}
-	val := &actionLockValue{
-		lockID:    lockID,
-		operation: operation,
-		released:  releasedFlag,
-	}
-
-	// Return a new context with the lock info
-	return context.WithValue(ctx, actionLockKey{}, val), nil
+	return *new(context.Context), nil
 }
+
+// Try to acquire the semaphore
+
+// Generate a unique ID for this acquisition
+
+// Create the lock value with a released flag
+
+// Return a new context with the lock info
 
 // Release releases the action lock. It validates that the provided context
 // holds the lock and panics if it doesn't (which indicates a programming error).
 // After releasing, the context is marked as invalid so future assertions will fail.
-func (al *ActionLock) Release(ctx context.Context) {
-	val, ok := ctx.Value(actionLockKey{}).(*actionLockValue)
-	if !ok {
-		panic("Release called with context that has no action lock info")
-	}
+func (al *ActionLock) Release(ctx context.Context) { _ = "STUB: not implemented"; return }
 
-	// Check if already released
-	if val.released.Load() {
-		panic(fmt.Sprintf("Release called twice with same context (operation: %s)", val.operation))
-	}
+// Check if already released
 
-	// Verify this context holds the current lock
-	al.mu.Lock()
-	currentID := al.currentID
-	al.mu.Unlock()
+// Verify this context holds the current lock
 
-	if val.lockID != currentID {
-		panic(fmt.Sprintf("Release called with context that doesn't hold the lock (operation: %s, lockID: %d, currentID: %d)",
-			val.operation, val.lockID, currentID))
-	}
-
-	// Mark as released BEFORE actually releasing the semaphore
-	// This ensures assertions fail immediately
-	val.released.Store(true)
-
-	al.mu.Lock()
-	al.currentID = 0
-	al.activeAction = multipoolermanagerdatapb.PostgresAction_POSTGRES_ACTION_UNSPECIFIED
-	al.activeActionStartedAt = time.Time{}
-	al.mu.Unlock()
-
-	al.sema.Release(1)
-}
+// Mark as released BEFORE actually releasing the semaphore
+// This ensures assertions fail immediately
 
 // SetAction records the postgres action currently being performed.
 // Must be called while holding the lock (enforced via AssertActionLockHeld).
 func (al *ActionLock) SetAction(ctx context.Context, action multipoolermanagerdatapb.PostgresAction) error {
-	if err := AssertActionLockHeld(ctx); err != nil {
-		return err
-	}
-	al.mu.Lock()
-	defer al.mu.Unlock()
-	al.activeAction = action
-	al.activeActionStartedAt = time.Now()
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -151,26 +96,11 @@ func (al *ActionLock) SetAction(ctx context.Context, action multipoolermanagerda
 // Returns UNSPECIFIED and zero duration when no action is in progress.
 // Safe to call without holding the action lock.
 func (al *ActionLock) ActiveAction() (multipoolermanagerdatapb.PostgresAction, time.Duration) {
-	al.mu.Lock()
-	defer al.mu.Unlock()
-	if al.activeAction == multipoolermanagerdatapb.PostgresAction_POSTGRES_ACTION_UNSPECIFIED {
-		return multipoolermanagerdatapb.PostgresAction_POSTGRES_ACTION_UNSPECIFIED, 0
-	}
-	return al.activeAction, time.Since(al.activeActionStartedAt)
+	_ = "STUB: not implemented"
+	return *new(multipoolermanagerdatapb.PostgresAction), *new(time.Duration)
 }
 
 // AssertActionLockHeld returns an error if the provided context does not hold
 // an action lock or if the lock has been released. This is a global function
 // that doesn't require a reference to the ActionLock.
-func AssertActionLockHeld(ctx context.Context) error {
-	val, ok := ctx.Value(actionLockKey{}).(*actionLockValue)
-	if !ok {
-		return errors.New("context does not hold an action lock")
-	}
-
-	if val.released.Load() {
-		return errors.New("context's action lock has been released")
-	}
-
-	return nil
-}
+func AssertActionLockHeld(ctx context.Context) error { _ = "STUB: not implemented"; return nil }

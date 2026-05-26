@@ -15,11 +15,7 @@
 package scram
 
 import (
-	"crypto/subtle"
-	"encoding/base64"
 	"errors"
-	"fmt"
-	"strings"
 )
 
 // Sentinel errors for SCRAM authentication.
@@ -85,15 +81,10 @@ type SASLProtocolError struct {
 	Msg string
 }
 
-func (e *SASLProtocolError) Error() string {
-	if e.Msg != "" {
-		return "scram: " + e.Msg + ": " + e.Detail
-	}
-	return "scram: malformed SCRAM message: " + e.Detail
-}
+func (e *SASLProtocolError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Unwrap lets errors.Is(err, ErrSASLProtocol) succeed.
-func (e *SASLProtocolError) Unwrap() error { return ErrSASLProtocol }
+func (e *SASLProtocolError) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
 // authenticatorState tracks the current state of the SCRAM handshake.
 type authenticatorState int
@@ -187,14 +178,8 @@ type ScramAuthenticator struct {
 // Panics if hash is nil. Unknown-user / login-disabled / password-expired
 // cases must be handled by the caller before reaching this constructor.
 func NewScramAuthenticator(hash *ScramHash, database string) *ScramAuthenticator {
-	if hash == nil {
-		panic("auth: scram hash cannot be nil")
-	}
-	return &ScramAuthenticator{
-		hash:     hash,
-		database: database,
-		state:    stateInitial,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetChannelBinding attaches TLS channel binding context to the authenticator.
@@ -206,27 +191,18 @@ func NewScramAuthenticator(hash *ScramHash, database string) *ScramAuthenticator
 //
 // Pass nil to clear any previously set binding.
 func (a *ScramAuthenticator) SetChannelBinding(cb *ChannelBinding) {
-	if a.state != stateInitial {
-		panic("scram: SetChannelBinding called after StartAuthentication")
-	}
-	a.channelBinding = cb
+	_ = "STUB: not implemented"
+	return
 }
 
 // SetOverTLS records that the underlying connection is TLS-encrypted. Must
 // be called before StartAuthentication. This is independent of whether
 // SetChannelBinding succeeded — downgrade detection still needs to fire
 // over TLS even when cbind material couldn't be derived.
-func (a *ScramAuthenticator) SetOverTLS(overTLS bool) {
-	if a.state != stateInitial {
-		panic("scram: SetOverTLS called after StartAuthentication")
-	}
-	a.overTLS = overTLS
-}
+func (a *ScramAuthenticator) SetOverTLS(overTLS bool) { _ = "STUB: not implemented"; return }
 
 // hasChannelBinding reports whether channel binding material is available.
-func (a *ScramAuthenticator) hasChannelBinding() bool {
-	return a.channelBinding != nil && len(a.channelBinding.TLSServerEndPointHash) > 0
-}
+func (a *ScramAuthenticator) hasChannelBinding() bool { _ = "STUB: not implemented"; return false }
 
 // StartAuthentication begins the SCRAM authentication process.
 // Returns the list of supported SASL mechanisms. When channel binding is
@@ -234,13 +210,7 @@ func (a *ScramAuthenticator) hasChannelBinding() bool {
 // the stronger mechanism by default.
 //
 // This corresponds to sending AuthenticationSASL (auth type 10) to the client.
-func (a *ScramAuthenticator) StartAuthentication() []string {
-	a.state = stateStarted
-	if a.hasChannelBinding() {
-		return []string{ScramSHA256PlusMechanism, ScramSHA256Mechanism}
-	}
-	return []string{ScramSHA256Mechanism}
-}
+func (a *ScramAuthenticator) StartAuthentication() []string { _ = "STUB: not implemented"; return nil }
 
 // HandleClientFirst processes the client-first-message from the client.
 // Returns the server-first-message to send back.
@@ -263,122 +233,50 @@ func (a *ScramAuthenticator) StartAuthentication() []string {
 // generates the server-first-message containing the combined nonce, salt,
 // and iteration count from that hash.
 func (a *ScramAuthenticator) HandleClientFirst(mechanism, clientFirstMessage, startupMessageUsername string) (string, error) {
+	_ = "STUB: not implemented"
 	// Verify state.
-	if a.state != stateStarted {
-		return "", fmt.Errorf("auth: invalid state for HandleClientFirst (expected started, got %d)", a.state)
-	}
-
-	// Validate mechanism against what we advertised.
-	switch mechanism {
-	case ScramSHA256Mechanism:
-	case ScramSHA256PlusMechanism:
-		if !a.hasChannelBinding() {
-			a.state = stateFailed
-			return "", fmt.Errorf("auth: client selected %s but server did not advertise it", ScramSHA256PlusMechanism)
-		}
-	default:
-		a.state = stateFailed
-		return "", fmt.Errorf("auth: unsupported SASL mechanism: %q", mechanism)
-	}
-
-	// Parse the client-first-message.
-	parsed, err := parseClientFirstMessage(clientFirstMessage)
-	if err != nil {
-		a.state = stateFailed
-		return "", fmt.Errorf("auth: invalid client-first-message: %w", err)
-	}
-
-	// PG rejects SASL authzid outright (see auth-scram.c
-	// read_client_first_message). Mirror that for parity.
-	if parsed.authzid != "" {
-		a.state = stateFailed
-		return "", ErrAuthzidNotSupported
-	}
-
-	// Cross-check the GS2 channel-binding flag against the chosen mechanism.
-	// Enforces RFC 5802 §6 and detects downgrade attempts.
-	if err := a.validateGS2Flag(mechanism, parsed); err != nil {
-		a.state = stateFailed
-		return "", err
-	}
-	a.selectedMechanism = mechanism
-	a.clientGS2Header = parsed.gs2Header
-
-	// PostgreSQL always ignores the username from client-first-message
-	// and uses the startup message username. This is because not all UTF-8
-	// strings are valid postgres usernames.
-	// See https://www.postgresql.org/docs/current/sasl-authentication.html#SASL-SCRAM-SHA-256
-	// We still parse the name here for protocol validation, but intentionally ignore it.
-	_ = parsed.username // Parsed but ignored per PostgreSQL behavior
-
-	// Always use the username from the startup message.
-	username := startupMessageUsername
-	if username == "" {
-		a.state = stateFailed
-		return "", errors.New("auth: no username provided in startup message")
-	}
-
-	// Store values for later verification.
-	a.username = username
-	a.clientNonce = parsed.clientNonce
-	a.clientFirstMessageBare = parsed.clientFirstMessageBare
-
-	// Generate the server-first-message.
-	serverFirstMessage, combinedNonce, err := generateServerFirstMessage(
-		a.clientNonce,
-		a.hash.Salt,
-		a.hash.Iterations,
-	)
-	if err != nil {
-		a.state = stateFailed
-		return "", fmt.Errorf("auth: failed to generate server-first-message: %w", err)
-	}
-
-	a.serverFirstMessage = serverFirstMessage
-	a.combinedNonce = combinedNonce
-	a.state = stateClientFirstReceived
-
-	return serverFirstMessage, nil
+	return "", nil
 }
+
+// Validate mechanism against what we advertised.
+
+// Parse the client-first-message.
+
+// PG rejects SASL authzid outright (see auth-scram.c
+// read_client_first_message). Mirror that for parity.
+
+// Cross-check the GS2 channel-binding flag against the chosen mechanism.
+// Enforces RFC 5802 §6 and detects downgrade attempts.
+
+// PostgreSQL always ignores the username from client-first-message
+// and uses the startup message username. This is because not all UTF-8
+// strings are valid postgres usernames.
+// See https://www.postgresql.org/docs/current/sasl-authentication.html#SASL-SCRAM-SHA-256
+// We still parse the name here for protocol validation, but intentionally ignore it.
+// Parsed but ignored per PostgreSQL behavior
+
+// Always use the username from the startup message.
+
+// Store values for later verification.
+
+// Generate the server-first-message.
 
 // validateGS2Flag enforces the RFC 5802 §6 rules tying the SASL mechanism
 // the client selected to the GS2 channel-binding flag it sent. Error
 // messages and SQLSTATE classes mirror PostgreSQL 17 (auth-scram.c) so
 // libpq-compatible clients see byte-identical diagnostics.
 func (a *ScramAuthenticator) validateGS2Flag(mechanism string, parsed *clientFirstMessage) error {
-	switch mechanism {
-	case ScramSHA256PlusMechanism:
-		switch parsed.gs2CbindFlag {
-		case "n", "y":
-			return &SASLProtocolError{
-				Detail: "The client selected SCRAM-SHA-256-PLUS, but the SCRAM message does not include channel binding data.",
-			}
-		}
-		if parsed.channelBindingType != ChannelBindingTypeTLSServerEndPoint {
-			return &SASLProtocolError{
-				Msg: fmt.Sprintf("unsupported SCRAM channel-binding type %q", parsed.channelBindingType),
-			}
-		}
-	case ScramSHA256Mechanism:
-		switch parsed.gs2CbindFlag {
-		case "n":
-			// no binding — fine.
-		case "y":
-			if a.overTLS {
-				// Connection is TLS — server can do cbind — but client claims
-				// it didn't advertise. PG returns 28000 here (distinct from
-				// the 08P01 used for other cbind protocol errors).
-				return ErrChannelBindingNegotiation
-			}
-		default:
-			// gs2 flag starts with "p=" → cbind requested without picking PLUS.
-			return &SASLProtocolError{
-				Detail: "The client selected SCRAM-SHA-256 without channel binding, but the SCRAM message includes channel binding data.",
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// no binding — fine.
+
+// Connection is TLS — server can do cbind — but client claims
+// it didn't advertise. PG returns 28000 here (distinct from
+// the 08P01 used for other cbind protocol errors).
+
+// gs2 flag starts with "p=" → cbind requested without picking PLUS.
 
 // verifyChannelBinding recomputes the expected c= value the client should
 // have sent and compares it in constant time. Note: the cbind data is not
@@ -392,25 +290,8 @@ func (a *ScramAuthenticator) validateGS2Flag(mechanism string, parsed *clientFir
 //     and "eSws" (= y,,), each tied to the matching original gs2 flag.
 //     Anything else is a protocol violation (08P01).
 func (a *ScramAuthenticator) verifyChannelBinding(clientCBindB64 string) error {
-	if a.selectedMechanism == ScramSHA256PlusMechanism {
-		expected := append([]byte(a.clientGS2Header), a.channelBinding.TLSServerEndPointHash...)
-		expectedB64 := base64.StdEncoding.EncodeToString(expected)
-		if subtle.ConstantTimeCompare([]byte(clientCBindB64), []byte(expectedB64)) != 1 {
-			return ErrChannelBindingCheck
-		}
-		return nil
-	}
-
-	switch {
-	case clientCBindB64 == "biws" && a.clientGS2Header == "n,,":
-		return nil
-	case clientCBindB64 == "eSws" && a.clientGS2Header == "y,,":
-		return nil
-	default:
-		return &SASLProtocolError{
-			Msg: "unexpected SCRAM channel-binding attribute in client-final-message",
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HandleClientFinal processes the client-final-message from the client.
@@ -425,77 +306,37 @@ func (a *ScramAuthenticator) verifyChannelBinding(clientCBindB64 string) error {
 // cbind data the client echoes back does not match the gs2-header (+ TLS
 // cert hash for PLUS) the server expects.
 func (a *ScramAuthenticator) HandleClientFinal(clientFinalMessage string) (string, error) {
+	_ = "STUB: not implemented"
 	// Verify state.
-	if a.state != stateClientFirstReceived {
-		return "", fmt.Errorf("auth: invalid state for HandleClientFinal (expected client-first-received, got %d)", a.state)
-	}
-
-	// Parse the client-final-message.
-	parsed, err := parseClientFinalMessage(clientFinalMessage)
-	if err != nil {
-		a.state = stateFailed
-		return "", fmt.Errorf("auth: invalid client-final-message: %w", err)
-	}
-
-	// Verify the channel binding data the client echoed back. The client
-	// sends base64(gs2-header [|| cbind-data]); we recompute the same bytes
-	// and compare. Mismatch means either the gs2-header was tampered with
-	// mid-handshake or, for PLUS, the cbind hash diverges from the TLS cert
-	// the client actually saw.
-	if err := a.verifyChannelBinding(parsed.channelBinding); err != nil {
-		a.state = stateFailed
-		return "", err
-	}
-
-	// Verify the nonce matches.
-	if parsed.nonce != a.combinedNonce {
-		a.state = stateFailed
-		return "", errors.New("auth: nonce mismatch (possible replay attack)")
-	}
-
-	// Verify the nonce starts with our client nonce (extra safety check).
-	if !strings.HasPrefix(parsed.nonce, a.clientNonce) {
-		a.state = stateFailed
-		return "", errors.New("auth: combined nonce does not start with client nonce")
-	}
-
-	// Build the AuthMessage for verification.
-	authMessage := buildAuthMessage(
-		a.clientFirstMessageBare,
-		a.serverFirstMessage,
-		parsed.clientFinalMessageWithoutProof,
-	)
-
-	// Verify the client proof and extract the ClientKey for passthrough authentication.
-	extractedClientKey, err := ExtractAndVerifyClientProof(a.hash.StoredKey, authMessage, parsed.proof)
-	if err != nil {
-		a.state = stateFailed
-		// Return the specific error (ErrAuthenticationFailed for wrong password, or other errors)
-		return "", err
-	}
-	a.extractedClientKey = extractedClientKey
-
-	// Authentication successful! Compute the server signature.
-	serverSignature := ComputeServerSignature(a.hash.ServerKey, authMessage)
-	serverFinalMessage := generateServerFinalMessage(serverSignature)
-
-	a.state = stateAuthenticated
-	return serverFinalMessage, nil
+	return "", nil
 }
+
+// Parse the client-final-message.
+
+// Verify the channel binding data the client echoed back. The client
+// sends base64(gs2-header [|| cbind-data]); we recompute the same bytes
+// and compare. Mismatch means either the gs2-header was tampered with
+// mid-handshake or, for PLUS, the cbind hash diverges from the TLS cert
+// the client actually saw.
+
+// Verify the nonce matches.
+
+// Verify the nonce starts with our client nonce (extra safety check).
+
+// Build the AuthMessage for verification.
+
+// Verify the client proof and extract the ClientKey for passthrough authentication.
+
+// Return the specific error (ErrAuthenticationFailed for wrong password, or other errors)
+
+// Authentication successful! Compute the server signature.
 
 // IsAuthenticated returns true if the authentication completed successfully.
-func (a *ScramAuthenticator) IsAuthenticated() bool {
-	return a.state == stateAuthenticated
-}
+func (a *ScramAuthenticator) IsAuthenticated() bool { _ = "STUB: not implemented"; return false }
 
 // AuthenticatedUser returns the username that was successfully authenticated.
 // Returns an empty string if authentication has not completed successfully.
-func (a *ScramAuthenticator) AuthenticatedUser() string {
-	if a.state != stateAuthenticated {
-		return ""
-	}
-	return a.username
-}
+func (a *ScramAuthenticator) AuthenticatedUser() string { _ = "STUB: not implemented"; return "" }
 
 // ExtractedKeys returns the SCRAM keys extracted during authentication.
 // These can be used for passthrough authentication to backend PostgreSQL servers.
@@ -505,10 +346,8 @@ func (a *ScramAuthenticator) AuthenticatedUser() string {
 //
 // Returns nil, nil if authentication has not completed successfully.
 func (a *ScramAuthenticator) ExtractedKeys() (clientKey, serverKey []byte) {
-	if a.state != stateAuthenticated {
-		return nil, nil
-	}
-	return a.extractedClientKey, a.hash.ServerKey
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Reset clears the authenticator state, allowing it to be reused for
@@ -517,17 +356,4 @@ func (a *ScramAuthenticator) ExtractedKeys() (clientKey, serverKey []byte) {
 // not to a particular handshake attempt. The extracted ClientKey is
 // zeroized before being nilled so a memory dump after Reset cannot recover
 // the previous session's secret.
-func (a *ScramAuthenticator) Reset() {
-	for i := range a.extractedClientKey {
-		a.extractedClientKey[i] = 0
-	}
-	a.state = stateInitial
-	a.username = ""
-	a.clientNonce = ""
-	a.combinedNonce = ""
-	a.clientFirstMessageBare = ""
-	a.serverFirstMessage = ""
-	a.extractedClientKey = nil
-	a.selectedMechanism = ""
-	a.clientGS2Header = ""
-}
+func (a *ScramAuthenticator) Reset() { _ = "STUB: not implemented"; return }

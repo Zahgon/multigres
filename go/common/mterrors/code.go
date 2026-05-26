@@ -15,12 +15,6 @@
 
 package mterrors
 
-import (
-	"errors"
-	"fmt"
-	"slices"
-)
-
 // PostgreSQL SQLSTATE codes used by Multigres when spoofing native PG errors.
 // See: https://www.postgresql.org/docs/current/errcodes-appendix.html
 const (
@@ -45,26 +39,17 @@ const (
 
 // NewQueryCanceled creates a PgDiagnostic for an explicit cancel request
 // (e.g. CancelRequest). SQLSTATE 57014 (query_canceled).
-func NewQueryCanceled() *PgDiagnostic {
-	return NewPgError("ERROR", PgSSQueryCanceled,
-		"canceling statement due to user request", "")
-}
+func NewQueryCanceled() *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // NewStatementTimeout creates a PgDiagnostic for a statement timeout expiry.
 // SQLSTATE 57014 (query_canceled).
-func NewStatementTimeout() *PgDiagnostic {
-	return NewPgError("ERROR", PgSSQueryCanceled,
-		"canceling statement due to statement timeout", "")
-}
+func NewStatementTimeout() *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // NewAuthenticationTimeout creates a PgDiagnostic for an authentication_timeout
 // expiry during the startup phase (SSLRequest, StartupMessage, or SCRAM
 // exchange). SQLSTATE 08006 (connection_failure), severity FATAL — matches
 // the way native PostgreSQL closes the connection when the timeout fires.
-func NewAuthenticationTimeout() *PgDiagnostic {
-	return NewPgError("FATAL", PgSSConnectionFailure,
-		"canceling authentication due to timeout", "")
-}
+func NewAuthenticationTimeout() *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // MTError defines a Multigres-specific error code for conditions that have no
 // PostgreSQL equivalent. Each instance is a template that produces a
@@ -83,27 +68,14 @@ type MTError struct {
 // The MT ID is placed in the SQLSTATE Code field and the Description
 // is placed in the Detail field. If args are provided, the Format
 // string is passed through fmt.Sprintf.
-func (e *MTError) New(args ...any) *PgDiagnostic {
-	msg := e.Format
-	if len(args) != 0 {
-		msg = fmt.Sprintf(e.Format, args...)
-	}
-	return &PgDiagnostic{
-		MessageType: 'E',
-		Severity:    e.Severity,
-		Code:        e.ID,
-		Message:     msg,
-		Detail:      e.Description,
-	}
-}
+func (e *MTError) New(args ...any) *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // NewWithDetail builds a *PgDiagnostic from this error definition, using the
 // provided detail string instead of the Description. This is useful for wrapper
 // errors where the underlying error message should appear as the Detail field.
 func (e *MTError) NewWithDetail(detail string, args ...any) *PgDiagnostic {
-	d := e.New(args...)
-	d.Detail = detail
-	return d
+	_ = "STUB: not implemented"
+	return nil
 }
 
 var (
@@ -193,13 +165,8 @@ var (
 // Use this for errors that should present as native PostgreSQL errors to clients
 // (e.g., authentication failures, protocol violations, aborted transactions).
 func NewPgError(severity, sqlState, message, detail string) *PgDiagnostic {
-	return &PgDiagnostic{
-		MessageType: 'E',
-		Severity:    severity,
-		Code:        sqlState,
-		Message:     message,
-		Detail:      detail,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewPgNotice creates a *PgDiagnostic that will be sent as a NoticeResponse
@@ -208,53 +175,33 @@ func NewPgError(severity, sqlState, message, detail string) *PgDiagnostic {
 // successful CommandComplete — e.g., the WARNING emitted for `SET LOCAL`
 // outside a transaction block.
 func NewPgNotice(severity, sqlState, message, detail string) *PgDiagnostic {
-	return &PgDiagnostic{
-		MessageType: 'N',
-		Severity:    severity,
-		Code:        sqlState,
-		Message:     message,
-		Detail:      detail,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewUnrecognizedParameter creates a PgDiagnostic for an unrecognized configuration
 // parameter (SQLSTATE 42704 undefined_object). This matches PostgreSQL's error for
 // SHOW/SET/RESET of unknown GUC parameters.
-func NewUnrecognizedParameter(name string) *PgDiagnostic {
-	return NewPgError("ERROR", PgSSUndefinedObject,
-		fmt.Sprintf("unrecognized configuration parameter %q", name), "")
-}
+func NewUnrecognizedParameter(name string) *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // NewInvalidPreparedStatementError creates a PgDiagnostic for a reference to
 // a nonexistent prepared statement. SQLSTATE 26000 (invalid_sql_statement_name).
 func NewInvalidPreparedStatementError(name string) *PgDiagnostic {
-	return NewPgError("ERROR", PgSSInvalidSQLStatementName,
-		fmt.Sprintf("prepared statement \"%s\" does not exist", name), "")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewInvalidPortalError creates a PgDiagnostic for a reference to
 // a nonexistent portal. SQLSTATE 34000 (invalid_cursor_name).
-func NewInvalidPortalError(name string) *PgDiagnostic {
-	return NewPgError("ERROR", PgSSInvalidCursorName,
-		fmt.Sprintf("portal \"%s\" does not exist", name), "")
-}
+func NewInvalidPortalError(name string) *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 // NewDuplicatePreparedStatementError creates a PgDiagnostic for a PREPARE
 // that reuses an existing statement name. SQLSTATE 42P05.
 func NewDuplicatePreparedStatementError(name string) *PgDiagnostic {
-	return NewPgError("ERROR", PgSSDuplicatePreparedStmt,
-		fmt.Sprintf("prepared statement \"%s\" already exists", name), "")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // IsErrorCode checks whether err (or a wrapped cause) is a *PgDiagnostic
 // whose SQLSTATE Code matches any of the provided codes.
-func IsErrorCode(err error, codes ...string) bool {
-	if err == nil {
-		return false
-	}
-	var diag *PgDiagnostic
-	if errors.As(err, &diag) {
-		return slices.Contains(codes, diag.Code)
-	}
-	return false
-}
+func IsErrorCode(err error, codes ...string) bool { _ = "STUB: not implemented"; return false }

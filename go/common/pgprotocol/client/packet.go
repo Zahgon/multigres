@@ -15,12 +15,7 @@
 package client
 
 import (
-	"encoding/binary"
-	"fmt"
-	"io"
-
 	"github.com/multigres/multigres/go/common/pgprotocol/bufpool"
-	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
 )
 
 // bufPool is the package-level buffer pool used by the slow path of
@@ -35,9 +30,7 @@ var bufPool = bufpool.New(16*1024, 64*1024*1024)
 // Reading utilities
 
 // readMessageType reads a single byte message type from the connection.
-func (c *Conn) readMessageType() (byte, error) {
-	return c.bufferedReader.ReadByte()
-}
+func (c *Conn) readMessageType() (byte, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // readMessageLength reads the 4-byte message length from the connection.
 // The length includes itself but excludes the message type byte.
@@ -47,20 +40,7 @@ func (c *Conn) readMessageType() (byte, error) {
 // internal buffer — vs the previous io.ReadFull(io.Reader, []byte)
 // shape, which forced the stack-local slice header to the heap on
 // every call due to the io.Reader interface dispatch.
-func (c *Conn) readMessageLength() (int, error) {
-	hdr, err := c.bufferedReader.Peek(4)
-	if err != nil {
-		return 0, err
-	}
-	length := binary.BigEndian.Uint32(hdr)
-	if _, err := c.bufferedReader.Discard(4); err != nil {
-		return 0, err
-	}
-	if length < 4 {
-		return 0, fmt.Errorf("invalid message length: %d", length)
-	}
-	return int(length - 4), nil
-}
+func (c *Conn) readMessageLength() (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // readMessageBody reads the message body of the given length.
 //
@@ -74,14 +54,8 @@ func (c *Conn) readMessageLength() (int, error) {
 // single-make-per-body pattern. If we ever change parseDataRow to
 // fully copy values, we can pool here too.
 func (c *Conn) readMessageBody(length int) ([]byte, error) {
-	if length == 0 {
-		return nil, nil
-	}
-	buf := make([]byte, length)
-	if _, err := io.ReadFull(c.bufferedReader, buf); err != nil {
-		return nil, err
-	}
-	return buf, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // returnOutboundBuffer releases the buffer held by outboundPoolBuf
@@ -89,42 +63,22 @@ func (c *Conn) readMessageBody(length int) ([]byte, error) {
 // it via defer; this method exists for defensive cleanup on
 // Conn.Close so a panic during body encoding (between startPacket
 // and writePacket) doesn't strand the pool buffer.
-func (c *Conn) returnOutboundBuffer() {
-	if c.outboundPoolBuf != nil {
-		bufPool.Put(c.outboundPoolBuf)
-		c.outboundPoolBuf = nil
-	}
-}
+func (c *Conn) returnOutboundBuffer() { _ = "STUB: not implemented"; return }
 
 // readMessage reads a complete message (type, length, body).
-func (c *Conn) readMessage() (byte, []byte, error) {
-	msgType, err := c.readMessageType()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	bodyLen, err := c.readMessageLength()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	body, err := c.readMessageBody(bodyLen)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	return msgType, body, nil
-}
+func (c *Conn) readMessage() (byte, []byte, error) { _ = "STUB: not implemented"; return 0, nil, nil }
 
 // ReadRawMessage reads a single protocol message (type byte + body).
 // The caller is responsible for message classification and parsing.
 // This enables split read/write patterns where the reader goroutine
 // handles all incoming message types (e.g., PubSubListener).
 func (c *Conn) ReadRawMessage() (byte, []byte, error) {
-	return c.readMessage()
-}
+	_ = "STUB: not implemented"
+	return 0,
 
-// Writing utilities
+		// Writing utilities
+		nil, nil
+}
 
 // startPacket reserves space for a single pgwire packet of the given
 // body length, with the message type and 4-byte length header pre-
@@ -148,23 +102,8 @@ func (c *Conn) ReadRawMessage() (byte, []byte, error) {
 // level bufpool. writePacket returns the buffer to the pool. We do
 // not keep a per-connection scratch buffer.
 func (c *Conn) startPacket(msgType byte, bodyLen int) ([]byte, int) {
-	totalLen := 5 + bodyLen
-
-	if c.bufferedWriter != nil {
-		avail := c.bufferedWriter.AvailableBuffer()
-		if cap(avail) >= totalLen {
-			buf := avail[:totalLen]
-			buf[0] = msgType
-			binary.BigEndian.PutUint32(buf[1:5], uint32(4+bodyLen))
-			return buf, 5
-		}
-	}
-
-	c.outboundPoolBuf = bufPool.Get(totalLen)
-	buf := *c.outboundPoolBuf
-	buf[0] = msgType
-	binary.BigEndian.PutUint32(buf[1:5], uint32(4+bodyLen))
-	return buf, 5
+	_ = "STUB: not implemented"
+	return nil, 0
 }
 
 // writePacket commits the packet started by startPacket. On the fast
@@ -186,50 +125,19 @@ func (c *Conn) startPacket(msgType byte, bodyLen int) ([]byte, int) {
 //
 // Cleanup runs via defer so a panic during body encoding still returns
 // the pool buffer.
-func (c *Conn) writePacket(buf []byte, pos int) error {
-	defer func() {
-		if c.outboundPoolBuf != nil {
-			bufPool.Put(c.outboundPoolBuf)
-			c.outboundPoolBuf = nil
-		}
-	}()
-
-	if pos != len(buf) {
-		panic(fmt.Sprintf("pgwire: packet size mismatch: encoded %d bytes, expected %d", pos, len(buf)))
-	}
-
-	var err error
-	if c.bufferedWriter != nil {
-		_, err = c.bufferedWriter.Write(buf)
-	} else {
-		_, err = c.conn.Write(buf)
-	}
-	return err
-}
+func (c *Conn) writePacket(buf []byte, pos int) error { _ = "STUB: not implemented"; return nil }
 
 // In-place packet body encoders. Each writes at buf[pos:] and returns
 // the new position. Callers must size the buffer (via startPacket) so
 // these never run off the end — out-of-range slice writes panic.
 
-func writeByteAt(buf []byte, pos int, b byte) int {
-	buf[pos] = b
-	return pos + 1
-}
+func writeByteAt(buf []byte, pos int, b byte) int { _ = "STUB: not implemented"; return 0 }
 
-func writeInt16At(buf []byte, pos int, v int16) int {
-	binary.BigEndian.PutUint16(buf[pos:], uint16(v))
-	return pos + 2
-}
+func writeInt16At(buf []byte, pos int, v int16) int { _ = "STUB: not implemented"; return 0 }
 
-func writeInt32At(buf []byte, pos int, v int32) int {
-	binary.BigEndian.PutUint32(buf[pos:], uint32(v))
-	return pos + 4
-}
+func writeInt32At(buf []byte, pos int, v int32) int { _ = "STUB: not implemented"; return 0 }
 
-func writeUint32At(buf []byte, pos int, v uint32) int {
-	binary.BigEndian.PutUint32(buf[pos:], v)
-	return pos + 4
-}
+func writeUint32At(buf []byte, pos int, v uint32) int { _ = "STUB: not implemented"; return 0 }
 
 // writeStringAt writes s followed by a single null terminator.
 //
@@ -239,33 +147,17 @@ func writeUint32At(buf []byte, pos int, v uint32) int {
 // silently mis-frame the packet on the wire. Inputs that come from
 // untrusted sources (query text, identifiers) should be validated by
 // the caller.
-func writeStringAt(buf []byte, pos int, s string) int {
-	n := copy(buf[pos:], s)
-	buf[pos+n] = 0
-	return pos + n + 1
-}
+func writeStringAt(buf []byte, pos int, s string) int { _ = "STUB: not implemented"; return 0 }
 
 // writeBytesAt writes raw bytes (no terminator).
-func writeBytesAt(buf []byte, pos int, b []byte) int {
-	n := copy(buf[pos:], b)
-	return pos + n
-}
+func writeBytesAt(buf []byte, pos int, b []byte) int { _ = "STUB: not implemented"; return 0 }
 
 // writeByteStringAt writes a length-prefixed byte string (4-byte
 // length + data). Writes -1 for nil (NULL).
-func writeByteStringAt(buf []byte, pos int, b []byte) int {
-	if b == nil {
-		return writeInt32At(buf, pos, -1)
-	}
-	pos = writeInt32At(buf, pos, int32(len(b)))
-	return writeBytesAt(buf, pos, b)
-}
+func writeByteStringAt(buf []byte, pos int, b []byte) int { _ = "STUB: not implemented"; return 0 }
 
 // writeTerminate writes a Terminate message.
-func (c *Conn) writeTerminate() error {
-	buf, pos := c.startPacket(protocol.MsgTerminate, 0)
-	return c.writePacket(buf, pos)
-}
+func (c *Conn) writeTerminate() error { _ = "STUB: not implemented"; return nil }
 
 // MessageReader provides helper methods for reading message fields.
 type MessageReader struct {
@@ -286,92 +178,44 @@ type MessageReader struct {
 // inside the helper vanish on return — silently producing wrong
 // reads if the caller continues parsing after the call.
 func NewMessageReader(buf []byte) MessageReader {
-	return MessageReader{buf: buf, pos: 0}
+	_ = "STUB: not implemented"
+	return *new(MessageReader)
 }
 
 // Remaining returns the number of unread bytes.
-func (r *MessageReader) Remaining() int {
-	return len(r.buf) - r.pos
-}
+func (r *MessageReader) Remaining() int { _ = "STUB: not implemented"; return 0 }
 
 // ReadByte reads a single byte.
-func (r *MessageReader) ReadByte() (byte, error) {
-	if r.pos >= len(r.buf) {
-		return 0, io.EOF
-	}
-	b := r.buf[r.pos]
-	r.pos++
-	return b, nil
-}
+func (r *MessageReader) ReadByte() (byte, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // ReadUint16 reads a 16-bit unsigned integer in network byte order.
-func (r *MessageReader) ReadUint16() (uint16, error) {
-	if r.pos+2 > len(r.buf) {
-		return 0, io.EOF
-	}
-	v := binary.BigEndian.Uint16(r.buf[r.pos:])
-	r.pos += 2
-	return v, nil
-}
+func (r *MessageReader) ReadUint16() (uint16, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // ReadUint32 reads a 32-bit unsigned integer in network byte order.
-func (r *MessageReader) ReadUint32() (uint32, error) {
-	if r.pos+4 > len(r.buf) {
-		return 0, io.EOF
-	}
-	v := binary.BigEndian.Uint32(r.buf[r.pos:])
-	r.pos += 4
-	return v, nil
-}
+func (r *MessageReader) ReadUint32() (uint32, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // ReadInt16 reads a 16-bit signed integer in network byte order.
-func (r *MessageReader) ReadInt16() (int16, error) {
-	v, err := r.ReadUint16()
-	return int16(v), err
-}
+func (r *MessageReader) ReadInt16() (int16, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // ReadInt32 reads a 32-bit signed integer in network byte order.
-func (r *MessageReader) ReadInt32() (int32, error) {
-	v, err := r.ReadUint32()
-	return int32(v), err
-}
+func (r *MessageReader) ReadInt32() (int32, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // ReadString reads a null-terminated string.
-func (r *MessageReader) ReadString() (string, error) {
-	start := r.pos
-	for r.pos < len(r.buf) {
-		if r.buf[r.pos] == 0 {
-			s := string(r.buf[start:r.pos])
-			r.pos++ // Skip null terminator.
-			return s, nil
-		}
-		r.pos++
-	}
-	return "", io.EOF
-}
+func (r *MessageReader) ReadString() (string, error) { _ = "STUB: not implemented"; return "", nil }
+
+// Skip null terminator.
 
 // ReadBytes reads n bytes.
 func (r *MessageReader) ReadBytes(n int) ([]byte, error) {
-	if r.pos+n > len(r.buf) {
-		return nil, io.EOF
-	}
-	b := r.buf[r.pos : r.pos+n]
-	r.pos += n
-	return b, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ReadByteString reads a length-prefixed byte string (4-byte length + data).
 // Returns nil if length is -1 (NULL).
 func (r *MessageReader) ReadByteString() ([]byte, error) {
-	length, err := r.ReadInt32()
-	if err != nil {
-		return nil, err
-	}
-	if length == -1 {
-		return nil, nil // NULL
-	}
-	if length < 0 {
-		return nil, fmt.Errorf("invalid byte string length: %d", length)
-	}
-	return r.ReadBytes(int(length))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// NULL

@@ -18,21 +18,14 @@ package rpcclient
 
 import (
 	"context"
-	"errors"
 	"io"
 	"log/slog"
-	"sort"
 	"sync"
 	"time"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/semaphore"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/keepalive"
-
-	"github.com/multigres/multigres/go/tools/grpccommon"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	consensuspb "github.com/multigres/multigres/go/pb/consensus"
@@ -53,40 +46,7 @@ type ConnConfig struct {
 }
 
 // NewConnConfig creates a new ConnConfig with default values.
-func NewConnConfig(reg *viperutil.Registry) *ConnConfig {
-	return &ConnConfig{
-		cert: viperutil.Configure(reg, "multipooler-grpc-cert", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "multipooler-grpc-cert",
-			Dynamic:  false,
-		}),
-		key: viperutil.Configure(reg, "multipooler-grpc-key", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "multipooler-grpc-key",
-			Dynamic:  false,
-		}),
-		ca: viperutil.Configure(reg, "multipooler-grpc-ca", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "multipooler-grpc-ca",
-			Dynamic:  false,
-		}),
-		crl: viperutil.Configure(reg, "multipooler-grpc-crl", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "multipooler-grpc-crl",
-			Dynamic:  false,
-		}),
-		name: viperutil.Configure(reg, "multipooler-grpc-server-name", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "multipooler-grpc-server-name",
-			Dynamic:  false,
-		}),
-		requireTLS: viperutil.Configure(reg, "multipooler-grpc-require-tls", viperutil.Options[bool]{
-			Default:  false,
-			FlagName: "multipooler-grpc-require-tls",
-			Dynamic:  false,
-		}),
-	}
-}
+func NewConnConfig(reg *viperutil.Registry) *ConnConfig { _ = "STUB: not implemented"; return nil }
 
 // RegisterFlags registers all multipooler RPC client flags with the given FlagSet.
 //
@@ -94,16 +54,7 @@ func NewConnConfig(reg *viperutil.Registry) *ConnConfig {
 // forwarding, so a single PKI configuration covers both internal hops. If you
 // need to run different PKI for gateway vs. pooler, split these into dedicated
 // flags in a follow-up.
-func (cc *ConnConfig) RegisterFlags(fs *pflag.FlagSet) {
-	fs.String("multipooler-grpc-cert", cc.cert.Default(), "client certificate for mTLS when connecting to multipooler (also used for gateway-to-gateway gRPC on multigateway)")
-	fs.String("multipooler-grpc-key", cc.key.Default(), "client private key for mTLS when connecting to multipooler (also used for gateway-to-gateway gRPC on multigateway)")
-	fs.String("multipooler-grpc-ca", cc.ca.Default(), "CA certificate to validate multipooler server certificates (also used for gateway-to-gateway gRPC on multigateway)")
-	fs.String("multipooler-grpc-crl", cc.crl.Default(), "certificate revocation list to validate multipooler server certificates (not yet implemented)")
-	fs.String("multipooler-grpc-server-name", cc.name.Default(), "expected server name for multipooler certificate verification (also used for gateway-to-gateway gRPC on multigateway)")
-	fs.Bool("multipooler-grpc-require-tls", cc.requireTLS.Default(), "require TLS for multipooler gRPC connections; fail startup if TLS is not configured (also applies to gateway-to-gateway gRPC on multigateway)")
-
-	viperutil.BindFlags(fs, cc.cert, cc.key, cc.ca, cc.crl, cc.name, cc.requireTLS)
-}
+func (cc *ConnConfig) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // TransportCredentials builds a gRPC dial option for transport security based
 // on the configured TLS flags. Returns insecure credentials when no TLS
@@ -114,35 +65,15 @@ func (cc *ConnConfig) RegisterFlags(fs *pflag.FlagSet) {
 // emitted. Passing the service-local structured logger keeps the warning
 // attached to whatever attributes the caller has set up (service, cell, etc).
 func (cc *ConnConfig) TransportCredentials(logger *slog.Logger) (grpc.DialOption, error) {
-	if cc == nil {
-		return grpc.WithTransportCredentials(insecure.NewCredentials()), nil
-	}
-
-	tlsConfig, err := grpccommon.BuildClientTLSConfig(
-		cc.cert.Get(), cc.key.Get(), cc.ca.Get(), cc.name.Get(),
-	)
-	if err != nil {
-		return nil, err
-	}
-	if tlsConfig == nil {
-		if cc.requireTLS.Get() {
-			return nil, errors.New("multipooler gRPC TLS is required but not configured")
-		}
-		if logger != nil {
-			logger.Warn("multipooler gRPC TLS is not configured; using insecure transport", "flag", "--multipooler-grpc-require-tls")
-		}
-		return grpc.WithTransportCredentials(insecure.NewCredentials()), nil
-	}
-	return grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)), nil
+	_ = "STUB: not implemented"
+	return *new(grpc.DialOption), nil
 }
 
 // closeFunc allows a standalone function to implement io.Closer, similar to
 // how http.HandlerFunc allows standalone functions to implement http.Handler.
 type closeFunc func() error
 
-func (fn closeFunc) Close() error {
-	return fn()
-}
+func (fn closeFunc) Close() error { _ = "STUB: not implemented"; return nil }
 
 var _ io.Closer = (*closeFunc)(nil)
 
@@ -172,47 +103,21 @@ type connCache struct {
 }
 
 // newConnCache creates a new connection cache with the default capacity and insecure transport.
-func newConnCache() *connCache {
-	return newConnCacheWithCapacity(defaultCapacity, grpc.WithTransportCredentials(insecure.NewCredentials()))
-}
+func newConnCache() *connCache { _ = "STUB: not implemented"; return nil }
 
 // newConnCacheWithCapacity creates a new connection cache with a specified capacity
 // and transport credentials dial option.
 func newConnCacheWithCapacity(capacity int, transportCreds grpc.DialOption) *connCache {
-	cc := &connCache{
-		conns:          make(map[string]*cachedConn, capacity),
-		evict:          make([]*cachedConn, 0, capacity),
-		connWaitSema:   semaphore.NewWeighted(int64(capacity)),
-		capacity:       capacity,
-		metrics:        NewMetrics(),
-		transportCreds: transportCreds,
-	}
-
-	// Register callback for cache size observable gauge
-	_ = cc.metrics.RegisterCacheSizeCallback(func() int {
-		cc.m.Lock()
-		defer cc.m.Unlock()
-		return len(cc.conns)
-	})
-
-	return cc
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Register callback for cache size observable gauge
 
 // sortEvictionsLocked sorts the eviction queue by refs (descending) then by
 // lastAccessTime (ascending). This ensures unreferenced connections (refs=0)
 // are at the front of the queue for efficient eviction.
-func (cc *connCache) sortEvictionsLocked() {
-	if !cc.evictSorted {
-		sort.Slice(cc.evict, func(i, j int) bool {
-			left, right := cc.evict[i], cc.evict[j]
-			if left.refs == right.refs {
-				return right.lastAccessTime.After(left.lastAccessTime)
-			}
-			return right.refs > left.refs
-		})
-		cc.evictSorted = true
-	}
-}
+func (cc *connCache) sortEvictionsLocked() { _ = "STUB: not implemented"; return }
 
 // getOrDial gets an existing connection from the cache or creates a new one.
 // Returns the connection and a closer function that must be called when done.
@@ -222,49 +127,22 @@ func (cc *connCache) sortEvictionsLocked() {
 //  2. sema_fast: Acquire semaphore without blocking and dial new connection
 //  3. sema_poll: Poll for evictable connections while waiting for capacity
 func (cc *connCache) getOrDial(ctx context.Context, addr string, poolerID *clustermetadatapb.ID) (*cachedConn, closeFunc, error) {
-	start := time.Now()
+	_ = "STUB: not implemented"
+	return nil,
 
-	// Fast path: try to get from cache without blocking
-	if client, closer, found, err := cc.tryFromCache(ctx, addr, &cc.m); found {
-		cc.metrics.RecordDialDuration(ctx, time.Since(start), DialPathCacheFast)
-		return client, closer, err
-	}
-
-	// Try to acquire semaphore without blocking (fast path for new connections)
-	if cc.connWaitSema.TryAcquire(1) {
-		defer func() {
-			cc.metrics.RecordDialDuration(ctx, time.Since(start), DialPathSemaFast)
-		}()
-
-		// Check if another goroutine managed to dial a conn for the same addr
-		// while we were waiting for the write lock. This is identical to the
-		// read-lock section above, except we release the connWaitSema if we
-		// are able to use the cache, allowing another goroutine to dial a new
-		// conn instead.
-		if client, closer, found, err := cc.tryFromCache(ctx, addr, &cc.m); found {
-			cc.connWaitSema.Release(1)
-			return client, closer, err
-		}
-		return cc.newDial(ctx, addr, poolerID)
-	}
-
-	// Slow path: poll for evictable connections
-	defer func() {
-		cc.metrics.RecordDialDuration(ctx, time.Since(start), DialPathSemaPoll)
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			cc.metrics.AddDialTimeout(ctx)
-			return nil, nil, ctx.Err()
-		default:
-			if client, closer, found, err := cc.pollOnce(ctx, addr, poolerID); found {
-				return client, closer, err
-			}
-		}
-	}
+		// Fast path: try to get from cache without blocking
+		*new(closeFunc), nil
 }
+
+// Try to acquire semaphore without blocking (fast path for new connections)
+
+// Check if another goroutine managed to dial a conn for the same addr
+// while we were waiting for the write lock. This is identical to the
+// read-lock section above, except we release the connWaitSema if we
+// are able to use the cache, allowing another goroutine to dial a new
+// conn instead.
+
+// Slow path: poll for evictable connections
 
 // tryFromCache tries to get a connection from the cache, performing a redial
 // on that connection if it exists. It returns a connection, a closer, a flag
@@ -277,17 +155,8 @@ func (cc *connCache) getOrDial(ctx context.Context, addr string, poolerID *clust
 // other cases (like in the cache_fast path of getOrDial()), we pass in the cc.m
 // to ensure we have a lock on the cache for the duration of the call.
 func (cc *connCache) tryFromCache(ctx context.Context, addr string, locker sync.Locker) (client *cachedConn, closer closeFunc, found bool, err error) {
-	if locker != nil {
-		locker.Lock()
-		defer locker.Unlock()
-	}
-
-	if conn, ok := cc.conns[addr]; ok {
-		client, closer, err := cc.redialLocked(ctx, conn)
-		return client, closer, ok, err
-	}
-
-	return nil, nil, false, nil
+	_ = "STUB: not implemented"
+	return nil, *new(closeFunc), false, nil
 }
 
 // pollOnce is called on each iteration of the polling loop in getOrDial(). It:
@@ -307,30 +176,8 @@ func (cc *connCache) tryFromCache(ctx context.Context, addr string, locker sync.
 // It returns a connection, a closer, a flag to indicate whether the getOrDial()
 // poll loop should exit, and an error.
 func (cc *connCache) pollOnce(ctx context.Context, addr string, poolerID *clustermetadatapb.ID) (client *cachedConn, closer closeFunc, found bool, err error) {
-	cc.m.Lock()
-
-	if client, closer, found, err := cc.tryFromCache(ctx, addr, nil); found {
-		cc.m.Unlock()
-		return client, closer, found, err
-	}
-
-	cc.sortEvictionsLocked()
-
-	conn := cc.evict[0]
-	if conn.refs != 0 {
-		cc.m.Unlock()
-		return nil, nil, false, nil
-	}
-
-	cc.evict = cc.evict[1:]
-	delete(cc.conns, conn.addr)
-	if conn.cc != nil {
-		conn.cc.Close()
-	}
-	cc.m.Unlock()
-
-	client, closer, err = cc.newDial(ctx, addr, poolerID)
-	return client, closer, true, err
+	_ = "STUB: not implemented"
+	return nil, *new(closeFunc), false, nil
 }
 
 // newDial creates a new cached connection, and updates the cache and eviction
@@ -339,123 +186,56 @@ func (cc *connCache) pollOnce(ctx context.Context, addr string, poolerID *cluste
 //
 // It returns the two-tuple of connection and closer that getOrDial returns.
 func (cc *connCache) newDial(ctx context.Context, addr string, poolerID *clustermetadatapb.ID) (*cachedConn, closeFunc, error) {
+	_ = "STUB: not implemented"
 	// Build client options with multipooler target for telemetry
-	clientOpts := []grpccommon.ClientOption{
-		grpccommon.WithDialOptions(
-			cc.transportCreds,
-			grpc.WithKeepaliveParams(keepalive.ClientParameters{
-				// Send a ping after this period of inactivity to detect dead connections.
-				// Matches the server-side keepalive Time to stay within server enforcement policy.
-				Time: 10 * time.Second,
-				// Close the connection if no response within this window.
-				Timeout: 10 * time.Second,
-				// Probe even when there are no active streams.
-				PermitWithoutStream: true,
-			}),
-		),
-	}
-	if poolerID != nil {
-		clientOpts = append(clientOpts, grpccommon.WithAttributes(PoolerSpanAttributes(poolerID)...))
-	}
-
-	grpcConn, err := grpccommon.NewClient(addr, clientOpts...)
-	if err != nil {
-		cc.connWaitSema.Release(1)
-		return nil, nil, err
-	}
-
-	cc.m.Lock()
-	defer cc.m.Unlock()
-
-	if conn, existing := cc.conns[addr]; existing {
-		// race condition: some other goroutine has dialed our multipooler before we have;
-		// this is not great, but shouldn't happen often (if at all), so we're going to
-		// close this connection and reuse the existing one. by doing this, we can keep
-		// the actual Dial out of the global lock and significantly increase throughput
-		grpcConn.Close()
-		cc.connWaitSema.Release(1)
-		return cc.redialLocked(ctx, conn)
-	}
-
-	// Record new connection metric
-	cc.metrics.AddConnNew(ctx)
-
-	conn := &cachedConn{
-		consensusClient: consensuspb.NewMultiPoolerConsensusClient(grpcConn),
-		managerClient:   multipoolermanagerpb.NewMultiPoolerManagerClient(grpcConn),
-		cc:              grpcConn,
-		lastAccessTime:  time.Now(),
-		refs:            1,
-		addr:            addr,
-	}
-
-	// NOTE: we deliberately do not set cc.evictSorted=false here. Since
-	// cachedConns are evicted from the front of the queue, and we are appending
-	// to the end, if there is already a second evictable connection, it will be
-	// at the front of the queue, so we can speed up the edge case where we need
-	// to evict multiple connections in a row.
-	cc.evict = append(cc.evict, conn)
-	cc.conns[addr] = conn
-
-	return cc.connWithCloser(conn)
+	return nil, *new(closeFunc), nil
 }
+
+// Send a ping after this period of inactivity to detect dead connections.
+// Matches the server-side keepalive Time to stay within server enforcement policy.
+
+// Close the connection if no response within this window.
+
+// Probe even when there are no active streams.
+
+// race condition: some other goroutine has dialed our multipooler before we have;
+// this is not great, but shouldn't happen often (if at all), so we're going to
+// close this connection and reuse the existing one. by doing this, we can keep
+// the actual Dial out of the global lock and significantly increase throughput
+
+// Record new connection metric
+
+// NOTE: we deliberately do not set cc.evictSorted=false here. Since
+// cachedConns are evicted from the front of the queue, and we are appending
+// to the end, if there is already a second evictable connection, it will be
+// at the front of the queue, so we can speed up the edge case where we need
+// to evict multiple connections in a row.
 
 // redialLocked takes an already-dialed connection in the cache does all the
 // work of lending that connection out to one more caller. It returns the
 // two-tuple of connection and closer that getOrDial returns.
 func (cc *connCache) redialLocked(ctx context.Context, conn *cachedConn) (*cachedConn, closeFunc, error) {
+	_ = "STUB: not implemented"
 	// Record connection reuse metric
-	cc.metrics.AddConnReuse(ctx)
-
-	conn.lastAccessTime = time.Now()
-	conn.refs++
-	cc.evictSorted = false
-	return cc.connWithCloser(conn)
+	return nil, *new(closeFunc), nil
 }
 
 // connWithCloser returns the two-tuple expected by getOrDial, where
 // the closer handles the correct state management for updating the conns place
 // in the eviction queue.
 func (cc *connCache) connWithCloser(conn *cachedConn) (*cachedConn, closeFunc, error) {
-	return conn, closeFunc(func() error {
-		cc.m.Lock()
-		defer cc.m.Unlock()
-		if conn.refs > 0 {
-			conn.refs--
-			cc.evictSorted = false
-		}
-		return nil
-	}), nil
+	_ = "STUB: not implemented"
+	return nil, *new(closeFunc), nil
 }
 
 // close closes a specific connection and removes it from the cache.
-func (cc *connCache) close(addr string) {
-	cc.m.Lock()
-	defer cc.m.Unlock()
+func (cc *connCache) close(addr string) { _ = "STUB: not implemented"; return }
 
-	conn, ok := cc.conns[addr]
-	if !ok {
-		return
-	}
+// Close the connection
 
-	// Close the connection
-	if conn.cc != nil {
-		conn.cc.Close()
-	}
+// Remove from cache
 
-	// Remove from cache
-	delete(cc.conns, addr)
-
-	// Remove from eviction queue
-	for i, ec := range cc.evict {
-		if ec == conn {
-			cc.evict = append(cc.evict[:i], cc.evict[i+1:]...)
-			break
-		}
-	}
-
-	cc.connWaitSema.Release(1)
-}
+// Remove from eviction queue
 
 // closeAll closes all currently cached connections, ***regardless of whether
 // those connections are in use***. Calling closeAll therefore will fail any RPCs
@@ -468,16 +248,4 @@ func (cc *connCache) close(addr string) {
 // As a result, while it is safe to reuse a connCache after calling closeAll,
 // it will be less performant than getting a new one by calling
 // newConnCache or newConnCacheWithCapacity directly.
-func (cc *connCache) closeAll() {
-	cc.m.Lock()
-	defer cc.m.Unlock()
-
-	for _, conn := range cc.evict {
-		if conn.cc != nil {
-			conn.cc.Close()
-		}
-		delete(cc.conns, conn.addr)
-		cc.connWaitSema.Release(1)
-	}
-	cc.evict = make([]*cachedConn, 0, cc.capacity)
-}
+func (cc *connCache) closeAll() { _ = "STUB: not implemented"; return }

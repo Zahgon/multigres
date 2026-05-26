@@ -19,7 +19,6 @@ package planner
 import (
 	"log/slog"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
@@ -41,11 +40,8 @@ type Planner struct {
 
 // NewPlanner creates a new query planner.
 func NewPlanner(defaultTableGroup string, logger *slog.Logger, txnMetrics *engine.TransactionMetrics) *Planner {
-	return &Planner{
-		defaultTableGroup: defaultTableGroup,
-		logger:            logger,
-		txnMetrics:        txnMetrics,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Plan creates an execution plan for the given SQL query and AST.
@@ -67,134 +63,36 @@ func (p *Planner) Plan(
 	stmt ast.Stmt,
 	conn *server.Conn,
 ) (*engine.Plan, error) {
-	p.logger.Debug("planning query",
-		"query", sql,
-		"user", conn.User(),
-		"database", conn.Database(),
-		"default_tablegroup", p.defaultTableGroup,
-		"statement_type", stmt.NodeTag())
-
-	// Reject unsupported constructs before dispatch: Tier 2 statement types
-	// (LOAD, ALTER SYSTEM, CREATE/DROP DATABASE, etc.) plus any blocklisted
-	// or misplaced FuncCalls in expression trees. Running here (not in the
-	// executor) means the plan cache short-circuits both checks: a cached
-	// plan is by construction safe. The normalizer is configured to
-	// preserve literals inside set_config calls so its args remain A_Const
-	// at this point.
-	exprResult, err := planUnsupportedConstructs(stmt)
-	if err != nil {
-		return nil, err
-	}
-
-	// Handle wrapped EXECUTE forms (EXPLAIN EXECUTE / CREATE TABLE AS EXECUTE)
-	// before normal dispatch. The wrapper's inner ExecuteStmt references a
-	// gateway-managed prepared statement by user-facing name (e.g. "p"); we
-	// rewrite it to the canonical name (e.g. "stmt42") and attach the
-	// PreparedStatement metadata so the multipooler can ensurePrepared() on
-	// the backend connection before running the query. See execute_unwrap.go.
-	if unwrappedPlan, err := p.tryUnwrapWrappedExecute(sql, stmt, conn); err != nil {
-		return nil, err
-	} else if unwrappedPlan != nil {
-		unwrappedPlan.TablesUsed = ast.ExtractTablesUsed(stmt)
-		unwrappedPlan.Type = primitiveName(unwrappedPlan.Primitive)
-		return unwrappedPlan, nil
-	}
-
-	// Dispatch to appropriate planner function based on statement type
-	// This follows PostgreSQL's utility.c pattern with switch on node tag
-	var plan *engine.Plan
-
-	switch stmt.NodeTag() {
-	case ast.T_VariableSetStmt:
-		plan, err = p.planVariableSetStmt(sql, stmt.(*ast.VariableSetStmt), conn)
-
-	case ast.T_CopyStmt:
-		plan, err = p.planCopyStmt(sql, stmt.(*ast.CopyStmt))
-
-	case ast.T_TransactionStmt:
-		plan, err = p.planTransactionStmt(sql, stmt.(*ast.TransactionStmt))
-
-	case ast.T_VariableShowStmt:
-		plan, err = p.planVariableShowStmt(sql, stmt.(*ast.VariableShowStmt), conn)
-
-	case ast.T_PrepareStmt:
-		plan, err = p.planPrepareStmt(sql, stmt.(*ast.PrepareStmt))
-
-	case ast.T_ExecuteStmt:
-		plan, err = p.planExecuteStmt(sql, stmt.(*ast.ExecuteStmt))
-
-	case ast.T_DeallocateStmt:
-		plan, err = p.planDeallocateStmt(sql, stmt.(*ast.DeallocateStmt))
-
-	case ast.T_ListenStmt:
-		return p.planListenStmt(sql, stmt.(*ast.ListenStmt))
-
-	case ast.T_UnlistenStmt:
-		return p.planUnlistenStmt(sql, stmt.(*ast.UnlistenStmt))
-
-	case ast.T_NotifyStmt:
-		return p.planNotifyStmt(sql)
-
-	case ast.T_DiscardStmt:
-		return p.planDiscardStmt(sql, stmt.(*ast.DiscardStmt), conn)
-
-	case ast.T_CreateStmt:
-		if cs := stmt.(*ast.CreateStmt); cs.Relation != nil && cs.Relation.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.planTempTableCreation(sql, conn)
-		}
-		plan, err = p.planDefault(sql, stmt, conn)
-
-	case ast.T_CreateTableAsStmt:
-		if cs := stmt.(*ast.CreateTableAsStmt); cs.Into != nil && cs.Into.Rel != nil && cs.Into.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.planTempTableCreation(sql, conn)
-		}
-		plan, err = p.planDefault(sql, stmt, conn)
-
-	case ast.T_SelectStmt:
-		ss := stmt.(*ast.SelectStmt)
-		if ss.IntoClause != nil && ss.IntoClause.Rel != nil && ss.IntoClause.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.planTempTableCreation(sql, conn)
-		}
-		plan, err = p.planSelectStmt(sql, ss, conn, exprResult.SetConfigs)
-
-	case ast.T_ViewStmt:
-		if vs := stmt.(*ast.ViewStmt); vs.View != nil && vs.View.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.planTempTableCreation(sql, conn)
-		}
-		plan, err = p.planDefault(sql, stmt, conn)
-
-	case ast.T_DeclareCursorStmt:
-		dcs := stmt.(*ast.DeclareCursorStmt)
-		if dcs.Options&ast.CURSOR_OPT_HOLD != 0 {
-			return p.planHoldCursorDeclare(sql, dcs)
-		}
-		plan, err = p.planDefault(sql, stmt, conn)
-
-	case ast.T_ClosePortalStmt:
-		return p.planClosePortalStmt(sql, stmt.(*ast.ClosePortalStmt))
-
-	default:
-		// Default: simple route to PostgreSQL
-		plan, err = p.planDefault(sql, stmt, conn)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	plan.TablesUsed = ast.ExtractTablesUsed(stmt)
-	plan.Type = primitiveName(plan.Primitive)
-
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Reject unsupported constructs before dispatch: Tier 2 statement types
+// (LOAD, ALTER SYSTEM, CREATE/DROP DATABASE, etc.) plus any blocklisted
+// or misplaced FuncCalls in expression trees. Running here (not in the
+// executor) means the plan cache short-circuits both checks: a cached
+// plan is by construction safe. The normalizer is configured to
+// preserve literals inside set_config calls so its args remain A_Const
+// at this point.
+
+// Handle wrapped EXECUTE forms (EXPLAIN EXECUTE / CREATE TABLE AS EXECUTE)
+// before normal dispatch. The wrapper's inner ExecuteStmt references a
+// gateway-managed prepared statement by user-facing name (e.g. "p"); we
+// rewrite it to the canonical name (e.g. "stmt42") and attach the
+// PreparedStatement metadata so the multipooler can ensurePrepared() on
+// the backend connection before running the query. See execute_unwrap.go.
+
+// Dispatch to appropriate planner function based on statement type
+// This follows PostgreSQL's utility.c pattern with switch on node tag
+
+// Default: simple route to PostgreSQL
 
 // planTempTableCreation creates a plan that routes through a reserved
 // connection with ReasonTempTable. The reservation ensures the temp table
 // persists across queries on the same session.
 func (p *Planner) planTempTableCreation(sql string, conn *server.Conn) (*engine.Plan, error) {
-	p.logger.Debug("planning temp table creation", "sql", sql)
-	route := engine.NewTempTableRoute(p.defaultTableGroup, constants.DefaultShard, sql)
-	return engine.NewPlan(sql, route), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // planHoldCursorDeclare creates a plan for `DECLARE ... WITH HOLD` cursors.
@@ -203,12 +101,8 @@ func (p *Planner) planTempTableCreation(sql string, conn *server.Conn) (*engine.
 // ReasonPortal so the multipooler does not return the backend to the pool
 // when the surrounding transaction commits.
 func (p *Planner) planHoldCursorDeclare(sql string, stmt *ast.DeclareCursorStmt) (*engine.Plan, error) {
-	p.logger.Debug("planning DECLARE WITH HOLD cursor",
-		"cursor", stmt.PortalName, "sql", sql)
-	route := engine.NewHoldCursorRoute(p.defaultTableGroup, constants.DefaultShard, sql, stmt.PortalName)
-	plan := engine.NewPlan(sql, route)
-	plan.Type = engine.PlanTypeHoldCursorRoute
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // planClosePortalStmt creates a plan for `CLOSE <name>` / `CLOSE ALL`. The
@@ -217,28 +111,15 @@ func (p *Planner) planHoldCursorDeclare(sql string, stmt *ast.DeclareCursorStmt)
 // multipooler to drop the corresponding entry from the reserved
 // connection's portal set.
 func (p *Planner) planClosePortalStmt(sql string, stmt *ast.ClosePortalStmt) (*engine.Plan, error) {
-	p.logger.Debug("planning CLOSE cursor", "cursor", stmt.PortalName, "sql", sql)
-	var route *engine.CloseCursorRoute
-	if stmt.PortalName == "" {
-		route = engine.NewCloseAllCursorRoute(p.defaultTableGroup, constants.DefaultShard, sql)
-	} else {
-		route = engine.NewCloseCursorRoute(p.defaultTableGroup, constants.DefaultShard, sql, stmt.PortalName)
-	}
-	plan := engine.NewPlan(sql, route)
-	plan.Type = engine.PlanTypeCloseCursorRoute
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // planDefault creates a simple route plan for queries without special handling.
 // This is the fallback for most SQL statements.
 func (p *Planner) planDefault(sql string, stmt ast.Stmt, conn *server.Conn) (*engine.Plan, error) {
-	route := engine.NewRoute(p.defaultTableGroup, constants.DefaultShard, sql, stmt)
-	plan := engine.NewPlan(sql, route)
-
-	p.logger.Debug("created default route plan",
-		"plan", plan.String(),
-		"tablegroup", p.defaultTableGroup)
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // PlanPortal creates an execution plan for the extended query protocol (portal path).
@@ -256,154 +137,60 @@ func (p *Planner) PlanPortal(
 	portalInfo *preparedstatement.PortalInfo,
 	conn *server.Conn,
 ) (*engine.Plan, error) {
-	stmt := portalInfo.PreparedStatementInfo.AstStmt()
-
-	// Non-cacheable extended-protocol statements reach PlanPortal directly
-	// (cacheable ones go through resolvePortalPlan → Plan, which does the
-	// same checks), so both paths must share the same pre-dispatch rejection.
-	// We throw away the set_config result here: PlanPortal only routes
-	// gateway-local statement types, none of which are SELECTs that could
-	// carry tracked set_configs.
-	if _, err := planUnsupportedConstructs(stmt); err != nil {
-		return nil, err
-	}
-
-	switch stmt.NodeTag() {
-	case ast.T_VariableSetStmt:
-		setStmt := stmt.(*ast.VariableSetStmt)
-		if isGatewayManagedVariable(setStmt.Name) || setStmt.Kind == ast.VAR_RESET_ALL {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_VariableShowStmt:
-		showStmt := stmt.(*ast.VariableShowStmt)
-		if isGatewayManagedVariable(showStmt.Name) {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_ListenStmt:
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_UnlistenStmt:
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_NotifyStmt:
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_DiscardStmt:
-		// DISCARD TEMP needs the DiscardTempPrimitive for reservation cleanup.
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_CreateStmt:
-		if cs := stmt.(*ast.CreateStmt); cs.Relation != nil && cs.Relation.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_CreateTableAsStmt:
-		if cs := stmt.(*ast.CreateTableAsStmt); cs.Into != nil && cs.Into.Rel != nil && cs.Into.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_SelectStmt:
-		if ss := stmt.(*ast.SelectStmt); ss.IntoClause != nil && ss.IntoClause.Rel != nil && ss.IntoClause.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_ViewStmt:
-		if vs := stmt.(*ast.ViewStmt); vs.View != nil && vs.View.RelPersistence == ast.RELPERSISTENCE_TEMP {
-			return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-		}
-		return nil, nil
-
-	case ast.T_TransactionStmt:
-		// BEGIN/COMMIT/ROLLBACK must run through the gateway's transaction
-		// primitive — executing them as a normal portal on a pooled backend
-		// connection leaks open (or aborted) transactions across clients when
-		// the connection is recycled.
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_DeclareCursorStmt:
-		// DECLARE … WITH HOLD must go through HoldCursorRoute so the cursor
-		// name is pinned on the reserved backend (ReasonPortal). Without
-		// this case, an extended-protocol DECLARE WITH HOLD would land on a
-		// pooled connection and the cursor would be lost on COMMIT.
-		// Non-HOLD DECLARE is delegated through Plan too so the parser-driven
-		// dispatch decides — non-HOLD falls through to planDefault there.
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	case ast.T_ClosePortalStmt:
-		// CLOSE / CLOSE ALL must go through CloseCursorRoute so HOLD-cursor
-		// pin bookkeeping on the multipooler stays in sync — otherwise the
-		// reserved backend would leak with a stale ReasonPortal.
-		return p.Plan(portalInfo.PreparedStatementInfo.Query, stmt, conn)
-
-	default:
-		return nil, nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Non-cacheable extended-protocol statements reach PlanPortal directly
+// (cacheable ones go through resolvePortalPlan → Plan, which does the
+// same checks), so both paths must share the same pre-dispatch rejection.
+// We throw away the set_config result here: PlanPortal only routes
+// gateway-local statement types, none of which are SELECTs that could
+// carry tracked set_configs.
+
+// DISCARD TEMP needs the DiscardTempPrimitive for reservation cleanup.
+
+// BEGIN/COMMIT/ROLLBACK must run through the gateway's transaction
+// primitive — executing them as a normal portal on a pooled backend
+// connection leaks open (or aborted) transactions across clients when
+// the connection is recycled.
+
+// DECLARE … WITH HOLD must go through HoldCursorRoute so the cursor
+// name is pinned on the reserved backend (ReasonPortal). Without
+// this case, an extended-protocol DECLARE WITH HOLD would land on a
+// pooled connection and the cursor would be lost on COMMIT.
+// Non-HOLD DECLARE is delegated through Plan too so the parser-driven
+// dispatch decides — non-HOLD falls through to planDefault there.
+
+// CLOSE / CLOSE ALL must go through CloseCursorRoute so HOLD-cursor
+// pin bookkeeping on the multipooler stays in sync — otherwise the
+// reserved backend would leak with a stale ReasonPortal.
 
 // SetDefaultTableGroup updates the default tablegroup for routing.
 // This allows dynamic configuration changes.
-func (p *Planner) SetDefaultTableGroup(tableGroup string) {
-	p.defaultTableGroup = tableGroup
-	p.logger.Info("default tablegroup updated", "tablegroup", tableGroup)
-}
+func (p *Planner) SetDefaultTableGroup(tableGroup string) { _ = "STUB: not implemented"; return }
 
 // GetDefaultTableGroup returns the current default tablegroup.
-func (p *Planner) GetDefaultTableGroup() string {
-	return p.defaultTableGroup
-}
+func (p *Planner) GetDefaultTableGroup() string { _ = "STUB: not implemented"; return "" }
 
 // primitiveName returns a short string identifying the primitive type.
 // Used for observability (span attributes and query logs).
-func primitiveName(p engine.Primitive) string {
-	switch p.(type) {
-	case *engine.Route:
-		return engine.PlanTypeRoute
-	case *engine.TempTableRoute:
-		return engine.PlanTypeTempTableRoute
-	case *engine.HoldCursorRoute:
-		return engine.PlanTypeHoldCursorRoute
-	case *engine.CloseCursorRoute:
-		return engine.PlanTypeCloseCursorRoute
-	case *engine.TransactionPrimitive:
-		return engine.PlanTypeTransaction
-	case *engine.CopyStatement:
-		return engine.PlanTypeCopyStatement
-	case *engine.ApplySessionState:
-		return engine.PlanTypeApplySessionState
-	case *engine.GatewaySessionState:
-		return engine.PlanTypeGatewaySessionState
-	case *engine.GatewayShowVariable:
-		return engine.PlanTypeGatewayShowVariable
-	case *engine.ListenNotifyPrimitive:
-		return engine.PlanTypeListenNotify
-	case *engine.Sequence:
-		return engine.PlanTypeSequence
-	default:
-		return engine.PlanTypeUnknown
-	}
-}
+func primitiveName(p engine.Primitive) string { _ = "STUB: not implemented"; return "" }
 
 // planListenStmt creates a ListenNotify primitive for LISTEN.
 func (p *Planner) planListenStmt(sql string, stmt *ast.ListenStmt) (*engine.Plan, error) {
-	return engine.NewPlan(sql, engine.NewListenPrimitive(stmt.Conditionname, sql)), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // planUnlistenStmt creates a ListenNotify primitive for UNLISTEN.
 func (p *Planner) planUnlistenStmt(sql string, stmt *ast.UnlistenStmt) (*engine.Plan, error) {
-	if stmt.Conditionname == "*" || stmt.Conditionname == "" {
-		return engine.NewPlan(sql, engine.NewUnlistenAllPrimitive(sql)), nil
-	}
-	return engine.NewPlan(sql, engine.NewUnlistenPrimitive(stmt.Conditionname, sql)), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // planNotifyStmt routes NOTIFY to the default table group as a regular query.
 func (p *Planner) planNotifyStmt(sql string) (*engine.Plan, error) {
-	return engine.NewPlan(sql, engine.NewRoute(p.defaultTableGroup, constants.DefaultShard, sql, nil)), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

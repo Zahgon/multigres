@@ -25,8 +25,6 @@
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 package ast
 
-import "strings"
-
 // PostgreSQL Type OIDs
 // Ported from postgres/src/include/catalog/pg_type_d.h
 // These constants represent the built-in PostgreSQL data types.
@@ -193,292 +191,77 @@ const InvalidOid = Oid(0)
 // TypeNameToOid resolves a simple (unqualified) PostgreSQL type name to its OID.
 // Handles common aliases like "int" → INT4OID, "boolean" → BOOLOID, etc.
 // Returns InvalidOid for unrecognized type names.
-func TypeNameToOid(name string) Oid {
-	switch strings.ToLower(name) {
-	// Boolean
-	case "bool", "boolean":
-		return BOOLOID
+func TypeNameToOid(name string) Oid { _ = "STUB: not implemented"; return *new(Oid) }
 
-	// Character types
-	case "char", "bpchar":
-		return BPCHAROID
-	case "varchar", "character varying":
-		return VARCHAROID
-	case "text":
-		return TEXTOID
-	case "name":
-		return NAMEOID
+// Boolean
 
-	// Integer types
-	case "int2", "smallint":
-		return INT2OID
-	case "int", "int4", "integer":
-		return INT4OID
-	case "int8", "bigint":
-		return INT8OID
+// Character types
 
-	// Floating point
-	case "float4", "real":
-		return FLOAT4OID
-	case "float", "float8", "double precision":
-		return FLOAT8OID
+// Integer types
 
-	// Numeric
-	case "numeric", "decimal":
-		return NUMERICOID
+// Floating point
 
-	// Date/time
-	case "date":
-		return DATEOID
-	case "time", "time without time zone":
-		return TIMEOID
-	case "timetz", "time with time zone":
-		return TIMETZOID
-	case "timestamp", "timestamp without time zone":
-		return TIMESTAMPOID
-	case "timestamptz", "timestamp with time zone":
-		return TIMESTAMPTZOID
-	case "interval":
-		return INTERVALOID
+// Numeric
 
-	// Binary
-	case "bytea":
-		return BYTEAOID
+// Date/time
 
-	// JSON
-	case "json":
-		return JSONOID
-	case "jsonb":
-		return JSONBOID
+// Binary
 
-	// XML
-	case "xml":
-		return XMLOID
+// JSON
 
-	// UUID
-	case "uuid":
-		return UUIDOID
+// XML
 
-	// Network
-	case "inet":
-		return INETOID
-	case "cidr":
-		return CIDROID
-	case "macaddr":
-		return MACADDROID
-	case "macaddr8":
-		return MACADDR8OID
+// UUID
 
-	// Bit string
-	case "bit":
-		return BITOID
-	case "varbit", "bit varying":
-		return VARBITOID
+// Network
 
-	// Money
-	case "money":
-		return MONEYOID
+// Bit string
 
-	// System
-	case "oid":
-		return OIDOID
+// Money
 
-	default:
-		return InvalidOid
-	}
-}
+// System
 
 // String returns the canonical PostgreSQL type name for this OID.
 // Returns an empty string if the OID is not recognized.
 func (o Oid) String() string {
-	switch o {
+	_ = "STUB: not implemented"
+
 	// Boolean type
-	case BOOLOID:
-		return "BOOL"
-
-	// Binary types
-	case BYTEAOID:
-		return "BYTEA"
-
-	// Character types
-	case CHAROID:
-		return "CHAR"
-	case NAMEOID:
-		return "NAME"
-	case TEXTOID:
-		return "TEXT"
-	case VARCHAROID:
-		return "VARCHAR"
-	case BPCHAROID:
-		return "BPCHAR"
-
-	// Integer types
-	case INT2OID:
-		return "INT2"
-	case INT4OID:
-		return "INT4"
-	case INT8OID:
-		return "INT8"
-
-	// System types
-	case REGPROCOID:
-		return "REGPROC"
-	case OIDOID:
-		return "OID"
-	case TIDOID:
-		return "TID"
-	case XIDOID:
-		return "XID"
-	case CIDOID:
-		return "CID"
-	case INT2VECTOROID:
-		return "INT2VECTOR"
-	case OIDVECTOROID:
-		return "OIDVECTOR"
-	case XID8OID:
-		return "XID8"
-
-	// JSON types
-	case JSONOID:
-		return "JSON"
-	case JSONBOID:
-		return "JSONB"
-
-	// XML type
-	case XMLOID:
-		return "XML"
-
-	// Geometric types
-	case POINTOID:
-		return "POINT"
-	case LSEGOID:
-		return "LSEG"
-	case PATHOID:
-		return "PATH"
-	case BOXOID:
-		return "BOX"
-	case POLYGONOID:
-		return "POLYGON"
-	case LINEOID:
-		return "LINE"
-	case CIRCLEOID:
-		return "CIRCLE"
-
-	// Floating point types
-	case FLOAT4OID:
-		return "FLOAT4"
-	case FLOAT8OID:
-		return "FLOAT8"
-
-	// Money type
-	case MONEYOID:
-		return "MONEY"
-
-	// Network types
-	case CIDROID:
-		return "CIDR"
-	case MACADDR8OID:
-		return "MACADDR8"
-	case MACADDROID:
-		return "MACADDR"
-	case INETOID:
-		return "INET"
-
-	// Date/time types
-	case DATEOID:
-		return "DATE"
-	case TIMEOID:
-		return "TIME"
-	case TIMESTAMPOID:
-		return "TIMESTAMP"
-	case TIMESTAMPTZOID:
-		return "TIMESTAMPTZ"
-	case TIMETZOID:
-		return "TIMETZ"
-	case INTERVALOID:
-		return "INTERVAL"
-
-	// Bit string types
-	case BITOID:
-		return "BIT"
-	case VARBITOID:
-		return "VARBIT"
-
-	// Numeric type
-	case NUMERICOID:
-		return "NUMERIC"
-
-	// UUID type
-	case UUIDOID:
-		return "UUID"
-
-	// Range types
-	case INT4RANGEOID:
-		return "INT4RANGE"
-	case NUMRANGEOID:
-		return "NUMRANGE"
-	case TSRANGEOID:
-		return "TSRANGE"
-	case TSTZRANGEOID:
-		return "TSTZRANGE"
-	case DATERANGEOID:
-		return "DATERANGE"
-	case INT8RANGEOID:
-		return "INT8RANGE"
-
-	// PostgreSQL LSN type
-	case PG_LSNOID:
-		return "PG_LSN"
-
-	// PostgreSQL internal types
-	case PG_DDL_COMMANDOID:
-		return "PG_DDL_COMMAND"
-	case PG_NODE_TREEOID:
-		return "PG_NODE_TREE"
-	case PG_NDISTINCTOID:
-		return "PG_NDISTINCT"
-	case PG_DEPENDENCIESOID:
-		return "PG_DEPENDENCIES"
-	case PG_MCV_LISTOID:
-		return "PG_MCV_LIST"
-
-	// Array types - prefixed with underscore as per PostgreSQL convention
-	case BOOLARRAYOID:
-		return "_BOOL"
-	case BYTEAARRAYOID:
-		return "_BYTEA"
-	case CHARARRAYOID:
-		return "_CHAR"
-	case NAMEARRAYOID:
-		return "_NAME"
-	case INT2ARRAYOID:
-		return "_INT2"
-	case INT4ARRAYOID:
-		return "_INT4"
-	case TEXTARRAYOID:
-		return "_TEXT"
-	case VARCHARARRAYOID:
-		return "_VARCHAR"
-	case INT8ARRAYOID:
-		return "_INT8"
-	case FLOAT4ARRAYOID:
-		return "_FLOAT4"
-	case FLOAT8ARRAYOID:
-		return "_FLOAT8"
-	case DATEARRAYOID:
-		return "_DATE"
-	case TIMEARRAYOID:
-		return "_TIME"
-	case TIMESTAMPARRAYOID:
-		return "_TIMESTAMP"
-	case TIMESTAMPTZARRAYOID:
-		return "_TIMESTAMPTZ"
-	case JSONARRAYOID:
-		return "_JSON"
-	case JSONBARRAYOID:
-		return "_JSONB"
-
-	default:
-		return ""
-	}
+	return ""
 }
+
+// Binary types
+
+// Character types
+
+// Integer types
+
+// System types
+
+// JSON types
+
+// XML type
+
+// Geometric types
+
+// Floating point types
+
+// Money type
+
+// Network types
+
+// Date/time types
+
+// Bit string types
+
+// Numeric type
+
+// UUID type
+
+// Range types
+
+// PostgreSQL LSN type
+
+// PostgreSQL internal types
+
+// Array types - prefixed with underscore as per PostgreSQL convention

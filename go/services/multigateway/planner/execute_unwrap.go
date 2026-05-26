@@ -15,8 +15,6 @@
 package planner
 
 import (
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/services/multigateway/engine"
@@ -54,44 +52,21 @@ import (
 //   - (nil, nil) if no rewrite applies (caller should continue normal dispatch);
 //   - (nil, err) if a wrapped EXECUTE referenced an unknown prepared statement.
 func (p *Planner) tryUnwrapWrappedExecute(sql string, stmt ast.Stmt, conn *server.Conn) (*engine.Plan, error) {
-	execStmt, isTemp := findWrappedExecute(stmt)
-	if execStmt == nil {
-		return nil, nil
-	}
-
-	// Look up the user-visible prepared statement name via the Handler
-	// interface. The handler's consolidator maps the user name to a
-	// canonical name and the associated PreparedStatementInfo.
-	psi := conn.Handler().GetPreparedStatementInfo(conn.ConnectionID(), execStmt.Name)
-	if psi == nil {
-		return nil, mterrors.NewInvalidPreparedStatementError(execStmt.Name)
-	}
-
-	// Mutate the AST so the regenerated SQL references the canonical name.
-	// The AST is freshly parsed per-query in handler.HandleQuery, so it's
-	// safe to mutate in-place here.
-	userName := execStmt.Name
-	execStmt.Name = psi.Name
-	rewrittenSQL := stmt.SqlString()
-	p.logger.Debug("unwrapped wrapped EXECUTE",
-		"user_name", userName,
-		"canonical_name", psi.Name,
-		"original", sql,
-		"rewritten", rewrittenSQL)
-
-	// Build the route. Use TempTableRoute for `CREATE TEMP TABLE t AS EXECUTE p`
-	// so the query runs on a temp-table-reserved connection; otherwise use a
-	// plain Route that goes through the regular pool.
-	var prim engine.Primitive
-	if isTemp {
-		prim = engine.NewTempTableRouteWithPreparedStatement(
-			p.defaultTableGroup, constants.DefaultShard, rewrittenSQL, psi.PreparedStatement)
-	} else {
-		prim = engine.NewRouteWithPreparedStatement(
-			p.defaultTableGroup, constants.DefaultShard, rewrittenSQL, psi.PreparedStatement)
-	}
-	return engine.NewPlan(rewrittenSQL, prim), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Look up the user-visible prepared statement name via the Handler
+// interface. The handler's consolidator maps the user name to a
+// canonical name and the associated PreparedStatementInfo.
+
+// Mutate the AST so the regenerated SQL references the canonical name.
+// The AST is freshly parsed per-query in handler.HandleQuery, so it's
+// safe to mutate in-place here.
+
+// Build the route. Use TempTableRoute for `CREATE TEMP TABLE t AS EXECUTE p`
+// so the query runs on a temp-table-reserved connection; otherwise use a
+// plain Route that goes through the regular pool.
 
 // findWrappedExecute returns the innermost ExecuteStmt inside a supported
 // wrapper and true when the effective plan should use the temp-table-aware
@@ -109,24 +84,10 @@ func (p *Planner) tryUnwrapWrappedExecute(sql string, stmt ast.Stmt, conn *serve
 // Returns (nil, false) if the statement shape does not match a wrapped
 // EXECUTE.
 func findWrappedExecute(stmt ast.Stmt) (*ast.ExecuteStmt, bool) {
-	switch s := stmt.(type) {
-	case *ast.ExplainStmt:
-		// Direct EXPLAIN EXECUTE
-		if es, ok := s.Query.(*ast.ExecuteStmt); ok {
-			return es, false
-		}
-		// EXPLAIN wrapping CREATE TABLE ... AS EXECUTE
-		if ctas, ok := s.Query.(*ast.CreateTableAsStmt); ok {
-			if es, ok := ctas.Query.(*ast.ExecuteStmt); ok {
-				isTemp := ctas.Into != nil && ctas.Into.Rel != nil && ctas.Into.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP
-				return es, isTemp
-			}
-		}
-	case *ast.CreateTableAsStmt:
-		if es, ok := s.Query.(*ast.ExecuteStmt); ok {
-			isTemp := s.Into != nil && s.Into.Rel != nil && s.Into.Rel.RelPersistence == ast.RELPERSISTENCE_TEMP
-			return es, isTemp
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil, false
 }
+
+// Direct EXPLAIN EXECUTE
+
+// EXPLAIN wrapping CREATE TABLE ... AS EXECUTE

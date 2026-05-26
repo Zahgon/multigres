@@ -20,7 +20,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/services/multiorch"
 
 	"github.com/spf13/cobra"
@@ -28,24 +27,8 @@ import (
 
 // CreateMultiOrchCommand creates a cobra command with a MultiOrch instance and registers its flags
 func CreateMultiOrchCommand() (*cobra.Command, *multiorch.MultiOrch) {
-	mo := multiorch.NewMultiOrch()
-
-	cmd := &cobra.Command{
-		Use:   constants.ServiceMultiorch,
-		Short: "Multiorch orchestrates cluster operations including consensus protocol management, failover detection and repair, and health monitoring of multipooler instances.",
-		Long:  "Multiorch orchestrates cluster operations including consensus protocol management, failover detection and repair, and health monitoring of multipooler instances.",
-		Args:  cobra.NoArgs,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return mo.CobraPreRunE(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return run(cmd, args, mo)
-		},
-	}
-
-	mo.RegisterFlags(cmd.Flags())
-
-	return cmd, mo
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func main() {
@@ -58,8 +41,6 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string, mo *multiorch.MultiOrch) error {
-	if err := mo.Init(); err != nil {
-		return err
-	}
-	return mo.RunDefault()
+	_ = "STUB: not implemented"
+	return nil
 }

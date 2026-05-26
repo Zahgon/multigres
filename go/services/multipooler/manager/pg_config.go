@@ -15,15 +15,9 @@
 package manager
 
 import (
-	"fmt"
 	"regexp"
-	"strconv"
-	"strings"
 
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	mtrpcpb "github.com/multigres/multigres/go/pb/mtrpc"
 	multipoolermanagerdata "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 )
 
@@ -47,15 +41,8 @@ type SyncStandbyConfig struct {
 // For decoding non-pooler IDs that happen to share the cell_name encoding
 // (e.g. coordinator_id in rule_history), use topoclient.SplitClusterID directly.
 func parseApplicationName(appName string) (*clustermetadatapb.ID, error) {
-	cell, name, err := topoclient.SplitClusterID(appName)
-	if err != nil {
-		return nil, err
-	}
-	return &clustermetadatapb.ID{
-		Component: clustermetadatapb.ID_MULTIPOOLER,
-		Cell:      cell,
-		Name:      name,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // parseSynchronousStandbyNames parses a PostgreSQL synchronous_standby_names string
@@ -65,138 +52,46 @@ func parseApplicationName(appName string) (*clustermetadatapb.ID, error) {
 //   - "*" (wildcard - all connected standbys)
 //   - "" (empty - no synchronous replication)
 func parseSynchronousStandbyNames(value string) (*SyncStandbyConfig, error) {
-	value = strings.TrimSpace(value)
-
-	// Handle empty case
-	if value == "" {
-		return nil, mterrors.New(mtrpcpb.Code_FAILED_PRECONDITION, "synchronous replication not configured")
-	}
-
-	// Handle wildcard case - not supported in Multigres context
-	if value == "*" || strings.Contains(value, "(*)") {
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			"wildcard (*) is not supported in Multigres - standby list must be explicit")
-	}
-
-	// Parse format: METHOD NUM (member1, member2, ...)
-	// Note: this regex assumes standby_names are being controlled by multigres
-	// and will have the format we expect (i.e cell_name). We are not validating
-	// for this format here.
-	matches := syncStandbyNamesRegex.FindStringSubmatch(value)
-	if matches == nil {
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			fmt.Sprintf("invalid synchronous_standby_names format: %q", value))
-	}
-
-	methodStr := strings.ToUpper(matches[1]) // Normalize to uppercase
-	numSync, err := strconv.ParseInt(matches[2], 10, 32)
-	if err != nil {
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			fmt.Sprintf("invalid num_sync value in synchronous_standby_names: %q", matches[2]))
-	}
-
-	// Convert string method to enum
-	var method multipoolermanagerdata.SynchronousMethod
-	switch methodStr {
-	case "FIRST":
-		method = multipoolermanagerdata.SynchronousMethod_SYNCHRONOUS_METHOD_FIRST
-	case "ANY":
-		method = multipoolermanagerdata.SynchronousMethod_SYNCHRONOUS_METHOD_ANY
-	default:
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			fmt.Sprintf("unsupported synchronous method: %q", methodStr))
-	}
-
-	// Parse member list
-	membersStr := strings.TrimSpace(matches[3])
-	if membersStr == "" {
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			"empty member list in synchronous_standby_names")
-	}
-
-	// Split by comma and clean up each member
-	membersParts := strings.Split(membersStr, ",")
-	standbyIDs := make([]*clustermetadatapb.ID, 0, len(membersParts))
-	for _, part := range membersParts {
-		part = strings.TrimSpace(part)
-		// Remove surrounding quotes if present
-		part = strings.Trim(part, `"`)
-		if part != "" {
-			// Parse application name back to ID
-			id, err := parseApplicationName(part)
-			if err != nil {
-				return nil, mterrors.Wrap(err, fmt.Sprintf("failed to parse application name %q", part))
-			}
-			standbyIDs = append(standbyIDs, id)
-		}
-	}
-
-	if len(standbyIDs) == 0 {
-		return nil, mterrors.New(mtrpcpb.Code_INVALID_ARGUMENT,
-			"no valid members found in synchronous_standby_names")
-	}
-
-	return &SyncStandbyConfig{
-		Method:     method,
-		NumSync:    int32(numSync),
-		StandbyIDs: standbyIDs,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Handle empty case
+
+// Handle wildcard case - not supported in Multigres context
+
+// Parse format: METHOD NUM (member1, member2, ...)
+// Note: this regex assumes standby_names are being controlled by multigres
+// and will have the format we expect (i.e cell_name). We are not validating
+// for this format here.
+
+// Normalize to uppercase
+
+// Convert string method to enum
+
+// Parse member list
+
+// Split by comma and clean up each member
+
+// Remove surrounding quotes if present
+
+// Parse application name back to ID
 
 // parseAndRedactPrimaryConnInfo parses a PostgreSQL primary_conninfo connection string into structured fields
 // Example input: "host=localhost port=5432 user=postgres application_name=cell_name"
 // Returns a PrimaryConnInfo message with parsed fields, or an error if parsing fails
 // Note: Passwords are redacted in the raw field for security
 func parseAndRedactPrimaryConnInfo(connInfoStr string) (*multipoolermanagerdata.PrimaryConnInfo, error) {
-	connInfo := &multipoolermanagerdata.PrimaryConnInfo{}
-
-	// Simple space-based parsing of key=value pairs
-	parts := strings.Split(connInfoStr, " ")
-	redactedParts := make([]string, 0, len(parts))
-
-	for _, part := range parts {
-		part = strings.TrimSpace(part)
-		if part == "" {
-			continue
-		}
-
-		kv := strings.SplitN(part, "=", 2)
-		if len(kv) != 2 {
-			// Not a key=value pair - parsing failed
-			return nil, fmt.Errorf("invalid key=value format in primary_conninfo: %q", part)
-		}
-
-		key := strings.TrimSpace(kv[0])
-		value := strings.TrimSpace(kv[1])
-
-		if key == "" {
-			return nil, fmt.Errorf("empty key in primary_conninfo: %q", part)
-		}
-
-		// Redact sensitive fields in the raw string
-		if key == "password" {
-			redactedParts = append(redactedParts, key+"=[REDACTED]")
-		} else {
-			redactedParts = append(redactedParts, part)
-		}
-
-		// Parse specific fields we care about
-		switch key {
-		case "host":
-			connInfo.Host = value
-		case "port":
-			if port, err := strconv.ParseInt(value, 10, 32); err == nil {
-				connInfo.Port = int32(port)
-			}
-		case "user":
-			connInfo.User = value
-		case "application_name":
-			connInfo.ApplicationName = value
-		}
-	}
-
-	// Set the redacted raw string
-	connInfo.Raw = strings.Join(redactedParts, " ")
-
-	return connInfo, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Simple space-based parsing of key=value pairs
+
+// Not a key=value pair - parsing failed
+
+// Redact sensitive fields in the raw string
+
+// Parse specific fields we care about
+
+// Set the redacted raw string

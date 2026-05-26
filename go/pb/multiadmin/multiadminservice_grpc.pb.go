@@ -22,9 +22,8 @@ package multiadmin
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -112,177 +111,93 @@ type multiAdminServiceClient struct {
 }
 
 func NewMultiAdminServiceClient(cc grpc.ClientConnInterface) MultiAdminServiceClient {
-	return &multiAdminServiceClient{cc}
+	_ = "STUB: not implemented"
+	return *new(MultiAdminServiceClient)
 }
 
 func (c *multiAdminServiceClient) GetCell(ctx context.Context, in *GetCellRequest, opts ...grpc.CallOption) (*GetCellResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetCellResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetCell_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetDatabase(ctx context.Context, in *GetDatabaseRequest, opts ...grpc.CallOption) (*GetDatabaseResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetDatabaseResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetDatabase_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetCellNames(ctx context.Context, in *GetCellNamesRequest, opts ...grpc.CallOption) (*GetCellNamesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetCellNamesResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetCellNames_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetDatabaseNames(ctx context.Context, in *GetDatabaseNamesRequest, opts ...grpc.CallOption) (*GetDatabaseNamesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetDatabaseNamesResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetDatabaseNames_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetGateways(ctx context.Context, in *GetGatewaysRequest, opts ...grpc.CallOption) (*GetGatewaysResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGatewaysResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetGateways_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetPoolers(ctx context.Context, in *GetPoolersRequest, opts ...grpc.CallOption) (*GetPoolersResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPoolersResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetPoolers_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetOrchs(ctx context.Context, in *GetOrchsRequest, opts ...grpc.CallOption) (*GetOrchsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetOrchsResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetOrchs_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) Backup(ctx context.Context, in *BackupRequest, opts ...grpc.CallOption) (*BackupResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BackupResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_Backup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) RestoreFromBackup(ctx context.Context, in *RestoreFromBackupRequest, opts ...grpc.CallOption) (*RestoreFromBackupResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RestoreFromBackupResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_RestoreFromBackup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetBackupJobStatus(ctx context.Context, in *GetBackupJobStatusRequest, opts ...grpc.CallOption) (*GetBackupJobStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetBackupJobStatusResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetBackupJobStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetBackups(ctx context.Context, in *GetBackupsRequest, opts ...grpc.CallOption) (*GetBackupsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetBackupsResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetBackups_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) ExpireBackups(ctx context.Context, in *ExpireBackupsRequest, opts ...grpc.CallOption) (*ExpireBackupsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ExpireBackupsResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_ExpireBackups_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetPoolerStatus(ctx context.Context, in *GetPoolerStatusRequest, opts ...grpc.CallOption) (*GetPoolerStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPoolerStatusResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetPoolerStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) SetPostgresRestartsEnabled(ctx context.Context, in *SetPostgresRestartsEnabledRequest, opts ...grpc.CallOption) (*SetPostgresRestartsEnabledResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SetPostgresRestartsEnabledResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_SetPostgresRestartsEnabled_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetGatewayQueries(ctx context.Context, in *GetGatewayQueriesRequest, opts ...grpc.CallOption) (*GetGatewayQueriesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGatewayQueriesResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetGatewayQueries_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) GetGatewayConsolidator(ctx context.Context, in *GetGatewayConsolidatorRequest, opts ...grpc.CallOption) (*GetGatewayConsolidatorResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGatewayConsolidatorResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_GetGatewayConsolidator_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiAdminServiceClient) ApplyCertifiedRuleChange(ctx context.Context, in *ApplyCertifiedRuleChangeRequest, opts ...grpc.CallOption) (*ApplyCertifiedRuleChangeResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ApplyCertifiedRuleChangeResponse)
-	err := c.cc.Invoke(ctx, MultiAdminService_ApplyCertifiedRuleChange_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiAdminServiceServer is the server API for MultiAdminService service.
@@ -349,381 +264,199 @@ type MultiAdminServiceServer interface {
 type UnimplementedMultiAdminServiceServer struct{}
 
 func (UnimplementedMultiAdminServiceServer) GetCell(context.Context, *GetCellRequest) (*GetCellResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCell not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedMultiAdminServiceServer) GetDatabase(context.Context, *GetDatabaseRequest) (*GetDatabaseResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDatabase not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetCellNames(context.Context, *GetCellNamesRequest) (*GetCellNamesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCellNames not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetDatabaseNames(context.Context, *GetDatabaseNamesRequest) (*GetDatabaseNamesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDatabaseNames not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetGateways(context.Context, *GetGatewaysRequest) (*GetGatewaysResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGateways not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetPoolers(context.Context, *GetPoolersRequest) (*GetPoolersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPoolers not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetOrchs(context.Context, *GetOrchsRequest) (*GetOrchsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOrchs not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) Backup(context.Context, *BackupRequest) (*BackupResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Backup not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) RestoreFromBackup(context.Context, *RestoreFromBackupRequest) (*RestoreFromBackupResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RestoreFromBackup not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetBackupJobStatus(context.Context, *GetBackupJobStatusRequest) (*GetBackupJobStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBackupJobStatus not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetBackups(context.Context, *GetBackupsRequest) (*GetBackupsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBackups not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) ExpireBackups(context.Context, *ExpireBackupsRequest) (*ExpireBackupsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExpireBackups not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetPoolerStatus(context.Context, *GetPoolerStatusRequest) (*GetPoolerStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPoolerStatus not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) SetPostgresRestartsEnabled(context.Context, *SetPostgresRestartsEnabledRequest) (*SetPostgresRestartsEnabledResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetPostgresRestartsEnabled not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetGatewayQueries(context.Context, *GetGatewayQueriesRequest) (*GetGatewayQueriesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGatewayQueries not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) GetGatewayConsolidator(context.Context, *GetGatewayConsolidatorRequest) (*GetGatewayConsolidatorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGatewayConsolidator not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) ApplyCertifiedRuleChange(context.Context, *ApplyCertifiedRuleChangeRequest) (*ApplyCertifiedRuleChangeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ApplyCertifiedRuleChange not implemented")
-}
-func (UnimplementedMultiAdminServiceServer) mustEmbedUnimplementedMultiAdminServiceServer() {}
-func (UnimplementedMultiAdminServiceServer) testEmbeddedByValue()                           {}
 
-// UnsafeMultiAdminServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to MultiAdminServiceServer will
-// result in compilation errors.
+func (UnimplementedMultiAdminServiceServer) GetDatabase(context.Context, *GetDatabaseRequest) (*GetDatabaseResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetCellNames(context.Context, *GetCellNamesRequest) (*GetCellNamesResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetDatabaseNames(context.Context, *GetDatabaseNamesRequest) (*GetDatabaseNamesResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetGateways(context.Context, *GetGatewaysRequest) (*GetGatewaysResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetPoolers(context.Context, *GetPoolersRequest) (*GetPoolersResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetOrchs(context.Context, *GetOrchsRequest) (*GetOrchsResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) Backup(context.Context, *BackupRequest) (*BackupResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) RestoreFromBackup(context.Context, *RestoreFromBackupRequest) (*RestoreFromBackupResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetBackupJobStatus(context.Context, *GetBackupJobStatusRequest) (*GetBackupJobStatusResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetBackups(context.Context, *GetBackupsRequest) (*GetBackupsResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) ExpireBackups(context.Context, *ExpireBackupsRequest) (*ExpireBackupsResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetPoolerStatus(context.Context, *GetPoolerStatusRequest) (*GetPoolerStatusResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) SetPostgresRestartsEnabled(context.Context, *SetPostgresRestartsEnabledRequest) (*SetPostgresRestartsEnabledResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetGatewayQueries(context.Context, *GetGatewayQueriesRequest) (*GetGatewayQueriesResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) GetGatewayConsolidator(context.Context, *GetGatewayConsolidatorRequest) (*GetGatewayConsolidatorResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) ApplyCertifiedRuleChange(context.Context, *ApplyCertifiedRuleChangeRequest) (*ApplyCertifiedRuleChangeResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (UnimplementedMultiAdminServiceServer) mustEmbedUnimplementedMultiAdminServiceServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedMultiAdminServiceServer) testEmbeddedByValue() {
+	_ = "STUB: not implemented"
+	return
+
+	// UnsafeMultiAdminServiceServer may be embedded to opt out of forward compatibility for this service.
+	// Use of this interface is not recommended, as added methods to MultiAdminServiceServer will
+	// result in compilation errors.
+}
+
 type UnsafeMultiAdminServiceServer interface {
 	mustEmbedUnimplementedMultiAdminServiceServer()
 }
 
 func RegisterMultiAdminServiceServer(s grpc.ServiceRegistrar, srv MultiAdminServiceServer) {
+	_ = "STUB: not implemented"
 	// If the following call pancis, it indicates UnimplementedMultiAdminServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MultiAdminService_ServiceDesc, srv)
+	return
 }
 
 func _MultiAdminService_GetCell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCellRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetCell(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetCell_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetCell(ctx, req.(*GetCellRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetDatabase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDatabaseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetDatabase(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetDatabase_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetDatabase(ctx, req.(*GetDatabaseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetCellNames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCellNamesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetCellNames(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetCellNames_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetCellNames(ctx, req.(*GetCellNamesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetDatabaseNames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDatabaseNamesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetDatabaseNames(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetDatabaseNames_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetDatabaseNames(ctx, req.(*GetDatabaseNamesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetGateways_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGatewaysRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetGateways(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetGateways_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetGateways(ctx, req.(*GetGatewaysRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetPoolers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPoolersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetPoolers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetPoolers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetPoolers(ctx, req.(*GetPoolersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetOrchs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetOrchsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetOrchs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetOrchs_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetOrchs(ctx, req.(*GetOrchsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_Backup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BackupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).Backup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_Backup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).Backup(ctx, req.(*BackupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_RestoreFromBackup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RestoreFromBackupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).RestoreFromBackup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_RestoreFromBackup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).RestoreFromBackup(ctx, req.(*RestoreFromBackupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetBackupJobStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBackupJobStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetBackupJobStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetBackupJobStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetBackupJobStatus(ctx, req.(*GetBackupJobStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetBackups_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBackupsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetBackups(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetBackups_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetBackups(ctx, req.(*GetBackupsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_ExpireBackups_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExpireBackupsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).ExpireBackups(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_ExpireBackups_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).ExpireBackups(ctx, req.(*ExpireBackupsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetPoolerStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPoolerStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetPoolerStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetPoolerStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetPoolerStatus(ctx, req.(*GetPoolerStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_SetPostgresRestartsEnabled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetPostgresRestartsEnabledRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).SetPostgresRestartsEnabled(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_SetPostgresRestartsEnabled_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).SetPostgresRestartsEnabled(ctx, req.(*SetPostgresRestartsEnabledRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetGatewayQueries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGatewayQueriesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetGatewayQueries(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetGatewayQueries_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetGatewayQueries(ctx, req.(*GetGatewayQueriesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_GetGatewayConsolidator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGatewayConsolidatorRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).GetGatewayConsolidator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_GetGatewayConsolidator_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).GetGatewayConsolidator(ctx, req.(*GetGatewayConsolidatorRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiAdminService_ApplyCertifiedRuleChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplyCertifiedRuleChangeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiAdminServiceServer).ApplyCertifiedRuleChange(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiAdminService_ApplyCertifiedRuleChange_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiAdminServiceServer).ApplyCertifiedRuleChange(ctx, req.(*ApplyCertifiedRuleChangeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiAdminService_ServiceDesc is the grpc.ServiceDesc for MultiAdminService service.

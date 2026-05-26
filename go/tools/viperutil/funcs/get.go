@@ -17,21 +17,9 @@
 package funcs
 
 import (
-	"strings"
-
 	"github.com/spf13/viper"
 )
 
 // GetPath returns a GetFunc that expands a slice of strings into individual
 // paths based on standard POSIX shell $PATH separator parsing.
-func GetPath(v *viper.Viper) func(key string) []string {
-	return func(key string) (paths []string) {
-		for _, val := range v.GetStringSlice(key) {
-			if val != "" {
-				paths = append(paths, strings.Split(val, ":")...)
-			}
-		}
-
-		return paths
-	}
-}
+func GetPath(v *viper.Viper) func(key string) []string { _ = "STUB: not implemented"; return nil }

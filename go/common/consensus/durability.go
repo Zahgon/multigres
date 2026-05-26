@@ -15,11 +15,8 @@
 package consensus
 
 import (
-	"errors"
-	"fmt"
 	"log/slog"
 
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 )
@@ -28,14 +25,8 @@ import (
 // TODO: generalize to support AT_LEAST_N and MULTI_CELL_AT_LEAST_N for arbitrary N by parsing the number
 // from the suffix (e.g. "AT_LEAST_3", "MULTI_CELL_AT_LEAST_4") instead of enumerating each case.
 func ParseUserSpecifiedDurabilityPolicy(name string) (*clustermetadatapb.DurabilityPolicy, error) {
-	switch name {
-	case "AT_LEAST_2":
-		return topoclient.AtLeastN(2), nil
-	case "MULTI_CELL_AT_LEAST_2":
-		return topoclient.MultiCellAtLeastN(2), nil
-	default:
-		return nil, fmt.Errorf("unsupported durability policy %q (supported: AT_LEAST_2, MULTI_CELL_AT_LEAST_2)", name)
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // DurabilityPolicy captures the quorum semantics of a single durability rule.
@@ -108,57 +99,31 @@ type SyncReplicationConfig struct {
 // NewPolicyFromProto converts a proto DurabilityPolicy into a concrete
 // DurabilityPolicy implementation.
 func NewPolicyFromProto(policy *clustermetadatapb.DurabilityPolicy) (DurabilityPolicy, error) {
-	if policy == nil {
-		return nil, errors.New("durability policy is nil")
-	}
-
-	switch policy.QuorumType {
-	case clustermetadatapb.QuorumType_QUORUM_TYPE_AT_LEAST_N:
-		// N=0 would make revocation (|missing| < N) unsatisfiable for any recruitment.
-		if policy.RequiredCount < 1 {
-			return nil, fmt.Errorf("AT_LEAST_N requires RequiredCount >= 1, got %d", policy.RequiredCount)
-		}
-		return AtLeastNPolicy{N: int(policy.RequiredCount)}, nil
-	case clustermetadatapb.QuorumType_QUORUM_TYPE_MULTI_CELL_AT_LEAST_N:
-		// N=0 would make revocation (|uncovered cells| < N) unsatisfiable for any recruitment.
-		if policy.RequiredCount < 1 {
-			return nil, fmt.Errorf("MULTI_CELL_AT_LEAST_N requires RequiredCount >= 1, got %d", policy.RequiredCount)
-		}
-		return MultiCellPolicy{N: int(policy.RequiredCount)}, nil
-	default:
-		return nil, fmt.Errorf("unsupported quorum type: %v", policy.QuorumType)
-	}
+	_ = "STUB: not implemented"
+	return *new(DurabilityPolicy), nil
 }
+
+// N=0 would make revocation (|missing| < N) unsatisfiable for any recruitment.
+
+// N=0 would make revocation (|uncovered cells| < N) unsatisfiable for any recruitment.
 
 // keysOf returns the set of distinct keyFn-keys present in poolers.
 func keysOf(poolers []*clustermetadatapb.ID, keyFn func(*clustermetadatapb.ID) string) map[string]struct{} {
-	out := make(map[string]struct{}, len(poolers))
-	for _, p := range poolers {
-		out[keyFn(p)] = struct{}{}
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // poolerKeysOf returns the set of cluster-unique pooler keys.
 func poolerKeysOf(poolers []*clustermetadatapb.ID) map[string]struct{} {
-	return keysOf(poolers, topoclient.ClusterIDString)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // cohortIntersect returns the IDs of nodes (from statuses) that are members of
 // cohort. statuses is assumed to be already deduplicated by ID.
 func cohortIntersect(cohort []*clustermetadatapb.ID, statuses []*clustermetadatapb.ConsensusStatus) []*clustermetadatapb.ID {
-	cohortKeys := poolerKeysOf(cohort)
-	result := make([]*clustermetadatapb.ID, 0, len(cohort))
-	for _, cs := range statuses {
-		id := cs.GetId()
-		if id == nil {
-			continue
-		}
-		if _, inCohort := cohortKeys[topoclient.ClusterIDString(id)]; inCohort {
-			result = append(result, id)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PolicyWithCohort bundles a DurabilityPolicy with the cohort it applies to.
@@ -170,11 +135,8 @@ type PolicyWithCohort struct {
 // NewPolicyWithCohort constructs a PolicyWithCohort from a proto DurabilityPolicy and cohort.
 // Returns an error if the proto cannot be converted to a concrete policy implementation.
 func NewPolicyWithCohort(cohort []*clustermetadatapb.ID, dp *clustermetadatapb.DurabilityPolicy) (PolicyWithCohort, error) {
-	policy, err := NewPolicyFromProto(dp)
-	if err != nil {
-		return PolicyWithCohort{}, fmt.Errorf("invalid durability policy: %w", err)
-	}
-	return PolicyWithCohort{Policy: policy, Cohort: cohort}, nil
+	_ = "STUB: not implemented"
+	return *new(PolicyWithCohort), nil
 }
 
 // PolicyTransition holds the computed GUC policies for a leader-led rule change.
@@ -187,20 +149,12 @@ type PolicyTransition struct {
 
 // intersectStandbys returns the IDs from a that also appear in b.
 func intersectStandbys(a, b []*clustermetadatapb.ID) []*clustermetadatapb.ID {
-	bKeys := poolerKeysOf(b)
-	result := make([]*clustermetadatapb.ID, 0, len(a))
-	for _, id := range a {
-		if _, ok := bKeys[topoclient.ClusterIDString(id)]; ok {
-			result = append(result, id)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // cohortIsSubsetOf reports whether every element of a appears in b.
-func cohortIsSubsetOf(a, b []*clustermetadatapb.ID) bool {
-	return len(intersectStandbys(a, b)) == len(a)
-}
+func cohortIsSubsetOf(a, b []*clustermetadatapb.ID) bool { _ = "STUB: not implemented"; return false }
 
 // BuildPolicyTransition computes the PolicyTransition for a leader-led rule
 // change where only N or the cohort changes, not both simultaneously.
@@ -216,82 +170,30 @@ func cohortIsSubsetOf(a, b []*clustermetadatapb.ID) bool {
 // Both AtLeastNPolicy and MultiCellPolicy are supported; mixing the two types
 // returns an error.
 func BuildPolicyTransition(outgoing, incoming PolicyWithCohort) (*PolicyTransition, error) {
-	outN, outFamily := policyFamily(outgoing.Policy)
-	inN, inFamily := policyFamily(incoming.Policy)
-	if outFamily == "" || inFamily == "" {
-		return nil, fmt.Errorf("unsupported leader-led rule change: policies must be AtLeastN or MultiCellAtLeastN (got %T and %T)", outgoing.Policy, incoming.Policy)
-	}
-	if outFamily != inFamily {
-		return nil, fmt.Errorf("unsupported leader-led rule change: policy types must match (got %T and %T)", outgoing.Policy, incoming.Policy)
-	}
-
-	cohortSame := sameCohort(outgoing.Cohort, incoming.Cohort)
-	nSame := outN == inN
-
-	if cohortSame && nSame {
-		return &PolicyTransition{Both: incoming, Incoming: incoming}, nil
-	}
-	if !cohortSame && !nSame {
-		return nil, errors.New("unsupported leader-led rule change: both N and cohort changed simultaneously")
-	}
-
-	if nSame {
-		// Cohort changed: Both uses the subset cohort.
-		if cohortIsSubsetOf(incoming.Cohort, outgoing.Cohort) {
-			return &PolicyTransition{Both: incoming, Incoming: incoming}, nil
-		}
-		if cohortIsSubsetOf(outgoing.Cohort, incoming.Cohort) {
-			return &PolicyTransition{Both: outgoing, Incoming: incoming}, nil
-		}
-		return nil, errors.New("unsupported leader-led rule change: neither cohort is a subset of the other")
-	}
-
-	// Same cohort, N changed: Both uses the larger N.
-	if inN > outN {
-		return &PolicyTransition{Both: incoming, Incoming: incoming}, nil
-	}
-	return &PolicyTransition{Both: outgoing, Incoming: incoming}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Cohort changed: Both uses the subset cohort.
+
+// Same cohort, N changed: Both uses the larger N.
 
 // policyFamily returns the RequiredCount and a string tag identifying the policy
 // family for AtLeastNPolicy and MultiCellPolicy. Returns (0, "") for unsupported types.
 func policyFamily(p DurabilityPolicy) (n int, family string) {
-	switch v := p.(type) {
-	case AtLeastNPolicy:
-		return v.N, "at_least_n"
-	case MultiCellPolicy:
-		return v.N, "multi_cell_at_least_n"
-	default:
-		return 0, ""
-	}
+	_ = "STUB: not implemented"
+	return 0, ""
 }
 
 // sameCohort reports whether a and b represent the same set of pooler IDs.
-func sameCohort(a, b []*clustermetadatapb.ID) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	aKeys := poolerKeysOf(a)
-	for _, id := range b {
-		if _, ok := aKeys[topoclient.ClusterIDString(id)]; !ok {
-			return false
-		}
-	}
-	return true
-}
+func sameCohort(a, b []*clustermetadatapb.ID) bool { _ = "STUB: not implemented"; return false }
 
 // validateRecruitedSubset returns an error if any recruited pooler is not a
 // member of the cohort. All durability policies assume recruited ⊆ cohort so
 // that candidacy counts reflect only policy-eligible poolers. This is a
 // defensive invariant check; call sites should already enforce it upstream.
 func validateRecruitedSubset(cohort, recruited []*clustermetadatapb.ID) error {
-	cohortKeys := poolerKeysOf(cohort)
-	for _, p := range recruited {
-		key := topoclient.ClusterIDString(p)
-		if _, ok := cohortKeys[key]; !ok {
-			return fmt.Errorf("recruited pooler %s is not in cohort", key)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -302,11 +204,7 @@ func validateRecruitedSubset(cohort, recruited []*clustermetadatapb.ID) error {
 // size. Shared intersection + "one accept per term" at the pooler level is
 // what makes concurrent recruitments mutually exclusive.
 func validateMajority(cohort, recruited []*clustermetadatapb.ID) error {
-	majority := len(cohort)/2 + 1
-	if len(recruited) < majority {
-		return fmt.Errorf("majority not satisfied: recruited %d of %d cohort poolers, need at least %d",
-			len(recruited), len(cohort), majority)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -322,13 +220,6 @@ func validateMajority(cohort, recruited []*clustermetadatapb.ID) error {
 //     same cell collapse into a single entry — the count is the number of
 //     cells with at least one un-recruited pooler.
 func unrecruitedKeyCount(cohort, recruited []*clustermetadatapb.ID, keyFn func(*clustermetadatapb.ID) string) int {
-	recruitedPoolers := poolerKeysOf(recruited)
-	uncovered := make(map[string]struct{})
-	for _, p := range cohort {
-		if _, ok := recruitedPoolers[topoclient.ClusterIDString(p)]; ok {
-			continue
-		}
-		uncovered[keyFn(p)] = struct{}{}
-	}
-	return len(uncovered)
+	_ = "STUB: not implemented"
+	return 0
 }

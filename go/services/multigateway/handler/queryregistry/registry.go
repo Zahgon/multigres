@@ -26,7 +26,6 @@ package queryregistry
 
 import (
 	"context"
-	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -82,13 +81,7 @@ type QueryStats struct {
 // strings and the trend ring buffers (5 rings × cap × 8 bytes/float64),
 // charged eagerly at admit time so theine's admission policy isn't fooled
 // into over-admitting once the sampler warms up.
-func (s *QueryStats) CachedSize(_ bool) int64 {
-	base := int64(384) + int64(len(s.fingerprint)) + int64(len(s.normalizedSQL))
-	if s.trends.initialized {
-		base += int64(5) * int64(len(s.trends.callRate.buf)) * 8
-	}
-	return base
-}
+func (s *QueryStats) CachedSize(_ bool) int64 { _ = "STUB: not implemented"; return 0 }
 
 // Snapshot is a point-in-time copy of a QueryStats, safe to hand out to
 // HTTP handlers or serialize to JSON. Trend slices are oldest-to-newest
@@ -160,145 +153,57 @@ type Config struct {
 }
 
 // DefaultConfig returns reasonable defaults for the registry.
-func DefaultConfig() Config {
-	return Config{
-		MaxMemoryBytes:     8 * 1024 * 1024, // 8 MB — sized so the per-fingerprint trend rings (5 × TrendWindowSamples × 8 B) don't shrink admission capacity vs the pre-trend layout.
-		MaxSQLLength:       4096,
-		SampleInterval:     10 * time.Second,
-		TrendWindowSamples: 60, // 60 × 10s = 10-minute trend window
-	}
-}
+func DefaultConfig() Config { _ = "STUB: not implemented"; return *new(Config) }
+
+// 8 MB — sized so the per-fingerprint trend rings (5 × TrendWindowSamples × 8 B) don't shrink admission capacity vs the pre-trend layout.
+
+// 60 × 10s = 10-minute trend window
 
 // New constructs a Registry with the given config.
 // If cfg.MaxMemoryBytes <= 0 the registry is disabled and all methods become no-ops.
-func New(cfg Config) *Registry {
-	return newRegistry(cfg, true)
-}
+func New(cfg Config) *Registry { _ = "STUB: not implemented"; return nil }
 
 // NewForTest constructs a Registry without the TinyLFU doorkeeper so tests
 // can assert deterministic admission behavior.
-func NewForTest(cfg Config) *Registry {
-	return newRegistry(cfg, false)
-}
+func NewForTest(cfg Config) *Registry { _ = "STUB: not implemented"; return nil }
 
-func newRegistry(cfg Config, doorkeeper bool) *Registry {
-	r := &Registry{maxSQLLen: cfg.MaxSQLLength}
-	if cfg.MaxMemoryBytes <= 0 {
-		return r
-	}
-	r.store = theine.NewStore[theine.StringKey, *QueryStats](int64(cfg.MaxMemoryBytes), doorkeeper)
-	if cfg.SampleInterval > 0 && cfg.TrendWindowSamples > 0 {
-		r.sampleInterval = cfg.SampleInterval
-		r.trendCapacity = cfg.TrendWindowSamples
-		//nolint:gocritic // Long-lived sampler tied to the registry's lifetime, cancelled in Close().
-		ctx, cancel := context.WithCancel(context.Background())
-		r.samplerCancel = cancel
-		r.samplerDone = make(chan struct{})
-		go r.runSampler(ctx)
-	}
-	return r
-}
+func newRegistry(cfg Config, doorkeeper bool) *Registry { _ = "STUB: not implemented"; return nil }
+
+//nolint:gocritic // Long-lived sampler tied to the registry's lifetime, cancelled in Close().
 
 // Record updates stats for the given fingerprint. If the fingerprint is not
 // yet tracked, the TinyLFU admission policy decides whether to admit it —
 // one-off queries won't enter the tracked set on their first hit.
 func (r *Registry) Record(fingerprint, normalizedSQL string, duration time.Duration, rows int, hadError bool) {
-	if r == nil || r.store == nil || fingerprint == "" {
-		return
-	}
-
-	stats, ok := r.store.Get(theine.StringKey(fingerprint), 0)
-	if !ok {
-		// Try to admit — may fail if TinyLFU rejects a cold entry.
-		stats = r.admit(fingerprint, normalizedSQL)
-		if stats == nil {
-			return
-		}
-	}
-
-	durNs := duration.Nanoseconds()
-	stats.calls.Add(1)
-	stats.totalDurationNs.Add(durNs)
-	stats.durationBuckets[bucketIndex(durNs)].Add(1)
-	if rows > 0 {
-		stats.totalRows.Add(uint64(rows))
-	}
-	if hadError {
-		stats.errors.Add(1)
-	}
-	stats.lastSeenUnixNs.Store(time.Now().UnixNano())
-
-	// Update min/max with CAS loops.
-	for {
-		cur := stats.minDurationNs.Load()
-		if cur != 0 && durNs >= cur {
-			break
-		}
-		if stats.minDurationNs.CompareAndSwap(cur, durNs) {
-			break
-		}
-	}
-	for {
-		cur := stats.maxDurationNs.Load()
-		if durNs <= cur {
-			break
-		}
-		if stats.maxDurationNs.CompareAndSwap(cur, durNs) {
-			break
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Try to admit — may fail if TinyLFU rejects a cold entry.
+
+// Update min/max with CAS loops.
 
 // admit attempts to insert a new QueryStats entry for fingerprint.
 // Returns the stats (either newly admitted or racing winner's), or nil if
 // TinyLFU rejected the admission.
 func (r *Registry) admit(fingerprint, normalizedSQL string) *QueryStats {
-	r.newEntryMu.Lock()
-	defer r.newEntryMu.Unlock()
-
-	// Re-check after acquiring lock: another goroutine may have admitted it.
-	if existing, ok := r.store.Get(theine.StringKey(fingerprint), 0); ok {
-		return existing
-	}
-
-	truncated := normalizedSQL
-	if r.maxSQLLen > 0 && len(truncated) > r.maxSQLLen {
-		truncated = truncated[:r.maxSQLLen]
-	}
-	stats := &QueryStats{
-		fingerprint:   fingerprint,
-		normalizedSQL: truncated,
-	}
-	if r.trendCapacity > 0 {
-		// Allocate up-front so CachedSize reflects the real footprint and
-		// theine's admission policy can use accurate sizes.
-		stats.trends = newTrendBuffers(r.trendCapacity)
-	}
-	if !r.store.Set(theine.StringKey(fingerprint), stats, 0, 0) {
-		return nil
-	}
-	// Reload through Get so we return the authoritative stored pointer —
-	// theine may have rejected via doorkeeper and returned false without
-	// actually admitting.
-	stored, ok := r.store.Get(theine.StringKey(fingerprint), 0)
-	if !ok {
-		return nil
-	}
-	return stored
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Re-check after acquiring lock: another goroutine may have admitted it.
+
+// Allocate up-front so CachedSize reflects the real footprint and
+// theine's admission policy can use accurate sizes.
+
+// Reload through Get so we return the authoritative stored pointer —
+// theine may have rejected via doorkeeper and returned false without
+// actually admitting.
 
 // Labelize returns the fingerprint if it is currently tracked in the
 // registry, otherwise returns OtherLabel. Use this as the value for
 // a Prometheus/OTel label to bound cardinality.
-func (r *Registry) Labelize(fingerprint string) string {
-	if r == nil || r.store == nil || fingerprint == "" {
-		return OtherLabel
-	}
-	if _, ok := r.store.Get(theine.StringKey(fingerprint), 0); ok {
-		return fingerprint
-	}
-	return OtherLabel
-}
+func (r *Registry) Labelize(fingerprint string) string { _ = "STUB: not implemented"; return "" }
 
 // SortKey identifies how Top should sort results.
 type SortKey string
@@ -314,178 +219,37 @@ const (
 // Top returns up to `limit` snapshots of the currently-tracked query
 // statistics, sorted by the given key in descending order. Passing
 // limit <= 0 returns all tracked entries.
-func (r *Registry) Top(limit int, sortBy SortKey) []Snapshot {
-	if r == nil || r.store == nil {
-		return nil
-	}
-
-	intervalSec := r.sampleInterval.Seconds()
-	var snapshots []Snapshot
-	r.store.Range(0, func(_ theine.StringKey, v *QueryStats) bool {
-		snapshots = append(snapshots, v.snapshot(intervalSec))
-		return true
-	})
-
-	sortSnapshots(snapshots, sortBy)
-	if limit > 0 && len(snapshots) > limit {
-		snapshots = snapshots[:limit]
-	}
-	return snapshots
-}
+func (r *Registry) Top(limit int, sortBy SortKey) []Snapshot { _ = "STUB: not implemented"; return nil }
 
 // Len returns the number of fingerprints currently tracked in the registry.
-func (r *Registry) Len() int {
-	if r == nil || r.store == nil {
-		return 0
-	}
-	return r.store.Len()
-}
+func (r *Registry) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // Close stops the background maintenance goroutine.
 // Safe to call on a nil or disabled registry.
-func (r *Registry) Close() {
-	if r == nil || r.store == nil {
-		return
-	}
-	if r.samplerCancel != nil {
-		r.samplerCancel()
-		<-r.samplerDone
-		r.samplerCancel = nil
-	}
-	r.store.Close()
-}
+func (r *Registry) Close() { _ = "STUB: not implemented"; return }
 
 // runSampler periodically captures a per-fingerprint sample (rates +
 // histogram percentiles) into each entry's trend rings until ctx is done.
-func (r *Registry) runSampler(ctx context.Context) {
-	defer close(r.samplerDone)
-	t := time.NewTicker(r.sampleInterval)
-	defer t.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-t.C:
-			r.sampleAll()
-		}
-	}
-}
+func (r *Registry) runSampler(ctx context.Context) { _ = "STUB: not implemented"; return }
 
 // sampleAll walks the registry and records one trend sample per entry.
-func (r *Registry) sampleAll() {
-	if r == nil || r.store == nil {
-		return
-	}
-	intervalSec := r.sampleInterval.Seconds()
-	if intervalSec <= 0 {
-		return
-	}
-	r.store.Range(0, func(_ theine.StringKey, v *QueryStats) bool {
-		v.takeSample(intervalSec)
-		return true
-	})
-}
+func (r *Registry) sampleAll() { _ = "STUB: not implemented"; return }
 
 // takeSample reads the current counters/histogram, computes deltas vs. the
 // previous sample, and pushes one new value into each trend ring. The rings
 // are pre-allocated by admit() when the registry has sampling enabled, so a
 // nil-or-uninitialised state means the entry pre-dates the sampler config
 // and trend pushes are skipped.
-func (s *QueryStats) takeSample(intervalSec float64) {
-	s.trendMu.Lock()
-	defer s.trendMu.Unlock()
+func (s *QueryStats) takeSample(intervalSec float64) { _ = "STUB: not implemented"; return }
 
-	if !s.trends.initialized {
-		return
-	}
-
-	callsNow := s.calls.Load()
-	totalDurNow := s.totalDurationNs.Load()
-	rowsNow := s.totalRows.Load()
-
-	callsDelta := callsNow - s.lastSampleCalls
-	durDeltaNs := max(totalDurNow-s.lastSampleTotalDurationNs, 0)
-	rowsDelta := rowsNow - s.lastSampleTotalRows
-
-	s.lastSampleCalls = callsNow
-	s.lastSampleTotalDurationNs = totalDurNow
-	s.lastSampleTotalRows = rowsNow
-
-	s.trends.callRate.push(float64(callsDelta) / intervalSec)
-	s.trends.totalTime.push(float64(durDeltaNs) / 1e6 / intervalSec)
-	s.trends.rowsRate.push(float64(rowsDelta) / intervalSec)
-
-	// Percentile sparkline tracks per-interval distribution: snapshot the
-	// histogram, push the percentile of (current - previous), then save
-	// the snapshot for the next sample. Without this delta, the sparkline
-	// would show cumulative-since-admission percentiles and flatten out.
-	var counts, delta [numHistBuckets]uint64
-	for i := range s.durationBuckets {
-		counts[i] = s.durationBuckets[i].Load()
-		delta[i] = counts[i] - s.lastSampleBuckets[i]
-	}
-	s.lastSampleBuckets = counts
-	s.trends.p50Ms.push(float64(percentileNs(delta, 0.50)) / 1e6)
-	s.trends.p99Ms.push(float64(percentileNs(delta, 0.99)) / 1e6)
-}
+// Percentile sparkline tracks per-interval distribution: snapshot the
+// histogram, push the percentile of (current - previous), then save
+// the snapshot for the next sample. Without this delta, the sparkline
+// would show cumulative-since-admission percentiles and flatten out.
 
 func (s *QueryStats) snapshot(sampleIntervalSec float64) Snapshot {
-	calls := s.calls.Load()
-	total := time.Duration(s.totalDurationNs.Load())
-	var avg time.Duration
-	if calls > 0 {
-		avg = total / time.Duration(calls)
-	}
-
-	var counts [numHistBuckets]uint64
-	for i := range s.durationBuckets {
-		counts[i] = s.durationBuckets[i].Load()
-	}
-	p50 := time.Duration(percentileNs(counts, 0.50))
-	p99 := time.Duration(percentileNs(counts, 0.99))
-
-	snap := Snapshot{
-		Fingerprint:           s.fingerprint,
-		NormalizedSQL:         s.normalizedSQL,
-		Calls:                 calls,
-		Errors:                s.errors.Load(),
-		TotalDuration:         total,
-		AverageDuration:       avg,
-		MinDuration:           time.Duration(s.minDurationNs.Load()),
-		MaxDuration:           time.Duration(s.maxDurationNs.Load()),
-		P50Duration:           p50,
-		P99Duration:           p99,
-		TotalRows:             s.totalRows.Load(),
-		LastSeen:              time.Unix(0, s.lastSeenUnixNs.Load()),
-		SampleIntervalSeconds: sampleIntervalSec,
-	}
-
-	s.trendMu.Lock()
-	if s.trends.initialized {
-		snap.CallRateTrend = s.trends.callRate.snapshot()
-		snap.TotalTimeMsTrend = s.trends.totalTime.snapshot()
-		snap.P50MsTrend = s.trends.p50Ms.snapshot()
-		snap.P99MsTrend = s.trends.p99Ms.snapshot()
-		snap.RowsRateTrend = s.trends.rowsRate.snapshot()
-	}
-	s.trendMu.Unlock()
-
-	return snap
+	_ = "STUB: not implemented"
+	return *new(Snapshot)
 }
 
-func sortSnapshots(snapshots []Snapshot, sortBy SortKey) {
-	var less func(i, j int) bool
-	switch sortBy {
-	case SortByTotalTime:
-		less = func(i, j int) bool { return snapshots[i].TotalDuration > snapshots[j].TotalDuration }
-	case SortByAverageTime:
-		less = func(i, j int) bool { return snapshots[i].AverageDuration > snapshots[j].AverageDuration }
-	case SortByErrors:
-		less = func(i, j int) bool { return snapshots[i].Errors > snapshots[j].Errors }
-	case SortByLastSeen:
-		less = func(i, j int) bool { return snapshots[i].LastSeen.After(snapshots[j].LastSeen) }
-	default:
-		less = func(i, j int) bool { return snapshots[i].Calls > snapshots[j].Calls }
-	}
-	sort.Slice(snapshots, less)
-}
+func sortSnapshots(snapshots []Snapshot, sortBy SortKey) { _ = "STUB: not implemented"; return }

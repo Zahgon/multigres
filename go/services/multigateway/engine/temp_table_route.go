@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -44,14 +43,16 @@ type TempTableRoute struct {
 
 // NewTempTableRoute creates a new TempTableRoute primitive.
 func NewTempTableRoute(tableGroup, shard, sql string) *TempTableRoute {
-	return &TempTableRoute{TableGroup: tableGroup, Shard: shard, Query: sql}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewTempTableRouteWithPreparedStatement creates a TempTableRoute that
 // carries a gateway-managed prepared statement. See
 // TempTableRoute.PreparedStatement for details.
 func NewTempTableRouteWithPreparedStatement(tableGroup, shard, sql string, ps *query.PreparedStatement) *TempTableRoute {
-	return &TempTableRoute{TableGroup: tableGroup, Shard: shard, Query: sql, PreparedStatement: ps}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute sets the temp table reservation flag and delegates to
@@ -65,8 +66,8 @@ func (t *TempTableRoute) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	state.PendingTempTableReservation = true
-	return exec.StreamExecute(ctx, conn, t.TableGroup, t.Shard, t.Query, t.PreparedStatement, state, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns the target tablegroup.
@@ -86,16 +87,25 @@ func (t *TempTableRoute) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return t.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (t *TempTableRoute) GetTableGroup() string { return t.TableGroup }
+func (t *TempTableRoute) GetTableGroup() string {
+	_ = "STUB: not implemented"
 
-// GetQuery returns the SQL query.
-func (t *TempTableRoute) GetQuery() string { return t.Query }
+	// GetQuery returns the SQL query.
+	return ""
+}
 
-// String returns a description of the primitive for debugging.
-func (t *TempTableRoute) String() string { return fmt.Sprintf("TempTableRoute(%s)", t.Query) }
+func (t *TempTableRoute) GetQuery() string {
+	_ = "STUB: not implemented"
+
+	// String returns a description of the primitive for debugging.
+	return ""
+}
+
+func (t *TempTableRoute) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure TempTableRoute implements Primitive interface.
 var _ Primitive = (*TempTableRoute)(nil)

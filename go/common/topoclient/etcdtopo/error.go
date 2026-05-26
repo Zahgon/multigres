@@ -15,15 +15,7 @@
 package etcdtopo
 
 import (
-	"context"
 	"errors"
-
-	"github.com/multigres/multigres/go/common/topoclient"
-
-	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Errors specific to this package.
@@ -38,56 +30,17 @@ var (
 
 // convertError converts an etcd error into a topo error. All errors
 // are either application-level errors, or context errors.
-func convertError(err error, nodePath string) error {
-	if err == nil {
-		return nil
-	}
+func convertError(err error, nodePath string) error { _ = "STUB: not implemented"; return nil }
 
-	var typeErr rpctypes.EtcdError
-	if errors.As(err, &typeErr) {
-		switch typeErr.Code() {
-		case codes.NotFound:
-			return topoclient.NewError(topoclient.NoNode, nodePath)
-		case codes.Unavailable, codes.DeadlineExceeded:
-			// The etcd client library may return this error:
-			// grpc.Errorf(codes.Unavailable,
-			// "etcdserver: request timed out") which seems to be
-			// misclassified, it should be using
-			// codes.DeadlineExceeded. All timeouts errors
-			// seem to be using the codes.Unavailable
-			// category. So changing all of them to ErrTimeout.
-			// The other reasons for codes.Unavailable are when
-			// etcd primary election is failing, so timeout
-			// also sounds reasonable there.
-			return topoclient.NewError(topoclient.Timeout, nodePath)
-		case codes.ResourceExhausted:
-			return topoclient.NewError(topoclient.ResourceExhausted, nodePath)
-		}
-		return err
-	}
+// The etcd client library may return this error:
+// grpc.Errorf(codes.Unavailable,
+// "etcdserver: request timed out") which seems to be
+// misclassified, it should be using
+// codes.DeadlineExceeded. All timeouts errors
+// seem to be using the codes.Unavailable
+// category. So changing all of them to ErrTimeout.
+// The other reasons for codes.Unavailable are when
+// etcd primary election is failing, so timeout
+// also sounds reasonable there.
 
-	if s, ok := status.FromError(err); ok {
-		// This is a gRPC error.
-		switch s.Code() {
-		case codes.NotFound:
-			return topoclient.NewError(topoclient.NoNode, nodePath)
-		case codes.Canceled:
-			return topoclient.NewError(topoclient.Interrupted, nodePath)
-		case codes.DeadlineExceeded:
-			return topoclient.NewError(topoclient.Timeout, nodePath)
-		case codes.ResourceExhausted:
-			return topoclient.NewError(topoclient.ResourceExhausted, nodePath)
-		default:
-			return err
-		}
-	}
-
-	switch {
-	case errors.Is(err, context.Canceled):
-		return topoclient.NewError(topoclient.Interrupted, nodePath)
-	case errors.Is(err, context.DeadlineExceeded):
-		return topoclient.NewError(topoclient.Timeout, nodePath)
-	default:
-		return err
-	}
-}
+// This is a gRPC error.

@@ -66,11 +66,13 @@ const (
 // IntervalMask returns the bit mask for an interval field
 // Ported from postgres/src/include/utils/timestamp.h:73
 func IntervalMask(field int) int {
-	return 1 << field
+	_ = "STUB: not implemented"
+
+	// Interval range and precision constants
+	// Ported from postgres/src/include/utils/timestamp.h:76-82
+	return 0
 }
 
-// Interval range and precision constants
-// Ported from postgres/src/include/utils/timestamp.h:76-82
 const (
 	INTERVAL_FULL_RANGE     = 0x7FFF // Full range mask
 	INTERVAL_RANGE_MASK     = 0x7FFF // Range mask for extracting range
@@ -80,21 +82,15 @@ const (
 
 // IntervalTypmod creates a typmod value from precision and range
 // Ported from postgres/src/include/utils/timestamp.h:80
-func IntervalTypmod(precision, rangeVal int) int {
-	return ((rangeVal & INTERVAL_RANGE_MASK) << 16) | (precision & INTERVAL_PRECISION_MASK)
-}
+func IntervalTypmod(precision, rangeVal int) int { _ = "STUB: not implemented"; return 0 }
 
 // IntervalPrecision extracts precision from typmod
 // Ported from postgres/src/include/utils/timestamp.h:81
-func IntervalPrecision(typmod int) int {
-	return typmod & INTERVAL_PRECISION_MASK
-}
+func IntervalPrecision(typmod int) int { _ = "STUB: not implemented"; return 0 }
 
 // IntervalRange extracts range from typmod
 // Ported from postgres/src/include/utils/timestamp.h:82
-func IntervalRange(typmod int) int {
-	return (typmod >> 16) & INTERVAL_RANGE_MASK
-}
+func IntervalRange(typmod int) int { _ = "STUB: not implemented"; return 0 }
 
 // Common interval mask combinations for convenience
 var (

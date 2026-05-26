@@ -16,26 +16,17 @@ package actions
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-
-	commonconsensus "github.com/multigres/multigres/go/common/consensus"
-	"github.com/multigres/multigres/go/common/eventlog"
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/rpcclient"
 	"github.com/multigres/multigres/go/common/topoclient"
-	commontypes "github.com/multigres/multigres/go/common/types"
 	"github.com/multigres/multigres/go/services/multiorch/config"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 	"github.com/multigres/multigres/go/services/multiorch/store"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	consensusdatapb "github.com/multigres/multigres/go/pb/consensusdata"
 	multiorchdatapb "github.com/multigres/multigres/go/pb/multiorchdata"
-	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 )
 
 // Compile-time assertion that DemoteStaleLeaderAction implements types.RecoveryAction.
@@ -65,35 +56,28 @@ func NewDemoteStaleLeaderAction(
 	topoStore topoclient.Store,
 	logger *slog.Logger,
 ) *DemoteStaleLeaderAction {
-	return &DemoteStaleLeaderAction{
-		config:      cfg,
-		rpcClient:   rpcClient,
-		poolerStore: poolerStore,
-		topoStore:   topoStore,
-		logger:      logger,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (a *DemoteStaleLeaderAction) Metadata() types.RecoveryMetadata {
-	return types.RecoveryMetadata{
-		Name:        "DemoteStaleLeader",
-		Description: "Demote a stale leader that came back online after failover",
-		Timeout:     60 * time.Second,
-		LockTimeout: 15 * time.Second,
-		Retryable:   true,
-	}
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryMetadata)
 }
 
 func (a *DemoteStaleLeaderAction) Priority() types.Priority {
-	return types.PriorityHigh
+	_ = "STUB: not implemented"
+	return *new(types.Priority)
 }
 
 func (a *DemoteStaleLeaderAction) RequiresHealthyLeader() bool {
+	_ = "STUB: not implemented"
 	// We're demoting a stale leader, so we can't require a healthy leader
 	return false
 }
 
 func (a *DemoteStaleLeaderAction) GracePeriod() *types.GracePeriodConfig {
+	_ = "STUB: not implemented"
 	// Under the new consensus flow the demote goes through SetTermPrimary, which is
 	// position-fenced: a leader that's only momentarily-stale would see its
 	// own rule >= the incoming rule and no-op without touching postgres.
@@ -101,13 +85,7 @@ func (a *DemoteStaleLeaderAction) GracePeriod() *types.GracePeriodConfig {
 	// grace period that guarded the old destructive DemoteStalePrimary RPC
 	// is no longer needed. Skipping it lets recovery converge much faster
 	// across sequential failovers.
-	if a.config.GetUseNewConsensusFlow() {
-		return nil
-	}
-	return &types.GracePeriodConfig{
-		BaseDelay: a.config.GetLeaderFailoverGracePeriodBase(),
-		MaxJitter: a.config.GetLeaderFailoverGracePeriodMaxJitter(),
-	}
+	return nil
 }
 
 // Execute demotes the stale leader using the DemoteStalePrimary RPC with the correct leader's term.
@@ -116,131 +94,52 @@ func (a *DemoteStaleLeaderAction) GracePeriod() *types.GracePeriodConfig {
 // 2. The stale leader accepts term >= its current term and demotes
 // 3. Both leaders end up with the same term (no term inconsistency)
 func (a *DemoteStaleLeaderAction) Execute(ctx context.Context, problem types.Problem) (retErr error) {
-	poolerIDStr := topoclient.MultiPoolerIDString(problem.PoolerID)
-
-	a.logger.InfoContext(ctx, "executing demote stale leader action",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey),
-		"stale_leader", poolerIDStr)
-
-	// Get the stale leader from the store
-	staleLeader, ok := a.poolerStore.Get(poolerIDStr)
-	if !ok {
-		return fmt.Errorf("stale leader %s not found in store", poolerIDStr)
-	}
-
-	// Check if postgres is running on the stale leader before attempting demote.
-	// Demote requires postgres to be healthy. If postgres is not running yet,
-	// we should skip this attempt and let the next recovery cycle retry once
-	// postgres is ready. This avoids wasting time on RPCs that will fail.
-	// if !stalePrimary.IsPostgresReady {
-	// 	return mterrors.New(mtrpcpb.Code_UNAVAILABLE,
-	// 		fmt.Sprintf("postgres not running on stale leader %s, skipping demote attempt", poolerIDStr))
-	// }
-
-	// Find the correct leader to use as rewind source
-	correctLeader, correctLeaderTerm, err := a.findCorrectLeader(problem.ShardKey, poolerIDStr)
-	if err != nil {
-		return mterrors.Wrap(err, "failed to find correct leader")
-	}
-
-	a.logger.InfoContext(ctx, "demoting stale leader using DemoteStalePrimary RPC",
-		"stale_leader", poolerIDStr,
-		"correct_leader", correctLeader.MultiPooler.Id.Name,
-		"correct_leader_term", correctLeaderTerm)
-
-	eventlog.Emit(ctx, a.logger, eventlog.Started, eventlog.PrimaryDemotion{NodeName: poolerIDStr, Reason: "stale"})
-	defer func() {
-		if retErr == nil {
-			eventlog.Emit(ctx, a.logger, eventlog.Success, eventlog.PrimaryDemotion{NodeName: poolerIDStr, Reason: "stale"})
-		} else {
-			eventlog.Emit(ctx, a.logger, eventlog.Failed, eventlog.PrimaryDemotion{NodeName: poolerIDStr, Reason: "stale"}, "error", retErr)
-		}
-	}()
-
-	// Demote the stale leader. Under the new consensus flow, route through
-	// SetTermPrimary .
-	//
-	// Both RPCs do the same work on the pooler side:
-	// 1. Stop postgres
-	// 2. Run pg_rewind to sync with the correct leader's postgres
-	// 3. Restart as standby
-	// 4. Clear sync replication config
-	// 5. Update topology to REPLICA
-	if a.config.GetUseNewConsensusFlow() {
-		informReq := &consensusdatapb.SetTermPrimaryRequest{
-			Leader: topoclient.PoolerAddressFor(correctLeader.MultiPooler),
-			Rule:   correctLeader.GetConsensusStatus().GetCurrentPosition().GetRule(),
-		}
-		if _, err := a.rpcClient.SetTermPrimary(ctx, staleLeader.MultiPooler, informReq); err != nil {
-			return mterrors.Wrap(err, "SetTermPrimary RPC failed")
-		}
-		a.logger.InfoContext(ctx, "stale leader demoted successfully via SetTermPrimary",
-			"stale_leader", poolerIDStr)
-	} else {
-		demoteResp, err := a.rpcClient.DemoteStalePrimary(ctx, staleLeader.MultiPooler, &multipoolermanagerdatapb.DemoteStalePrimaryRequest{
-			Source:        correctLeader.MultiPooler,
-			ConsensusTerm: correctLeaderTerm,
-			Force:         false,
-		})
-		if err != nil {
-			return mterrors.Wrap(err, "DemoteStalePrimary RPC failed")
-		}
-		a.logger.InfoContext(ctx, "stale leader demoted successfully",
-			"stale_leader", poolerIDStr,
-			"rewind_performed", demoteResp.RewindPerformed,
-			"lsn_position", demoteResp.LsnPosition)
-	}
-
-	a.logger.InfoContext(ctx, "demote stale leader action completed",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey),
-		"demoted_leader", poolerIDStr)
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Get the stale leader from the store
+
+// Check if postgres is running on the stale leader before attempting demote.
+// Demote requires postgres to be healthy. If postgres is not running yet,
+// we should skip this attempt and let the next recovery cycle retry once
+// postgres is ready. This avoids wasting time on RPCs that will fail.
+// if !stalePrimary.IsPostgresReady {
+// 	return mterrors.New(mtrpcpb.Code_UNAVAILABLE,
+// 		fmt.Sprintf("postgres not running on stale leader %s, skipping demote attempt", poolerIDStr))
+// }
+
+// Find the correct leader to use as rewind source
+
+// Demote the stale leader. Under the new consensus flow, route through
+// SetTermPrimary .
+//
+// Both RPCs do the same work on the pooler side:
+// 1. Stop postgres
+// 2. Run pg_rewind to sync with the correct leader's postgres
+// 3. Restart as standby
+// 4. Clear sync replication config
+// 5. Update topology to REPLICA
 
 // findCorrectLeader finds the current leader in the shard and returns it along with its term.
 // The correct leader is the one with the highest LeaderTerm.
 func (a *DemoteStaleLeaderAction) findCorrectLeader(shardKey *clustermetadatapb.ShardKey, stalePrimaryIDStr string) (*multiorchdatapb.PoolerHealthState, int64, error) {
-	var correctLeader *multiorchdatapb.PoolerHealthState
-	var maxLeaderTerm int64
-
-	// Iterate through all poolers to find the current leader
-	a.poolerStore.Range(func(key string, pooler *multiorchdatapb.PoolerHealthState) bool {
-		if pooler == nil || pooler.MultiPooler == nil || pooler.MultiPooler.Id == nil {
-			return true // continue
-		}
-
-		// Only consider poolers in the same shard
-		if !proto.Equal(pooler.MultiPooler.GetShardKey(), shardKey) {
-			return true // continue
-		}
-
-		poolerIDStr := topoclient.MultiPoolerIDString(pooler.MultiPooler.Id)
-
-		// Skip the stale leader
-		if poolerIDStr == stalePrimaryIDStr {
-			return true // continue
-		}
-
-		if !commonconsensus.IsLeader(pooler.GetConsensusStatus()) {
-			return true // continue
-		}
-
-		leaderTerm := commonconsensus.LeaderTerm(pooler.GetConsensusStatus())
-
-		if leaderTerm > maxLeaderTerm {
-			maxLeaderTerm = leaderTerm
-			correctLeader = pooler
-		}
-
-		return true // continue
-	})
-
-	if correctLeader == nil {
-		return nil, 0, fmt.Errorf("no current leader found in shard %s", commontypes.FormatShardKey(shardKey))
-	}
-
-	consensusTerm := correctLeader.GetConsensusStatus().GetTermRevocation().GetRevokedBelowTerm()
-
-	return correctLeader, consensusTerm, nil
+	_ = "STUB: not implemented"
+	return nil, 0, nil
 }
+
+// Iterate through all poolers to find the current leader
+
+// continue
+
+// Only consider poolers in the same shard
+
+// continue
+
+// Skip the stale leader
+
+// continue
+
+// continue
+
+// continue

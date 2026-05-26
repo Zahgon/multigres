@@ -15,22 +15,9 @@
 // Package pathutil provides a command to append a path to PATH.
 package pathutil
 
-import (
-	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
-)
-
 // PrependPath prepends a given path to the PATH environment variable.
 // It ensures the path is absolute and takes precedence over existing paths.
-func PrependPath(path string) {
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return
-	}
-	_ = os.Setenv("PATH", absPath+string(os.PathListSeparator)+os.Getenv("PATH"))
-}
+func PrependPath(path string) { _ = "STUB: not implemented"; return }
 
 // findModuleRoot finds the root directory of the Go module by walking up
 // the directory tree looking for go.mod. It starts from the current working
@@ -39,51 +26,22 @@ func PrependPath(path string) {
 //
 // This approach is borrowed from the Go standard library's module loading logic:
 // https://github.com/golang/go/blob/9e3b1d53a012e98cfd02de2de8b1bd53522464d4/src/cmd/go/internal/modload/init.go#L1504-L1522
-func findModuleRoot() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("cannot get working directory: %w", err)
-	}
+func findModuleRoot() (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-	dir = filepath.Clean(dir)
+// Look for enclosing go.mod
 
-	// Look for enclosing go.mod
-	for {
-		goModPath := filepath.Join(dir, "go.mod")
-		if fi, err := os.Stat(goModPath); err == nil && !fi.IsDir() {
-			return dir, nil
-		}
+// Move to parent directory
 
-		// Move to parent directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			// Reached the filesystem root
-			break
-		}
-		dir = parent
-	}
-
-	return "", errors.New("go.mod not found in any parent directory")
-}
+// Reached the filesystem root
 
 // prependModuleSubdirsToPath finds the module root and prepends multiple
 // subdirectories to PATH. Each subdir is joined with the module root and
 // prepended to PATH in order (first argument will have highest precedence).
 // Subdirs are processed in reverse order so that the first argument ends up
 // first in the resulting PATH.
-func prependModuleSubdirsToPath(subdirs ...string) error {
-	moduleRoot, err := findModuleRoot()
-	if err != nil {
-		return fmt.Errorf("failed to find module root: %w", err)
-	}
+func prependModuleSubdirsToPath(subdirs ...string) error { _ = "STUB: not implemented"; return nil }
 
-	// Iterate in reverse order so first argument ends up first in PATH
-	for i := len(subdirs) - 1; i >= 0; i-- {
-		targetPath := filepath.Join(moduleRoot, subdirs[i])
-		PrependPath(targetPath)
-	}
-	return nil
-}
+// Iterate in reverse order so first argument ends up first in PATH
 
 // PrependBinToPath finds the module root and prepends the bin directory to PATH.
 // This is useful for tests that need to use binaries built in the project.
@@ -94,13 +52,12 @@ func prependModuleSubdirsToPath(subdirs ...string) error {
 // prepended before bin/ to enable automatic coverage collection from subprocess
 // executions. If bin/cov/ doesn't exist, PATH lookup will skip it harmlessly.
 func PrependBinToPath() error {
+	_ = "STUB: not implemented"
 	// Check if coverage collection is requested via GOCOVERDIR
-	if gocoverdir := os.Getenv("GOCOVERDIR"); gocoverdir != "" {
-		// GOCOVERDIR is set, so prepend bin/cov before bin
-		// This allows coverage-instrumented binaries to be found first
-		return prependModuleSubdirsToPath("bin/cov", "bin", "go/test/endtoend")
-	}
-
-	// Normal case: just prepend bin
-	return prependModuleSubdirsToPath("bin", "go/test/endtoend")
+	return nil
 }
+
+// GOCOVERDIR is set, so prepend bin/cov before bin
+// This allows coverage-instrumented binaries to be found first
+
+// Normal case: just prepend bin

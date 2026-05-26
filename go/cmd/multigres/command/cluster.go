@@ -15,32 +15,15 @@
 package command
 
 import (
-	"github.com/multigres/multigres/go/cmd/multigres/command/cluster"
-
 	"github.com/spf13/cobra"
 )
 
 // AddClusterCommand adds the cluster subcommand and its subcommands to the root command
 func AddClusterCommand(root *cobra.Command, mc *MultigresCommand) {
-	clusterCmd := &cobra.Command{
-		Use:   "cluster",
-		Short: "Manage cluster lifecycle",
-		Long:  "Commands for managing the Multigres cluster lifecycle including initialization, startup, shutdown, and status monitoring.",
-	}
-
-	// Register cluster subcommands
-	cluster.AddInitCommand(clusterCmd)
-	cluster.AddStartCommand(clusterCmd)
-	cluster.AddStopCommand(clusterCmd)
-	cluster.AddRestartCommand(clusterCmd)
-	cluster.AddStatusCommand(clusterCmd)
-	cluster.AddBackupCommand(clusterCmd)
-	cluster.AddListBackupsCommand(clusterCmd)
-	cluster.AddCheckBackupConfigCommand(clusterCmd)
-	cluster.AddRefreshCredentialsCommand(clusterCmd)
-	cluster.AddExpireBackupsCommand(clusterCmd)
-	cluster.AddApplyRuleChangeCommand(clusterCmd)
-
-	// Register cluster command with root
-	root.AddCommand(clusterCmd)
+	_ = "STUB: not implemented"
+	return
 }
+
+// Register cluster subcommands
+
+// Register cluster command with root

@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -60,24 +59,16 @@ type Route struct {
 // execution time (substituting bind values into ParamRef placeholders). Pass
 // nil for routes that don't need SQL reconstruction (e.g., non-cached plans).
 func NewRoute(tableGroup, shard, query string, astStmt ast.Stmt) *Route {
-	return &Route{
-		TableGroup:    tableGroup,
-		Shard:         shard,
-		Query:         query,
-		NormalizedAST: astStmt,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewRouteWithPreparedStatement creates a Route that carries a gateway-managed
 // prepared statement to be ensured on the backend connection before execution.
 // See Route.PreparedStatement for details.
 func NewRouteWithPreparedStatement(tableGroup, shard, sql string, ps *query.PreparedStatement) *Route {
-	return &Route{
-		TableGroup:        tableGroup,
-		Shard:             shard,
-		Query:             sql,
-		PreparedStatement: ps,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute executes the route by sending the query to the target tablegroup.
@@ -95,24 +86,13 @@ func (r *Route) StreamExecute(
 	bindVars []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	query := r.Query
-	if len(bindVars) > 0 && r.NormalizedAST != nil {
-		query = ast.ReconstructSQL(r.NormalizedAST, bindVars)
-	}
-	// Execute the query through the execution interface.
-	// We pass ctx (not conn.Context()) so that deadlines set by executeWithTimeout
-	// propagate through gRPC to the multipooler for statement timeout enforcement.
-	return exec.StreamExecute(
-		ctx,
-		conn,
-		r.TableGroup,
-		r.Shard,
-		query,
-		r.PreparedStatement,
-		state,
-		callback,
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Execute the query through the execution interface.
+// We pass ctx (not conn.Context()) so that deadlines set by executeWithTimeout
+// propagate through gRPC to the multipooler for statement timeout enforcement.
 
 // PortalStreamExecute reissues the portal against the route's tablegroup/shard
 // so the multipooler receives the original query text (with $N placeholders)
@@ -128,23 +108,22 @@ func (r *Route) PortalStreamExecute(
 	includeDescribe bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return exec.PortalStreamExecute(ctx, r.TableGroup, r.Shard, conn, state, portalInfo, maxRows, includeDescribe, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns the target tablegroup.
-func (r *Route) GetTableGroup() string {
-	return r.TableGroup
-}
+func (r *Route) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
 // GetQuery returns the SQL query.
 func (r *Route) GetQuery() string {
-	return r.Query
+	_ = "STUB: not implemented"
+
+	// String returns a description of the route for debugging.
+	return ""
 }
 
-// String returns a description of the route for debugging.
-func (r *Route) String() string {
-	return fmt.Sprintf("Route(tablegroup=%s, query=%s)", r.TableGroup, r.Query)
-}
+func (r *Route) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure Route implements Primitive interface.
 var _ Primitive = (*Route)(nil)

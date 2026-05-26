@@ -16,35 +16,16 @@
 
 package servenv
 
-import (
-	"fmt"
-	"log/slog"
-)
-
 // InitServiceMap will set the default value for a protocol/name to be served.
-func (sv *ServEnv) InitServiceMap(protocol, name string) {
-	sv.serviceMap[protocol+"-"+name] = true
-}
+func (sv *ServEnv) InitServiceMap(protocol, name string) { _ = "STUB: not implemented"; return }
 
 // updateServiceMap takes the command line parameter, and updates the
 // ServiceMap accordingly
-func (sv *ServEnv) updateServiceMap() {
-	for _, s := range sv.serviceMapFlag.Get() {
-		if s[0] == '-' {
-			delete(sv.serviceMap, s[1:])
-		} else {
-			sv.serviceMap[s] = true
-		}
-	}
-}
+func (sv *ServEnv) updateServiceMap() { _ = "STUB: not implemented"; return }
 
 // checkServiceMap returns if we should register a RPC service
 // (and also logs how to enable / disable it)
 func (sv *ServEnv) checkServiceMap(protocol, name string) bool {
-	if sv.serviceMap[protocol+"-"+name] {
-		slog.Info(fmt.Sprintf("Registering %v for %v, disable it with -%v-%v service_map parameter", name, protocol, protocol, name))
-		return true
-	}
-	slog.Info(fmt.Sprintf("Not registering %v for %v, enable it with %v-%v service_map parameter", name, protocol, protocol, name))
+	_ = "STUB: not implemented"
 	return false
 }

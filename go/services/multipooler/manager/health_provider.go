@@ -22,7 +22,6 @@ import (
 	"time"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	querypb "github.com/multigres/multigres/go/pb/query"
 	"github.com/multigres/multigres/go/services/multipooler/poolerserver"
 )
 
@@ -73,31 +72,23 @@ type healthStreamer struct {
 
 // newHealthStreamer creates a new health streamer with the given identity.
 func newHealthStreamer(logger *slog.Logger, poolerID *clustermetadatapb.ID, tableGroup, shard string) *healthStreamer {
-	return &healthStreamer{
-		logger:                      logger,
-		poolerID:                    poolerID,
-		tableGroup:                  tableGroup,
-		shard:                       shard,
-		clients:                     make(map[chan *poolerserver.HealthState]struct{}),
-		recommendedStalenessTimeout: defaultRecommendedStalenessTimeout,
-		servingStatus:               clustermetadatapb.PoolerServingStatus_NOT_SERVING,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetQueryServer sets the query server that the healthStreamer waits on before
 // broadcasting SERVING transitions. Must be called before any state transitions.
 func (hs *healthStreamer) SetQueryServer(qs poolerserver.PoolerController) {
-	hs.queryServer = qs
+	_ = "STUB: not implemented"
+	return
+
+	// UpdateLeaderObservation updates the primary observation (term + primary ID)
+	// and broadcasts to clients.
 }
 
-// UpdateLeaderObservation updates the primary observation (term + primary ID)
-// and broadcasts to clients.
 func (hs *healthStreamer) UpdateLeaderObservation(obs *poolerserver.LeaderObservation) {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	hs.leaderObservation = obs
-	hs.broadcastLocked()
+	_ = "STUB: not implemented"
+	return
 }
 
 // OnStateChange updates both poolerType and servingStatus atomically with a single
@@ -110,95 +101,51 @@ func (hs *healthStreamer) UpdateLeaderObservation(obs *poolerserver.LeaderObserv
 // NOT_SERVING transitions broadcast immediately so the gateway can start
 // buffering without delay.
 func (hs *healthStreamer) OnStateChange(ctx context.Context, poolerType clustermetadatapb.PoolerType, servingStatus clustermetadatapb.PoolerServingStatus) error {
-	if servingStatus == clustermetadatapb.PoolerServingStatus_SERVING && hs.queryServer != nil {
-		hs.queryServer.AwaitStateChange(ctx, poolerType, servingStatus)
-	}
-
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	hs.poolerType = poolerType
-	hs.servingStatus = servingStatus
-	hs.broadcastLocked()
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Broadcast sends the current state to all clients without changing any state.
 // Used for periodic heartbeats.
-func (hs *healthStreamer) Broadcast() {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	hs.broadcastLocked()
-}
+func (hs *healthStreamer) Broadcast() { _ = "STUB: not implemented"; return }
 
 // SetReplicationLag updates the replication lag reported in the health stream.
 // Called by the manager's heartbeat loop with the latest measured lag.
 // Safe to call concurrently with any method.
-func (hs *healthStreamer) SetReplicationLag(lagNs int64) {
-	hs.replicationLagNs.Store(lagNs)
-}
+func (hs *healthStreamer) SetReplicationLag(lagNs int64) { _ = "STUB: not implemented"; return }
 
 // buildStateLocked builds the current health state. Caller must hold hs.mu.
 func (hs *healthStreamer) buildStateLocked() *poolerserver.HealthState {
-	return &poolerserver.HealthState{
-		Target: &querypb.Target{
-			TableGroup: hs.tableGroup,
-			Shard:      hs.shard,
-			PoolerType: hs.poolerType,
-		},
-		PoolerID:                    hs.poolerID,
-		ServingStatus:               hs.servingStatus,
-		LeaderObservation:           hs.leaderObservation,
-		RecommendedStalenessTimeout: hs.recommendedStalenessTimeout,
-		ReplicationLagNs:            hs.replicationLagNs.Load(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // broadcastLocked sends the current health state to all registered clients.
 // If a client's buffer is full, closes the channel to force reconnect.
 // Caller must hold hs.mu.
-func (hs *healthStreamer) broadcastLocked() {
-	state := hs.buildStateLocked()
+func (hs *healthStreamer) broadcastLocked() { _ = "STUB: not implemented"; return }
 
-	for ch := range hs.clients {
-		select {
-		case ch <- state:
-		default:
-			// If the buffer is full, the channel is closed to force client
-			// reconnect. This ensures clients don't operate on stale state
-			// indefinitely. This can happen if the client is too slow to
-			// process updates or if there are too many updates in a short time
-			// (e.g. due to flapping). The client should reconnect and receive
-			// the latest state.
-			//
-			// TODO: consider adding a metric for this to detect if clients are
-			// falling behind frequently.
-			hs.logger.Warn("Health stream buffer full, closing channel to force reconnect")
-			close(ch)
-			delete(hs.clients, ch)
-		}
-	}
-}
+// If the buffer is full, the channel is closed to force client
+// reconnect. This ensures clients don't operate on stale state
+// indefinitely. This can happen if the client is too slow to
+// process updates or if there are too many updates in a short time
+// (e.g. due to flapping). The client should reconnect and receive
+// the latest state.
+//
+// TODO: consider adding a metric for this to detect if clients are
+// falling behind frequently.
 
 // getState returns the current health state.
 func (hs *healthStreamer) getState() *poolerserver.HealthState {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-	return hs.buildStateLocked()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // subscribe registers a new client for health updates.
 // Returns the current state and a channel that receives updates.
 func (hs *healthStreamer) subscribe() (*poolerserver.HealthState, chan *poolerserver.HealthState) {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	ch := make(chan *poolerserver.HealthState, defaultHealthStreamBufferSize)
-	hs.clients[ch] = struct{}{}
-
-	state := hs.buildStateLocked()
-	return state, ch
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // unsubscribe removes a client from health updates and closes the channel so
@@ -206,32 +153,20 @@ func (hs *healthStreamer) subscribe() (*poolerserver.HealthState, chan *poolerse
 // already removed (e.g. by broadcastLocked's buffer-full path, which also
 // closes), the second call is a no-op.
 func (hs *healthStreamer) unsubscribe(ch chan *poolerserver.HealthState) {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-
-	if _, ok := hs.clients[ch]; !ok {
-		return
-	}
-	delete(hs.clients, ch)
-	close(ch)
+	_ = "STUB: not implemented"
+	return
 }
 
 // clientCount returns the number of active streaming clients.
-func (hs *healthStreamer) clientCount() int {
-	hs.mu.Lock()
-	defer hs.mu.Unlock()
-	return len(hs.clients)
-}
+func (hs *healthStreamer) clientCount() int { _ = "STUB: not implemented"; return 0 }
 
 // HealthProvider implementation for MultiPoolerManager
 
 // GetHealthState returns the current health state of the pooler.
 // Implements poolerserver.HealthProvider.
 func (pm *MultiPoolerManager) GetHealthState(ctx context.Context) (*poolerserver.HealthState, error) {
-	if pm.healthStreamer == nil {
-		return nil, nil
-	}
-	return pm.healthStreamer.getState(), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SubscribeHealth subscribes to health state changes.
@@ -240,57 +175,28 @@ func (pm *MultiPoolerManager) GetHealthState(ctx context.Context) (*poolerserver
 // falls too far behind (buffer full).
 // Implements poolerserver.HealthProvider.
 func (pm *MultiPoolerManager) SubscribeHealth(ctx context.Context) (*poolerserver.HealthState, <-chan *poolerserver.HealthState, error) {
-	if pm.healthStreamer == nil {
-		return nil, nil, nil
-	}
-
-	state, ch := pm.healthStreamer.subscribe()
-
-	// Clean up on either:
-	//   - the caller's ctx ending (gRPC stream finished, client disconnected,
-	//     RPC cancelled), or
-	//   - the manager's shutdownCtx firing at the end of GracefulShutdown
-	//     (forces in-flight stream handlers to return so grpcServer.GracefulStop
-	//     can complete without waiting for them).
-	//
-	// shutdownDone is nil for tests that bypass NewMultiPoolerManager; a
-	// receive on a nil channel blocks forever, so the select degrades cleanly
-	// to "wait on caller ctx only."
-	var shutdownDone <-chan struct{}
-	if pm.shutdownCtx != nil {
-		shutdownDone = pm.shutdownCtx.Done()
-	}
-	go func() {
-		select {
-		case <-ctx.Done():
-		case <-shutdownDone:
-		}
-		pm.healthStreamer.unsubscribe(ch)
-	}()
-
-	return state, ch, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
+
+// Clean up on either:
+//   - the caller's ctx ending (gRPC stream finished, client disconnected,
+//     RPC cancelled), or
+//   - the manager's shutdownCtx firing at the end of GracefulShutdown
+//     (forces in-flight stream handlers to return so grpcServer.GracefulStop
+//     can complete without waiting for them).
+//
+// shutdownDone is nil for tests that bypass NewMultiPoolerManager; a
+// receive on a nil channel blocks forever, so the select degrades cleanly
+// to "wait on caller ctx only."
 
 // runHealthHeartbeat runs the periodic health heartbeat loop.
 // It broadcasts the current health state at the specified interval.
 // This should be started as a goroutine when the manager opens.
 func (pm *MultiPoolerManager) runHealthHeartbeat(ctx context.Context, interval time.Duration) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			// Refresh replication lag before broadcasting so clients see
-			// up-to-date lag without requiring a separate state-change event.
-			if pm.healthStreamer != nil {
-				if lag, err := pm.ReplicationLag(ctx); err == nil {
-					pm.healthStreamer.SetReplicationLag(lag.Nanoseconds())
-				}
-			}
-			pm.broadcastHealth()
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Refresh replication lag before broadcasting so clients see
+// up-to-date lag without requiring a separate state-change event.

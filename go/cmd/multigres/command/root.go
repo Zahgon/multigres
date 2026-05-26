@@ -15,18 +15,10 @@
 package command
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"time"
-
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/multigres/multigres/go/tools/telemetry"
 	"github.com/multigres/multigres/go/tools/viperutil"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // MultigresCommand holds the configuration for multigres commands
@@ -37,89 +29,25 @@ type MultigresCommand struct {
 }
 
 // GetRootCommand creates and returns the root command for multigres with all subcommands
-func GetRootCommand() *cobra.Command {
-	reg := viperutil.NewRegistry()
-	telemetry := telemetry.NewTelemetry()
-	mc := &MultigresCommand{
-		reg:       reg,
-		vc:        viperutil.NewViperConfig(reg),
-		telemetry: telemetry,
-	}
+func GetRootCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }
 
-	var span trace.Span
+// Silence usage for application errors, but allow it for flag errors
+// This gets called after flag parsing, so flag errors will still show usage
 
-	root := &cobra.Command{
-		Use:   "multigres",
-		Short: "The command-line companion for managing and developing with Multigres clusters",
-		Long: `The Multigres CLI makes distributed Postgres feel as easy as running Postgres locally.
+// Set multigres-specific config name
 
-A single binary that gives developers confidence when experimenting,
-and operators the tools to keep clusters healthy at scale.
+// Load config (without the full servenv setup)
 
-Get started with:
-  multigres cluster init    # Create a local cluster configuration
-  multigres cluster up      # Start your local cluster
+/* startSpan */
 
-Configuration:
-  Multigres automatically searches for configuration files in this order:
-  1. File specified by --config-file flag (if provided)
-  2. Files named 'multigres' with supported extensions (.yaml, .yml, .json, .toml)
-     in directories specified by --config-path flags
-  3. Current working directory (default search path)
+// Shutdown OpenTelemetry to flush all pending spans
+// This is critical for CLI commands to export traces before process exit
 
-  Environment variable MT_CONFIG_NAME can override the config filename.
-  Use --config-file-not-found-handling to control behavior when no config is found.`,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// Silence usage for application errors, but allow it for flag errors
-			// This gets called after flag parsing, so flag errors will still show usage
-			cmd.SilenceUsage = true
+// Add any other servenv flags
 
-			// Set multigres-specific config name
-			viper.SetConfigName("multigres")
+// Override the default display value for multigres
 
-			// Load config (without the full servenv setup)
-			_, err := mc.vc.LoadConfig(mc.reg)
-			if err != nil {
-				return err
-			}
+// Configure output streams explicitly
+// Otherwise cobra will output commands to StdErr
 
-			if span, err = mc.telemetry.InitForCommand(cmd, "multigres-cli", true /* startSpan */); err != nil {
-				return fmt.Errorf("failed to initialize OpenTelemetry: %w", err)
-			}
-
-			return nil
-		},
-		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
-			span.End()
-
-			// Shutdown OpenTelemetry to flush all pending spans
-			// This is critical for CLI commands to export traces before process exit
-			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-			defer cancel()
-			if err := mc.telemetry.ShutdownTelemetry(ctx); err != nil {
-				return fmt.Errorf("failed to shutdown OpenTelemetry: %w", err)
-			}
-			return nil
-		},
-	}
-
-	// Add any other servenv flags
-	mc.vc.RegisterFlags(root.PersistentFlags())
-
-	// Override the default display value for multigres
-	if flag := root.PersistentFlags().Lookup("config-name"); flag != nil {
-		flag.DefValue = "multigres"
-	}
-
-	// Configure output streams explicitly
-	// Otherwise cobra will output commands to StdErr
-	root.SetOut(os.Stdout)
-	root.SetErr(os.Stderr)
-
-	// Add all subcommands
-	AddClusterCommand(root, mc)
-	AddTopoCommands(root, mc)
-	AddPoolerCommands(root, mc)
-
-	return root
-}
+// Add all subcommands

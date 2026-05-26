@@ -30,11 +30,6 @@
 // Ported from postgres/src/include/nodes/primnodes.h
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // TYPE COERCION AND ADVANCED EXPRESSION NODES - PostgreSQL Type System
 // ==============================================================================
@@ -54,53 +49,25 @@ type RelabelType struct {
 
 // NewRelabelType creates a new RelabelType node.
 func NewRelabelType(arg Expression, resulttype Oid, resulttypmod int32, relabelformat CoercionForm) *RelabelType {
-	return &RelabelType{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_RelabelType}},
-		Arg:           arg,
-		Resulttype:    resulttype,
-		Resulttypmod:  resulttypmod,
-		Relabelformat: relabelformat,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewImplicitRelabelType creates a new RelabelType for implicit casts.
 func NewImplicitRelabelType(arg Expression, resulttype Oid) *RelabelType {
-	return &RelabelType{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_RelabelType}},
-		Arg:           arg,
-		Resulttype:    resulttype,
-		Resulttypmod:  -1,
-		Relabelformat: COERCE_IMPLICIT_CAST,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewExplicitRelabelType creates a new RelabelType for explicit casts.
 func NewExplicitRelabelType(arg Expression, resulttype Oid) *RelabelType {
-	return &RelabelType{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_RelabelType}},
-		Arg:           arg,
-		Resulttype:    resulttype,
-		Resulttypmod:  -1,
-		Relabelformat: COERCE_EXPLICIT_CAST,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (rt *RelabelType) ExpressionType() string {
-	return "RelabelType"
-}
+func (rt *RelabelType) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (rt *RelabelType) String() string {
-	formatStrs := map[CoercionForm]string{
-		COERCE_EXPLICIT_CALL: "CALL", COERCE_EXPLICIT_CAST: "CAST",
-		COERCE_IMPLICIT_CAST: "IMPLICIT", COERCE_SQL_SYNTAX: "SQL",
-	}
-	formatStr := formatStrs[rt.Relabelformat]
-	if formatStr == "" {
-		formatStr = fmt.Sprintf("FORMAT_%d", int(rt.Relabelformat))
-	}
-
-	return fmt.Sprintf("RelabelType(%s as %d, %s)", rt.Arg, rt.Resulttype, formatStr)
-}
+func (rt *RelabelType) String() string { _ = "STUB: not implemented"; return "" }
 
 // CoerceViaIO represents type coercion through I/O functions.
 // This is used when types need to be converted by invoking their I/O functions
@@ -116,40 +83,19 @@ type CoerceViaIO struct {
 
 // NewCoerceViaIO creates a new CoerceViaIO node.
 func NewCoerceViaIO(arg Expression, resulttype Oid, coerceformat CoercionForm) *CoerceViaIO {
-	return &CoerceViaIO{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_CoerceViaIO}},
-		Arg:          arg,
-		Resulttype:   resulttype,
-		Coerceformat: coerceformat,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewExplicitCoerceViaIO creates a new CoerceViaIO for explicit coercion.
 func NewExplicitCoerceViaIO(arg Expression, resulttype Oid) *CoerceViaIO {
-	return &CoerceViaIO{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_CoerceViaIO}},
-		Arg:          arg,
-		Resulttype:   resulttype,
-		Coerceformat: COERCE_EXPLICIT_CAST,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (cvio *CoerceViaIO) ExpressionType() string {
-	return "CoerceViaIO"
-}
+func (cvio *CoerceViaIO) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (cvio *CoerceViaIO) String() string {
-	formatStrs := map[CoercionForm]string{
-		COERCE_EXPLICIT_CALL: "CALL", COERCE_EXPLICIT_CAST: "CAST",
-		COERCE_IMPLICIT_CAST: "IMPLICIT", COERCE_SQL_SYNTAX: "SQL",
-	}
-	formatStr := formatStrs[cvio.Coerceformat]
-	if formatStr == "" {
-		formatStr = fmt.Sprintf("FORMAT_%d", int(cvio.Coerceformat))
-	}
-
-	return fmt.Sprintf("CoerceViaIO(%s as %d, %s)", cvio.Arg, cvio.Resulttype, formatStr)
-}
+func (cvio *CoerceViaIO) String() string { _ = "STUB: not implemented"; return "" }
 
 // ArrayCoerceExpr represents array type coercion.
 // This handles coercion of array types, including element-wise coercion.
@@ -166,35 +112,19 @@ type ArrayCoerceExpr struct {
 
 // NewArrayCoerceExpr creates a new ArrayCoerceExpr node.
 func NewArrayCoerceExpr(arg, elemexpr Expression, resulttype Oid, coerceformat CoercionForm) *ArrayCoerceExpr {
-	return &ArrayCoerceExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_ArrayCoerceExpr}},
-		Arg:          arg,
-		Elemexpr:     elemexpr,
-		Resulttype:   resulttype,
-		Resulttypmod: -1,
-		Coerceformat: coerceformat,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewExplicitArrayCoerceExpr creates a new explicit ArrayCoerceExpr.
 func NewExplicitArrayCoerceExpr(arg, elemexpr Expression, resulttype Oid) *ArrayCoerceExpr {
-	return &ArrayCoerceExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_ArrayCoerceExpr}},
-		Arg:          arg,
-		Elemexpr:     elemexpr,
-		Resulttype:   resulttype,
-		Resulttypmod: -1,
-		Coerceformat: COERCE_EXPLICIT_CAST,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ace *ArrayCoerceExpr) ExpressionType() string {
-	return "ArrayCoerceExpr"
-}
+func (ace *ArrayCoerceExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (ace *ArrayCoerceExpr) String() string {
-	return fmt.Sprintf("ArrayCoerceExpr(%s as %d)", ace.Arg, ace.Resulttype)
-}
+func (ace *ArrayCoerceExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // ConvertRowtypeExpr represents row type conversion.
 // This converts a whole-row value from one composite type to another.
@@ -208,21 +138,13 @@ type ConvertRowtypeExpr struct {
 
 // NewConvertRowtypeExpr creates a new ConvertRowtypeExpr node.
 func NewConvertRowtypeExpr(arg Expression, resulttype Oid, convertformat CoercionForm) *ConvertRowtypeExpr {
-	return &ConvertRowtypeExpr{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_ConvertRowtypeExpr}},
-		Arg:           arg,
-		Resulttype:    resulttype,
-		Convertformat: convertformat,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (crte *ConvertRowtypeExpr) ExpressionType() string {
-	return "ConvertRowtypeExpr"
-}
+func (crte *ConvertRowtypeExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (crte *ConvertRowtypeExpr) String() string {
-	return fmt.Sprintf("ConvertRowtypeExpr(%s as %d)", crte.Arg, crte.Resulttype)
-}
+func (crte *ConvertRowtypeExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // CollateExpr represents a COLLATE expression.
 // This specifies a collation to be used for a particular expression.
@@ -235,20 +157,13 @@ type CollateExpr struct {
 
 // NewCollateExpr creates a new CollateExpr node.
 func NewCollateExpr(arg Expression, collOid Oid) *CollateExpr {
-	return &CollateExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_CollateExpr}},
-		Arg:      arg,
-		CollOid:  collOid,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ce *CollateExpr) ExpressionType() string {
-	return "CollateExpr"
-}
+func (ce *CollateExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (ce *CollateExpr) String() string {
-	return fmt.Sprintf("CollateExpr(%s COLLATE %d)", ce.Arg, ce.CollOid)
-}
+func (ce *CollateExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // FIELD AND RECORD OPERATIONS
@@ -267,22 +182,13 @@ type FieldSelect struct {
 
 // NewFieldSelect creates a new FieldSelect node.
 func NewFieldSelect(arg Expression, fieldnum AttrNumber, resulttype Oid) *FieldSelect {
-	return &FieldSelect{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_FieldSelect}},
-		Arg:          arg,
-		Fieldnum:     fieldnum,
-		Resulttype:   resulttype,
-		Resulttypmod: -1,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (fs *FieldSelect) ExpressionType() string {
-	return "FieldSelect"
-}
+func (fs *FieldSelect) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (fs *FieldSelect) String() string {
-	return fmt.Sprintf("FieldSelect(%s.%d)", fs.Arg, fs.Fieldnum)
-}
+func (fs *FieldSelect) String() string { _ = "STUB: not implemented"; return "" }
 
 // FieldStore represents field assignment to a composite value.
 // This is used for UPDATE operations on composite type columns.
@@ -297,33 +203,19 @@ type FieldStore struct {
 
 // NewFieldStore creates a new FieldStore node.
 func NewFieldStore(arg Expression, newvals []Expression, fieldnums []AttrNumber, resulttype Oid) *FieldStore {
-	return &FieldStore{
-		BaseExpr:   BaseExpr{BaseNode: BaseNode{Tag: T_FieldStore}},
-		Arg:        arg,
-		Newvals:    newvals,
-		Fieldnums:  fieldnums,
-		Resulttype: resulttype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewSingleFieldStore creates a FieldStore for updating a single field.
 func NewSingleFieldStore(arg Expression, newval Expression, fieldnum AttrNumber, resulttype Oid) *FieldStore {
-	return &FieldStore{
-		BaseExpr:   BaseExpr{BaseNode: BaseNode{Tag: T_FieldStore}},
-		Arg:        arg,
-		Newvals:    []Expression{newval},
-		Fieldnums:  []AttrNumber{fieldnum},
-		Resulttype: resulttype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (fs *FieldStore) ExpressionType() string {
-	return "FieldStore"
-}
+func (fs *FieldStore) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (fs *FieldStore) String() string {
-	return fmt.Sprintf("FieldStore(%s, fields=%d)", fs.Arg, len(fs.Fieldnums))
-}
+func (fs *FieldStore) String() string { _ = "STUB: not implemented"; return "" }
 
 // SubscriptingRef represents array/JSON subscripting operations.
 // This handles both array indexing (arr[1]) and JSON key access (json['key']).
@@ -343,71 +235,37 @@ type SubscriptingRef struct {
 
 // NewSubscriptingRef creates a new SubscriptingRef node.
 func NewSubscriptingRef(containertype, elemtype, restype Oid, refexpr Expression, upperindex []Expression) *SubscriptingRef {
-	return &SubscriptingRef{
-		BaseExpr:         BaseExpr{BaseNode: BaseNode{Tag: T_SubscriptingRef}},
-		Refcontainertype: containertype,
-		Refelemtype:      elemtype,
-		Refrestype:       restype,
-		Reftypmod:        -1,
-		Refupperindexpr:  upperindex,
-		Refexpr:          refexpr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewArraySubscript creates a SubscriptingRef for array indexing (arr[index]).
 func NewArraySubscript(arraytype, elemtype Oid, arrayexpr, indexexpr Expression) *SubscriptingRef {
-	return &SubscriptingRef{
-		BaseExpr:         BaseExpr{BaseNode: BaseNode{Tag: T_SubscriptingRef}},
-		Refcontainertype: arraytype,
-		Refelemtype:      elemtype,
-		Refrestype:       elemtype, // Result type is element type for array indexing
-		Reftypmod:        -1,
-		Refupperindexpr:  []Expression{indexexpr},
-		Refexpr:          arrayexpr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Result type is element type for array indexing
 
 // NewArraySlice creates a SubscriptingRef for array slicing (arr[lower:upper]).
 func NewArraySlice(arraytype, elemtype Oid, arrayexpr, lowerexpr, upperexpr Expression) *SubscriptingRef {
-	return &SubscriptingRef{
-		BaseExpr:         BaseExpr{BaseNode: BaseNode{Tag: T_SubscriptingRef}},
-		Refcontainertype: arraytype,
-		Refelemtype:      elemtype,
-		Refrestype:       arraytype, // Result type is array type for slicing
-		Reftypmod:        -1,
-		Refupperindexpr:  []Expression{upperexpr},
-		Reflowerindexpr:  []Expression{lowerexpr},
-		Refexpr:          arrayexpr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Result type is array type for slicing
 
 // NewArrayAssignment creates a SubscriptingRef for array assignment (arr[index] = value).
 func NewArrayAssignment(arraytype, elemtype Oid, arrayexpr, indexexpr, assignexpr Expression) *SubscriptingRef {
-	return &SubscriptingRef{
-		BaseExpr:         BaseExpr{BaseNode: BaseNode{Tag: T_SubscriptingRef}},
-		Refcontainertype: arraytype,
-		Refelemtype:      elemtype,
-		Refrestype:       arraytype, // Result type is array type for assignment
-		Reftypmod:        -1,
-		Refupperindexpr:  []Expression{indexexpr},
-		Refexpr:          arrayexpr,
-		Refassgnexpr:     assignexpr,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (sr *SubscriptingRef) ExpressionType() string {
-	return "SubscriptingRef"
-}
+// Result type is array type for assignment
 
-func (sr *SubscriptingRef) String() string {
-	if sr.Refassgnexpr != nil {
-		return fmt.Sprintf("SubscriptingRef(%s[...] = %s)", sr.Refexpr, sr.Refassgnexpr)
-	}
-	if len(sr.Reflowerindexpr) > 0 {
-		return fmt.Sprintf("SubscriptingRef(%s[%d:%d])", sr.Refexpr, len(sr.Reflowerindexpr), len(sr.Refupperindexpr))
-	}
-	return fmt.Sprintf("SubscriptingRef(%s[%d])", sr.Refexpr, len(sr.Refupperindexpr))
-}
+func (sr *SubscriptingRef) ExpressionType() string { _ = "STUB: not implemented"; return "" }
+
+func (sr *SubscriptingRef) String() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // TEST EXPRESSIONS - NULL, BOOLEAN, AND DOMAIN TESTS
@@ -434,77 +292,28 @@ type NullTest struct {
 
 // NewNullTest creates a new NullTest node.
 func NewNullTest(arg Expression, nulltesttype NullTestType) *NullTest {
-	return &NullTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_NullTest}},
-		Arg:          arg,
-		Nulltesttype: nulltesttype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewIsNullTest creates a new IS NULL test.
-func NewIsNullTest(arg Expression) *NullTest {
-	return &NullTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_NullTest}},
-		Arg:          arg,
-		Nulltesttype: IS_NULL,
-	}
-}
+func NewIsNullTest(arg Expression) *NullTest { _ = "STUB: not implemented"; return nil }
 
 // NewIsNotNullTest creates a new IS NOT NULL test.
-func NewIsNotNullTest(arg Expression) *NullTest {
-	return &NullTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_NullTest}},
-		Arg:          arg,
-		Nulltesttype: IS_NOT_NULL,
-	}
-}
+func NewIsNotNullTest(arg Expression) *NullTest { _ = "STUB: not implemented"; return nil }
 
 // NewRowNullTest creates a NullTest for row values.
 func NewRowNullTest(arg Expression, nulltesttype NullTestType) *NullTest {
-	return &NullTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_NullTest}},
-		Arg:          arg,
-		Nulltesttype: nulltesttype,
-		Argisrow:     true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (nt *NullTest) ExpressionType() string {
-	return "NullTest"
-}
+func (nt *NullTest) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (nt *NullTest) String() string {
-	testStrs := map[NullTestType]string{
-		IS_NULL: "IS NULL", IS_NOT_NULL: "IS NOT NULL",
-	}
-	testStr := testStrs[nt.Nulltesttype]
-	if testStr == "" {
-		testStr = fmt.Sprintf("NULLTEST_%d", int(nt.Nulltesttype))
-	}
-
-	row := ""
-	if nt.Argisrow {
-		row = " (ROW)"
-	}
-
-	return fmt.Sprintf("NullTest(%s %s%s)", nt.Arg, testStr, row)
-}
+func (nt *NullTest) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of NullTest
-func (nt *NullTest) SqlString() string {
-	var result strings.Builder
-
-	result.WriteString(nt.Arg.SqlString())
-
-	switch nt.Nulltesttype {
-	case IS_NULL:
-		result.WriteString(" IS NULL")
-	case IS_NOT_NULL:
-		result.WriteString(" IS NOT NULL")
-	}
-
-	return result.String()
-}
+func (nt *NullTest) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // BoolTestType represents the type of boolean test.
 // Ported from postgres/src/include/nodes/primnodes.h:1974
@@ -530,81 +339,25 @@ type BooleanTest struct {
 
 // NewBooleanTest creates a new BooleanTest node.
 func NewBooleanTest(arg Expression, booltesttype BoolTestType) *BooleanTest {
-	return &BooleanTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_BooleanTest}},
-		Arg:          arg,
-		Booltesttype: booltesttype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewIsTrueTest creates a new IS TRUE test.
-func NewIsTrueTest(arg Expression) *BooleanTest {
-	return &BooleanTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_BooleanTest}},
-		Arg:          arg,
-		Booltesttype: IS_TRUE,
-	}
-}
+func NewIsTrueTest(arg Expression) *BooleanTest { _ = "STUB: not implemented"; return nil }
 
 // NewIsFalseTest creates a new IS FALSE test.
-func NewIsFalseTest(arg Expression) *BooleanTest {
-	return &BooleanTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_BooleanTest}},
-		Arg:          arg,
-		Booltesttype: IS_FALSE,
-	}
-}
+func NewIsFalseTest(arg Expression) *BooleanTest { _ = "STUB: not implemented"; return nil }
 
 // NewIsUnknownTest creates a new IS UNKNOWN test.
-func NewIsUnknownTest(arg Expression) *BooleanTest {
-	return &BooleanTest{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_BooleanTest}},
-		Arg:          arg,
-		Booltesttype: IS_UNKNOWN,
-	}
-}
+func NewIsUnknownTest(arg Expression) *BooleanTest { _ = "STUB: not implemented"; return nil }
 
-func (bt *BooleanTest) ExpressionType() string {
-	return "BooleanTest"
-}
+func (bt *BooleanTest) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (bt *BooleanTest) String() string {
-	testStrs := map[BoolTestType]string{
-		IS_TRUE: "IS TRUE", IS_NOT_TRUE: "IS NOT TRUE",
-		IS_FALSE: "IS FALSE", IS_NOT_FALSE: "IS NOT FALSE",
-		IS_UNKNOWN: "IS UNKNOWN", IS_NOT_UNKNOWN: "IS NOT UNKNOWN",
-	}
-	testStr := testStrs[bt.Booltesttype]
-	if testStr == "" {
-		testStr = fmt.Sprintf("BOOLTEST_%d", int(bt.Booltesttype))
-	}
-
-	return fmt.Sprintf("BooleanTest(%s %s)", bt.Arg, testStr)
-}
+func (bt *BooleanTest) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of BooleanTest
-func (bt *BooleanTest) SqlString() string {
-	var result strings.Builder
-
-	result.WriteString(bt.Arg.SqlString())
-
-	switch bt.Booltesttype {
-	case IS_TRUE:
-		result.WriteString(" IS TRUE")
-	case IS_NOT_TRUE:
-		result.WriteString(" IS NOT TRUE")
-	case IS_FALSE:
-		result.WriteString(" IS FALSE")
-	case IS_NOT_FALSE:
-		result.WriteString(" IS NOT FALSE")
-	case IS_UNKNOWN:
-		result.WriteString(" IS UNKNOWN")
-	case IS_NOT_UNKNOWN:
-		result.WriteString(" IS NOT UNKNOWN")
-	}
-
-	return result.String()
-}
+func (bt *BooleanTest) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // CoerceToDomain represents coercion to a domain type.
 // Domain types are user-defined types with constraints.
@@ -620,22 +373,13 @@ type CoerceToDomain struct {
 
 // NewCoerceToDomain creates a new CoerceToDomain node.
 func NewCoerceToDomain(arg Expression, resulttype Oid, resulttypmod int32, coercionformat CoercionForm) *CoerceToDomain {
-	return &CoerceToDomain{
-		BaseExpr:       BaseExpr{BaseNode: BaseNode{Tag: T_CoerceToDomain}},
-		Arg:            arg,
-		Resulttype:     resulttype,
-		Resulttypmod:   resulttypmod,
-		Coercionformat: coercionformat,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ctd *CoerceToDomain) ExpressionType() string {
-	return "CoerceToDomain"
-}
+func (ctd *CoerceToDomain) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (ctd *CoerceToDomain) String() string {
-	return fmt.Sprintf("CoerceToDomain(%s as domain %d)", ctd.Arg, ctd.Resulttype)
-}
+func (ctd *CoerceToDomain) String() string { _ = "STUB: not implemented"; return "" }
 
 // CoerceToDomainValue represents a value being coerced to a domain type.
 // This is used in domain constraint checking.
@@ -649,21 +393,13 @@ type CoerceToDomainValue struct {
 
 // NewCoerceToDomainValue creates a new CoerceToDomainValue node.
 func NewCoerceToDomainValue(typeId Oid, typeMod int32, collation Oid) *CoerceToDomainValue {
-	return &CoerceToDomainValue{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_CoerceToDomainValue}},
-		TypeId:    typeId,
-		TypeMod:   typeMod,
-		Collation: collation,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ctdv *CoerceToDomainValue) ExpressionType() string {
-	return "CoerceToDomainValue"
-}
+func (ctdv *CoerceToDomainValue) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (ctdv *CoerceToDomainValue) String() string {
-	return fmt.Sprintf("CoerceToDomainValue(type=%d, typmod=%d, collation=%d)", ctdv.TypeId, ctdv.TypeMod, ctdv.Collation)
-}
+func (ctdv *CoerceToDomainValue) String() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // SPECIAL VALUE EXPRESSIONS
@@ -681,30 +417,24 @@ type SetToDefault struct {
 
 // NewSetToDefault creates a new SetToDefault node.
 func NewSetToDefault(typeId Oid, typeMod int32, collation Oid) *SetToDefault {
-	return &SetToDefault{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_SetToDefault}},
-		TypeId:    typeId,
-		TypeMod:   typeMod,
-		Collation: collation,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (std *SetToDefault) ExpressionType() string {
-	return "SetToDefault"
-}
+func (std *SetToDefault) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (std *SetToDefault) String() string {
-	return "SetToDefault(DEFAULT)"
-}
+func (std *SetToDefault) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of SetToDefault
 func (std *SetToDefault) SqlString() string {
-	return "DEFAULT"
+	_ = "STUB: not implemented"
+
+	// CurrentOfExpr represents CURRENT OF cursor_name expressions.
+	// This is used in UPDATE and DELETE statements to refer to the current row of a cursor.
+	// Ported from postgres/src/include/nodes/primnodes.h:2094
+	return ""
 }
 
-// CurrentOfExpr represents CURRENT OF cursor_name expressions.
-// This is used in UPDATE and DELETE statements to refer to the current row of a cursor.
-// Ported from postgres/src/include/nodes/primnodes.h:2094
 type CurrentOfExpr struct {
 	BaseExpr
 	Cvarno      Index  // RT index of target relation - primnodes.h:2097
@@ -713,41 +443,23 @@ type CurrentOfExpr struct {
 }
 
 // SqlString returns the SQL representation of the CurrentOfExpr.
-func (c *CurrentOfExpr) SqlString() string {
-	if c.CursorName == "" {
-		return "CURRENT OF <unnamed>"
-	}
-	return "CURRENT OF " + QuoteIdentifier(c.CursorName)
-}
+func (c *CurrentOfExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewCurrentOfExpr creates a new CurrentOfExpr node.
 func NewCurrentOfExpr(cvarno Index, cursor_name string) *CurrentOfExpr {
-	return &CurrentOfExpr{
-		BaseExpr:   BaseExpr{BaseNode: BaseNode{Tag: T_CurrentOfExpr}},
-		Cvarno:     cvarno,
-		CursorName: cursor_name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewCurrentOfExprParam creates a new CurrentOfExpr with parameter reference.
 func NewCurrentOfExprParam(cvarno Index, cursor_param int) *CurrentOfExpr {
-	return &CurrentOfExpr{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_CurrentOfExpr}},
-		Cvarno:      cvarno,
-		CursorParam: cursor_param,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (coe *CurrentOfExpr) ExpressionType() string {
-	return "CurrentOfExpr"
-}
+func (coe *CurrentOfExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (coe *CurrentOfExpr) String() string {
-	if coe.CursorName != "" {
-		return fmt.Sprintf("CurrentOfExpr(CURRENT OF %s)", coe.CursorName)
-	}
-	return fmt.Sprintf("CurrentOfExpr(CURRENT OF $%d)", coe.CursorParam)
-}
+func (coe *CurrentOfExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // NextValueExpr represents nextval() and currval() sequence operations.
 // This handles sequence value generation and retrieval.
@@ -759,21 +471,11 @@ type NextValueExpr struct {
 }
 
 // NewNextValueExpr creates a new NextValueExpr node.
-func NewNextValueExpr(seqid, typeId Oid) *NextValueExpr {
-	return &NextValueExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_NextValueExpr}},
-		Seqid:    seqid,
-		TypeId:   typeId,
-	}
-}
+func NewNextValueExpr(seqid, typeId Oid) *NextValueExpr { _ = "STUB: not implemented"; return nil }
 
-func (nve *NextValueExpr) ExpressionType() string {
-	return "NextValueExpr"
-}
+func (nve *NextValueExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (nve *NextValueExpr) String() string {
-	return fmt.Sprintf("NextValueExpr(seq=%d, type=%d)", nve.Seqid, nve.TypeId)
-}
+func (nve *NextValueExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // InferenceElem represents an inference element for ON CONFLICT clauses.
 // This is used to specify which unique index to use for conflict detection.
@@ -786,30 +488,14 @@ type InferenceElem struct {
 }
 
 // NewInferenceElem creates a new InferenceElem node.
-func NewInferenceElem(expr Node) *InferenceElem {
-	return &InferenceElem{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_InferenceElem}},
-		Expr:     expr,
-	}
-}
+func NewInferenceElem(expr Node) *InferenceElem { _ = "STUB: not implemented"; return nil }
 
 // NewInferenceElemWithCollation creates a new InferenceElem with collation.
 func NewInferenceElemWithCollation(expr Node, infercollid, inferopclass Oid) *InferenceElem {
-	return &InferenceElem{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_InferenceElem}},
-		Expr:         expr,
-		Infercollid:  infercollid,
-		Inferopclass: inferopclass,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ie *InferenceElem) ExpressionType() string {
-	return "InferenceElem"
-}
+func (ie *InferenceElem) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (ie *InferenceElem) String() string {
-	if ie.Infercollid != 0 || ie.Inferopclass != 0 {
-		return fmt.Sprintf("InferenceElem(%s, coll=%d, opclass=%d)", ie.Expr, ie.Infercollid, ie.Inferopclass)
-	}
-	return fmt.Sprintf("InferenceElem(%s)", ie.Expr)
-}
+func (ie *InferenceElem) String() string { _ = "STUB: not implemented"; return "" }

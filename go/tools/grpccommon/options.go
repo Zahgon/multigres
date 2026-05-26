@@ -21,7 +21,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -38,21 +37,13 @@ var (
 // `go/cmd/*` entrypoints should either use servenv.ParseFlags(WithArgs)? which
 // calls this function, or call this function directly before parsing
 // command-line arguments.
-func RegisterFlags(fs *pflag.FlagSet) {
-	fs.IntVar(&maxMessageSize, "grpc-max-message-size", maxMessageSize, "Maximum allowed RPC message size. Larger messages will be rejected by gRPC with the error 'exceeding the max size'.")
-	fs.BoolVar(&grpc.EnableTracing, "grpc-enable-tracing", grpc.EnableTracing, "Enable gRPC tracing.")
-	fs.BoolVar(&enablePrometheus, "grpc-prometheus", enablePrometheus, "Enable gRPC monitoring with Prometheus.")
-}
+func RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // EnableGRPCPrometheus returns the value of the --grpc-prometheus flag.
-func EnableGRPCPrometheus() bool {
-	return enablePrometheus
-}
+func EnableGRPCPrometheus() bool { _ = "STUB: not implemented"; return false }
 
 // MaxMessageSize returns the value of the --grpc-max-message-size flag.
-func MaxMessageSize() int {
-	return maxMessageSize
-}
+func MaxMessageSize() int { _ = "STUB: not implemented"; return 0 }
 
 // LocalClientDialOptions returns a slice of grpc.DialOption to be used when creating a gRPC client.
 // These options are used for local clients connecting to the gRPC server.
@@ -60,19 +51,15 @@ func MaxMessageSize() int {
 // The WithDisableServiceConfig is a workaround for a known issue
 // in MacOS where localhost host takes too long to resolve.
 // See the following PR for more details: https://github.com/multigres/multigres/pull/152
-func LocalClientDialOptions() []grpc.DialOption {
-	return ClientDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials()))
-}
+func LocalClientDialOptions() []grpc.DialOption { _ = "STUB: not implemented"; return nil }
 
 // ClientDialOptions returns the standard dial options for a gRPC client given
 // a caller-supplied transport credentials dial option. It always includes
 // WithDisableServiceConfig, a macOS localhost-resolution workaround (see #152),
 // so callers can't forget it when wiring up TLS or insecure credentials.
 func ClientDialOptions(transportCreds grpc.DialOption) []grpc.DialOption {
-	return []grpc.DialOption{
-		transportCreds,
-		grpc.WithDisableServiceConfig(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ClientOption configures OpenTelemetry instrumentation for the gRPC client.
@@ -90,42 +77,33 @@ type clientConfig struct {
 // This is a generic helper that can be used by domain-specific code to add
 // custom span attributes without making grpccommon domain-aware.
 func WithAttributes(attrs ...attribute.KeyValue) ClientOption {
-	return funcOption(func(c *clientConfig) {
-		c.otelOptions = append(c.otelOptions,
-			otelgrpc.WithSpanAttributes(attrs...),
-		)
-	})
+	_ = "STUB: not implemented"
+	return *new(ClientOption)
 }
 
 // WithDialOptions adds standard gRPC dial options to the client.
 func WithDialOptions(opts ...grpc.DialOption) ClientOption {
-	return funcOption(func(c *clientConfig) {
-		c.dialOptions = append(c.dialOptions, opts...)
-	})
+	_ = "STUB: not implemented"
+	return *new(ClientOption)
 }
 
 type funcOption func(*clientConfig)
 
 func (f funcOption) apply(c *clientConfig) {
-	f(c)
+	_ = "STUB: not implemented"
+
+	// NewClient creates a gRPC client with OpenTelemetry instrumentation.
+	// Use WithPeerService to set the remote service identifier in traces.
+	// Use WithDialOptions to pass standard gRPC dial options.
+	//
+	// All ClientOptions are used to configure a single stats handler, preventing
+	// duplication and ensuring consistent telemetry across the application.
+	return
 }
 
-// NewClient creates a gRPC client with OpenTelemetry instrumentation.
-// Use WithPeerService to set the remote service identifier in traces.
-// Use WithDialOptions to pass standard gRPC dial options.
-//
-// All ClientOptions are used to configure a single stats handler, preventing
-// duplication and ensuring consistent telemetry across the application.
 func NewClient(target string, opts ...ClientOption) (*grpc.ClientConn, error) {
-	cfg := &clientConfig{}
-	for _, opt := range opts {
-		opt.apply(cfg)
-	}
-
-	// Create single stats handler with all OTel options
-	allOpts := append([]grpc.DialOption{
-		grpc.WithStatsHandler(otelgrpc.NewClientHandler(cfg.otelOptions...)),
-	}, cfg.dialOptions...)
-
-	return grpc.NewClient(target, allOpts...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Create single stats handler with all OTel options

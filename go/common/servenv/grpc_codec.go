@@ -38,40 +38,16 @@ type Codec struct {
 	fallback encoding.CodecV2
 }
 
-func (Codec) Name() string { return Name }
+func (Codec) Name() string { _ = "STUB: not implemented"; return "" }
 
 var defaultBufferPool = mem.DefaultBufferPool()
 
 func (c *Codec) Marshal(v any) (mem.BufferSlice, error) {
-	if m, ok := v.(vtprotoMessage); ok {
-		size := m.SizeVT()
-		if mem.IsBelowBufferPoolingThreshold(size) {
-			buf := make([]byte, size)
-			if _, err := m.MarshalToSizedBufferVT(buf[:size]); err != nil {
-				return nil, err
-			}
-			return mem.BufferSlice{mem.SliceBuffer(buf)}, nil
-		}
-		buf := defaultBufferPool.Get(size)
-		if _, err := m.MarshalToSizedBufferVT((*buf)[:size]); err != nil {
-			defaultBufferPool.Put(buf)
-			return nil, err
-		}
-		return mem.BufferSlice{mem.NewBuffer(buf, defaultBufferPool)}, nil
-	}
-
-	return c.fallback.Marshal(v)
+	_ = "STUB: not implemented"
+	return *new(mem.BufferSlice), nil
 }
 
-func (c *Codec) Unmarshal(data mem.BufferSlice, v any) error {
-	if m, ok := v.(vtprotoMessage); ok {
-		buf := data.MaterializeToBuffer(defaultBufferPool)
-		defer buf.Free()
-		return m.UnmarshalVT(buf.ReadOnlyData())
-	}
-
-	return c.fallback.Unmarshal(data, v)
-}
+func (c *Codec) Unmarshal(data mem.BufferSlice, v any) error { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	encoding.RegisterCodecV2(&Codec{

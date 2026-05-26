@@ -42,13 +42,10 @@ const (
 // EncodePID combines a gateway prefix and local connection ID into a 32-bit PID.
 // The prefix occupies the upper PrefixBits bits and the local connection ID
 // occupies the lower LocalConnBits bits.
-func EncodePID(prefix uint32, localConnID uint32) uint32 {
-	return (prefix << LocalConnBits) | (localConnID & localConnMask)
-}
+func EncodePID(prefix uint32, localConnID uint32) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // DecodePID extracts the gateway prefix and local connection ID from a 32-bit PID.
 func DecodePID(pid uint32) (prefix uint32, localConnID uint32) {
-	prefix = pid >> LocalConnBits
-	localConnID = pid & localConnMask
-	return prefix, localConnID
+	_ = "STUB: not implemented"
+	return 0, 0
 }

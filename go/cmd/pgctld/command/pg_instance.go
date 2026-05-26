@@ -15,16 +15,7 @@
 package command
 
 import (
-	"errors"
-	"fmt"
 	"log/slog"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strconv"
-	"time"
-
-	"github.com/multigres/multigres/go/common/constants"
 )
 
 // pgInstance represents a transiently-running PostgreSQL server started for
@@ -62,100 +53,40 @@ type pgInstance struct {
 // socket directory and blocks until it is ready to accept connections.
 // The caller must call stop() when done (typically via defer pg.stop()).
 func newPgInstance(logger *slog.Logger, dataDir, configFile string, cfg PgCtldServiceConfig) (*pgInstance, error) {
-	if cfg.Password == "" {
-		return nil, errors.New("pgInstance requires a non-empty password")
-	}
-	socketDir, err := os.MkdirTemp("", "pgctld-setup-*")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create temporary socket directory: %w", err)
-	}
-
-	pg := &pgInstance{
-		dataDir:   dataDir,
-		socketDir: socketDir,
-		port:      cfg.Port,
-		user:      cfg.User,
-		password:  cfg.Password,
-		logger:    logger,
-	}
-
-	if err := pg.start(configFile); err != nil {
-		os.RemoveAll(socketDir)
-		return nil, err
-	}
-	return pg, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // start launches the PostgreSQL server via pg_ctl and waits for readiness.
-func (p *pgInstance) start(configFile string) error {
-	logFile := filepath.Join(p.dataDir, "setup.log")
+func (p *pgInstance) start(configFile string) error { _ = "STUB: not implemented"; return nil }
 
-	// No TCP (listen_addresses=), private socket, config file already written by
-	// GeneratePostgresServerConfig.  -W tells pg_ctl not to wait; we poll below
-	// with pg_isready so we can target the exact socket path.
-	postgresOpts := fmt.Sprintf(
-		"-c config_file=%s -c port=%d -c listen_addresses= -c unix_socket_directories=%s",
-		configFile, p.port, p.socketDir,
-	)
-	if out, err := exec.Command("pg_ctl",
-		"start", "-D", p.dataDir, "-o", postgresOpts, "-l", logFile, "-W",
-	).CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to start transient PostgreSQL: %w\nOutput: %s", err, out)
-	}
-
-	return p.waitReady()
-}
+// No TCP (listen_addresses=), private socket, config file already written by
+// GeneratePostgresServerConfig.  -W tells pg_ctl not to wait; we poll below
+// with pg_isready so we can target the exact socket path.
 
 // waitReady polls pg_isready until PostgreSQL accepts connections or the
 // attempt limit is reached.
-func (p *pgInstance) waitReady() error {
-	const maxAttempts = 30
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		if err := exec.Command("pg_isready",
-			"-h", p.socketDir,
-			"-p", strconv.Itoa(p.port),
-			"-d", constants.DefaultPostgresDatabase,
-		).Run(); err == nil {
-			return nil
-		}
-		if attempt == maxAttempts {
-			return fmt.Errorf("transient PostgreSQL did not become ready after %d seconds", maxAttempts)
-		}
-		time.Sleep(1 * time.Second)
-	}
-	return nil
-}
+func (p *pgInstance) waitReady() error { _ = "STUB: not implemented"; return nil }
 
 // stop shuts down the transient PostgreSQL server and removes the private
 // socket directory.  Errors are logged as warnings because stop is typically
 // called from a defer and must not shadow the caller's primary error.
 func (p *pgInstance) stop() {
+	_ = "STUB: not implemented"
 	// pg_ctl stop targets the data directory directly and reads the PID from
 	// postmaster.pid, so it works regardless of the socket path in use.
-	if out, err := exec.Command("pg_ctl",
-		"stop", "-D", p.dataDir, "-m", "fast",
-	).CombinedOutput(); err != nil {
-		p.logger.Warn("Failed to stop transient PostgreSQL",
-			"error", err, "output", string(out))
-	}
-	os.RemoveAll(p.socketDir)
+	return
 }
 
 // psql runs a psql command against this instance connected to database,
 // appending args after the standard -h/-p/-U/-d connection flags.
 // Returns combined stdout+stderr and any error.
 func (p *pgInstance) psql(database string, args ...string) ([]byte, error) {
-	baseArgs := []string{
-		"-h", p.socketDir,
-		"-p", strconv.Itoa(p.port),
-		"-U", p.user,
-		"-d", database,
-	}
-	cmd := exec.Command("psql", append(baseArgs, args...)...)
-	// pg_hba.conf requires scram-sha-256 for every connection including the
-	// local socket, so psql needs the password and we pass it via PGPASSWORD.
-	// Embedding it in a connection URI would expose it via /proc/<pid>/cmdline.
-	// The password is guaranteed non-empty by newPgInstance.
-	cmd.Env = append(os.Environ(), "PGPASSWORD="+p.password)
-	return cmd.CombinedOutput()
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// pg_hba.conf requires scram-sha-256 for every connection including the
+// local socket, so psql needs the password and we pass it via PGPASSWORD.
+// Embedding it in a connection URI would expose it via /proc/<pid>/cmdline.
+// The password is guaranteed non-empty by newPgInstance.

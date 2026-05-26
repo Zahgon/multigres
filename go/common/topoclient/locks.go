@@ -18,20 +18,8 @@ package topoclient
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"log/slog"
-	"os"
-	"os/user"
 	"sync"
 	"time"
-
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/pb/mtrpc"
-	"github.com/multigres/multigres/go/tools/telemetry"
 )
 
 // This file contains utility methods and definitions to lock resources using topology server.
@@ -51,31 +39,10 @@ type Lock struct {
 }
 
 // newLock creates a new Lock.
-func newLock(action string) *Lock {
-	l := &Lock{
-		Action:   action,
-		HostName: "unknown",
-		UserName: "unknown",
-		Time:     time.Now().Format(time.RFC3339),
-		Status:   "Running",
-	}
-	if h, err := os.Hostname(); err == nil {
-		l.HostName = h
-	}
-	if u, err := user.Current(); err == nil {
-		l.UserName = u.Username
-	}
-	return l
-}
+func newLock(action string) *Lock { _ = "STUB: not implemented"; return nil }
 
 // ToJSON returns a JSON representation of the object.
-func (l *Lock) ToJSON() (string, error) {
-	data, err := json.MarshalIndent(l, "", "  ")
-	if err != nil {
-		return "", mterrors.Wrapf(err, "cannot JSON-marshal node")
-	}
-	return string(data), nil
-}
+func (l *Lock) ToJSON() (string, error) { _ = "STUB: not implemented"; return "", nil }
 
 // lockInfo is an individual info structure for a lock
 type lockInfo struct {
@@ -113,20 +80,7 @@ const (
 	NamedNonBlockingWithTTL          // Uses TryLockNameWithTTL for fail-fast with custom TTL
 )
 
-func (lt LockType) String() string {
-	switch lt {
-	case NonBlocking:
-		return "non blocking"
-	case Named:
-		return "named"
-	case NamedNonBlocking:
-		return "named non blocking"
-	case NamedNonBlockingWithTTL:
-		return "named non blocking with ttl"
-	default:
-		return "blocking"
-	}
-}
+func (lt LockType) String() string { _ = "STUB: not implemented"; return "" }
 
 // iTopoLock is the interface for knowing the resource that is being locked.
 // It allows for better controlling nuances for different lock types and log messages.
@@ -138,183 +92,49 @@ type iTopoLock interface {
 
 // perform the topo lock operation
 func (l *Lock) lock(ctx context.Context, ts *store, lt iTopoLock, opts ...LockOption) (LockDescriptor, error) {
-	for _, o := range opts {
-		o.apply(&l.Options)
-	}
-	slog.InfoContext(ctx, "Locking resource", "type", lt.Type(), "resource", lt.ResourceName(), "action", l.Action, "options", l.Options)
-
-	ctx, cancel := context.WithTimeout(ctx, ts.getLockTimeout())
-	defer cancel()
-
-	ctx, span := telemetry.Tracer().Start(ctx, "TopoServer.Lock",
-		trace.WithAttributes(
-			attribute.String("action", l.Action),
-			attribute.String("path", lt.Path()),
-		))
-	defer span.End()
-
-	j, err := l.ToJSON()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-	if ts.globalTopo == nil {
-		return nil, errors.New("no global cell connection on the topo server")
-	}
-
-	start := time.Now()
-	var lockDescriptor LockDescriptor
-	var lockOp LockOperation
-
-	switch l.Options.lockType {
-	case NonBlocking:
-		lockOp = LockOpTryLock
-		lockDescriptor, err = ts.globalTopo.TryLock(ctx, lt.Path(), j)
-	case Named:
-		lockOp = LockOpLockNameWithTTL
-		lockDescriptor, err = ts.globalTopo.LockNameWithTTL(ctx, lt.Path(), j, l.Options.ttl)
-	case NamedNonBlocking:
-		lockOp = LockOpTryLockName
-		lockDescriptor, err = ts.globalTopo.TryLockName(ctx, lt.Path(), j)
-	case NamedNonBlockingWithTTL:
-		lockOp = LockOpTryLockName
-		lockDescriptor, err = ts.globalTopo.TryLockWithLease(ctx, lt.Path(), j, l.Options.ttl)
-	default:
-		if l.Options.ttl != 0 {
-			lockOp = LockOpLockWithTTL
-			lockDescriptor, err = ts.globalTopo.LockWithTTL(ctx, lt.Path(), j, l.Options.ttl)
-		} else {
-			lockOp = LockOpLock
-			lockDescriptor, err = ts.globalTopo.Lock(ctx, lt.Path(), j)
-		}
-	}
-
-	// Record metrics
-	result := LockResultSuccess
-	if err != nil {
-		if ctx.Err() != nil {
-			result = LockResultTimeout
-		} else {
-			result = LockResultError
-		}
-	}
-	RecordLockOperation(ctx, lockOp, lt.Type(), lt.ResourceName(), result, time.Since(start))
-
-	return lockDescriptor, err
+	_ = "STUB: not implemented"
+	return *new(LockDescriptor), nil
 }
+
+// Record metrics
 
 // unlock unlocks a previously locked key.
 func (l *Lock) unlock(ctx context.Context, ts *store, lt iTopoLock, lockDescriptor LockDescriptor, actionError error) error {
+	_ = "STUB: not implemented"
 	// Detach from the parent timeout, but preserve the trace span.
 	// We need to still release the lock even if the parent context timed out.
-	ctx = context.WithoutCancel(ctx)
-	ctx, cancel := context.WithTimeout(ctx, ts.GetRemoteOperationTimeout())
-	defer cancel()
-
-	ctx, unlockSpan := telemetry.Tracer().Start(ctx, "TopoServer.Unlock",
-		trace.WithAttributes(
-			attribute.String("action", l.Action),
-			attribute.String("path", lt.Path()),
-		))
-	defer unlockSpan.End()
-
-	// first update the actionNode
-	if actionError != nil {
-		slog.InfoContext(ctx, "Unlocking resource with error", "type", lt.Type(), "resource", lt.ResourceName(), "action", l.Action, "error", actionError)
-		l.Status = "Error: " + actionError.Error()
-	} else {
-		slog.InfoContext(ctx, "Unlocking resource successfully", "type", lt.Type(), "resource", lt.ResourceName(), "action", l.Action)
-		l.Status = "Done"
-	}
-
-	start := time.Now()
-	err := lockDescriptor.Unlock(ctx)
-
-	// Record metrics
-	result := LockResultSuccess
-	if err != nil {
-		result = LockResultError
-	}
-	RecordLockOperation(ctx, LockOpUnlock, lt.Type(), lt.ResourceName(), result, time.Since(start))
-
-	return err
+	return nil
 }
+
+// first update the actionNode
+
+// Record metrics
 
 func (ts *store) internalLock(ctx context.Context, lt iTopoLock, action string, opts ...LockOption) (context.Context, func(*error), error) {
-	i, ok := ctx.Value(locksKey).(*locksInfo)
-	if !ok {
-		i = &locksInfo{
-			info: make(map[string]*lockInfo),
-		}
-		ctx = context.WithValue(ctx, locksKey, i)
-	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
-	// check that we are not already locked
-	if _, ok := i.info[lt.ResourceName()]; ok {
-		return nil, nil, mterrors.Errorf(mtrpc.Code_INTERNAL, "lock for %v %v is already held", lt.Type(), lt.ResourceName())
-	}
-
-	// lock it
-	l := newLock(action)
-	lockDescriptor, err := l.lock(ctx, ts, lt, opts...)
-	if err != nil {
-		return nil, nil, err
-	}
-	// and update our structure
-	i.info[lt.ResourceName()] = &lockInfo{
-		lockDescriptor: lockDescriptor,
-		actionNode:     l,
-	}
-	return ctx, func(finalErr *error) {
-		i.mu.Lock()
-		defer i.mu.Unlock()
-
-		if _, ok := i.info[lt.ResourceName()]; !ok {
-			if *finalErr != nil {
-				slog.ErrorContext(ctx, "trying to unlock multiple times", "type", lt.Type(), "resource", lt.ResourceName())
-			} else {
-				*finalErr = mterrors.Errorf(mtrpc.Code_INTERNAL, "trying to unlock %v %v multiple times", lt.Type(), lt.ResourceName())
-			}
-			return
-		}
-
-		err := l.unlock(ctx, ts, lt, lockDescriptor, *finalErr)
-		// if we have an error, we log it, but we still want to delete the lock
-		if *finalErr != nil {
-			if err != nil {
-				// both error are set, just log the unlock error
-				slog.WarnContext(ctx, "unlock failed", "type", lt.Type(), "resource", lt.ResourceName(), "error", err)
-			}
-		} else {
-			*finalErr = err
-		}
-		delete(i.info, lt.ResourceName())
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil, nil
 }
+
+// check that we are not already locked
+
+// lock it
+
+// and update our structure
+
+// if we have an error, we log it, but we still want to delete the lock
+
+// both error are set, just log the unlock error
 
 // checkLocked checks that the given resource is locked.
 func checkLocked(ctx context.Context, lt iTopoLock) error {
+	_ = "STUB: not implemented"
 	// extract the locksInfo pointer
-	i, ok := ctx.Value(locksKey).(*locksInfo)
-	if !ok {
-		return mterrors.Errorf(mtrpc.Code_INTERNAL, "%v %v is not locked (no locksInfo)", lt.Type(), lt.ResourceName())
-	}
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	// find the individual entry
-	li, ok := i.info[lt.ResourceName()]
-	if !ok {
-		return mterrors.Errorf(mtrpc.Code_INTERNAL, "%v %v is not locked (no lockInfo in map)", lt.Type(), lt.ResourceName())
-	}
-
-	// Check the lock server implementation still holds the lock.
-	return li.lockDescriptor.Check(ctx)
+	return nil
 }
+
+// find the individual entry
+
+// Check the lock server implementation still holds the lock.
 
 // lockOptions configure a Lock call. lockOptions are set by the LockOption
 // values passed to the lock functions.
@@ -334,28 +154,14 @@ type funcLockOption struct {
 	f func(*lockOptions)
 }
 
-func (flo *funcLockOption) apply(lo *lockOptions) {
-	flo.f(lo)
-}
+func (flo *funcLockOption) apply(lo *lockOptions) { _ = "STUB: not implemented"; return }
 
-func newFuncLockOption(f func(*lockOptions)) *funcLockOption {
-	return &funcLockOption{
-		f: f,
-	}
-}
+func newFuncLockOption(f func(*lockOptions)) *funcLockOption { _ = "STUB: not implemented"; return nil }
 
 // WithType determines the type of lock we take. The options are defined
 // by the LockType type.
-func WithType(lt LockType) LockOption {
-	return newFuncLockOption(func(o *lockOptions) {
-		o.lockType = lt
-	})
-}
+func WithType(lt LockType) LockOption { _ = "STUB: not implemented"; return *new(LockOption) }
 
 // WithTTL sets a custom TTL for the lock lease.
 // For Named locks, this overrides the default NamedLockTTL (24h).
-func WithTTL(ttl time.Duration) LockOption {
-	return newFuncLockOption(func(o *lockOptions) {
-		o.ttl = ttl
-	})
-}
+func WithTTL(ttl time.Duration) LockOption { _ = "STUB: not implemented"; return *new(LockOption) }

@@ -17,8 +17,6 @@ package fakepgdb
 import (
 	"context"
 	"database/sql/driver"
-	"errors"
-	"io"
 )
 
 // fakeDriver implements driver.Driver
@@ -28,7 +26,8 @@ type fakeDriver struct {
 
 // Open returns a new connection to the fake database.
 func (d *fakeDriver) Open(name string) (driver.Conn, error) {
-	return &fakeConn{db: d.db}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Conn), nil
 }
 
 // fakeConn implements driver.Conn
@@ -38,54 +37,35 @@ type fakeConn struct {
 
 // Prepare returns a prepared statement, bound to this connection.
 func (c *fakeConn) Prepare(query string) (driver.Stmt, error) {
-	return &fakeStmt{conn: c, query: query}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Stmt), nil
 }
 
 // Close closes the connection.
 func (c *fakeConn) Close() error {
+	_ = "STUB: not implemented"
+
+	// Begin starts and returns a new transaction.
 	return nil
 }
 
-// Begin starts and returns a new transaction.
 func (c *fakeConn) Begin() (driver.Tx, error) {
-	return &fakeTx{conn: c}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Tx), nil
 }
 
 // QueryContext executes a query that may return rows.
 func (c *fakeConn) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Rows, error) {
+	_ = "STUB: not implemented"
 	// Convert args to []interface{} for compatibility
-	iargs := make([]any, len(args))
-	for i, arg := range args {
-		iargs[i] = arg.Value
-	}
-
-	result, err := c.db.handleQuery(query)
-	if err != nil {
-		return nil, err
-	}
-
-	return &fakeRows{
-		columns: result.Columns,
-		rows:    result.Rows,
-		index:   0,
-	}, nil
+	return *new(driver.Rows), nil
 }
 
 // ExecContext executes a query that doesn't return rows.
 func (c *fakeConn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Result, error) {
+	_ = "STUB: not implemented"
 	// Convert args to []interface{} for compatibility
-	iargs := make([]any, len(args))
-	for i, arg := range args {
-		iargs[i] = arg.Value
-	}
-
-	result, err := c.db.handleQuery(query)
-	if err != nil {
-		return nil, err
-	}
-
-	rowsAffected := int64(len(result.Rows))
-	return &fakeResult{rowsAffected: rowsAffected}, nil
+	return *new(driver.Result), nil
 }
 
 // fakeStmt implements driver.Stmt
@@ -96,37 +76,28 @@ type fakeStmt struct {
 
 // Close closes the statement.
 func (s *fakeStmt) Close() error {
+	_ = "STUB: not implemented"
+
+	// NumInput returns the number of placeholder parameters.
 	return nil
 }
 
-// NumInput returns the number of placeholder parameters.
 func (s *fakeStmt) NumInput() int {
-	return -1 // -1 means the driver doesn't know
+	_ = "STUB: not implemented"
+	// -1 means the driver doesn't know
+	return 0
 }
 
 // Exec executes a query that doesn't return rows.
 func (s *fakeStmt) Exec(args []driver.Value) (driver.Result, error) {
-	result, err := s.conn.db.handleQuery(s.query)
-	if err != nil {
-		return nil, err
-	}
-
-	rowsAffected := int64(len(result.Rows))
-	return &fakeResult{rowsAffected: rowsAffected}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Result), nil
 }
 
 // Query executes a query that may return rows.
 func (s *fakeStmt) Query(args []driver.Value) (driver.Rows, error) {
-	result, err := s.conn.db.handleQuery(s.query)
-	if err != nil {
-		return nil, err
-	}
-
-	return &fakeRows{
-		columns: result.Columns,
-		rows:    result.Rows,
-		index:   0,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(driver.Rows), nil
 }
 
 // fakeTx implements driver.Tx
@@ -136,15 +107,19 @@ type fakeTx struct {
 
 // Commit commits the transaction.
 func (tx *fakeTx) Commit() error {
+	_ = "STUB: not implemented"
+
+	// Rollback aborts the transaction.
 	return nil
 }
 
-// Rollback aborts the transaction.
 func (tx *fakeTx) Rollback() error {
+	_ = "STUB: not implemented"
+
+	// fakeResult implements driver.Result
 	return nil
 }
 
-// fakeResult implements driver.Result
 type fakeResult struct {
 	lastInsertId int64
 	rowsAffected int64
@@ -152,15 +127,21 @@ type fakeResult struct {
 
 // LastInsertId returns the database's auto-generated ID.
 func (r *fakeResult) LastInsertId() (int64, error) {
-	return r.lastInsertId, nil
+	_ = "STUB: not implemented"
+	return 0,
+
+		// RowsAffected returns the number of rows affected by the query.
+		nil
 }
 
-// RowsAffected returns the number of rows affected by the query.
 func (r *fakeResult) RowsAffected() (int64, error) {
-	return r.rowsAffected, nil
+	_ = "STUB: not implemented"
+	return 0,
+
+		// fakeRows implements driver.Rows
+		nil
 }
 
-// fakeRows implements driver.Rows
 type fakeRows struct {
 	columns []string
 	rows    [][]any
@@ -169,33 +150,20 @@ type fakeRows struct {
 
 // Columns returns the names of the columns.
 func (r *fakeRows) Columns() []string {
-	return r.columns
+	_ = "STUB: not implemented"
+
+	// Close closes the rows iterator.
+	return nil
 }
 
-// Close closes the rows iterator.
 func (r *fakeRows) Close() error {
+	_ = "STUB: not implemented"
+
+	// Next is called to populate the next row of data into the provided slice.
 	return nil
 }
 
-// Next is called to populate the next row of data into the provided slice.
-func (r *fakeRows) Next(dest []driver.Value) error {
-	if r.index >= len(r.rows) {
-		return io.EOF
-	}
-
-	row := r.rows[r.index]
-	r.index++
-
-	if len(dest) != len(row) {
-		return errors.New("fakepgdb: destination slice length doesn't match row length")
-	}
-
-	for i, val := range row {
-		dest[i] = val
-	}
-
-	return nil
-}
+func (r *fakeRows) Next(dest []driver.Value) error { _ = "STUB: not implemented"; return nil }
 
 // Ensure interfaces are implemented
 var (

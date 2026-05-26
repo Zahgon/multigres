@@ -60,19 +60,12 @@ package topoclient
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"io"
-	"log"
 	"log/slog"
-	"maps"
-	"slices"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/spf13/pflag"
-	"golang.org/x/sync/errgroup"
 
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	"github.com/multigres/multigres/go/tools/viperutil"
@@ -289,13 +282,15 @@ var _ Store = (*store)(nil)
 
 // getLockTimeout returns the configured lock timeout.
 func (ts *store) getLockTimeout() time.Duration {
-	return ts.config.GetLockTimeout()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // GetRemoteOperationTimeout returns the configured remote operation timeout.
 // This should be used for RPCs and database operations that should use a shorter timeout than the parent context.
 func (ts *store) GetRemoteOperationTimeout() time.Duration {
-	return ts.config.GetRemoteOperationTimeout()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // cellConn represents a cached connection to a cell's topology service
@@ -315,81 +310,33 @@ type TopoConfig struct {
 }
 
 // NewTopoConfig creates a new TopoConfig with default values
-func NewTopoConfig(reg *viperutil.Registry) *TopoConfig {
-	return &TopoConfig{
-		globalServerAddresses: viperutil.Configure(reg, "topo-global-server-addresses", viperutil.Options[[]string]{
-			Default:  []string{},
-			FlagName: "topo-global-server-addresses",
-			Dynamic:  false,
-		}),
-		globalRoot: viperutil.Configure(reg, "topo-global-root", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "topo-global-root",
-			Dynamic:  false,
-		}),
-		readConcurrency: viperutil.Configure(reg, "topo-read-concurrency", viperutil.Options[int64]{
-			Default:  32,
-			FlagName: "topo-read-concurrency",
-			Dynamic:  false,
-		}),
-		lockTimeout: viperutil.Configure(reg, "lock-timeout", viperutil.Options[time.Duration]{
-			Default:  45 * time.Second,
-			FlagName: "lock-timeout",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_LOCK_TIMEOUT"},
-		}),
-		remoteOperationTimeout: viperutil.Configure(reg, "remote-operation-timeout", viperutil.Options[time.Duration]{
-			Default:  15 * time.Second,
-			FlagName: "remote-operation-timeout",
-			Dynamic:  false,
-			EnvVars:  []string{"MT_REMOTE_OPERATION_TIMEOUT"},
-		}),
-	}
-}
+func NewTopoConfig(reg *viperutil.Registry) *TopoConfig { _ = "STUB: not implemented"; return nil }
 
 // RegisterFlags registers all topo flags with the given FlagSet
-func (tc *TopoConfig) RegisterFlags(fs *pflag.FlagSet) {
-	fs.StringSlice("topo-global-server-addresses", tc.globalServerAddresses.Default(), "the address of the global topology server")
-	fs.String("topo-global-root", tc.globalRoot.Default(), "the path of the global topology data in the global topology server")
-	fs.Int64("topo-read-concurrency", tc.readConcurrency.Default(), "Maximum concurrency of topo reads per global or local cell.")
-	fs.Duration("lock-timeout", tc.lockTimeout.Default(), "Maximum time to wait when attempting to acquire a lock from the topo server")
-	fs.Duration("remote-operation-timeout", tc.remoteOperationTimeout.Default(), "time to wait for a remote operation")
-
-	viperutil.BindFlags(fs,
-		tc.globalServerAddresses,
-		tc.globalRoot,
-		tc.readConcurrency,
-		tc.lockTimeout,
-		tc.remoteOperationTimeout,
-	)
-}
+func (tc *TopoConfig) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // GetLockTimeout returns the configured lock timeout duration.
 func (tc *TopoConfig) GetLockTimeout() time.Duration {
-	return tc.lockTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // GetRemoteOperationTimeout returns the configured remote operation timeout duration.
 func (tc *TopoConfig) GetRemoteOperationTimeout() time.Duration {
-	return tc.remoteOperationTimeout.Get()
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // NewDefaultTopoConfig creates a TopoConfig with default values.
 // Use this when you need a TopoConfig but don't have a viperutil.Registry
 // (e.g., in the local provisioner or tests).
-func NewDefaultTopoConfig() *TopoConfig {
-	return NewTopoConfig(viperutil.NewRegistry())
-}
+func NewDefaultTopoConfig() *TopoConfig { _ = "STUB: not implemented"; return nil }
 
 // SetLockTimeout sets the lock timeout value. This is primarily used for testing.
-func (tc *TopoConfig) SetLockTimeout(d time.Duration) {
-	tc.lockTimeout.Set(d)
-}
+func (tc *TopoConfig) SetLockTimeout(d time.Duration) { _ = "STUB: not implemented"; return }
 
 // SetRemoteOperationTimeout sets the remote operation timeout value. This is primarily used for testing.
-func (tc *TopoConfig) SetRemoteOperationTimeout(d time.Duration) {
-	tc.remoteOperationTimeout.Set(d)
-}
+func (tc *TopoConfig) SetRemoteOperationTimeout(d time.Duration) { _ = "STUB: not implemented"; return }
 
 // factories contains the registered factories for creating topology connections.
 // Each implementation (e.g., etcd, memory) registers its factory here.
@@ -398,223 +345,71 @@ var factories = make(map[string]Factory)
 // RegisterFactory registers a Factory for a specific topology implementation.
 // If an implementation with that name already exists, it will log.Fatal and exit.
 // Call this function in the 'init' function of your topology implementation module.
-func RegisterFactory(name string, factory Factory) {
-	if factories[name] != nil {
-		log.Fatalf("Duplicate topoclient.Factory registration for %v", name)
-	}
-	factories[name] = factory
-}
+func RegisterFactory(name string, factory Factory) { _ = "STUB: not implemented"; return }
 
 // GetAvailableImplementations returns a sorted list of all registered topology implementations.
-func GetAvailableImplementations() []string {
-	implementations := make([]string, 0, len(factories))
-	for name := range factories {
-		implementations = append(implementations, name)
-	}
-	// Sort for consistent output
-	slices.Sort(implementations)
-	return implementations
-}
+func GetAvailableImplementations() []string { _ = "STUB: not implemented"; return nil }
+
+// Sort for consistent output
 
 // NewWithFactory creates a new topology store based on the given Factory.
 // It also opens the global topology connection and initializes the store.
 func NewWithFactory(factory Factory, root string, serverAddrs []string, config *TopoConfig) Store {
-	ts := &store{
-		factory:   factory,
-		config:    config,
-		cellConns: make(map[string]cellConn),
-		status:    make(map[string]string),
-	}
-	ts.status[GlobalCell] = ""
-	conn := NewWrapperConn(
-		func() (Conn, error) {
-			return factory.Create(GlobalCell, root, serverAddrs)
-		},
-		func(s string) {
-			ts.setStatus(GlobalCell, s)
-		},
-	)
-	ts.globalTopo = conn
-	return ts
+	_ = "STUB: not implemented"
+	return *new(Store)
 }
 
 // OpenServer returns a topology store using the specified implementation,
 // root path, and server addresses for the global topology server.
 func OpenServer(implementation, root string, serverAddrs []string, config *TopoConfig) (Store, error) {
-	if config == nil {
-		return nil, errors.New("TopoConfig is required")
-	}
-
-	factory, ok := factories[implementation]
-	if !ok {
-		// Build a helpful error message showing available implementations
-		var available []string
-		for name := range factories {
-			available = append(available, name)
-		}
-
-		if len(available) == 0 {
-			return nil, errors.New("no topology implementations registered. This may indicate a build or import issue")
-		}
-
-		return nil, fmt.Errorf("topology implementation '%s' not found. Available implementations: %s", implementation, strings.Join(available, ", "))
-	}
-	return NewWithFactory(factory, root, serverAddrs, config), nil
+	_ = "STUB: not implemented"
+	return *new(Store), nil
 }
+
+// Build a helpful error message showing available implementations
 
 // Open returns a topology store using the command-line parameter flags
 // for address and root. It returns an error if required configuration
 // is missing or if an error occurs.
-func (config *TopoConfig) Open() (Store, error) {
-	addresses := config.globalServerAddresses.Get()
-	root := config.globalRoot.Get()
-
-	if len(addresses) == 0 {
-		return nil, errors.New("topo-global-server-addresses must be configured")
-	}
-	if root == "" {
-		return nil, errors.New("topo-global-root must be non-empty")
-	}
-
-	ts, err := OpenServer(DefaultTopoImplementation, root, addresses, config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open topo server (implementation=%s, addresses=%v, root=%s): %w", DefaultTopoImplementation, addresses, root, err)
-	}
-	return ts, nil
-}
+func (config *TopoConfig) Open() (Store, error) { _ = "STUB: not implemented"; return *new(Store), nil }
 
 // ConnForCell returns a connection object for the given cell.
 // It caches connection objects from previously requested cells and reuses them
 // when the cell configuration hasn't changed.
 func (ts *store) ConnForCell(ctx context.Context, cell string) (Conn, error) {
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-
-	// Global cell is the easy case - return the existing connection.
-	if cell == GlobalCell {
-		return ts.globalTopo, nil
-	}
-
-	// Fetch cell cluster addresses from the global cluster.
-	// We can use the GlobalReadOnlyCell for this call.
-	ci, err := ts.GetCell(ctx, cell)
-	if err != nil {
-		return nil, err
-	}
-
-	ts.cellConnsMu.Lock()
-	defer ts.cellConnsMu.Unlock()
-	cc, ok := ts.cellConns[cell]
-	if ok {
-		// Verify that the connection parameters match.
-		if cellsEqual(ci, cc.Cell) {
-			return cc.conn, nil
-		}
-		// Connections parameters have changed,
-		// close the cached connection and create a new one.
-		if cc.conn != nil {
-			cc.conn.Close()
-		}
-	}
-
-	// Connect to the cell topology server while holding the lock.
-	// This ensures only one connection is established at any given time.
-	// Create the connection and cache it for future use.
-
-	ts.setStatus(cell, "")
-	conn := NewWrapperConn(
-		func() (Conn, error) {
-			return ts.factory.Create(cell, ci.Root, ci.ServerAddresses)
-		},
-		func(s string) {
-			ts.setStatus(cell, s)
-		},
-	)
-	ts.cellConns[cell] = cellConn{
-		Cell: &clustermetadatapb.Cell{
-			Name:            ci.Name,
-			ServerAddresses: slices.Clone(ci.ServerAddresses),
-			Root:            ci.Root,
-		},
-		conn: conn,
-	}
-	return conn, nil
+	_ = "STUB: not implemented"
+	return *new(Conn), nil
 }
+
+// Global cell is the easy case - return the existing connection.
+
+// Fetch cell cluster addresses from the global cluster.
+// We can use the GlobalReadOnlyCell for this call.
+
+// Verify that the connection parameters match.
+
+// Connections parameters have changed,
+// close the cached connection and create a new one.
+
+// Connect to the cell topology server while holding the lock.
+// This ensures only one connection is established at any given time.
+// Create the connection and cache it for future use.
 
 // cellsEqual compares two Cell protos for equality.
 // This is needed because gogo/protobuf's proto.Equal doesn't work
 // with protobuf v1 generated messages.
-func cellsEqual(a, b *clustermetadatapb.Cell) bool {
-	if a == nil && b == nil {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-	return a.Name == b.Name &&
-		a.Root == b.Root &&
-		slices.Equal(a.ServerAddresses, b.ServerAddresses)
-}
+func cellsEqual(a, b *clustermetadatapb.Cell) bool { _ = "STUB: not implemented"; return false }
 
-func (ts *store) setStatus(cell string, status string) {
-	ts.statusMu.Lock()
-	defer ts.statusMu.Unlock()
-	ts.status[cell] = status
-}
+func (ts *store) setStatus(cell string, status string) { _ = "STUB: not implemented"; return }
 
 // Status returns the status of all the connections in the store.
-func (ts *store) Status() map[string]string {
-	ts.statusMu.Lock()
-	defer ts.statusMu.Unlock()
-	return maps.Clone(ts.status)
-}
+func (ts *store) Status() map[string]string { _ = "STUB: not implemented"; return nil }
 
 // Close will close all connections to underlying topology stores.
 // It will nil all member variables, so any further access will panic.
 // Returns a combined error if any errors occurred during cleanup.
-func (ts *store) Close() error {
-	g, _ := errgroup.WithContext(context.TODO())
+func (ts *store) Close() error { _ = "STUB: not implemented"; return nil }
 
-	// Close global topology connection
-	g.Go(func() error {
-		if ts.globalTopo != nil {
-			if err := ts.globalTopo.Close(); err != nil {
-				return fmt.Errorf("failed to close global topo: %w", err)
-			}
-			ts.globalTopo = nil
-		}
-		return nil
-	})
+// Close global topology connection
 
-	// Close all cell connections
-
-	g.Go(func() error {
-		ts.cellConnsMu.Lock()
-		defer ts.cellConnsMu.Unlock()
-
-		for cell, cc := range ts.cellConns {
-			if cc.conn != nil {
-				if err := cc.conn.Close(); err != nil {
-					return fmt.Errorf("failed to close cell connection %s: %w", cell, err)
-				}
-			}
-		}
-		return nil
-	})
-	err := g.Wait()
-
-	func() {
-		ts.cellConnsMu.Lock()
-		defer ts.cellConnsMu.Unlock()
-		ts.cellConns = make(map[string]cellConn)
-	}()
-
-	func() {
-		ts.statusMu.Lock()
-		defer ts.statusMu.Unlock()
-		ts.status = make(map[string]string)
-	}()
-
-	return err
-}
+// Close all cell connections

@@ -15,12 +15,8 @@
 package command
 
 import (
-	"context"
-	"errors"
 	"sync/atomic"
-	"time"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 )
 
@@ -40,62 +36,11 @@ type Metrics struct {
 
 // NewMetrics creates and registers the pgBackRest health gauges.
 // It always returns a non-nil *Metrics; any registration errors are collected and returned.
-func NewMetrics() (*Metrics, error) {
-	m := &Metrics{}
-	meter := otel.Meter(pgctldMeterName)
-
-	var errs []error
-
-	var err error
-	m.serverUp, err = meter.Int64ObservableGauge(
-		"pgbackrest.server.up",
-		metric.WithDescription("1 if the pgBackRest TLS server is running, 0 if not"),
-	)
-	errs = append(errs, err)
-
-	m.restartCount, err = meter.Int64ObservableGauge(
-		"pgbackrest.server.restart_count",
-		metric.WithDescription("Cumulative number of times the pgBackRest TLS server has been restarted"),
-	)
-	errs = append(errs, err)
-
-	m.serverUptime, err = meter.Int64ObservableGauge(
-		"pgbackrest.server.uptime",
-		metric.WithDescription("Seconds since the pgBackRest TLS server last started, 0 if down"),
-	)
-	errs = append(errs, err)
-
-	_, err = meter.RegisterCallback(
-		func(_ context.Context, o metric.Observer) error {
-			o.ObserveInt64(m.serverUp, m.serverUpVal.Load())
-			o.ObserveInt64(m.restartCount, m.restartCountVal.Load())
-			var uptime int64
-			if started := m.startedAtNanos.Load(); started > 0 {
-				uptime = (time.Now().UnixNano() - started) / int64(time.Second)
-			}
-			o.ObserveInt64(m.serverUptime, uptime)
-			return nil
-		},
-		m.serverUp, m.restartCount, m.serverUptime,
-	)
-	errs = append(errs, err)
-
-	return m, errors.Join(errs...)
-}
+func NewMetrics() (*Metrics, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // SetServerUp atomically stores 1 if running is true, 0 if false.
 // It also records the start timestamp for the uptime gauge.
-func (m *Metrics) SetServerUp(running bool) {
-	if running {
-		m.serverUpVal.Store(1)
-		m.startedAtNanos.Store(time.Now().UnixNano())
-	} else {
-		m.serverUpVal.Store(0)
-		m.startedAtNanos.Store(0)
-	}
-}
+func (m *Metrics) SetServerUp(running bool) { _ = "STUB: not implemented"; return }
 
 // SetRestartCount atomically stores the restart count as int64.
-func (m *Metrics) SetRestartCount(count int32) {
-	m.restartCountVal.Store(int64(count))
-}
+func (m *Metrics) SetRestartCount(count int32) { _ = "STUB: not implemented"; return }

@@ -35,9 +35,6 @@
 package replparser
 
 import (
-	"fmt"
-	__yyfmt__ "fmt"
-
 	"github.com/multigres/multigres/go/common/parser/ast"
 )
 
@@ -156,40 +153,22 @@ type replYySymType struct {
 	yys   int
 }
 
-func (st *replYySymType) boolvalUnion() bool {
-	v, _ := st.union.(bool)
-	return v
-}
+func (st *replYySymType) boolvalUnion() bool { _ = "STUB: not implemented"; return false }
 
-func (st *replYySymType) defeltUnion() *ast.DefElem {
-	v, _ := st.union.(*ast.DefElem)
-	return v
-}
+func (st *replYySymType) defeltUnion() *ast.DefElem { _ = "STUB: not implemented"; return nil }
 
-func (st *replYySymType) listUnion() []*ast.DefElem {
-	v, _ := st.union.([]*ast.DefElem)
-	return v
-}
+func (st *replYySymType) listUnion() []*ast.DefElem { _ = "STUB: not implemented"; return nil }
 
-func (st *replYySymType) nodeUnion() ast.Node {
-	v, _ := st.union.(ast.Node)
-	return v
-}
+func (st *replYySymType) nodeUnion() ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 func (st *replYySymType) recptrUnion() ast.XLogRecPtr {
-	v, _ := st.union.(ast.XLogRecPtr)
-	return v
+	_ = "STUB: not implemented"
+	return *new(ast.XLogRecPtr)
 }
 
-func (st *replYySymType) strUnion() string {
-	v, _ := st.union.(string)
-	return v
-}
+func (st *replYySymType) strUnion() string { _ = "STUB: not implemented"; return "" }
 
-func (st *replYySymType) uintvalUnion() uint32 {
-	v, _ := st.union.(uint32)
-	return v
-}
+func (st *replYySymType) uintvalUnion() uint32 { _ = "STUB: not implemented"; return 0 }
 
 var replYyR1 = [...]int{
 	0, 21, 22, 22, 1, 1, 1, 1, 1, 1,
@@ -285,732 +264,190 @@ type replYyParserImpl struct {
 	char  int
 }
 
-func (p *replYyParserImpl) Lookahead() int {
-	return p.char
-}
+func (p *replYyParserImpl) Lookahead() int { _ = "STUB: not implemented"; return 0 }
 
-func replYyNewParser() replYyParser {
-	return &replYyParserImpl{}
-}
+func replYyNewParser() replYyParser { _ = "STUB: not implemented"; return *new(replYyParser) }
 
 const replYyFlag = -1000
 
-func replYyTokname(c int) string {
-	if c >= 1 && c-1 < len(replYyToknames) {
-		if replYyToknames[c-1] != "" {
-			return replYyToknames[c-1]
-		}
-	}
-	return __yyfmt__.Sprintf("tok-%v", c)
-}
+func replYyTokname(c int) string { _ = "STUB: not implemented"; return "" }
 
-func replYyStatname(s int) string {
-	if s >= 0 && s < len(replYyStatenames) {
-		if replYyStatenames[s] != "" {
-			return replYyStatenames[s]
-		}
-	}
-	return __yyfmt__.Sprintf("state-%v", s)
-}
+func replYyStatname(s int) string { _ = "STUB: not implemented"; return "" }
 
-func replYyErrorMessage(state, lookAhead int) string {
-	const TOKSTART = 4
+func replYyErrorMessage(state, lookAhead int) string { _ = "STUB: not implemented"; return "" }
 
-	if !replYyErrorVerbose {
-		return "syntax error"
-	}
+// To match Bison, suggest at most four expected tokens.
 
-	for _, e := range replYyErrorMessages {
-		if e.state == state && e.token == lookAhead {
-			return "syntax error: " + e.msg
-		}
-	}
+// Look for shiftable tokens.
 
-	res := "syntax error: unexpected " + replYyTokname(lookAhead)
+// Look for tokens that we accept or reduce.
 
-	// To match Bison, suggest at most four expected tokens.
-	expected := make([]int, 0, 4)
-
-	// Look for shiftable tokens.
-	base := replYyPact[state]
-	for tok := TOKSTART; tok-1 < len(replYyToknames); tok++ {
-		if n := base + tok; n >= 0 && n < replYyLast && replYyChk[replYyAct[n]] == tok {
-			if len(expected) == cap(expected) {
-				return res
-			}
-			expected = append(expected, tok)
-		}
-	}
-
-	if replYyDef[state] == -2 {
-		i := 0
-		for replYyExca[i] != -1 || replYyExca[i+1] != state {
-			i += 2
-		}
-
-		// Look for tokens that we accept or reduce.
-		for i += 2; replYyExca[i] >= 0; i += 2 {
-			tok := replYyExca[i]
-			if tok < TOKSTART || replYyExca[i+1] == 0 {
-				continue
-			}
-			if len(expected) == cap(expected) {
-				return res
-			}
-			expected = append(expected, tok)
-		}
-
-		// If the default action is to accept or reduce, give up.
-		if replYyExca[i+1] != 0 {
-			return res
-		}
-	}
-
-	for i, tok := range expected {
-		if i == 0 {
-			res += ", expecting "
-		} else {
-			res += " or "
-		}
-		res += replYyTokname(tok)
-	}
-	return res
-}
+// If the default action is to accept or reduce, give up.
 
 func replYylex1(lex replYyLexer, lval *replYySymType) (char, token int) {
-	token = 0
-	char = lex.Lex(lval)
-	if char <= 0 {
-		token = replYyTok1[0]
-		goto out
-	}
-	if char < len(replYyTok1) {
-		token = replYyTok1[char]
-		goto out
-	}
-	if char >= replYyPrivate {
-		if char < replYyPrivate+len(replYyTok2) {
-			token = replYyTok2[char-replYyPrivate]
-			goto out
-		}
-	}
-	for i := 0; i < len(replYyTok3); i += 2 {
-		token = replYyTok3[i+0]
-		if token == char {
-			token = replYyTok3[i+1]
-			goto out
-		}
-	}
-
-out:
-	if token == 0 {
-		token = replYyTok2[1] /* unknown char */
-	}
-	if replYyDebug >= 3 {
-		__yyfmt__.Printf("lex %s(%d)\n", replYyTokname(token), uint(char))
-	}
-	return char, token
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
-func replYyParse(replYylex replYyLexer) int {
-	return replYyNewParser().Parse(replYylex)
-}
+/* unknown char */
+
+func replYyParse(replYylex replYyLexer) int { _ = "STUB: not implemented"; return 0 }
 
 func (replYyrcvr *replYyParserImpl) Parse(replYylex replYyLexer) int {
-	var replYyn int
-	var replYyVAL replYySymType
-	var replYyDollar []replYySymType
-	_ = replYyDollar // silence set and not used
-	replYyS := replYyrcvr.stack[:]
-
-	Nerrs := 0   /* number of errors */
-	Errflag := 0 /* error recovery flag */
-	replYystate := 0
-	replYyrcvr.char = -1
-	replYytoken := -1 // replYyrcvr.char translated into internal numbering
-	defer func() {
-		// Make sure we report no lookahead when not parsing.
-		replYystate = -1
-		replYyrcvr.char = -1
-		replYytoken = -1
-	}()
-	replYyp := -1
-	goto replYystack
-
-ret0:
+	_ = "STUB: not implemented"
 	return 0
-
-ret1:
-	return 1
-
-replYystack:
-	/* put a state and value onto the stack */
-	if replYyDebug >= 4 {
-		__yyfmt__.Printf("char %v in %v\n", replYyTokname(replYytoken), replYyStatname(replYystate))
-	}
-
-	replYyp++
-	if replYyp >= len(replYyS) {
-		nyys := make([]replYySymType, len(replYyS)*2)
-		copy(nyys, replYyS)
-		replYyS = nyys
-	}
-	replYyS[replYyp] = replYyVAL
-	replYyS[replYyp].yys = replYystate
-
-replYynewstate:
-	replYyn = replYyPact[replYystate]
-	if replYyn <= replYyFlag {
-		goto replYydefault /* simple state */
-	}
-	if replYyrcvr.char < 0 {
-		replYyrcvr.char, replYytoken = replYylex1(replYylex, &replYyrcvr.lval)
-	}
-	replYyn += replYytoken
-	if replYyn < 0 || replYyn >= replYyLast {
-		goto replYydefault
-	}
-	replYyn = replYyAct[replYyn]
-	if replYyChk[replYyn] == replYytoken { /* valid shift */
-		replYyrcvr.char = -1
-		replYytoken = -1
-		replYyVAL = replYyrcvr.lval
-		replYystate = replYyn
-		if Errflag > 0 {
-			Errflag--
-		}
-		goto replYystack
-	}
-
-replYydefault:
-	/* default state action */
-	replYyn = replYyDef[replYystate]
-	if replYyn == -2 {
-		if replYyrcvr.char < 0 {
-			replYyrcvr.char, replYytoken = replYylex1(replYylex, &replYyrcvr.lval)
-		}
-
-		/* look through exception table */
-		xi := 0
-		for {
-			if replYyExca[xi+0] == -1 && replYyExca[xi+1] == replYystate {
-				break
-			}
-			xi += 2
-		}
-		for xi += 2; ; xi += 2 {
-			replYyn = replYyExca[xi+0]
-			if replYyn < 0 || replYyn == replYytoken {
-				break
-			}
-		}
-		replYyn = replYyExca[xi+1]
-		if replYyn < 0 {
-			goto ret0
-		}
-	}
-	if replYyn == 0 {
-		/* error ... attempt to resume parsing */
-		switch Errflag {
-		case 0: /* brand new error */
-			replYylex.Error(replYyErrorMessage(replYystate, replYytoken))
-			Nerrs++
-			if replYyDebug >= 1 {
-				__yyfmt__.Printf("%s", replYyStatname(replYystate))
-				__yyfmt__.Printf(" saw %s\n", replYyTokname(replYytoken))
-			}
-			fallthrough
-
-		case 1, 2: /* incompletely recovered error ... try again */
-			Errflag = 3
-
-			/* find a state where "error" is a legal shift action */
-			for replYyp >= 0 {
-				replYyn = replYyPact[replYyS[replYyp].yys] + replYyErrCode
-				if replYyn >= 0 && replYyn < replYyLast {
-					replYystate = replYyAct[replYyn] /* simulate a shift of "error" */
-					if replYyChk[replYystate] == replYyErrCode {
-						goto replYystack
-					}
-				}
-
-				/* the current p has no shift on "error", pop stack */
-				if replYyDebug >= 2 {
-					__yyfmt__.Printf("error recovery pops state %d\n", replYyS[replYyp].yys)
-				}
-				replYyp--
-			}
-			/* there is no state on the stack with an error shift ... abort */
-			goto ret1
-
-		case 3: /* no shift yet; clobber input char */
-			if replYyDebug >= 2 {
-				__yyfmt__.Printf("error recovery discards %s\n", replYyTokname(replYytoken))
-			}
-			if replYytoken == replYyEofCode {
-				goto ret1
-			}
-			replYyrcvr.char = -1
-			replYytoken = -1
-			goto replYynewstate /* try again in the same state */
-		}
-	}
-
-	/* reduction by production replYyn */
-	if replYyDebug >= 2 {
-		__yyfmt__.Printf("reduce %v in:\n\t%v\n", replYyn, replYyStatname(replYystate))
-	}
-
-	replYynt := replYyn
-	replYypt := replYyp
-	_ = replYypt // guard against "declared and not used"
-
-	replYyp -= replYyR2[replYyn]
-	// replYyp is now the index of $0. Perform the default action. Iff the
-	// reduced production is ε, $1 is possibly out of range.
-	if replYyp+1 >= len(replYyS) {
-		nyys := make([]replYySymType, len(replYyS)*2)
-		copy(nyys, replYyS)
-		replYyS = nyys
-	}
-	replYyVAL = replYyS[replYyp+1]
-
-	/* consult goto table to find next state */
-	replYyn = replYyR1[replYyn]
-	replYyg := replYyPgo[replYyn]
-	replYyj := replYyg + replYyS[replYyp].yys + 1
-
-	if replYyj >= replYyLast {
-		replYystate = replYyAct[replYyg]
-	} else {
-		replYystate = replYyAct[replYyj]
-		if replYyChk[replYystate] != -replYyn {
-			replYystate = replYyAct[replYyg]
-		}
-	}
-	// dummy call; replaced with literal code
-	switch replYynt {
-
-	case 1:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-//line grammar.y:96
-		{
-			if l, ok := replYylex.(interface{ setResult(ast.Stmt) }); ok {
-				if s, ok := replYyDollar[1].nodeUnion().(ast.Stmt); ok {
-					l.setResult(s)
-				}
-			}
-		}
-	case 11:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:124
-		{
-			replYyLOCAL = ast.NewIdentifySystemCmd()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 12:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:132
-		{
-			replYyLOCAL = ast.NewReadReplicationSlotCmd(replYyDollar[2].strUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 13:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:140
-		{
-			replYyLOCAL = ast.NewVariableShowStmt(replYyDollar[2].strUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 14:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:145
-		{
-			replYyLOCAL = replYyDollar[1].strUnion()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 15:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:147
-		{
-			replYyLOCAL = fmt.Sprintf("%s.%s", replYyDollar[1].strUnion(), replYyDollar[3].strUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 16:
-		replYyDollar = replYyS[replYypt-6 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:153
-		{
-			cmd := ast.NewCreateReplicationSlotCmd(replYyDollar[2].strUnion(), ast.ReplicationKindLogical, replYyDollar[5].strUnion(), replYyDollar[3].boolvalUnion())
-			cmd.Options = replYyDollar[6].listUnion()
-			replYyLOCAL = cmd
-		}
-		replYyVAL.union = replYyLOCAL
-	case 17:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:162
-		{
-			replYyLOCAL = replYyDollar[2].listUnion()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 18:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:163
-		{
-			replYyLOCAL = replYyDollar[1].listUnion()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 19:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:169
-		{
-			replYyLOCAL = append(replYyDollar[1].listUnion(), replYyDollar[2].defeltUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 20:
-		replYyDollar = replYyS[replYypt-0 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:171
-		{
-			replYyLOCAL = nil
-		}
-		replYyVAL.union = replYyLOCAL
-	case 21:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:177
-		{
-			replYyLOCAL = ast.NewDefElem("snapshot", ast.NewString("export"))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 22:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:181
-		{
-			replYyLOCAL = ast.NewDefElem("snapshot", ast.NewString("nothing"))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 23:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:185
-		{
-			replYyLOCAL = ast.NewDefElem("snapshot", ast.NewString("use"))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 24:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:189
-		{
-			replYyLOCAL = ast.NewDefElem("reserve_wal", ast.NewBoolean(true))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 25:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:193
-		{
-			replYyLOCAL = ast.NewDefElem("two_phase", ast.NewBoolean(true))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 26:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:201
-		{
-			replYyLOCAL = ast.NewDropReplicationSlotCmd(replYyDollar[2].strUnion(), false)
-		}
-		replYyVAL.union = replYyLOCAL
-	case 27:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:205
-		{
-			replYyLOCAL = ast.NewDropReplicationSlotCmd(replYyDollar[2].strUnion(), true)
-		}
-		replYyVAL.union = replYyLOCAL
-	case 28:
-		replYyDollar = replYyS[replYypt-5 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:213
-		{
-			replYyLOCAL = ast.NewAlterReplicationSlotCmd(replYyDollar[2].strUnion(), replYyDollar[4].listUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 29:
-		replYyDollar = replYyS[replYypt-6 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:221
-		{
-			replYyLOCAL = ast.NewStartReplicationCmd(ast.ReplicationKindLogical, replYyDollar[3].strUnion(), 0, replYyDollar[5].recptrUnion(), replYyDollar[6].listUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 30:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL bool
-//line grammar.y:228
-		{
-			replYyLOCAL = true
-		}
-		replYyVAL.union = replYyLOCAL
-	case 31:
-		replYyDollar = replYyS[replYypt-0 : replYypt+1]
-		var replYyLOCAL bool
-//line grammar.y:229
-		{
-			replYyLOCAL = false
-		}
-		replYyVAL.union = replYyLOCAL
-	case 32:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:234
-		{
-			replYyLOCAL = replYyDollar[2].listUnion()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 33:
-		replYyDollar = replYyS[replYypt-0 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:235
-		{
-			replYyLOCAL = nil
-		}
-		replYyVAL.union = replYyLOCAL
-	case 34:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:241
-		{
-			replYyLOCAL = []*ast.DefElem{replYyDollar[1].defeltUnion()}
-		}
-		replYyVAL.union = replYyLOCAL
-	case 35:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:245
-		{
-			replYyLOCAL = append(replYyDollar[1].listUnion(), replYyDollar[3].defeltUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 36:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:253
-		{
-			replYyLOCAL = ast.NewDefElem(replYyDollar[1].strUnion(), replYyDollar[2].nodeUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 37:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:260
-		{
-			replYyLOCAL = ast.NewString(replYyDollar[1].strUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 38:
-		replYyDollar = replYyS[replYypt-0 : replYypt+1]
-		var replYyLOCAL ast.Node
-//line grammar.y:261
-		{
-			replYyLOCAL = nil
-		}
-		replYyVAL.union = replYyLOCAL
-	case 39:
-		replYyDollar = replYyS[replYypt-3 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:267
-		{
-			replYyLOCAL = append(replYyDollar[1].listUnion(), replYyDollar[3].defeltUnion())
-		}
-		replYyVAL.union = replYyLOCAL
-	case 40:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL []*ast.DefElem
-//line grammar.y:269
-		{
-			replYyLOCAL = []*ast.DefElem{replYyDollar[1].defeltUnion()}
-		}
-		replYyVAL.union = replYyLOCAL
-	case 41:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:275
-		{
-			replYyLOCAL = ast.NewDefElem(replYyDollar[1].strUnion(), nil)
-		}
-		replYyVAL.union = replYyLOCAL
-	case 42:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:279
-		{
-			replYyLOCAL = ast.NewDefElem(replYyDollar[1].strUnion(), ast.NewString(replYyDollar[2].strUnion()))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 43:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:283
-		{
-			replYyLOCAL = ast.NewDefElem(replYyDollar[1].strUnion(), ast.NewString(replYyDollar[2].strUnion()))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 44:
-		replYyDollar = replYyS[replYypt-2 : replYypt+1]
-		var replYyLOCAL *ast.DefElem
-//line grammar.y:287
-		{
-			replYyLOCAL = ast.NewDefElem(replYyDollar[1].strUnion(), ast.NewInteger(int(replYyDollar[2].uintvalUnion())))
-		}
-		replYyVAL.union = replYyLOCAL
-	case 45:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:294
-		{
-			replYyLOCAL = replYyDollar[1].strUnion()
-		}
-		replYyVAL.union = replYyLOCAL
-	case 46:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:295
-		{
-			replYyLOCAL = "identify_system"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 47:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:296
-		{
-			replYyLOCAL = "show"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 48:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:297
-		{
-			replYyLOCAL = "start_replication"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 49:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:298
-		{
-			replYyLOCAL = "create_replication_slot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 50:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:299
-		{
-			replYyLOCAL = "drop_replication_slot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 51:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:300
-		{
-			replYyLOCAL = "alter_replication_slot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 52:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:301
-		{
-			replYyLOCAL = "wait"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 53:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:302
-		{
-			replYyLOCAL = "timeline"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 54:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:303
-		{
-			replYyLOCAL = "logical"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 55:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:304
-		{
-			replYyLOCAL = "slot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 56:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:305
-		{
-			replYyLOCAL = "reserve_wal"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 57:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:306
-		{
-			replYyLOCAL = "temporary"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 58:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:307
-		{
-			replYyLOCAL = "two_phase"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 59:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:308
-		{
-			replYyLOCAL = "export_snapshot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 60:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:309
-		{
-			replYyLOCAL = "noexport_snapshot"
-		}
-		replYyVAL.union = replYyLOCAL
-	case 61:
-		replYyDollar = replYyS[replYypt-1 : replYypt+1]
-		var replYyLOCAL string
-//line grammar.y:310
-		{
-			replYyLOCAL = "use_snapshot"
-		}
-		replYyVAL.union = replYyLOCAL
-	}
-	goto replYystack /* stack new state and value */
 }
+
+// silence set and not used
+
+/* number of errors */
+/* error recovery flag */
+
+// replYyrcvr.char translated into internal numbering
+
+// Make sure we report no lookahead when not parsing.
+
+/* put a state and value onto the stack */
+
+/* simple state */
+
+/* valid shift */
+
+/* default state action */
+
+/* look through exception table */
+
+/* error ... attempt to resume parsing */
+
+/* brand new error */
+
+/* incompletely recovered error ... try again */
+
+/* find a state where "error" is a legal shift action */
+
+/* simulate a shift of "error" */
+
+/* the current p has no shift on "error", pop stack */
+
+/* there is no state on the stack with an error shift ... abort */
+
+/* no shift yet; clobber input char */
+
+/* try again in the same state */
+
+/* reduction by production replYyn */
+
+// guard against "declared and not used"
+
+// replYyp is now the index of $0. Perform the default action. Iff the
+// reduced production is ε, $1 is possibly out of range.
+
+/* consult goto table to find next state */
+
+// dummy call; replaced with literal code
+
+//line grammar.y:96
+
+//line grammar.y:124
+
+//line grammar.y:132
+
+//line grammar.y:140
+
+//line grammar.y:145
+
+//line grammar.y:147
+
+//line grammar.y:153
+
+//line grammar.y:162
+
+//line grammar.y:163
+
+//line grammar.y:169
+
+//line grammar.y:171
+
+//line grammar.y:177
+
+//line grammar.y:181
+
+//line grammar.y:185
+
+//line grammar.y:189
+
+//line grammar.y:193
+
+//line grammar.y:201
+
+//line grammar.y:205
+
+//line grammar.y:213
+
+//line grammar.y:221
+
+//line grammar.y:228
+
+//line grammar.y:229
+
+//line grammar.y:234
+
+//line grammar.y:235
+
+//line grammar.y:241
+
+//line grammar.y:245
+
+//line grammar.y:253
+
+//line grammar.y:260
+
+//line grammar.y:261
+
+//line grammar.y:267
+
+//line grammar.y:269
+
+//line grammar.y:275
+
+//line grammar.y:279
+
+//line grammar.y:283
+
+//line grammar.y:287
+
+//line grammar.y:294
+
+//line grammar.y:295
+
+//line grammar.y:296
+
+//line grammar.y:297
+
+//line grammar.y:298
+
+//line grammar.y:299
+
+//line grammar.y:300
+
+//line grammar.y:301
+
+//line grammar.y:302
+
+//line grammar.y:303
+
+//line grammar.y:304
+
+//line grammar.y:305
+
+//line grammar.y:306
+
+//line grammar.y:307
+
+//line grammar.y:308
+
+//line grammar.y:309
+
+//line grammar.y:310
+
+/* stack new state and value */

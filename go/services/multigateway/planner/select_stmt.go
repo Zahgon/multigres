@@ -15,7 +15,6 @@
 package planner
 
 import (
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/services/multigateway/engine"
@@ -40,28 +39,11 @@ func (p *Planner) planSelectStmt(
 	conn *server.Conn,
 	setConfigs []setConfigCall,
 ) (*engine.Plan, error) {
-	if len(setConfigs) == 0 {
-		return p.planDefault(sql, stmt, conn)
-	}
-
-	primitives := make([]engine.Primitive, 0, len(setConfigs)+1)
-	for _, sc := range setConfigs {
-		primitives = append(primitives, engine.NewApplySessionStateSilent(sql, syntheticSetStmt(sc)))
-	}
-	primitives = append(primitives, engine.NewRoute(p.defaultTableGroup, constants.DefaultShard, sql, stmt))
-	return engine.NewPlan(sql, engine.NewSequence(primitives)), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // syntheticSetStmt builds a VariableSetStmt equivalent to `SET name = value`
 // for use inside ApplySessionState. Same shape as what the real
 // VariableSetStmt path feeds into the primitive, so execution is identical.
-func syntheticSetStmt(sc setConfigCall) *ast.VariableSetStmt {
-	return &ast.VariableSetStmt{
-		BaseNode: ast.BaseNode{Tag: ast.T_VariableSetStmt},
-		Kind:     ast.VAR_SET_VALUE,
-		Name:     sc.Name,
-		Args: ast.NewNodeList(
-			ast.NewA_Const(ast.NewString(sc.Value), 0),
-		),
-	}
-}
+func syntheticSetStmt(sc setConfigCall) *ast.VariableSetStmt { _ = "STUB: not implemented"; return nil }

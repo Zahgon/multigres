@@ -35,12 +35,8 @@ package etcdtopo
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"time"
 
 	"github.com/spf13/pflag"
-	"go.etcd.io/etcd/client/pkg/v3/tlsutil"
-	"google.golang.org/grpc"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 
@@ -66,12 +62,15 @@ type Factory struct{}
 
 // HasGlobalReadOnlyCell is part of the topoclient.Factory interface.
 func (f Factory) HasGlobalReadOnlyCell(serverAddr, root string) bool {
+	_ = "STUB: not implemented"
+
+	// Create is part of the topoclient.Factory interface.
 	return false
 }
 
-// Create is part of the topoclient.Factory interface.
 func (f Factory) Create(cell, root string, serverAddrs []string) (topoclient.Conn, error) {
-	return NewEtcdTopo(serverAddrs, root)
+	_ = "STUB: not implemented"
+	return *new(topoclient.Conn), nil
 }
 
 // etcdtopo is the implementation of topoclient.Conn for etcd.
@@ -90,88 +89,33 @@ func init() {
 	topoclient.RegisterFactory(topoclient.DefaultTopoImplementation, Factory{})
 }
 
-func registerEtcdTopoFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&clientCertPath, "topo-etcd-tls-cert", clientCertPath, "path to the client cert to use to connect to the etcd topo server, requires topo-etcd-tls-key, enables TLS")
-	fs.StringVar(&clientKeyPath, "topo-etcd-tls-key", clientKeyPath, "path to the client key to use to connect to the etcd topo server, enables TLS")
-	fs.StringVar(&serverCaPath, "topo-etcd-tls-ca", serverCaPath, "path to the ca to use to validate the server cert when connecting to the etcd topo server")
-}
+func registerEtcdTopoFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // Close implements topoclient.Conn.Close.
 // It will nil out the global and cells fields, so any attempt to
 // reuse this server will panic.
-func (s *etcdtopo) Close() error {
-	close(s.running)
-	if err := s.cli.Close(); err != nil {
-		return err
-	}
-	s.cli = nil
-	return nil
-}
+func (s *etcdtopo) Close() error { _ = "STUB: not implemented"; return nil }
 
 func newTLSConfig(certPath, keyPath, caPath string) (*tls.Config, error) {
-	var tlscfg *tls.Config
-	// If TLS is enabled, attach TLS config info.
-	if certPath != "" && keyPath != "" {
-		var (
-			cert *tls.Certificate
-			cp   *x509.CertPool
-			err  error
-		)
+	_ = "STUB: not implemented"
+	return nil,
 
-		cert, err = tlsutil.NewCert(certPath, keyPath, nil)
-		if err != nil {
-			return nil, err
-		}
-
-		if caPath != "" {
-			cp, err = tlsutil.NewCertPool([]string{caPath})
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		tlscfg = &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			RootCAs:            cp,
-			InsecureSkipVerify: false,
-		}
-		if cert != nil {
-			tlscfg.Certificates = []tls.Certificate{*cert}
-		}
-	}
-	return tlscfg, nil
+		// If TLS is enabled, attach TLS config info.
+		nil
 }
 
 // NewServerWithOpts creates a new server with the provided TLS options
 func NewServerWithOpts(serverAddrs []string, root, certPath, keyPath, caPath string) (*etcdtopo, error) {
+	_ = "STUB: not implemented"
 	// TODO: Rename this to NewServer and change NewServer to a name that signifies it uses the process-wide TLS settings.
-	config := clientv3.Config{
-		Endpoints:   serverAddrs,
-		DialTimeout: time.Second,
-		DialOptions: []grpc.DialOption{grpc.WithBlock()}, // grpc.WithBlock is deprecated but required by etcd client
-	}
-
-	tlscfg, err := newTLSConfig(certPath, keyPath, caPath)
-	if err != nil {
-		return nil, err
-	}
-
-	config.TLS = tlscfg
-
-	cli, err := clientv3.New(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &etcdtopo{
-		cli:     cli,
-		root:    root,
-		running: make(chan struct{}),
-	}, nil
+	return nil, nil
 }
+
+// grpc.WithBlock is deprecated but required by etcd client
 
 // NewEtcdTopo returns a new etcdtopo.Server.
 func NewEtcdTopo(serverAddrs []string, root string) (*etcdtopo, error) {
+	_ = "STUB: not implemented"
 	// TODO: Rename this to a name to signifies this function uses the process-wide TLS settings.
-	return NewServerWithOpts(serverAddrs, root, clientCertPath, clientKeyPath, serverCaPath)
+	return nil, nil
 }

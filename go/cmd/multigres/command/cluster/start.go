@@ -15,11 +15,6 @@
 package cluster
 
 import (
-	"fmt"
-	"net"
-	"strconv"
-	"strings"
-
 	"github.com/multigres/multigres/go/provisioner"
 
 	"github.com/spf13/cobra"
@@ -40,162 +35,44 @@ type ServiceSummary struct {
 
 // AddService adds a service to the summary
 func (s *ServiceSummary) AddService(name string, result *provisioner.ProvisionResult) {
+	_ = "STUB: not implemented"
 	// Extract log file path from metadata if available
-	logFile := ""
-	if result.Metadata != nil {
-		if logPath, ok := result.Metadata["log_file"].(string); ok {
-			logFile = logPath
-		}
-	}
-
-	s.Services = append(s.Services, ServiceInfo{
-		Name:    name,
-		FQDN:    result.FQDN,
-		Ports:   result.Ports,
-		LogFile: logFile,
-	})
+	return
 }
 
 // PrintSummary prints a formatted summary of all provisioned services
-func (s *ServiceSummary) PrintSummary() {
-	fmt.Println(strings.Repeat("=", 65))
-	fmt.Println("🎉 - Multigres cluster started successfully!")
-	fmt.Println(strings.Repeat("=", 65))
-	fmt.Println()
-	fmt.Println("Provisioned Services")
-	fmt.Println("--------------------")
-	fmt.Println()
+func (s *ServiceSummary) PrintSummary() { _ = "STUB: not implemented"; return }
 
-	for _, service := range s.Services {
-		fmt.Printf("%s\n", service.Name)
-		fmt.Printf("   Host: %s\n", service.FQDN)
+// Single port format
 
-		if len(service.Ports) == 1 {
-			// Single port format
-			for portName, portNum := range service.Ports {
-				if portName == "http_port" {
-					fmt.Printf("   Port: %d → http://%s:%d\n", portNum, service.FQDN, portNum)
-				} else {
-					fmt.Printf("   Port: %d\n", portNum)
-				}
-			}
-		} else if len(service.Ports) > 1 {
-			// Multiple ports format
-			fmt.Printf("   Ports:\n")
-			for portName, portNum := range service.Ports {
-				displayPortName := strings.ToUpper(strings.Replace(portName, "_port", "", 1))
-				if portName == "http_port" {
-					fmt.Printf("     - %s: %d → http://%s:%d\n", displayPortName, portNum, service.FQDN, portNum)
-				} else {
-					fmt.Printf("     - %s: %d\n", displayPortName, portNum)
-				}
-			}
-		}
+// Multiple ports format
 
-		if service.LogFile != "" {
-			fmt.Printf("   Log: %s\n", service.LogFile)
-		}
-		fmt.Println()
-	}
+// Find services with HTTP ports and add direct links
 
-	fmt.Println(strings.Repeat("=", 65))
-	fmt.Println("✨ - Next steps:")
+// Find the first multigateway service and show connection command
 
-	// Find services with HTTP ports and add direct links
-	for _, service := range s.Services {
-		if httpPort, exists := service.Ports["http_port"]; exists {
-			hostPort := net.JoinHostPort(service.FQDN, strconv.Itoa(httpPort))
-			url := "http://" + hostPort
-			fmt.Printf("- Open %s in your browser: %s\n", service.Name, url)
-		}
-	}
-	// Find the first multigateway service and show connection command
-	for _, service := range s.Services {
-		if strings.HasPrefix(service.Name, "multigateway") {
-			if pgPort, exists := service.Ports["pg_port"]; exists {
-				fmt.Printf("- 🐘 Connect to PostgreSQL: PGPASSWORD=postgres psql -h %s -p %d -U postgres\n",
-					service.FQDN, pgPort)
-				break // Show only the first gateway
-			}
-		}
-	}
-	fmt.Println("- 🟢 Cluster started successfully. Enjoy!")
-	fmt.Println("- To stop the cluster: \"multigres cluster stop\"")
-	fmt.Println(strings.Repeat("=", 65))
-}
+// Show only the first gateway
 
 // start handles the cluster up command
-func start(cmd *cobra.Command, args []string) error {
-	fmt.Println("Multigres — Distributed Postgres made easy")
-	fmt.Println("=================================================================")
-	fmt.Println("✨ Bootstrapping your local Multigres cluster — this may take a few moments ✨")
+func start(cmd *cobra.Command, args []string) error { _ = "STUB: not implemented"; return nil }
 
-	// Get config paths from flags
-	configPaths, err := cmd.Flags().GetStringSlice("config-path")
-	if err != nil {
-		return fmt.Errorf("failed to get config-path flag: %w", err)
-	}
-	if len(configPaths) == 0 {
-		configPaths = []string{"."}
-	}
+// Get config paths from flags
 
-	// Load configuration to determine provisioner type
-	config, configFile, err := LoadConfig(configPaths)
-	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
-	}
+// Load configuration to determine provisioner type
 
-	fmt.Println("📄 - Config loaded from: " + configFile)
+// Create provisioner instance
 
-	// Create provisioner instance
-	p, err := provisioner.GetProvisioner(config.Provisioner)
-	if err != nil {
-		return fmt.Errorf("failed to create provisioner '%s': %w", config.Provisioner, err)
-	}
+// Let provisioner load its own configuration
 
-	// Let provisioner load its own configuration
-	if err := p.LoadConfig(configPaths); err != nil {
-		return fmt.Errorf("failed to load provisioner config: %w", err)
-	}
+// Initialize service summary to track all provisioned services
 
-	fmt.Println("🛠️  - Provisioner: " + p.Name())
-	fmt.Println()
-	fmt.Println("👋 Here we go! Starting core services...")
-	fmt.Println(strings.Repeat("=", 65))
-	fmt.Println()
+// Use the provisioner's Bootstrap method to provision all services
 
-	ctx := cmd.Context()
+// Add all returned services to summary dynamically
 
-	// Initialize service summary to track all provisioned services
-	summary := &ServiceSummary{}
-
-	// Use the provisioner's Bootstrap method to provision all services
-	allResults, err := p.Bootstrap(ctx)
-	if err != nil {
-		return fmt.Errorf("cluster bootstrap failed: %w", err)
-	}
-
-	// Add all returned services to summary dynamically
-	for _, result := range allResults {
-		summary.AddService(result.ServiceName, result)
-	}
-
-	// Print comprehensive summary
-	fmt.Println()
-	summary.PrintSummary()
-	return nil
-}
+// Print comprehensive summary
 
 // AddStartCommand adds the start subcommand to the cluster command
-func AddStartCommand(clusterCmd *cobra.Command) {
-	startCmd := &cobra.Command{
-		Use:   "start",
-		Short: "Start local cluster",
-		Long:  "Start a local Multigres cluster using the configuration created with 'multigres cluster init'.",
-		RunE:  start,
-	}
+func AddStartCommand(clusterCmd *cobra.Command) { _ = "STUB: not implemented"; return }
 
-	// No additional flags needed - config-path is provided by viperutil via root command
-
-	clusterCmd.AddCommand(startCmd)
-}
+// No additional flags needed - config-path is provided by viperutil via root command

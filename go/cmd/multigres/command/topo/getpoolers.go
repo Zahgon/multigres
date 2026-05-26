@@ -15,82 +15,25 @@
 package topo
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
-
-	"github.com/multigres/multigres/go/cmd/multigres/command/admin"
-	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
 
 // runGetPoolers handles the getpoolers command
 func runGetPoolers(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// Get flag values
-	cellsFlag, err := cmd.Flags().GetString("cells")
-	if err != nil {
-		return fmt.Errorf("failed to read cells flag: %w", err)
-	}
-	database, err := cmd.Flags().GetString("database")
-	if err != nil {
-		return fmt.Errorf("failed to read database flag: %w", err)
-	}
-
-	// Parse cells flag
-	var cells []string
-	if cellsFlag != "" {
-		cells = strings.Split(cellsFlag, ",")
-		// Trim whitespace from each cell name
-		for i, cell := range cells {
-			cells[i] = strings.TrimSpace(cell)
-		}
-	}
-
-	// Create admin client
-	client, err := admin.NewClient(cmd)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
-	request := &multiadminpb.GetPoolersRequest{
-		Cells:    cells,
-		Database: database,
-	}
-
-	response, err := client.GetPoolers(cmd.Context(), request)
-	if err != nil {
-		return fmt.Errorf("failed to get poolers: %w", err)
-	}
-
-	// Convert to JSON and output using protojson to properly render enums as strings
-	marshaler := protojson.MarshalOptions{
-		Indent:          "  ",
-		EmitUnpopulated: false,
-		UseProtoNames:   true, // Use snake_case field names from proto instead of camelCase
-	}
-	jsonData, err := marshaler.Marshal(response)
-	if err != nil {
-		return fmt.Errorf("failed to marshal response to JSON: %w", err)
-	}
-
-	cmd.Print(string(jsonData))
 	return nil
 }
 
+// Parse cells flag
+
+// Trim whitespace from each cell name
+
+// Create admin client
+
+// Convert to JSON and output using protojson to properly render enums as strings
+
+// Use snake_case field names from proto instead of camelCase
+
 // AddGetPoolersCommand adds the getpoolers subcommand
-func AddGetPoolersCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "getpoolers",
-		Short: "Get poolers filtered by cells and/or database",
-		Long:  "Retrieve poolers from specified cells and optionally filter by database. If no cells are specified, all cells will be queried.",
-		RunE:  runGetPoolers,
-	}
-
-	cmd.Flags().String("admin-server", "", "Address of the multiadmin server (overrides config)")
-	cmd.Flags().String("cells", "", "Comma-separated list of cell names to query (optional)")
-	cmd.Flags().String("database", "", "Database name to filter by (optional)")
-
-	return cmd
-}
+func AddGetPoolersCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }

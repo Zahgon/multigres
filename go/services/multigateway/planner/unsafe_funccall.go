@@ -15,10 +15,6 @@
 package planner
 
 import (
-	"strconv"
-	"strings"
-
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 )
 
@@ -99,10 +95,8 @@ type expressionCheckResult struct {
 // planUnsupportedStmt from PlanPortal and silently let blocklisted function
 // calls through on non-cacheable extended-protocol paths.
 func planUnsupportedConstructs(stmt ast.Stmt) (*expressionCheckResult, error) {
-	if err := planUnsupportedStmt(stmt); err != nil {
-		return nil, err
-	}
-	return inspectExpressionFuncCalls(stmt)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // inspectExpressionFuncCalls walks every FuncCall in stmt and either:
@@ -130,58 +124,12 @@ func planUnsupportedConstructs(stmt ast.Stmt) (*expressionCheckResult, error) {
 // is_local is literal true (those calls are accepted but not tracked, and
 // parameterizing them keeps the plan cache stable for hot patterns).
 func inspectExpressionFuncCalls(stmt ast.Stmt) (*expressionCheckResult, error) {
-	if stmt == nil {
-		return &expressionCheckResult{}, nil
-	}
-
-	result := &expressionCheckResult{}
-	allowedSetConfigs := collectTopLevelSetConfigs(stmt)
-
-	var walkErr error
-	ast.Rewrite(stmt, func(cursor *ast.Cursor) bool {
-		if walkErr != nil {
-			return false
-		}
-		fc, ok := cursor.Node().(*ast.FuncCall)
-		if !ok {
-			return true
-		}
-		name := resolveFuncName(fc.Funcname)
-		if name == "" {
-			return true
-		}
-		if msg, blocked := funcBlocklist[name]; blocked {
-			walkErr = mterrors.NewFeatureNotSupported(msg)
-			return false
-		}
-		if name != "set_config" {
-			return true
-		}
-
-		if _, isAllowed := allowedSetConfigs[fc]; !isAllowed {
-			walkErr = mterrors.NewFeatureNotSupported(
-				"set_config is only supported as a top-level SELECT target list entry — use a SET statement, or set_config(..., true) for a transaction-scoped change")
-			return false
-		}
-
-		setCfg, err := validateAcceptedSetConfig(fc)
-		if err != nil {
-			walkErr = err
-			return false
-		}
-		if setCfg != nil {
-			result.SetConfigs = append(result.SetConfigs, *setCfg)
-		}
-		// else is_local=true: leave it alone; PG executes it as a normal
-		// transaction-scoped call and the pooler does not track it.
-		return true
-	}, nil)
-
-	if walkErr != nil {
-		return nil, walkErr
-	}
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// else is_local=true: leave it alone; PG executes it as a normal
+// transaction-scoped call and the pooler does not track it.
 
 // collectTopLevelSetConfigs returns the set of FuncCall pointers that occupy
 // an allowed position for set_config — "directly as the Val of a ResTarget
@@ -200,32 +148,8 @@ func inspectExpressionFuncCalls(stmt ast.Stmt) (*expressionCheckResult, error) {
 // as a top-level SELECT target list entry" error users already see for
 // other unsupported positions.
 func collectTopLevelSetConfigs(stmt ast.Stmt) map[*ast.FuncCall]struct{} {
-	allowed := make(map[*ast.FuncCall]struct{})
-	ss, ok := stmt.(*ast.SelectStmt)
-	if !ok || ss.Op != ast.SETOP_NONE {
-		return allowed
-	}
-	if ss.IntoClause != nil {
-		return allowed
-	}
-	if ss.TargetList == nil {
-		return allowed
-	}
-	for _, item := range ss.TargetList.Items {
-		rt, ok := item.(*ast.ResTarget)
-		if !ok {
-			continue
-		}
-		fc, ok := rt.Val.(*ast.FuncCall)
-		if !ok {
-			continue
-		}
-		if resolveFuncName(fc.Funcname) != "set_config" {
-			continue
-		}
-		allowed[fc] = struct{}{}
-	}
-	return allowed
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // validateAcceptedSetConfig verifies that an allowed-position set_config
@@ -240,32 +164,13 @@ func collectTopLevelSetConfigs(stmt ast.Stmt) map[*ast.FuncCall]struct{} {
 // stays stable across a hot path like PostgREST's per-request
 // set_config('request.jwt.claims', '<dynamic JSON>', true).
 func validateAcceptedSetConfig(fc *ast.FuncCall) (*setConfigCall, error) {
-	if fc.Args == nil || fc.Args.Len() != 3 {
-		return nil, mterrors.NewFeatureNotSupported(
-			"set_config requires three arguments: (name text, value text, is_local bool)")
-	}
-
-	isLocal, ok := constBoolArg(fc.Args.Items[2])
-	if !ok {
-		return nil, setConfigArgError(fc.Args.Items[2], "is_local")
-	}
-	if isLocal {
-		// is_local=true: PG executes it as a transaction-scoped call and
-		// the pooler does not track it. Name/value need not be literals
-		// here — they may have been normalized to ParamRef.
-		return nil, nil
-	}
-
-	name, ok := constStringArg(fc.Args.Items[0])
-	if !ok {
-		return nil, setConfigArgError(fc.Args.Items[0], "name")
-	}
-	value, ok := constStringArg(fc.Args.Items[1])
-	if !ok {
-		return nil, setConfigArgError(fc.Args.Items[1], "value")
-	}
-	return &setConfigCall{Name: name, Value: value}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// is_local=true: PG executes it as a transaction-scoped call and
+// the pooler does not track it. Name/value need not be literals
+// here — they may have been normalized to ParamRef.
 
 // setConfigArgError builds the user-facing rejection for a set_config
 // argument that wasn't a recognizable literal. ParamRef gets a distinct
@@ -273,14 +178,7 @@ func validateAcceptedSetConfig(fc *ast.FuncCall) (*setConfigCall, error) {
 // expression — extended-protocol clients that Parse "SELECT
 // set_config($1,$2,$3)" then Bind hit this path and need to be told the
 // difference.
-func setConfigArgError(arg ast.Node, which string) error {
-	if _, isParam := unwrapTypeCast(arg).(*ast.ParamRef); isParam {
-		return mterrors.NewFeatureNotSupported(
-			"set_config " + which + " argument must be a literal, not a bound parameter; inline the value into the query text")
-	}
-	return mterrors.NewFeatureNotSupported(
-		"set_config " + which + " argument must be a literal constant")
-}
+func setConfigArgError(arg ast.Node, which string) error { _ = "STUB: not implemented"; return nil }
 
 // resolveFuncName returns the lowercased built-in name targeted by funcname,
 // or "" if the call does not resolve to a built-in we care about.
@@ -289,69 +187,26 @@ func setConfigArgError(arg ast.Node, which string) error {
 // and `pg_catalog.set_config(...)` as a two-element list; both target the
 // same built-in, so the blocklist must fire on both. Calls schema-qualified
 // to anything other than pg_catalog are user-defined and out of scope here.
-func resolveFuncName(funcname *ast.NodeList) string {
-	if funcname == nil {
-		return ""
-	}
-	switch funcname.Len() {
-	case 1:
-		return lowerStringNode(funcname.Items[0])
-	case 2:
-		schema := lowerStringNode(funcname.Items[0])
-		if schema != "pg_catalog" {
-			return ""
-		}
-		return lowerStringNode(funcname.Items[1])
-	}
-	return ""
-}
+func resolveFuncName(funcname *ast.NodeList) string { _ = "STUB: not implemented"; return "" }
 
 // lowerStringNode returns the lowercased value if n is a *ast.String, or ""
 // otherwise. FuncCall.Funcname items are always *ast.String in a well-formed
 // parse tree.
-func lowerStringNode(n ast.Node) string {
-	s, ok := n.(*ast.String)
-	if !ok {
-		return ""
-	}
-	return strings.ToLower(s.SVal)
-}
+func lowerStringNode(n ast.Node) string { _ = "STUB: not implemented"; return "" }
 
 // unwrapTypeCast strips any number of TypeCast wrappers from n. PostgreSQL
 // parses `'256MB'::text` as TypeCast{Arg: A_Const{String{"256MB"}}}, and
 // users routinely write set_config args that way. Stripping the cast lets
 // us look through to the literal underneath. Multiple layers (e.g.
 // `'t'::text::bool`) are uncommon but handled by looping.
-func unwrapTypeCast(n ast.Node) ast.Node {
-	for {
-		tc, ok := n.(*ast.TypeCast)
-		if !ok {
-			return n
-		}
-		n = tc.Arg
-	}
-}
+func unwrapTypeCast(n ast.Node) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 // constStringArg returns the underlying string value if n is a string- or
 // numeric-valued A_Const literal (after stripping any TypeCast). PG parses
 // `'foo'` as A_Const{Val: String{"foo"}} and `100` as A_Const{Val:
 // Integer{100}}; both are accepted because PG would implicitly cast the
 // numeric to text when calling set_config(text, text, bool).
-func constStringArg(n ast.Node) (string, bool) {
-	c, ok := unwrapTypeCast(n).(*ast.A_Const)
-	if !ok || c.Isnull {
-		return "", false
-	}
-	switch v := c.Val.(type) {
-	case *ast.String:
-		return v.SVal, true
-	case *ast.Integer:
-		return strconv.Itoa(v.IVal), true
-	case *ast.Float:
-		return v.FVal, true
-	}
-	return "", false
-}
+func constStringArg(n ast.Node) (string, bool) { _ = "STUB: not implemented"; return "", false }
 
 // constBoolArg returns the underlying boolean value if n is a boolean-valued
 // A_Const literal (after stripping any TypeCast). PG parses `true`/`false`
@@ -359,21 +214,4 @@ func constStringArg(n ast.Node) (string, bool) {
 // both forms are accepted. The accepted string spellings mirror PG's
 // boolin() — t/true/y/yes/on/1 and f/false/n/no/off/0, case-insensitive —
 // so users who write set_config(..., 'true') get the natural behavior.
-func constBoolArg(n ast.Node) (bool, bool) {
-	c, ok := unwrapTypeCast(n).(*ast.A_Const)
-	if !ok || c.Isnull {
-		return false, false
-	}
-	switch v := c.Val.(type) {
-	case *ast.Boolean:
-		return v.BoolVal, true
-	case *ast.String:
-		switch strings.ToLower(strings.TrimSpace(v.SVal)) {
-		case "t", "true", "y", "yes", "on", "1":
-			return true, true
-		case "f", "false", "n", "no", "off", "0":
-			return false, true
-		}
-	}
-	return false, false
-}
+func constBoolArg(n ast.Node) (bool, bool) { _ = "STUB: not implemented"; return false, false }

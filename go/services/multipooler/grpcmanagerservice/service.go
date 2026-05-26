@@ -19,13 +19,7 @@ import (
 	"context"
 	"time"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/durationpb"
-
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/servenv"
-	"github.com/multigres/multigres/go/common/timeouts"
 	multipoolermanagerpb "github.com/multigres/multigres/go/pb/multipoolermanager"
 	multipoolermanagerdatapb "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 	"github.com/multigres/multigres/go/services/multipooler/manager"
@@ -38,114 +32,69 @@ type managerService struct {
 }
 
 func RegisterPoolerManagerServices(senv *servenv.ServEnv, grpc *servenv.GrpcServer) {
+	_ = "STUB: not implemented"
 	// Register ourselves to be invoked when the manager starts
-	manager.RegisterPoolerManagerServices = append(manager.RegisterPoolerManagerServices, func(pm *manager.MultiPoolerManager) {
-		if grpc.CheckServiceMap("poolermanager", senv) {
-			srv := &managerService{
-				manager: pm,
-			}
-			multipoolermanagerpb.RegisterMultiPoolerManagerServer(grpc.Server, srv)
-		}
-	})
+	return
 }
 
 // WaitForLSN waits for PostgreSQL server to reach a specific LSN position
 func (s *managerService) WaitForLSN(ctx context.Context, req *multipoolermanagerdatapb.WaitForLSNRequest) (*multipoolermanagerdatapb.WaitForLSNResponse, error) {
-	err := s.manager.WaitForLSN(ctx, req.TargetLsn)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-	return &multipoolermanagerdatapb.WaitForLSNResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // StartReplication starts WAL replay on standby (calls pg_wal_replay_resume)
 func (s *managerService) StartReplication(ctx context.Context, req *multipoolermanagerdatapb.StartReplicationRequest) (*multipoolermanagerdatapb.StartReplicationResponse, error) {
-	err := s.manager.StartReplication(ctx)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-	return &multipoolermanagerdatapb.StartReplicationResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // StopReplication stops replication based on the specified mode
 func (s *managerService) StopReplication(ctx context.Context, req *multipoolermanagerdatapb.StopReplicationRequest) (*multipoolermanagerdatapb.StopReplicationResponse, error) {
-	err := s.manager.StopReplication(ctx, req.Mode, req.Wait)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-	return &multipoolermanagerdatapb.StopReplicationResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Status gets unified status that works for both PRIMARY and REPLICA poolers
 func (s *managerService) Status(ctx context.Context, req *multipoolermanagerdatapb.StatusRequest) (*multipoolermanagerdatapb.StatusResponse, error) {
-	resp, err := s.manager.Status(ctx)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-	return resp, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Backup performs a backup
 func (s *managerService) Backup(ctx context.Context, req *multipoolermanagerdatapb.BackupRequest) (*multipoolermanagerdatapb.BackupResponse, error) {
-	backupID, err := s.manager.Backup(ctx, req.ForcePrimary, req.Type, req.JobId, req.Overrides)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-
-	return &multipoolermanagerdatapb.BackupResponse{
-		BackupId: backupID,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // RestoreFromBackup restores from a backup
 func (s *managerService) RestoreFromBackup(ctx context.Context, req *multipoolermanagerdatapb.RestoreFromBackupRequest) (*multipoolermanagerdatapb.RestoreFromBackupResponse, error) {
-	err := s.manager.RestoreFromBackup(ctx, req.BackupId)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-
-	return &multipoolermanagerdatapb.RestoreFromBackupResponse{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetBackups retrieves backup information
 func (s *managerService) GetBackups(ctx context.Context, req *multipoolermanagerdatapb.GetBackupsRequest) (*multipoolermanagerdatapb.GetBackupsResponse, error) {
-	backups, err := s.manager.GetBackups(ctx, req.Limit)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-
-	return &multipoolermanagerdatapb.GetBackupsResponse{
-		Backups: backups,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // GetBackupByJobId retrieves a backup by its job_id annotation
 func (s *managerService) GetBackupByJobId(ctx context.Context, req *multipoolermanagerdatapb.GetBackupByJobIdRequest) (*multipoolermanagerdatapb.GetBackupByJobIdResponse, error) {
-	backup, err := s.manager.GetBackupByJobId(ctx, req.JobId)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-
-	return &multipoolermanagerdatapb.GetBackupByJobIdResponse{
-		Backup: backup,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ExpireBackups removes backups that exceed the configured retention policy
 func (s *managerService) ExpireBackups(ctx context.Context, req *multipoolermanagerdatapb.ExpireBackupsRequest) (*multipoolermanagerdatapb.ExpireBackupsResponse, error) {
-	expiredIDs, err := s.manager.ExpireBackups(ctx, req.Overrides)
-	if err != nil {
-		return nil, mterrors.ToGRPC(err)
-	}
-
-	return &multipoolermanagerdatapb.ExpireBackupsResponse{
-		ExpiredBackupIds: expiredIDs,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SetPostgresRestartsEnabled enables or disables automatic PostgreSQL restarts by the monitor
 func (s *managerService) SetPostgresRestartsEnabled(ctx context.Context, req *multipoolermanagerdatapb.SetPostgresRestartsEnabledRequest) (*multipoolermanagerdatapb.SetPostgresRestartsEnabledResponse, error) {
-	return s.manager.SetPostgresRestartsEnabled(ctx, req)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ManagerHealthStream is the bidirectional health stream implementation.
@@ -169,117 +118,43 @@ func (s *managerService) SetPostgresRestartsEnabled(ctx context.Context, req *mu
 func (s *managerService) ManagerHealthStream(
 	stream multipoolermanagerpb.MultiPoolerManager_ManagerHealthStreamServer,
 ) error {
-	ctx := stream.Context()
+	_ = "STUB: not implemented"
+	return nil
 
 	// Read the start message. The first client message must be a start message.
-	startMsg, err := stream.Recv()
-	if err != nil {
-		return status.Errorf(codes.InvalidArgument, "expected start message: %v", err)
-	}
-	req := startMsg.GetStart()
-	if req == nil {
-		return status.Error(codes.InvalidArgument, "first message must be a start message")
-	}
-
-	// Resolve effective timing values from the request, falling back to defaults.
-	// Use AsDuration() rather than direct .Seconds access: proto fields are nil
-	// when not set, and AsDuration() is nil-safe (returns 0 for nil).
-	snapshotInterval := timeouts.DefaultSnapshotInterval
-	if d := req.SnapshotInterval.AsDuration(); d > 0 {
-		snapshotInterval = d
-	}
-
-	timeout := timeouts.DefaultHealthStreamStalenessTimeout
-	if d := req.StalenessTimeout.AsDuration(); d > 0 {
-		timeout = d
-	}
-
-	// Send start response so the orchestrator knows the actual values in use.
-	response := &multipoolermanagerdatapb.ManagerHealthStreamResponse{
-		Message: &multipoolermanagerdatapb.ManagerHealthStreamResponse_Start{
-			Start: &multipoolermanagerdatapb.ManagerHealthStreamStartResponse{
-				SnapshotInterval: durationpb.New(snapshotInterval),
-				StalenessTimeout: durationpb.New(timeout),
-			},
-		},
-	}
-	if err := stream.Send(response); err != nil {
-		return status.Errorf(codes.Internal, "send start response: %v", err)
-	}
-
-	// Subscribe to health state changes. We use the channel as a notification
-	// signal only — the actual payload sent to the orchestrator is a full
-	// Status() snapshot rather than the lightweight gateway HealthState.
-	_, healthChan, err := s.manager.SubscribeHealth(ctx)
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to subscribe to health: %v", err)
-	}
-
-	if healthChan == nil {
-		return status.Error(codes.Unavailable, "health provider not initialized")
-	}
-
-	// Send initial snapshot immediately upon connection.
-	if err := s.sendManagerHealthSnapshot(ctx, stream, multipoolermanagerdatapb.SnapshotTrigger_SNAPSHOT_TRIGGER_INITIAL, timeout); err != nil {
-		return err
-	}
-
-	// Goroutine: read incoming client messages and forward poll requests.
-	// pollCh is buffered so bursts coalesce — only one snapshot is sent per
-	// batch of poll requests received while the send loop is busy.
-	pollCh := make(chan struct{}, 1)
-	go func() {
-		for {
-			msg, err := stream.Recv()
-			if err != nil {
-				return // stream ended; send loop will exit via ctx.Done or healthChan close
-			}
-			if msg.GetPoll() != nil {
-				select {
-				case pollCh <- struct{}{}:
-				default: // already a poll pending; coalesce
-				}
-			}
-		}
-	}()
-
-	// Periodic ticker so we poll Status() even without a broadcast.
-	// This catches postgres process death (reported by pgctld) within
-	// snapshotInterval even when the local monitor is disabled.
-	pollTicker := time.NewTicker(snapshotInterval)
-	defer pollTicker.Stop()
-
-	// Convenience function to send a snapshot with the given trigger, used by
-	// all cases in the select below.
-	sendSnapshot := func(trigger multipoolermanagerdatapb.SnapshotTrigger) error {
-		return s.sendManagerHealthSnapshot(ctx, stream, trigger, timeout)
-	}
-
-	// Stream updates until the client disconnects or the context is cancelled.
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case _, ok := <-healthChan:
-			if !ok {
-				// Channel closed because the buffer was full. Return Unavailable
-				// so the client reconnects and receives a fresh initial snapshot.
-				return status.Error(codes.Unavailable, "health stream buffer full, reconnect required")
-			}
-			if err := sendSnapshot(multipoolermanagerdatapb.SnapshotTrigger_SNAPSHOT_TRIGGER_BROADCAST); err != nil {
-				return err
-			}
-		case <-pollCh:
-			if err := sendSnapshot(multipoolermanagerdatapb.SnapshotTrigger_SNAPSHOT_TRIGGER_POLL); err != nil {
-				return err
-			}
-		case <-pollTicker.C:
-			if err := sendSnapshot(multipoolermanagerdatapb.SnapshotTrigger_SNAPSHOT_TRIGGER_HEARTBEAT); err != nil {
-				return err
-			}
-		}
-	}
 }
+
+// Resolve effective timing values from the request, falling back to defaults.
+// Use AsDuration() rather than direct .Seconds access: proto fields are nil
+// when not set, and AsDuration() is nil-safe (returns 0 for nil).
+
+// Send start response so the orchestrator knows the actual values in use.
+
+// Subscribe to health state changes. We use the channel as a notification
+// signal only — the actual payload sent to the orchestrator is a full
+// Status() snapshot rather than the lightweight gateway HealthState.
+
+// Send initial snapshot immediately upon connection.
+
+// Goroutine: read incoming client messages and forward poll requests.
+// pollCh is buffered so bursts coalesce — only one snapshot is sent per
+// batch of poll requests received while the send loop is busy.
+
+// stream ended; send loop will exit via ctx.Done or healthChan close
+
+// already a poll pending; coalesce
+
+// Periodic ticker so we poll Status() even without a broadcast.
+// This catches postgres process death (reported by pgctld) within
+// snapshotInterval even when the local monitor is disabled.
+
+// Convenience function to send a snapshot with the given trigger, used by
+// all cases in the select below.
+
+// Stream updates until the client disconnects or the context is cancelled.
+
+// Channel closed because the buffer was full. Return Unavailable
+// so the client reconnects and receives a fresh initial snapshot.
 
 // sendManagerHealthSnapshot fetches the current Status and sends it as a
 // ManagerHealthSnapshot on the stream.
@@ -293,22 +168,6 @@ func (s *managerService) sendManagerHealthSnapshot(
 	trigger multipoolermanagerdatapb.SnapshotTrigger,
 	timeout time.Duration,
 ) error {
-	statusResp, err := s.manager.Status(ctx)
-	if err != nil {
-		return mterrors.ToGRPC(err)
-	}
-
-	healthSnapshot := &multipoolermanagerdatapb.ManagerHealthSnapshot{
-		Status:  statusResp,
-		Timeout: durationpb.New(timeout),
-		Trigger: trigger,
-	}
-
-	response := &multipoolermanagerdatapb.ManagerHealthStreamResponse{
-		Message: &multipoolermanagerdatapb.ManagerHealthStreamResponse_Snapshot{
-			Snapshot: healthSnapshot,
-		},
-	}
-
-	return stream.Send(response)
+	_ = "STUB: not implemented"
+	return nil
 }

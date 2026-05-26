@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -62,12 +61,7 @@ type Plan struct {
 }
 
 // NewPlan creates a new query plan.
-func NewPlan(original string, primitive Primitive) *Plan {
-	return &Plan{
-		Original:  original,
-		Primitive: primitive,
-	}
-}
+func NewPlan(original string, primitive Primitive) *Plan { _ = "STUB: not implemented"; return nil }
 
 // StreamExecute executes the plan by calling the root primitive's StreamExecute.
 // bindVars contains literal values extracted during normalization; nil for non-cached paths.
@@ -79,7 +73,8 @@ func (p *Plan) StreamExecute(
 	bindVars []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return p.Primitive.StreamExecute(ctx, exec, conn, state, bindVars, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PortalStreamExecute executes the plan on the extended-protocol portal path.
@@ -96,38 +91,27 @@ func (p *Plan) PortalStreamExecute(
 	includeDescribe bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return p.Primitive.PortalStreamExecute(ctx, exec, conn, state, portalInfo, maxRows, includeDescribe, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns the target tablegroup from the primitive.
-func (p *Plan) GetTableGroup() string {
-	return p.Primitive.GetTableGroup()
-}
+func (p *Plan) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
 // CachedSize returns the approximate memory cost of this plan in bytes.
 // Used by the theine cache to enforce memory-based capacity limits.
 // Can be refined to return actual byte size.
 // TODO: Generate cached size
 func (p *Plan) CachedSize(_ bool) int64 {
+	_ = "STUB: not implemented"
 	// Plan struct overhead + pointer/interface/slice headers.
-	size := int64(256)
-	size += int64(len(p.Original))
-	size += int64(len(p.Type))
-	for _, t := range p.TablesUsed {
-		size += int64(len(t)) + 16 // string header + content
-	}
-	if r, ok := p.Primitive.(*Route); ok {
-		size += int64(len(r.Query)) + int64(len(r.TableGroup)) + int64(len(r.Shard))
-		// NormalizedAST is a cloned AST tree. Rough estimate: ~10x the query
-		// string length accounts for node structs, pointers, and metadata.
-		if r.NormalizedAST != nil {
-			size += int64(len(r.Query)) * 10
-		}
-	}
-	return size
+	return 0
 }
 
+// string header + content
+
+// NormalizedAST is a cloned AST tree. Rough estimate: ~10x the query
+// string length accounts for node structs, pointers, and metadata.
+
 // String returns a string representation of the plan for debugging.
-func (p *Plan) String() string {
-	return fmt.Sprintf("Plan{original=%q, primitive=%s}", p.Original, p.Primitive.String())
-}
+func (p *Plan) String() string { _ = "STUB: not implemented"; return "" }

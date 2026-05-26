@@ -14,16 +14,8 @@
 
 package local
 
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-)
-
 // certDir returns the directory where pgBackRest certificates are stored
-func (p *localProvisioner) certDir() string {
-	return filepath.Join(p.config.RootWorkingDir, "certs")
-}
+func (p *localProvisioner) certDir() string { _ = "STUB: not implemented"; return "" }
 
 // PgBackRestCertPaths holds the paths to the generated pgBackRest certificates.
 type PgBackRestCertPaths struct {
@@ -40,25 +32,6 @@ type PgBackRestCertPaths struct {
 //
 // Returns the paths to the generated certificates that are needed for pgBackRest configuration.
 func GeneratePgBackRestCerts(certDir string) (*PgBackRestCertPaths, error) {
-	if err := os.MkdirAll(certDir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create pgBackRest certificate directory: %w", err)
-	}
-
-	caCertFile := filepath.Join(certDir, "ca.crt")
-	caKeyFile := filepath.Join(certDir, "ca.key")
-	if err := GenerateCA(caCertFile, caKeyFile); err != nil {
-		return nil, fmt.Errorf("failed to generate CA for pgBackRest: %w", err)
-	}
-
-	certFile := filepath.Join(certDir, "pgbackrest.crt")
-	keyFile := filepath.Join(certDir, "pgbackrest.key")
-	if err := GenerateCert(caCertFile, caKeyFile, certFile, keyFile, "pgbackrest", []string{"localhost", "pgbackrest"}); err != nil {
-		return nil, fmt.Errorf("failed to generate certificate for pgBackRest: %w", err)
-	}
-
-	return &PgBackRestCertPaths{
-		CACertFile:     caCertFile,
-		ServerCertFile: certFile,
-		ServerKeyFile:  keyFile,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

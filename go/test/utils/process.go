@@ -16,7 +16,6 @@ package utils
 
 import (
 	"context"
-	"time"
 
 	"github.com/multigres/multigres/go/tools/executil"
 )
@@ -30,13 +29,6 @@ import (
 // Callers should set any required environment variables (e.g. MULTIGRES_TESTDATA_DIR)
 // on the returned Cmd before calling Start().
 func CommandWithOrphanProtection(monitorCtx context.Context, name string, args ...string) *executil.Cmd {
-	allArgs := append([]string{name}, args...)
-	cmd := executil.Command(context.Background(), "run_in_test.sh", allArgs...)
-	go func() {
-		<-monitorCtx.Done()
-		stopCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		_, _ = cmd.Stop(stopCtx)
-		cancel()
-	}()
-	return cmd
+	_ = "STUB: not implemented"
+	return nil
 }

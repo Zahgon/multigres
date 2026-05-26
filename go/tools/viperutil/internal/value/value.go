@@ -18,7 +18,6 @@ package value
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -53,9 +52,9 @@ type Base[T any] struct {
 	EnvVars  []string
 }
 
-func (val *Base[T]) Key() string { return val.KeyName }
-func (val *Base[T]) Default() T  { return val.DefaultVal }
-func (val *Base[T]) Get() T      { return val.BoundGetFunc(val.Key()) }
+func (val *Base[T]) Key() string { _ = "STUB: not implemented"; return "" }
+func (val *Base[T]) Default() T  { _ = "STUB: not implemented"; return *new(T) }
+func (val *Base[T]) Get() T      { _ = "STUB: not implemented"; return *new(T) }
 
 // ErrNoFlagDefined is returned when a Value has a FlagName set, but the given
 // FlagSet does not define a flag with that name.
@@ -69,50 +68,16 @@ var ErrNoFlagDefined = errors.New("flag not defined")
 // If the value is not configured to correspond to a flag (FlagName == ""), then
 // (nil, nil) is returned.
 func (val *Base[T]) Flag(fs *pflag.FlagSet) (*pflag.Flag, error) {
-	if val.FlagName == "" {
-		return nil, nil
-	}
-
-	flag := fs.Lookup(val.FlagName)
-	if flag == nil {
-		return nil, fmt.Errorf("%w with name %s (for key %s)", ErrNoFlagDefined, val.FlagName, val.Key())
-	}
-
-	return flag, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (val *Base[T]) bind(v registry.Bindable) {
-	v.SetDefault(val.Key(), val.DefaultVal)
-
-	for _, alias := range val.Aliases {
-		v.RegisterAlias(alias, val.Key())
-	}
-
-	if len(val.EnvVars) > 0 {
-		vars := append([]string{val.Key()}, val.EnvVars...)
-		_ = v.BindEnv(vars...)
-	}
-}
+func (val *Base[T]) bind(v registry.Bindable) { _ = "STUB: not implemented"; return }
 
 // BindFlags creates bindings between each value's registry and the given flag
 // set. This function will panic if any of the values defines a flag that does
 // not exist in the flag set.
-func BindFlags(fs *pflag.FlagSet, values ...Registerable) {
-	for _, val := range values {
-		flag, err := val.Flag(fs)
-		switch {
-		case err != nil:
-			panic(fmt.Errorf("failed to load flag for %s: %w", val.Key(), err))
-		case flag == nil:
-			continue
-		}
-
-		_ = val.Registry().BindPFlag(val.Key(), flag)
-		if flag.Name != val.Key() {
-			val.Registry().RegisterAlias(flag.Name, val.Key())
-		}
-	}
-}
+func BindFlags(fs *pflag.FlagSet, values ...Registerable) { _ = "STUB: not implemented"; return }
 
 // Static is a static value. Static values register to a Static registry, and
 // do not respond to changes to config files. Their Get() method will return the
@@ -125,22 +90,16 @@ type Static[T any] struct {
 // NewStatic returns a static value derived from the given base value, after
 // binding it to the provided static registry.
 func NewStatic[T any](staticReg *viper.Viper, base *Base[T]) *Static[T] {
-	base.bind(staticReg)
-	base.BoundGetFunc = base.GetFunc(staticReg)
-
-	return &Static[T]{
-		Base:      base,
-		staticReg: staticReg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (val *Static[T]) Registry() registry.Bindable {
-	return val.staticReg
+	_ = "STUB: not implemented"
+	return *new(registry.Bindable)
 }
 
-func (val *Static[T]) Set(v T) {
-	val.staticReg.Set(val.KeyName, v)
-}
+func (val *Static[T]) Set(v T) { _ = "STUB: not implemented"; return }
 
 // Dynamic is a dynamic value. Dynamic values register to the Dynamic registry,
 // and respond to changes to watched config files. Their Get() methods will
@@ -155,19 +114,13 @@ type Dynamic[T any] struct {
 // binding it to the provided dynamic registry and wrapping its GetFunc to be threadsafe
 // with respect to config reloading.
 func NewDynamic[T any](dynamicReg *sync.Viper, base *Base[T]) *Dynamic[T] {
-	base.bind(dynamicReg)
-	base.BoundGetFunc = sync.AdaptGetter(base.Key(), base.GetFunc, dynamicReg)
-
-	return &Dynamic[T]{
-		Base:       base,
-		dynamicReg: dynamicReg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (val *Dynamic[T]) Registry() registry.Bindable {
-	return val.dynamicReg
+	_ = "STUB: not implemented"
+	return *new(registry.Bindable)
 }
 
-func (val *Dynamic[T]) Set(v T) {
-	val.dynamicReg.Set(val.KeyName, v)
-}
+func (val *Dynamic[T]) Set(v T) { _ = "STUB: not implemented"; return }

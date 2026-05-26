@@ -22,8 +22,4 @@ type RegisterPoolerManagerService func(*MultiPoolerManager)
 var RegisterPoolerManagerServices []RegisterPoolerManagerService
 
 // registerGRPCServices will register all the gRPC service instances.
-func (pm *MultiPoolerManager) registerGRPCServices() {
-	for _, f := range RegisterPoolerManagerServices {
-		f(pm)
-	}
-}
+func (pm *MultiPoolerManager) registerGRPCServices() { _ = "STUB: not implemented"; return }

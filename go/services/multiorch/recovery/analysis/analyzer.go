@@ -41,27 +41,14 @@ var defaultAnalyzers []Analyzer
 // DefaultAnalyzers returns the current set of analyzers to run.
 // The factory is injected into each analyzer for creating recovery actions.
 func DefaultAnalyzers(factory *RecoveryActionFactory) []Analyzer {
-	if defaultAnalyzers == nil {
-		return []Analyzer{
-			&ShardNeedsInitializationAnalyzer{factory: factory},
-			&StaleLeaderAnalyzer{factory: factory},
-			&LeaderResignedAnalyzer{factory: factory},
-			&LeaderIsDeadAnalyzer{factory: factory},
-			&ReplicaNotReplicatingAnalyzer{factory: factory},
-			&CohortMismatchAnalyzer{factory: factory},
-		}
-	}
-	return defaultAnalyzers
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetTestAnalyzers overrides the default analyzers for testing.
 // This should only be called from tests.
-func SetTestAnalyzers(analyzers []Analyzer) {
-	defaultAnalyzers = analyzers
-}
+func SetTestAnalyzers(analyzers []Analyzer) { _ = "STUB: not implemented"; return }
 
 // ResetAnalyzers resets the analyzers to the default (empty) state.
 // This should be called in test cleanup.
-func ResetAnalyzers() {
-	defaultAnalyzers = nil
-}
+func ResetAnalyzers() { _ = "STUB: not implemented"; return }

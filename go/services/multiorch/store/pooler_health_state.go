@@ -26,48 +26,47 @@ type poolerHealthStore struct {
 }
 
 // newPoolerHealthStore creates a new store for pooler health state.
-func newPoolerHealthStore() *poolerHealthStore {
-	return &poolerHealthStore{
-		proto: NewProtoStore[string, *multiorchdata.PoolerHealthState](),
-	}
-}
+func newPoolerHealthStore() *poolerHealthStore { _ = "STUB: not implemented"; return nil }
 
 // get retrieves a pooler's health state by its ID string.
 func (s *poolerHealthStore) get(poolerID string) (*multiorchdata.PoolerHealthState, bool) {
-	return s.proto.Get(poolerID)
+	_ = "STUB: not implemented"
+	return nil, false
+
+	// set stores a deep clone of the pooler health state.
 }
 
-// set stores a deep clone of the pooler health state.
 func (s *poolerHealthStore) set(poolerID string, state *multiorchdata.PoolerHealthState) {
-	s.proto.Set(poolerID, state)
+	_ = "STUB: not implemented"
+	return
 }
 
 // delete removes a pooler from the store. Returns true if the pooler existed.
-func (s *poolerHealthStore) delete(poolerID string) bool {
-	return s.proto.Delete(poolerID)
-}
+func (s *poolerHealthStore) delete(poolerID string) bool { _ = "STUB: not implemented"; return false }
 
 // len returns the number of poolers in the store.
-func (s *poolerHealthStore) len() int {
-	return s.proto.Len()
-}
+func (s *poolerHealthStore) len() int { _ = "STUB: not implemented"; return 0 }
 
 // range iterates over all poolers. Each value passed to the callback is a deep
 // clone safe to mutate. Iteration stops early if the callback returns false.
 func (s *poolerHealthStore) rangeHealth(fn func(key string, value *multiorchdata.PoolerHealthState) bool) {
-	s.proto.Range(fn)
+	_ = "STUB: not implemented"
+
+	// doUpdateRange iterates over all poolers while holding the lock and allows
+	// in-place updates. See ProtoStore.DoUpdateRange for full semantics.
+	return
 }
 
-// doUpdateRange iterates over all poolers while holding the lock and allows
-// in-place updates. See ProtoStore.DoUpdateRange for full semantics.
 func (s *poolerHealthStore) doUpdateRange(fn func(key string, value *multiorchdata.PoolerHealthState) (*multiorchdata.PoolerHealthState, bool)) {
-	s.proto.DoUpdateRange(fn)
+	_ = "STUB: not implemented"
+	return
 }
 
 // doUpdate performs an atomic read-modify-write on a pooler's health state.
 // See ProtoStore.DoUpdate for full semantics.
 func (s *poolerHealthStore) doUpdate(key string, fn func(value *multiorchdata.PoolerHealthState) *multiorchdata.PoolerHealthState) {
-	s.proto.DoUpdate(key, fn)
+	_ = "STUB: not implemented"
+	return
 }
 
 // findPoolersInShard returns all poolers belonging to the given shard.
@@ -76,15 +75,11 @@ func (s *poolerHealthStore) doUpdate(key string, fn func(value *multiorchdata.Po
 // the Status RPC, which is determined by the data directory state (not LSN).
 // The node must also be reachable for us to trust this information.
 func IsInitialized(p *multiorchdata.PoolerHealthState) bool {
-	if !p.IsLastCheckValid {
-		return false // unreachable nodes are considered uninitialized
-	}
-
-	if p.MultiPooler == nil {
-		return false
-	}
-
-	// Use the IsInitialized field from Status RPC directly.
-	// This is based on data directory state, not LSN.
-	return p.GetStatus().GetIsInitialized()
+	_ = "STUB: not implemented"
+	return false
 }
+
+// unreachable nodes are considered uninitialized
+
+// Use the IsInitialized field from Status RPC directly.
+// This is based on data directory state, not LSN.

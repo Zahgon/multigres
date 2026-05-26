@@ -14,27 +14,9 @@
 
 package utils
 
-import (
-	"os/exec"
-	"testing"
-)
-
 // hasPostgreSQLBinaries checks if required PostgreSQL binaries are available
-func HasPostgreSQLBinaries() bool {
-	requiredBinaries := []string{"initdb", "postgres", "pg_ctl", "pg_isready"}
-
-	for _, binary := range requiredBinaries {
-		_, err := exec.LookPath(binary)
-		if err != nil {
-			return false
-		}
-	}
-
-	return true
-}
+func HasPostgreSQLBinaries() bool { _ = "STUB: not implemented"; return false }
 
 // ShouldSkipRealPostgres returns true if tests should skip real PostgreSQL tests.
 // This happens when running short tests AND PostgreSQL binaries are not available.
-func ShouldSkipRealPostgres() bool {
-	return testing.Short() && !HasPostgreSQLBinaries()
-}
+func ShouldSkipRealPostgres() bool { _ = "STUB: not implemented"; return false }

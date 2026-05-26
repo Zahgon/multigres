@@ -15,15 +15,7 @@
 package telemetry
 
 import (
-	"errors"
-	"fmt"
-	"maps"
-	"os"
-	"path/filepath"
-
-	consistent "go.opentelemetry.io/contrib/samplers/probability/consistent"
 	"go.opentelemetry.io/otel/attribute"
-	"gopkg.in/yaml.v3"
 
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -67,50 +59,17 @@ type SpanConfig struct {
 
 // loadSamplingConfig loads and validates sampling configuration from a YAML file
 func loadSamplingConfig(path string) (*SamplingConfig, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read sampling config file: %w", err)
-	}
-
-	var config SamplingConfig
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		return nil, fmt.Errorf("failed to parse sampling config YAML: %w", err)
-	}
-
-	// Validate categories
-	if len(config.Categories) == 0 {
-		return nil, errors.New("sampling config must define at least one category")
-	}
-
-	// Ensure "default" category exists
-	if _, ok := config.Categories["default"]; !ok {
-		return nil, errors.New("sampling config must define a 'default' category")
-	}
-
-	// Validate probabilities are in [0, 1]
-	for name, cat := range config.Categories {
-		if cat.Probability < 0 || cat.Probability > 1 {
-			return nil, fmt.Errorf("category %q has invalid probability %f (must be 0.0-1.0)", name, cat.Probability)
-		}
-	}
-
-	// Validate all span mappings reference defined categories
-	allMappings := make(map[string]string)
-	maps.Copy(allMappings, config.GRPC.Services)
-	maps.Copy(allMappings, config.GRPC.Methods)
-	maps.Copy(allMappings, config.HTTP.Exact)
-	maps.Copy(allMappings, config.HTTP.Patterns)
-	maps.Copy(allMappings, config.Spans.Exact)
-	maps.Copy(allMappings, config.Spans.Patterns)
-
-	for span, cat := range allMappings {
-		if _, ok := config.Categories[cat]; !ok {
-			return nil, fmt.Errorf("span %q references undefined category %q", span, cat)
-		}
-	}
-
-	return &config, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Validate categories
+
+// Ensure "default" category exists
+
+// Validate probabilities are in [0, 1]
+
+// Validate all span mappings reference defined categories
 
 // ConfigurableSampler wraps base samplers and routes sampling decisions based on
 // a file-based configuration that maps span names to categories with different probabilities.
@@ -123,11 +82,7 @@ type ConfigurableSampler struct {
 
 // getAttributeValue finds an attribute value by key from the span attributes
 func getAttributeValue(attrs []attribute.KeyValue, key string) (string, bool) {
-	for _, attr := range attrs {
-		if string(attr.Key) == key {
-			return attr.Value.AsString(), true
-		}
-	}
+	_ = "STUB: not implemented"
 	return "", false
 }
 
@@ -146,106 +101,60 @@ func getAttributeValue(attrs []attribute.KeyValue, key string) (string, bool) {
 //  6. Manual span pattern match
 //  7. Default category
 func (s *ConfigurableSampler) getCategoryForSpan(params sdktrace.SamplingParameters) string {
+	_ = "STUB: not implemented"
 	// Check for gRPC span using semantic conventions
 	// otelgrpc sets: rpc.system="grpc", rpc.service, rpc.method
-	if rpcSystem, ok := getAttributeValue(params.Attributes, "rpc.system"); ok && rpcSystem == "grpc" {
-		rpcService, hasService := getAttributeValue(params.Attributes, "rpc.service")
-		rpcMethod, hasMethod := getAttributeValue(params.Attributes, "rpc.method")
-
-		if hasService && hasMethod {
-			// Check method-level configuration (e.g., "/package.Service/Method")
-			fullMethod := "/" + rpcService + "/" + rpcMethod
-			if cat, ok := s.config.GRPC.Methods[fullMethod]; ok {
-				return cat
-			}
-
-			// Check service-level configuration (e.g., "/package.Service")
-			serviceName := "/" + rpcService
-			if cat, ok := s.config.GRPC.Services[serviceName]; ok {
-				return cat
-			}
-		}
-
-		// gRPC span but no config match - use default
-		return s.defaultCat
-	}
-
-	// Check for HTTP span using semantic conventions
-	// otelhttp sets: http.method, http.target (or http.route)
-	if httpMethod, ok := getAttributeValue(params.Attributes, "http.method"); ok {
-		// Prefer http.route (pattern) over http.target (actual path) for better matching
-		httpPath, _ := getAttributeValue(params.Attributes, "http.route")
-		if httpPath == "" {
-			httpPath, _ = getAttributeValue(params.Attributes, "http.target")
-		}
-
-		if httpPath != "" {
-			// Check exact match (e.g., "GET /live")
-			fullPath := httpMethod + " " + httpPath
-			if cat, ok := s.config.HTTP.Exact[fullPath]; ok {
-				return cat
-			}
-
-			// Check pattern match using filepath.Match
-			for pattern, cat := range s.config.HTTP.Patterns {
-				if matched, _ := filepath.Match(pattern, fullPath); matched {
-					return cat
-				}
-			}
-		}
-
-		// HTTP span but no config match - use default
-		return s.defaultCat
-	}
-
-	// Not gRPC or HTTP - treat as manual span, use span name for matching
-	spanName := params.Name
-
-	// TODO: Consider adding custom semantic conventions for multigres-specific operations
-	// to make matching more robust and explicit. For example:
-	//   - multigres.operation.type: "maintenance", "recovery", "background"
-	//   - multigres.operation.priority: "critical", "normal", "low"
-	// This would allow matching by attributes instead of span names, making configuration
-	// safer and less fragile than pattern matching. Example:
-	//   if opType, ok := getAttributeValue(params.Attributes, "multigres.operation.type"); ok {
-	//       // Use opType for category lookup
-	//   }
-
-	// Check exact match
-	if cat, ok := s.config.Spans.Exact[spanName]; ok {
-		return cat
-	}
-
-	// Check pattern match using filepath.Match
-	for pattern, cat := range s.config.Spans.Patterns {
-		if matched, _ := filepath.Match(pattern, spanName); matched {
-			return cat
-		}
-	}
-
-	// Fall back to default category
-	return s.defaultCat
+	return ""
 }
+
+// Check method-level configuration (e.g., "/package.Service/Method")
+
+// Check service-level configuration (e.g., "/package.Service")
+
+// gRPC span but no config match - use default
+
+// Check for HTTP span using semantic conventions
+// otelhttp sets: http.method, http.target (or http.route)
+
+// Prefer http.route (pattern) over http.target (actual path) for better matching
+
+// Check exact match (e.g., "GET /live")
+
+// Check pattern match using filepath.Match
+
+// HTTP span but no config match - use default
+
+// Not gRPC or HTTP - treat as manual span, use span name for matching
+
+// TODO: Consider adding custom semantic conventions for multigres-specific operations
+// to make matching more robust and explicit. For example:
+//   - multigres.operation.type: "maintenance", "recovery", "background"
+//   - multigres.operation.priority: "critical", "normal", "low"
+// This would allow matching by attributes instead of span names, making configuration
+// safer and less fragile than pattern matching. Example:
+//   if opType, ok := getAttributeValue(params.Attributes, "multigres.operation.type"); ok {
+//       // Use opType for category lookup
+//   }
+
+// Check exact match
+
+// Check pattern match using filepath.Match
+
+// Fall back to default category
 
 func (s *ConfigurableSampler) ShouldSample(params sdktrace.SamplingParameters) sdktrace.SamplingResult {
+	_ = "STUB: not implemented"
 	// Determine category for this span using full span metadata
-	category := s.getCategoryForSpan(params)
-
-	// Get sampler for this category
-	sampler, ok := s.samplers[category]
-	if !ok {
-		// Should not happen due to validation, but fallback to default
-		sampler = s.samplers[s.defaultCat]
-	}
-
-	// Delegate to category sampler
-	return sampler.ShouldSample(params)
+	return *new(sdktrace.SamplingResult)
 }
 
-func (s *ConfigurableSampler) Description() string {
-	return fmt.Sprintf("ConfigurableSampler{categories=%d, default=%s}",
-		len(s.config.Categories), s.defaultCat)
-}
+// Get sampler for this category
+
+// Should not happen due to validation, but fallback to default
+
+// Delegate to category sampler
+
+func (s *ConfigurableSampler) Description() string { _ = "STUB: not implemented"; return "" }
 
 // maybeCreateCustomSampler creates a custom file-based sampler if configured, otherwise returns nil
 // to defer to standard OpenTelemetry environment variable handling.
@@ -264,36 +173,14 @@ func (s *ConfigurableSampler) Description() string {
 // all standard sampler types automatically via environment variables.
 // Returns (nil, error) if custom sampling is requested but configuration fails.
 func maybeCreateCustomSampler() (sdktrace.Sampler, error) {
-	samplerType := os.Getenv("OTEL_TRACES_SAMPLER")
-
-	// Only handle "multigres_custom" sampler type - defer everything else to OTEL
-	if samplerType != "multigres_custom" {
-		return nil, nil
-	}
-
-	// Load file-based configuration
-	configPath := os.Getenv("OTEL_TRACES_SAMPLER_CONFIG")
-	if configPath == "" {
-		return nil, errors.New("OTEL_TRACES_SAMPLER=multigres_custom but OTEL_TRACES_SAMPLER_CONFIG not set")
-	}
-
-	config, err := loadSamplingConfig(configPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load sampling config from %s: %w", configPath, err)
-	}
-
-	// Create samplers for each category
-	samplers := make(map[string]sdktrace.Sampler)
-	for name, cat := range config.Categories {
-		samplers[name] = consistent.ProbabilityBased(cat.Probability)
-	}
-
-	rootSampler := &ConfigurableSampler{
-		config:     config,
-		samplers:   samplers,
-		defaultCat: "default",
-	}
-
-	// Wrap with ParentBased to ensure complete distributed traces
-	return sdktrace.ParentBased(rootSampler), nil
+	_ = "STUB: not implemented"
+	return *new(sdktrace.Sampler), nil
 }
+
+// Only handle "multigres_custom" sampler type - defer everything else to OTEL
+
+// Load file-based configuration
+
+// Create samplers for each category
+
+// Wrap with ParentBased to ensure complete distributed traces

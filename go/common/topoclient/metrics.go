@@ -18,10 +18,7 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // LockOperation represents the type of lock operation being performed.
@@ -60,33 +57,12 @@ func init() {
 }
 
 // newMetrics initializes OpenTelemetry metrics for the topo package.
-func newMetrics() *Metrics {
-	m := &Metrics{
-		meter: otel.Meter("github.com/multigres/multigres/go/common/topoclient"),
-	}
+func newMetrics() *Metrics { _ = "STUB: not implemented"; return nil }
 
-	var err error
-
-	// Histogram for lock operation duration (count can be derived from this)
-	m.lockDuration, err = m.meter.Float64Histogram(
-		"topoclient.lock.duration",
-		metric.WithDescription("Duration of topo lock operations"),
-		metric.WithUnit("s"),
-	)
-	if err != nil {
-		m.lockDuration = noop.Float64Histogram{}
-	}
-
-	return m
-}
+// Histogram for lock operation duration (count can be derived from this)
 
 // RecordLockOperation records a lock operation with its result and duration.
 func RecordLockOperation(ctx context.Context, op LockOperation, resourceType, resourceName string, result LockResult, duration time.Duration) {
-	attrs := []attribute.KeyValue{
-		attribute.String("operation", string(op)),
-		attribute.String("resource_type", resourceType),
-		attribute.String("result", string(result)),
-	}
-
-	metrics.lockDuration.Record(ctx, duration.Seconds(), metric.WithAttributes(attrs...))
+	_ = "STUB: not implemented"
+	return
 }

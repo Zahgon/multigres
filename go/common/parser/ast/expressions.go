@@ -28,11 +28,6 @@
 // Ported from postgres/src/include/nodes/primnodes.h
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // EXPRESSION FRAMEWORK - PostgreSQL primnodes.h implementation
 // Ported from postgres/src/include/nodes/primnodes.h
@@ -81,18 +76,7 @@ const (
 	NOT_EXPR                     // NOT expression
 )
 
-func (b BoolExprType) String() string {
-	switch b {
-	case AND_EXPR:
-		return "AND"
-	case OR_EXPR:
-		return "OR"
-	case NOT_EXPR:
-		return "NOT"
-	default:
-		return fmt.Sprintf("BoolExprType(%d)", int(b))
-	}
-}
+func (b BoolExprType) String() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // BASE EXPRESSION INTERFACE
@@ -112,12 +96,13 @@ type BaseExpr struct {
 }
 
 func (e *BaseExpr) IsExpr() bool {
-	return true
-}
+	_ = "STUB: not implemented"
 
-// ==============================================================================
-// TIER 1 EXPRESSIONS - Foundation Reference and Function Expressions
-// ==============================================================================
+	// ==============================================================================
+	// TIER 1 EXPRESSIONS - Foundation Reference and Function Expressions
+	// ==============================================================================
+	return false
+}
 
 // Var represents a reference to a table column.
 // Ported from postgres/src/include/nodes/primnodes.h:247
@@ -136,21 +121,13 @@ type Var struct {
 
 // NewVar creates a new Var node.
 func NewVar(varno int, varattno AttrNumber, vartype Oid) *Var {
-	return &Var{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_Var}},
-		Varno:    varno,
-		Varattno: varattno,
-		Vartype:  vartype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (v *Var) ExpressionType() string {
-	return "Var"
-}
+func (v *Var) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (v *Var) String() string {
-	return fmt.Sprintf("Var(%d.%d)@%d", v.Varno, v.Varattno, v.Location())
-}
+func (v *Var) String() string { _ = "STUB: not implemented"; return "" }
 
 // Const represents a constant value in an expression.
 // Ported from postgres/src/include/nodes/primnodes.h:306
@@ -167,24 +144,13 @@ type Const struct {
 
 // NewConst creates a new Const node.
 func NewConst(consttype Oid, constvalue Datum, constisnull bool) *Const {
-	return &Const{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_Const}},
-		Consttype:   consttype,
-		Constvalue:  constvalue,
-		Constisnull: constisnull,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *Const) ExpressionType() string {
-	return "Const"
-}
+func (c *Const) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *Const) String() string {
-	if c.Constisnull {
-		return fmt.Sprintf("Const(NULL)@%d", c.Location())
-	}
-	return fmt.Sprintf("Const(%v)@%d", c.Constvalue, c.Location())
-}
+func (c *Const) String() string { _ = "STUB: not implemented"; return "" }
 
 // Param represents a parameter reference in a prepared statement.
 // Ported from postgres/src/include/nodes/primnodes.h:373
@@ -199,21 +165,13 @@ type Param struct {
 
 // NewParam creates a new Param node.
 func NewParam(paramkind ParamKind, paramid int, paramtype Oid) *Param {
-	return &Param{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_Param}},
-		Paramkind: paramkind,
-		Paramid:   paramid,
-		Paramtype: paramtype,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *Param) ExpressionType() string {
-	return "Param"
-}
+func (p *Param) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (p *Param) String() string {
-	return fmt.Sprintf("Param($%d)@%d", p.Paramid, p.Location())
-}
+func (p *Param) String() string { _ = "STUB: not implemented"; return "" }
 
 // FuncExpr represents a function call expression.
 // Ported from postgres/src/include/nodes/primnodes.h:746
@@ -231,25 +189,13 @@ type FuncExpr struct {
 
 // NewFuncExpr creates a new FuncExpr node.
 func NewFuncExpr(funcid Oid, funcresulttype Oid, args *NodeList) *FuncExpr {
-	return &FuncExpr{
-		BaseExpr:       BaseExpr{BaseNode: BaseNode{Tag: T_FuncExpr}},
-		Funcid:         funcid,
-		Funcresulttype: funcresulttype,
-		Args:           args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (f *FuncExpr) ExpressionType() string {
-	return "FuncExpr"
-}
+func (f *FuncExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (f *FuncExpr) String() string {
-	argCount := 0
-	if f.Args != nil {
-		argCount = len(f.Args.Items)
-	}
-	return fmt.Sprintf("FuncExpr(oid:%d, %d args)@%d", f.Funcid, argCount, f.Location())
-}
+func (f *FuncExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // OpExpr represents a binary or unary operator expression.
 // Ported from postgres/src/include/nodes/primnodes.h:813
@@ -266,26 +212,13 @@ type OpExpr struct {
 
 // NewOpExpr creates a new OpExpr node.
 func NewOpExpr(opno Oid, opfuncid Oid, opresulttype Oid, args *NodeList) *OpExpr {
-	return &OpExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_OpExpr}},
-		Opno:         opno,
-		Opfuncid:     opfuncid,
-		Opresulttype: opresulttype,
-		Args:         args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (o *OpExpr) ExpressionType() string {
-	return "OpExpr"
-}
+func (o *OpExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (o *OpExpr) String() string {
-	opType := "binary"
-	if o.Args != nil && len(o.Args.Items) == 1 {
-		opType = "unary"
-	}
-	return fmt.Sprintf("OpExpr(%s, oid:%d)@%d", opType, o.Opno, o.Location())
-}
+func (o *OpExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // BoolExpr represents a boolean expression (AND/OR/NOT).
 // Ported from postgres/src/include/nodes/primnodes.h:934
@@ -297,94 +230,41 @@ type BoolExpr struct {
 
 // NewBoolExpr creates a new BoolExpr node.
 func NewBoolExpr(boolop BoolExprType, args *NodeList) *BoolExpr {
-	return &BoolExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_BoolExpr}},
-		Boolop:   boolop,
-		Args:     args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (b *BoolExpr) ExpressionType() string {
-	return "BoolExpr"
-}
+func (b *BoolExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (b *BoolExpr) String() string {
-	argCount := 0
-	if b.Args != nil {
-		argCount = len(b.Args.Items)
-	}
-	return fmt.Sprintf("BoolExpr(%s, %d args)@%d", b.Boolop, argCount, b.Location())
-}
+func (b *BoolExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of BoolExpr
-func (b *BoolExpr) SqlString() string {
-	if b.Args == nil || len(b.Args.Items) == 0 {
-		return ""
-	}
+func (b *BoolExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	switch b.Boolop {
-	case AND_EXPR:
-		var parts []string
-		for _, arg := range b.Args.Items {
-			if arg != nil {
-				parts = append(parts, arg.SqlString())
-			}
-		}
-		// Don't add parentheses - let ParenExpr handle explicit parentheses
-		// and let precedence rules determine when they're needed
-		return strings.Join(parts, " AND ")
+// Don't add parentheses - let ParenExpr handle explicit parentheses
+// and let precedence rules determine when they're needed
 
-	case OR_EXPR:
-		var parts []string
-		for _, arg := range b.Args.Items {
-			if arg != nil {
-				parts = append(parts, arg.SqlString())
-			}
-		}
-		// Don't add parentheses - let ParenExpr handle explicit parentheses
-		// and let precedence rules determine when they're needed
-		return strings.Join(parts, " OR ")
-
-	case NOT_EXPR:
-		if len(b.Args.Items) > 0 && b.Args.Items[0] != nil {
-			return "NOT " + b.Args.Items[0].SqlString()
-		}
-
-	default:
-		return "UNKNOWN_BOOL_EXPR"
-	}
-
-	return ""
-}
+// Don't add parentheses - let ParenExpr handle explicit parentheses
+// and let precedence rules determine when they're needed
 
 // ==============================================================================
 // CONVENIENCE CONSTRUCTORS FOR COMMON PATTERNS
 // ==============================================================================
 
 // NewAndExpr creates a new AND boolean expression.
-func NewAndExpr(left, right Node) *BoolExpr {
-	return NewBoolExpr(AND_EXPR, NewNodeList(left, right))
-}
+func NewAndExpr(left, right Node) *BoolExpr { _ = "STUB: not implemented"; return nil }
 
 // NewOrExpr creates a new OR boolean expression.
-func NewOrExpr(left, right Node) *BoolExpr {
-	return NewBoolExpr(OR_EXPR, NewNodeList(left, right))
-}
+func NewOrExpr(left, right Node) *BoolExpr { _ = "STUB: not implemented"; return nil }
 
 // NewNotExpr creates a new NOT boolean expression.
-func NewNotExpr(arg Node) *BoolExpr {
-	return NewBoolExpr(NOT_EXPR, NewNodeList(arg))
-}
+func NewNotExpr(arg Node) *BoolExpr { _ = "STUB: not implemented"; return nil }
 
 // NewBinaryOp creates a binary operator expression.
-func NewBinaryOp(opno Oid, left, right Node) *OpExpr {
-	return NewOpExpr(opno, 0, 0, NewNodeList(left, right))
-}
+func NewBinaryOp(opno Oid, left, right Node) *OpExpr { _ = "STUB: not implemented"; return nil }
 
 // NewUnaryOp creates a unary operator expression.
-func NewUnaryOp(opno Oid, arg Node) *OpExpr {
-	return NewOpExpr(opno, 0, 0, NewNodeList(arg))
-}
+func NewUnaryOp(opno Oid, arg Node) *OpExpr { _ = "STUB: not implemented"; return nil }
 
 // ==============================================================================
 // TIER 2 EXPRESSIONS - Common SQL Features
@@ -403,66 +283,23 @@ type CaseExpr struct {
 
 // NewCaseExpr creates a new CaseExpr node.
 func NewCaseExpr(casetype Oid, arg Node, whens *NodeList, defresult Node) *CaseExpr {
-	return &CaseExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_CaseExpr}},
-		Casetype:  casetype,
-		Arg:       arg,
-		Args:      whens,
-		Defresult: defresult,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CaseExpr) ExpressionType() string {
-	return "CaseExpr"
-}
+func (c *CaseExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CaseExpr) String() string {
-	whenCount := 0
-	if c.Args != nil {
-		whenCount = len(c.Args.Items)
-	}
-	hasElse := c.Defresult != nil
-	return fmt.Sprintf("CaseExpr(%d whens, else:%t)@%d", whenCount, hasElse, c.Location())
-}
+func (c *CaseExpr) String() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CaseExpr) SqlString() string {
-	if c == nil {
-		return ""
-	}
+func (c *CaseExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var result strings.Builder
+// Start with CASE
 
-	// Start with CASE
-	result.WriteString("CASE")
+// Add the case argument if present (for simple CASE expressions)
 
-	// Add the case argument if present (for simple CASE expressions)
-	if c.Arg != nil {
-		result.WriteString(" ")
-		result.WriteString(c.Arg.SqlString())
-	}
+// Add WHEN clauses
 
-	// Add WHEN clauses
-	if c.Args != nil {
-		for _, when := range c.Args.Items {
-			if caseWhen, ok := when.(*CaseWhen); ok {
-				result.WriteString(" WHEN ")
-				result.WriteString(caseWhen.Expr.SqlString())
-				result.WriteString(" THEN ")
-				result.WriteString(caseWhen.Result.SqlString())
-			}
-		}
-	}
-
-	// Add ELSE clause if present
-	if c.Defresult != nil {
-		result.WriteString(" ELSE ")
-		result.WriteString(c.Defresult.SqlString())
-	}
-
-	result.WriteString(" END")
-
-	return result.String()
-}
+// Add ELSE clause if present
 
 // CaseWhen represents a WHEN clause in a CASE expression.
 // Ported from postgres/src/include/nodes/primnodes.h:1322
@@ -473,21 +310,13 @@ type CaseWhen struct {
 }
 
 // NewCaseWhen creates a new CaseWhen node.
-func NewCaseWhen(expr Node, result Node) *CaseWhen {
-	return &CaseWhen{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_CaseExpr}}, // CaseWhen uses same tag family
-		Expr:     expr,
-		Result:   result,
-	}
-}
+func NewCaseWhen(expr Node, result Node) *CaseWhen { _ = "STUB: not implemented"; return nil }
 
-func (cw *CaseWhen) ExpressionType() string {
-	return "CaseWhen"
-}
+// CaseWhen uses same tag family
 
-func (cw *CaseWhen) String() string {
-	return fmt.Sprintf("CaseWhen@%d", cw.Location())
-}
+func (cw *CaseWhen) ExpressionType() string { _ = "STUB: not implemented"; return "" }
+
+func (cw *CaseWhen) String() string { _ = "STUB: not implemented"; return "" }
 
 // CoalesceExpr represents a COALESCE expression.
 // Ported from postgres/src/include/nodes/primnodes.h:1484
@@ -500,46 +329,16 @@ type CoalesceExpr struct {
 
 // NewCoalesceExpr creates a new CoalesceExpr node.
 func NewCoalesceExpr(coalescetype Oid, args *NodeList) *CoalesceExpr {
-	return &CoalesceExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_CoalesceExpr}},
-		Coalescetype: coalescetype,
-		Args:         args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CoalesceExpr) ExpressionType() string {
-	return "CoalesceExpr"
-}
+func (c *CoalesceExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CoalesceExpr) String() string {
-	argCount := 0
-	if c.Args != nil {
-		argCount = len(c.Args.Items)
-	}
-	return fmt.Sprintf("CoalesceExpr(%d args)@%d", argCount, c.Location())
-}
+func (c *CoalesceExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CoalesceExpr
-func (c *CoalesceExpr) SqlString() string {
-	var result strings.Builder
-	result.WriteString("COALESCE(")
-
-	if c.Args != nil && len(c.Args.Items) > 0 {
-		for i, arg := range c.Args.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if expr, ok := arg.(Expression); ok {
-				result.WriteString(expr.SqlString())
-			} else {
-				result.WriteString("<unknown>")
-			}
-		}
-	}
-
-	result.WriteString(")")
-	return result.String()
-}
+func (c *CoalesceExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // ArrayExpr represents an ARRAY[] constructor expression.
 // Ported from postgres/src/include/nodes/primnodes.h:1370
@@ -554,74 +353,26 @@ type ArrayExpr struct {
 
 // NewArrayExpr creates a new ArrayExpr node.
 func NewArrayExpr(arrayTypeid Oid, elementTypeid Oid, elements *NodeList) *ArrayExpr {
-	return &ArrayExpr{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_ArrayExpr}},
-		ArrayTypeid:   arrayTypeid,
-		ElementTypeid: elementTypeid,
-		Elements:      elements,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (a *ArrayExpr) ExpressionType() string {
-	return "ArrayExpr"
+	_ = "STUB: not implemented"
+
+	// SqlString formats the ArrayExpr as ARRAY[...] syntax
+	return ""
 }
 
-// SqlString formats the ArrayExpr as ARRAY[...] syntax
-func (a *ArrayExpr) SqlString() string {
-	if a.Elements == nil || len(a.Elements.Items) == 0 {
-		return "ARRAY[]"
-	}
+func (a *ArrayExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Check if all elements are arrays to use compact multidimensional syntax
-	allArrays := true
-	for _, element := range a.Elements.Items {
-		if element != nil {
-			if _, ok := element.(*ArrayExpr); !ok {
-				allArrays = false
-				break
-			}
-		}
-	}
+// Check if all elements are arrays to use compact multidimensional syntax
 
-	if allArrays && len(a.Elements.Items) > 0 {
-		// Use compact [[...],[...]] syntax for arrays of arrays
-		var compactItems []string
-		for _, element := range a.Elements.Items {
-			if arrayExpr, ok := element.(*ArrayExpr); ok {
-				var subItems []string
-				for _, subElement := range arrayExpr.Elements.Items {
-					if subElement != nil {
-						subItems = append(subItems, subElement.SqlString())
-					}
-				}
-				compactItems = append(compactItems, fmt.Sprintf("[%s]", strings.Join(subItems, ",")))
-			}
-		}
-		return fmt.Sprintf("ARRAY[%s]", strings.Join(compactItems, ","))
-	}
+// Use compact [[...],[...]] syntax for arrays of arrays
 
-	// Regular array syntax
-	var items []string
-	for _, element := range a.Elements.Items {
-		if element != nil {
-			items = append(items, element.SqlString())
-		}
-	}
+// Regular array syntax
 
-	return fmt.Sprintf("ARRAY[%s]", strings.Join(items, ","))
-}
-
-func (a *ArrayExpr) String() string {
-	dims := "1D"
-	if a.Multidims {
-		dims = "Multi-D"
-	}
-	elementCount := 0
-	if a.Elements != nil {
-		elementCount = len(a.Elements.Items)
-	}
-	return fmt.Sprintf("ArrayExpr(%s, %d elements)@%d", dims, elementCount, a.Location())
-}
+func (a *ArrayExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // ScalarArrayOpExpr represents a scalar op ANY/ALL (array) expression.
 // Ported from postgres/src/include/nodes/primnodes.h:893
@@ -638,25 +389,13 @@ type ScalarArrayOpExpr struct {
 
 // NewScalarArrayOpExpr creates a new ScalarArrayOpExpr node.
 func NewScalarArrayOpExpr(opno Oid, useOr bool, scalar Node, array Node) *ScalarArrayOpExpr {
-	return &ScalarArrayOpExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_ScalarArrayOpExpr}},
-		Opno:     opno,
-		UseOr:    useOr,
-		Args:     NewNodeList(scalar, array),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *ScalarArrayOpExpr) ExpressionType() string {
-	return "ScalarArrayOpExpr"
-}
+func (s *ScalarArrayOpExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (s *ScalarArrayOpExpr) String() string {
-	opType := "ALL"
-	if s.UseOr {
-		opType = "ANY"
-	}
-	return fmt.Sprintf("ScalarArrayOpExpr(%s, oid:%d)@%d", opType, s.Opno, s.Location())
-}
+func (s *ScalarArrayOpExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // RowExpr represents a ROW() constructor expression.
 // Ported from postgres/src/include/nodes/primnodes.h:1408
@@ -669,46 +408,17 @@ type RowExpr struct {
 }
 
 // NewRowExpr creates a new RowExpr node.
-func NewRowExpr(args *NodeList, rowTypeid Oid) *RowExpr {
-	return &RowExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_RowExpr}},
-		Args:      args,
-		RowTypeid: rowTypeid,
-	}
-}
+func NewRowExpr(args *NodeList, rowTypeid Oid) *RowExpr { _ = "STUB: not implemented"; return nil }
 
-func (r *RowExpr) ExpressionType() string {
-	return "RowExpr"
-}
+func (r *RowExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RowExpr) String() string {
-	fieldCount := 0
-	if r.Args != nil {
-		fieldCount = len(r.Args.Items)
-	}
-	return fmt.Sprintf("RowExpr(%d fields)@%d", fieldCount, r.Location())
-}
+func (r *RowExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the row expression
-func (r *RowExpr) SqlString() string {
-	if r.Args == nil || len(r.Args.Items) == 0 {
-		return "ROW()"
-	}
+func (r *RowExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var items []string
-	for _, arg := range r.Args.Items {
-		if arg != nil {
-			items = append(items, arg.SqlString())
-		}
-	}
-
-	// ROW expressions are typically written as just (expr1, expr2, ...)
-	// unless explicitly using ROW keyword
-	if r.RowFormat == COERCE_EXPLICIT_CALL {
-		return fmt.Sprintf("ROW(%s)", strings.Join(items, ", "))
-	}
-	return fmt.Sprintf("(%s)", strings.Join(items, ", "))
-}
+// ROW expressions are typically written as just (expr1, expr2, ...)
+// unless explicitly using ROW keyword
 
 // ==============================================================================
 // TIER 2 CONVENIENCE CONSTRUCTORS
@@ -716,43 +426,46 @@ func (r *RowExpr) SqlString() string {
 
 // NewSimpleCase creates a simple CASE expression: CASE expr WHEN val1 THEN result1 ... ELSE def END
 func NewSimpleCase(expr Node, whens *NodeList, defresult Node) *CaseExpr {
-	return NewCaseExpr(0, expr, whens, defresult)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewSearchedCase creates a searched CASE expression: CASE WHEN condition1 THEN result1 ... ELSE def END
 func NewSearchedCase(whens *NodeList, defresult Node) *CaseExpr {
-	return NewCaseExpr(0, nil, whens, defresult)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewArrayConstructor creates an ARRAY[...] constructor.
-func NewArrayConstructor(elements *NodeList) *ArrayExpr {
-	return NewArrayExpr(0, 0, elements)
-}
+func NewArrayConstructor(elements *NodeList) *ArrayExpr { _ = "STUB: not implemented"; return nil }
 
 // NewRowConstructor creates a ROW(...) constructor.
-func NewRowConstructor(fields *NodeList) *RowExpr {
-	return NewRowExpr(fields, 0)
-}
+func NewRowConstructor(fields *NodeList) *RowExpr { _ = "STUB: not implemented"; return nil }
 
 // NewAnyExpr creates a scalar = ANY(array) expression.
 func NewAnyExpr(opno Oid, scalar Node, array Node) *ScalarArrayOpExpr {
-	return NewScalarArrayOpExpr(opno, true, scalar, array)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewAllExpr creates a scalar = ALL(array) expression.
 func NewAllExpr(opno Oid, scalar Node, array Node) *ScalarArrayOpExpr {
-	return NewScalarArrayOpExpr(opno, false, scalar, array)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewInExpr creates a scalar IN (array) expression using = ANY.
-func NewInExpr(scalar Node, array Node) *ScalarArrayOpExpr {
-	return NewAnyExpr(96, scalar, array) // 96 is "=" operator OID
-}
+func NewInExpr(scalar Node, array Node) *ScalarArrayOpExpr { _ = "STUB: not implemented"; return nil }
+
+// 96 is "=" operator OID
 
 // NewNotInExpr creates a scalar NOT IN (array) expression using <> ALL.
 func NewNotInExpr(scalar Node, array Node) *ScalarArrayOpExpr {
-	return NewAllExpr(518, scalar, array) // 518 is "<>" operator OID
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// 518 is "<>" operator OID
 
 // ==============================================================================
 // EXPRESSION TYPE MAPPING
@@ -760,106 +473,26 @@ func NewNotInExpr(scalar Node, array Node) *ScalarArrayOpExpr {
 
 // GetExprTag maps expression types to NodeTag constants.
 // Expression NodeTag constants are defined in nodes.go
-func GetExprTag(exprType string) NodeTag {
-	switch exprType {
-	case "Var":
-		return T_Var
-	case "Const":
-		return T_Const
-	case "Param":
-		return T_Param
-	case "FuncExpr":
-		return T_FuncExpr
-	case "OpExpr":
-		return T_OpExpr
-	case "BoolExpr":
-		return T_BoolExpr
-	case "CaseExpr":
-		return T_CaseExpr
-	case "CoalesceExpr":
-		return T_CoalesceExpr
-	case "ArrayExpr":
-		return T_ArrayExpr
-	case "ScalarArrayOpExpr":
-		return T_ScalarArrayOpExpr
-	case "RowExpr":
-		return T_RowExpr
-	case "Aggref":
-		return T_Aggref
-	case "WindowFunc":
-		return T_WindowFunc
-	case "SubLink":
-		return T_SubLink
-	default:
-		return T_Invalid
-	}
-}
+func GetExprTag(exprType string) NodeTag { _ = "STUB: not implemented"; return *new(NodeTag) }
 
 // ==============================================================================
 // EXPRESSION UTILITIES
 // ==============================================================================
 
 // IsConstant checks if an expression is a constant value.
-func IsConstant(expr Node) bool {
-	_, ok := expr.(*Const)
-	return ok
-}
+func IsConstant(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsVariable checks if an expression is a variable reference.
-func IsVariable(expr Node) bool {
-	_, ok := expr.(*Var)
-	return ok
-}
+func IsVariable(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsFunction checks if an expression is a function call.
-func IsFunction(expr Node) bool {
-	_, ok := expr.(*FuncExpr)
-	return ok
-}
+func IsFunction(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetExpressionArgs returns the arguments of an expression if it has any.
-func GetExpressionArgs(expr Node) *NodeList {
-	switch e := expr.(type) {
-	case *FuncExpr:
-		return e.Args
-	case *OpExpr:
-		return e.Args
-	case *BoolExpr:
-		return e.Args
-	case *CaseExpr:
-		return e.Args
-	case *CaseWhen:
-		return NewNodeList(e.Expr, e.Result)
-	case *CoalesceExpr:
-		return e.Args
-	case *ArrayExpr:
-		return e.Elements
-	case *ScalarArrayOpExpr:
-		return e.Args
-	case *RowExpr:
-		return e.Args
-	case *Aggref:
-		return e.Args
-	case *WindowFunc:
-		return e.Args
-	case *SubLink:
-		if e.Testexpr != nil {
-			return NewNodeList(e.Testexpr, e.Subselect)
-		}
-		return NewNodeList(e.Subselect)
-	default:
-		return nil
-	}
-}
+func GetExpressionArgs(expr Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // CountArgs returns the number of arguments in an expression.
-func CountArgs(expr Node) int {
-	args := GetExpressionArgs(expr)
-	if args == nil {
-		return 0
-	}
-	return len(args.Items)
-}
+func CountArgs(expr Node) int { _ = "STUB: not implemented"; return 0 }
 
 // ==============================================================================
 // TIER 3 EXPRESSIONS - Advanced Expressions and Aggregations
@@ -879,28 +512,7 @@ const (
 	CTE_SUBLINK                           // for SubPlans only
 )
 
-func (s SubLinkType) String() string {
-	switch s {
-	case EXISTS_SUBLINK:
-		return "EXISTS"
-	case ALL_SUBLINK:
-		return "ALL"
-	case ANY_SUBLINK:
-		return "ANY"
-	case ROWCOMPARE_SUBLINK:
-		return "ROWCOMPARE"
-	case EXPR_SUBLINK:
-		return "EXPR"
-	case MULTIEXPR_SUBLINK:
-		return "MULTIEXPR"
-	case ARRAY_SUBLINK:
-		return "ARRAY"
-	case CTE_SUBLINK:
-		return "CTE"
-	default:
-		return fmt.Sprintf("SubLinkType(%d)", int(s))
-	}
-}
+func (s SubLinkType) String() string { _ = "STUB: not implemented"; return "" }
 
 // AggSplit represents aggregate splitting modes - ported from postgres/src/include/nodes/nodes.h:479-487
 type AggSplit int
@@ -911,18 +523,7 @@ const (
 	AGGSPLIT_FINAL_DESERIAL AggSplit = 12 // Final phase with deserialization
 )
 
-func (a AggSplit) String() string {
-	switch a {
-	case AGGSPLIT_SIMPLE:
-		return "SIMPLE"
-	case AGGSPLIT_INITIAL_SERIAL:
-		return "INITIAL_SERIAL"
-	case AGGSPLIT_FINAL_DESERIAL:
-		return "FINAL_DESERIAL"
-	default:
-		return fmt.Sprintf("AggSplit(%d)", int(a))
-	}
-}
+func (a AggSplit) String() string { _ = "STUB: not implemented"; return "" }
 
 // Aggref represents an aggregate function call expression.
 // Ported from postgres/src/include/nodes/primnodes.h:439
@@ -951,33 +552,13 @@ type Aggref struct {
 
 // NewAggref creates a new Aggref node.
 func NewAggref(aggfnoid Oid, aggtype Oid, args *NodeList) *Aggref {
-	return &Aggref{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_Aggref}},
-		Aggfnoid: aggfnoid,
-		Aggtype:  aggtype,
-		Args:     args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *Aggref) ExpressionType() string {
-	return "Aggref"
-}
+func (a *Aggref) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *Aggref) String() string {
-	distinct := ""
-	if a.Aggdistinct != nil && len(a.Aggdistinct.Items) > 0 {
-		distinct = " DISTINCT"
-	}
-	filter := ""
-	if a.Aggfilter != nil {
-		filter = " FILTER"
-	}
-	argCount := 0
-	if a.Args != nil {
-		argCount = len(a.Args.Items)
-	}
-	return fmt.Sprintf("Aggref(oid:%d%s%s, %d args)@%d", a.Aggfnoid, distinct, filter, argCount, a.Location())
-}
+func (a *Aggref) String() string { _ = "STUB: not implemented"; return "" }
 
 // WindowFunc represents a window function call expression.
 // Ported from postgres/src/include/nodes/primnodes.h:563
@@ -997,36 +578,13 @@ type WindowFunc struct {
 
 // NewWindowFunc creates a new WindowFunc node.
 func NewWindowFunc(winfnoid Oid, wintype Oid, args *NodeList, winref Index) *WindowFunc {
-	return &WindowFunc{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_WindowFunc}},
-		Winfnoid: winfnoid,
-		Wintype:  wintype,
-		Args:     args,
-		Winref:   winref,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (w *WindowFunc) ExpressionType() string {
-	return "WindowFunc"
-}
+func (w *WindowFunc) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (w *WindowFunc) String() string {
-	star := ""
-	if w.Winstar {
-		star = "*"
-	} else {
-		argCount := 0
-		if w.Args != nil {
-			argCount = len(w.Args.Items)
-		}
-		star = fmt.Sprintf("%d args", argCount)
-	}
-	filter := ""
-	if w.Aggfilter != nil {
-		filter = " FILTER"
-	}
-	return fmt.Sprintf("WindowFunc(oid:%d%s, %s)@%d", w.Winfnoid, filter, star, w.Location())
-}
+func (w *WindowFunc) String() string { _ = "STUB: not implemented"; return "" }
 
 // SubLink represents a sublink expression (subquery).
 // Ported from postgres/src/include/nodes/primnodes.h:1008
@@ -1041,471 +599,235 @@ type SubLink struct {
 
 // NewSubLink creates a new SubLink node.
 func NewSubLink(subLinkType SubLinkType, subselect Node) *SubLink {
-	return &SubLink{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_SubLink}},
-		SubLinkType: subLinkType,
-		Subselect:   subselect,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *SubLink) ExpressionType() string {
-	return "SubLink"
-}
+	_ = "STUB: not implemented"
 
-// SqlString returns the SQL representation of the SubLink
-func (s *SubLink) SqlString() string {
-	if s == nil {
-		return ""
-	}
-
-	// Handle different sublink types
-	switch s.SubLinkType {
-	case EXISTS_SUBLINK:
-		// EXISTS(subquery)
-		return fmt.Sprintf("EXISTS (%s)", s.Subselect.SqlString())
-
-	case ALL_SUBLINK:
-		// expr op ALL(subquery)
-		if s.Testexpr != nil && s.OperName != nil && len(s.OperName.Items) > 0 {
-			op := extractOperatorFromNodeList(s.OperName)
-			return fmt.Sprintf("%s %s ALL (%s)", s.Testexpr.SqlString(), op, s.Subselect.SqlString())
-		}
-		return fmt.Sprintf("ALL (%s)", s.Subselect.SqlString())
-
-	case ANY_SUBLINK:
-		// expr op ANY(subquery) - includes IN which is = ANY
-		if s.Testexpr != nil {
-			// Special case: OperName nil means it's IN not = ANY
-			if s.OperName == nil {
-				return fmt.Sprintf("%s IN (%s)", s.Testexpr.SqlString(), s.Subselect.SqlString())
-			}
-			// Regular ANY with operator
-			if len(s.OperName.Items) > 0 {
-				op := extractOperatorFromNodeList(s.OperName)
-				return fmt.Sprintf("%s %s ANY (%s)", s.Testexpr.SqlString(), op, s.Subselect.SqlString())
-			}
-		}
-		return fmt.Sprintf("ANY (%s)", s.Subselect.SqlString())
-
-	case ROWCOMPARE_SUBLINK:
-		// (expr list) op (subquery)
-		if s.Testexpr != nil && s.OperName != nil && len(s.OperName.Items) > 0 {
-			op := extractOperatorFromNodeList(s.OperName)
-			return fmt.Sprintf("%s %s (%s)", s.Testexpr.SqlString(), op, s.Subselect.SqlString())
-		}
-		return fmt.Sprintf("(%s)", s.Subselect.SqlString())
-
-	case EXPR_SUBLINK:
-		// Simple scalar subquery: (subquery)
-		return fmt.Sprintf("(%s)", s.Subselect.SqlString())
-
-	case MULTIEXPR_SUBLINK:
-		// Multiple expressions - just wrap in parentheses
-		return fmt.Sprintf("(%s)", s.Subselect.SqlString())
-
-	case ARRAY_SUBLINK:
-		// ARRAY(subquery)
-		return fmt.Sprintf("ARRAY(%s)", s.Subselect.SqlString())
-
-	case CTE_SUBLINK:
-		// For SubPlans only - shouldn't appear in normal SQL
-		return fmt.Sprintf("(%s)", s.Subselect.SqlString())
-
-	default:
-		// Fallback to simple subquery
-		return fmt.Sprintf("(%s)", s.Subselect.SqlString())
-	}
-}
-
-// extractOperatorFromNodeList extracts the operator string from a NodeList
-func extractOperatorFromNodeList(list *NodeList) string {
-	if list == nil || len(list.Items) == 0 {
-		return ""
-	}
-
-	// The operator is typically stored as a String node in the list
-	for _, item := range list.Items {
-		if str, ok := item.(*String); ok && str != nil {
-			return str.SVal
-		}
-	}
-
-	// Fallback: try to get SqlString of first item
-	if list.Items[0] != nil {
-		return list.Items[0].SqlString()
-	}
-
+	// SqlString returns the SQL representation of the SubLink
 	return ""
 }
 
-func (s *SubLink) String() string {
-	test := ""
-	if s.Testexpr != nil {
-		test = " with test"
-	}
-	return fmt.Sprintf("SubLink(%s%s)@%d", s.SubLinkType, test, s.Location())
-}
+func (s *SubLink) SqlString() string { _ = "STUB: not implemented"; return "" }
+
+// Handle different sublink types
+
+// EXISTS(subquery)
+
+// expr op ALL(subquery)
+
+// expr op ANY(subquery) - includes IN which is = ANY
+
+// Special case: OperName nil means it's IN not = ANY
+
+// Regular ANY with operator
+
+// (expr list) op (subquery)
+
+// Simple scalar subquery: (subquery)
+
+// Multiple expressions - just wrap in parentheses
+
+// ARRAY(subquery)
+
+// For SubPlans only - shouldn't appear in normal SQL
+
+// Fallback to simple subquery
+
+// extractOperatorFromNodeList extracts the operator string from a NodeList
+func extractOperatorFromNodeList(list *NodeList) string { _ = "STUB: not implemented"; return "" }
+
+// The operator is typically stored as a String node in the list
+
+// Fallback: try to get SqlString of first item
+
+func (s *SubLink) String() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // TIER 3 CONVENIENCE CONSTRUCTORS
 // ==============================================================================
 
 // NewCountStar creates a COUNT(*) aggregate.
-func NewCountStar() *Aggref {
-	agg := NewAggref(2147, 20, nil) // COUNT function OID 2147, result type bigint 20
-	agg.Aggstar = true
-	return agg
-}
+func NewCountStar() *Aggref { _ = "STUB: not implemented"; return nil }
+
+// COUNT function OID 2147, result type bigint 20
 
 // NewCount creates a COUNT(expr) aggregate.
-func NewCount(expr Node) *Aggref {
-	return NewAggref(2147, 20, NewNodeList(expr)) // COUNT function OID 2147, result type bigint 20
-}
+func NewCount(expr Node) *Aggref { _ = "STUB: not implemented"; return nil }
+
+// COUNT function OID 2147, result type bigint 20
 
 // NewSum creates a SUM(expr) aggregate.
-func NewSum(expr Node) *Aggref {
-	return NewAggref(2108, 0, NewNodeList(expr)) // SUM function OID (varies by type)
-}
+func NewSum(expr Node) *Aggref { _ = "STUB: not implemented"; return nil }
+
+// SUM function OID (varies by type)
 
 // NewAvg creates an AVG(expr) aggregate.
-func NewAvg(expr Node) *Aggref {
-	return NewAggref(2100, 0, NewNodeList(expr)) // AVG function OID (varies by type)
-}
+func NewAvg(expr Node) *Aggref { _ = "STUB: not implemented"; return nil }
+
+// AVG function OID (varies by type)
 
 // NewMax creates a MAX(expr) aggregate.
-func NewMax(expr Node) *Aggref {
-	return NewAggref(2116, 0, NewNodeList(expr)) // MAX function OID (varies by type)
-}
+func NewMax(expr Node) *Aggref { _ = "STUB: not implemented"; return nil }
+
+// MAX function OID (varies by type)
 
 // NewMin creates a MIN(expr) aggregate.
-func NewMin(expr Node) *Aggref {
-	return NewAggref(2132, 0, NewNodeList(expr)) // MIN function OID (varies by type)
-}
+func NewMin(expr Node) *Aggref { _ = "STUB: not implemented"; return nil }
+
+// MIN function OID (varies by type)
 
 // NewExistsSublink creates an EXISTS(subquery) expression.
-func NewExistsSublink(subquery Node) *SubLink {
-	return NewSubLink(EXISTS_SUBLINK, subquery)
-}
+func NewExistsSublink(subquery Node) *SubLink { _ = "STUB: not implemented"; return nil }
 
 // NewInSublink creates an expr IN (subquery) expression.
-func NewInSublink(testexpr Node, subquery Node) *SubLink {
-	sublink := NewSubLink(ANY_SUBLINK, subquery)
-	sublink.Testexpr = testexpr
-	return sublink
-}
+func NewInSublink(testexpr Node, subquery Node) *SubLink { _ = "STUB: not implemented"; return nil }
 
 // NewNotInSublink creates an expr NOT IN (subquery) expression.
-func NewNotInSublink(testexpr Node, subquery Node) *SubLink {
-	sublink := NewSubLink(ALL_SUBLINK, subquery)
-	sublink.Testexpr = testexpr
-	return sublink
-}
+func NewNotInSublink(testexpr Node, subquery Node) *SubLink { _ = "STUB: not implemented"; return nil }
 
 // NewExprSublink creates a scalar subquery expression.
-func NewExprSublink(subquery Node) *SubLink {
-	return NewSubLink(EXPR_SUBLINK, subquery)
-}
+func NewExprSublink(subquery Node) *SubLink { _ = "STUB: not implemented"; return nil }
 
 // NewArraySublink creates an ARRAY(subquery) expression.
-func NewArraySublink(subquery Node) *SubLink {
-	return NewSubLink(ARRAY_SUBLINK, subquery)
-}
+func NewArraySublink(subquery Node) *SubLink { _ = "STUB: not implemented"; return nil }
 
 // NewRowNumber creates a ROW_NUMBER() window function.
-func NewRowNumber() *WindowFunc {
-	return NewWindowFunc(3100, 20, nil, 0) // ROW_NUMBER function OID 3100, result type bigint 20
-}
+func NewRowNumber() *WindowFunc { _ = "STUB: not implemented"; return nil }
+
+// ROW_NUMBER function OID 3100, result type bigint 20
 
 // NewRank creates a RANK() window function.
-func NewRank() *WindowFunc {
-	return NewWindowFunc(3101, 20, nil, 0) // RANK function OID 3101, result type bigint 20
-}
+func NewRank() *WindowFunc { _ = "STUB: not implemented"; return nil }
+
+// RANK function OID 3101, result type bigint 20
 
 // NewDenseRank creates a DENSE_RANK() window function.
-func NewDenseRank() *WindowFunc {
-	return NewWindowFunc(3102, 20, nil, 0) // DENSE_RANK function OID 3102, result type bigint 20
-}
+func NewDenseRank() *WindowFunc { _ = "STUB: not implemented"; return nil }
+
+// DENSE_RANK function OID 3102, result type bigint 20
 
 // NewLag creates a LAG(expr) window function.
-func NewLag(expr Node) *WindowFunc {
-	return NewWindowFunc(3105, 0, NewNodeList(expr), 0) // LAG function OID (varies by type)
-}
+func NewLag(expr Node) *WindowFunc { _ = "STUB: not implemented"; return nil }
+
+// LAG function OID (varies by type)
 
 // NewLead creates a LEAD(expr) window function.
-func NewLead(expr Node) *WindowFunc {
-	return NewWindowFunc(3106, 0, NewNodeList(expr), 0) // LEAD function OID (varies by type)
-}
+func NewLead(expr Node) *WindowFunc { _ = "STUB: not implemented"; return nil }
+
+// LEAD function OID (varies by type)
 
 // ==============================================================================
 // TIER 2 EXPRESSION UTILITIES
 // ==============================================================================
 
 // IsCaseExpr checks if an expression is a CASE expression.
-func IsCaseExpr(expr Node) bool {
-	_, ok := expr.(*CaseExpr)
-	return ok
-}
+func IsCaseExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsCoalesceExpr checks if an expression is a COALESCE expression.
-func IsCoalesceExpr(expr Node) bool {
-	_, ok := expr.(*CoalesceExpr)
-	return ok
-}
+func IsCoalesceExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsArrayExpr checks if an expression is an ARRAY constructor.
-func IsArrayExpr(expr Node) bool {
-	_, ok := expr.(*ArrayExpr)
-	return ok
-}
+func IsArrayExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsScalarArrayOpExpr checks if an expression is a scalar array operation.
-func IsScalarArrayOpExpr(expr Node) bool {
-	_, ok := expr.(*ScalarArrayOpExpr)
-	return ok
-}
+func IsScalarArrayOpExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsRowExpr checks if an expression is a ROW constructor.
-func IsRowExpr(expr Node) bool {
-	_, ok := expr.(*RowExpr)
-	return ok
-}
+func IsRowExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsInExpr checks if an expression is an IN operation (scalar = ANY(array)).
-func IsInExpr(expr Node) bool {
-	if saoe, ok := expr.(*ScalarArrayOpExpr); ok {
-		return saoe.UseOr && saoe.Opno == 96 // "=" operator with ANY
-	}
-	return false
-}
+func IsInExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
+
+// "=" operator with ANY
 
 // IsNotInExpr checks if an expression is a NOT IN operation (scalar <> ALL(array)).
-func IsNotInExpr(expr Node) bool {
-	if saoe, ok := expr.(*ScalarArrayOpExpr); ok {
-		return !saoe.UseOr && saoe.Opno == 518 // "<>" operator with ALL
-	}
-	return false
-}
+func IsNotInExpr(expr Node) bool { _ = "STUB: not implemented"; return false }
+
+// "<>" operator with ALL
 
 // GetCaseWhenCount returns the number of WHEN clauses in a CASE expression.
-func GetCaseWhenCount(expr Node) int {
-	if caseExpr, ok := expr.(*CaseExpr); ok {
-		if caseExpr.Args == nil {
-			return 0
-		}
-		return len(caseExpr.Args.Items)
-	}
-	return 0
-}
+func GetCaseWhenCount(expr Node) int { _ = "STUB: not implemented"; return 0 }
 
 // HasCaseElse checks if a CASE expression has an ELSE clause.
-func HasCaseElse(expr Node) bool {
-	if caseExpr, ok := expr.(*CaseExpr); ok {
-		return caseExpr.Defresult != nil
-	}
-	return false
-}
+func HasCaseElse(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetArrayElements returns the elements of an array expression.
-func GetArrayElements(expr Node) *NodeList {
-	if arrayExpr, ok := expr.(*ArrayExpr); ok {
-		return arrayExpr.Elements
-	}
-	return nil
-}
+func GetArrayElements(expr Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // IsMultiDimArray checks if an array expression is multi-dimensional.
-func IsMultiDimArray(expr Node) bool {
-	if arrayExpr, ok := expr.(*ArrayExpr); ok {
-		return arrayExpr.Multidims
-	}
-	return false
-}
+func IsMultiDimArray(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // ==============================================================================
 // TIER 3 EXPRESSION UTILITIES
 // ==============================================================================
 
 // IsAggref checks if an expression is an aggregate function call.
-func IsAggref(expr Node) bool {
-	_, ok := expr.(*Aggref)
-	return ok
-}
+func IsAggref(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsWindowFunc checks if an expression is a window function call.
-func IsWindowFunc(expr Node) bool {
-	_, ok := expr.(*WindowFunc)
-	return ok
-}
+func IsWindowFunc(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsSubLink checks if an expression is a sublink (subquery).
-func IsSubLink(expr Node) bool {
-	_, ok := expr.(*SubLink)
-	return ok
-}
+func IsSubLink(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsAggregate checks if an expression is any kind of aggregate (Aggref or WindowFunc with winagg=true).
-func IsAggregate(expr Node) bool {
-	switch e := expr.(type) {
-	case *Aggref:
-		return true
-	case *WindowFunc:
-		return e.Winagg
-	default:
-		return false
-	}
-}
+func IsAggregate(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetAggregateArgs returns the arguments of an aggregate expression.
-func GetAggregateArgs(expr Node) *NodeList {
-	switch e := expr.(type) {
-	case *Aggref:
-		return e.Args
-	case *WindowFunc:
-		return e.Args
-	default:
-		return nil
-	}
-}
+func GetAggregateArgs(expr Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // HasAggregateFilter checks if an aggregate expression has a FILTER clause.
-func HasAggregateFilter(expr Node) bool {
-	switch e := expr.(type) {
-	case *Aggref:
-		return e.Aggfilter != nil
-	case *WindowFunc:
-		return e.Aggfilter != nil
-	default:
-		return false
-	}
-}
+func HasAggregateFilter(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetAggregateFilter returns the FILTER expression of an aggregate.
-func GetAggregateFilter(expr Node) Node {
-	switch e := expr.(type) {
-	case *Aggref:
-		return e.Aggfilter
-	case *WindowFunc:
-		return e.Aggfilter
-	default:
-		return nil
-	}
-}
+func GetAggregateFilter(expr Node) Node { _ = "STUB: not implemented"; return *new(Node) }
 
 // IsDistinctAggregate checks if an aggregate has DISTINCT.
-func IsDistinctAggregate(expr Node) bool {
-	if aggref, ok := expr.(*Aggref); ok {
-		return aggref.Aggdistinct != nil && len(aggref.Aggdistinct.Items) > 0
-	}
-	return false
-}
+func IsDistinctAggregate(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsStarAggregate checks if an aggregate uses * (like COUNT(*)).
-func IsStarAggregate(expr Node) bool {
-	switch e := expr.(type) {
-	case *Aggref:
-		return e.Aggstar
-	case *WindowFunc:
-		return e.Winstar
-	default:
-		return false
-	}
-}
+func IsStarAggregate(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetSubLinkType returns the type of a SubLink.
-func GetSubLinkType(expr Node) SubLinkType {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.SubLinkType
-	}
-	return -1 // Invalid
-}
+func GetSubLinkType(expr Node) SubLinkType { _ = "STUB: not implemented"; return *new(SubLinkType) }
+
+// Invalid
 
 // IsExistsSublink checks if an expression is an EXISTS sublink.
-func IsExistsSublink(expr Node) bool {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.SubLinkType == EXISTS_SUBLINK
-	}
-	return false
-}
+func IsExistsSublink(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsScalarSublink checks if an expression is a scalar sublink (EXPR_SUBLINK).
-func IsScalarSublink(expr Node) bool {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.SubLinkType == EXPR_SUBLINK
-	}
-	return false
-}
+func IsScalarSublink(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // IsArraySublink checks if an expression is an ARRAY sublink.
-func IsArraySublink(expr Node) bool {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.SubLinkType == ARRAY_SUBLINK
-	}
-	return false
-}
+func IsArraySublink(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetSubquery returns the subquery node from a SubLink.
-func GetSubquery(expr Node) Node {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.Subselect
-	}
-	return nil
-}
+func GetSubquery(expr Node) Node { _ = "STUB: not implemented"; return *new(Node) }
 
 // HasSubLinkTest checks if a SubLink has a test expression.
-func HasSubLinkTest(expr Node) bool {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.Testexpr != nil
-	}
-	return false
-}
+func HasSubLinkTest(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetSubLinkTest returns the test expression from a SubLink.
-func GetSubLinkTest(expr Node) Node {
-	if sublink, ok := expr.(*SubLink); ok {
-		return sublink.Testexpr
-	}
-	return nil
-}
+func GetSubLinkTest(expr Node) Node { _ = "STUB: not implemented"; return *new(Node) }
 
 // IsOrderedSetAggregate checks if an aggregate is an ordered-set aggregate.
-func IsOrderedSetAggregate(expr Node) bool {
-	if aggref, ok := expr.(*Aggref); ok {
-		return aggref.Aggdirectargs != nil && len(aggref.Aggdirectargs.Items) > 0
-	}
-	return false
-}
+func IsOrderedSetAggregate(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // GetAggregateDirectArgs returns the direct arguments of an ordered-set aggregate.
-func GetAggregateDirectArgs(expr Node) *NodeList {
-	if aggref, ok := expr.(*Aggref); ok {
-		return aggref.Aggdirectargs
-	}
-	return nil
-}
+func GetAggregateDirectArgs(expr Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // GetAggregateOrderBy returns the ORDER BY expressions of an aggregate.
-func GetAggregateOrderBy(expr Node) *NodeList {
-	if aggref, ok := expr.(*Aggref); ok {
-		return aggref.Aggorder
-	}
-	return nil
-}
+func GetAggregateOrderBy(expr Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // GetWindowFuncRef returns the window reference index from a WindowFunc.
-func GetWindowFuncRef(expr Node) Index {
-	if winFunc, ok := expr.(*WindowFunc); ok {
-		return winFunc.Winref
-	}
-	return 0
-}
+func GetWindowFuncRef(expr Node) Index { _ = "STUB: not implemented"; return *new(Index) }
 
 // IsSimpleWindowAgg checks if a WindowFunc is a simple aggregate.
-func IsSimpleWindowAgg(expr Node) bool {
-	if winFunc, ok := expr.(*WindowFunc); ok {
-		return winFunc.Winagg
-	}
-	return false
-}
+func IsSimpleWindowAgg(expr Node) bool { _ = "STUB: not implemented"; return false }
 
 // ==============================================================================
 // PHASE 1F: PRIMITIVE EXPRESSION COMPLETION PART 1
@@ -1592,40 +914,16 @@ type GroupingFunc struct {
 
 // NewGroupingFunc creates a new GroupingFunc node.
 func NewGroupingFunc(args *NodeList, refs, cols *NodeList, aggLevelsUp Index, location int) *GroupingFunc {
-	return &GroupingFunc{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_GroupingFunc, Loc: location}},
-		Args:        args,
-		Refs:        refs,
-		Cols:        cols,
-		AggLevelsUp: aggLevelsUp,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (g *GroupingFunc) ExpressionType() string {
-	return "GroupingFunc"
-}
+func (g *GroupingFunc) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (g *GroupingFunc) String() string {
-	argsCount := 0
-	if g.Args != nil {
-		argsCount = len(g.Args.Items)
-	}
-	return fmt.Sprintf("GroupingFunc{%d args, agglevelsup=%d}@%d", argsCount, g.AggLevelsUp, g.Location())
-}
+func (g *GroupingFunc) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of GroupingFunc
-func (g *GroupingFunc) SqlString() string {
-	if g.Args == nil || len(g.Args.Items) == 0 {
-		return "GROUPING()"
-	}
-
-	var argStrs []string
-	for _, arg := range g.Args.Items {
-		argStrs = append(argStrs, arg.SqlString())
-	}
-
-	return fmt.Sprintf("GROUPING(%s)", strings.Join(argStrs, ", "))
-}
+func (g *GroupingFunc) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // WindowFuncRunCondition represents a window function run condition
 // Ported from postgres/src/include/nodes/primnodes.h:596-609
@@ -1639,22 +937,13 @@ type WindowFuncRunCondition struct {
 
 // NewWindowFuncRunCondition creates a new WindowFuncRunCondition node.
 func NewWindowFuncRunCondition(opno, inputCollid Oid, wfuncLeft bool, arg Expression, location int) *WindowFuncRunCondition {
-	return &WindowFuncRunCondition{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_WindowFuncRunCondition, Loc: location}},
-		Opno:        opno,
-		InputCollid: inputCollid,
-		WfuncLeft:   wfuncLeft,
-		Arg:         arg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (w *WindowFuncRunCondition) ExpressionType() string {
-	return "WindowFuncRunCondition"
-}
+func (w *WindowFuncRunCondition) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (w *WindowFuncRunCondition) String() string {
-	return fmt.Sprintf("WindowFuncRunCondition{opno=%d, left=%t}@%d", w.Opno, w.WfuncLeft, w.Location())
-}
+func (w *WindowFuncRunCondition) String() string { _ = "STUB: not implemented"; return "" }
 
 // MergeSupportFunc represents a merge support function
 // Ported from postgres/src/include/nodes/primnodes.h:628-635
@@ -1666,25 +955,16 @@ type MergeSupportFunc struct {
 
 // NewMergeSupportFunc creates a new MergeSupportFunc node.
 func NewMergeSupportFunc(msfType, msfCollid Oid, location int) *MergeSupportFunc {
-	return &MergeSupportFunc{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_MergeSupportFunc, Loc: location}},
-		MsfType:   msfType,
-		MsfCollid: msfCollid,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *MergeSupportFunc) ExpressionType() string {
-	return "MergeSupportFunc"
-}
+func (m *MergeSupportFunc) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (m *MergeSupportFunc) String() string {
-	return fmt.Sprintf("MergeSupportFunc{type=%d, collid=%d}@%d", m.MsfType, m.MsfCollid, m.Location())
-}
+func (m *MergeSupportFunc) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of MergeSupportFunc
-func (m *MergeSupportFunc) SqlString() string {
-	return "MERGE_ACTION()"
-}
+func (m *MergeSupportFunc) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NamedArgExpr represents a named argument expression
 // Ported from postgres/src/include/nodes/primnodes.h:787-795
@@ -1697,29 +977,19 @@ type NamedArgExpr struct {
 
 // NewNamedArgExpr creates a new NamedArgExpr node.
 func NewNamedArgExpr(arg Expression, name string, argNumber, location int) *NamedArgExpr {
-	return &NamedArgExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_NamedArgExpr, Loc: location}},
-		Arg:       arg,
-		Name:      name,
-		ArgNumber: argNumber,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (n *NamedArgExpr) ExpressionType() string {
-	return "NamedArgExpr"
-}
+func (n *NamedArgExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *NamedArgExpr) String() string {
-	return fmt.Sprintf("NamedArgExpr{name='%s', argnum=%d}@%d", n.Name, n.ArgNumber, n.Location())
-}
+func (n *NamedArgExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of NamedArgExpr
 func (n *NamedArgExpr) SqlString() string {
+	_ = "STUB: not implemented"
 	// Format as: name => value
-	if n.Arg != nil {
-		return fmt.Sprintf("%s => %s", QuoteIdentifier(n.Name), n.Arg.SqlString())
-	}
-	return QuoteIdentifier(n.Name) + " => NULL"
+	return ""
 }
 
 // CaseTestExpr represents a CASE test expression
@@ -1733,21 +1003,13 @@ type CaseTestExpr struct {
 
 // NewCaseTestExpr creates a new CaseTestExpr node.
 func NewCaseTestExpr(typeId Oid, typeMod int, collation Oid, location int) *CaseTestExpr {
-	return &CaseTestExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_CaseTestExpr, Loc: location}},
-		TypeId:    typeId,
-		TypeMod:   typeMod,
-		Collation: collation,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CaseTestExpr) ExpressionType() string {
-	return "CaseTestExpr"
-}
+func (c *CaseTestExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CaseTestExpr) String() string {
-	return fmt.Sprintf("CaseTestExpr{type=%d, typmod=%d, collation=%d}@%d", c.TypeId, c.TypeMod, c.Collation, c.Location())
-}
+func (c *CaseTestExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // MinMaxExpr represents a MIN/MAX expression
 // Ported from postgres/src/include/nodes/primnodes.h:1506-1517
@@ -1762,62 +1024,20 @@ type MinMaxExpr struct {
 
 // NewMinMaxExpr creates a new MinMaxExpr node.
 func NewMinMaxExpr(minMaxType, minMaxCollid, inputCollid Oid, op MinMaxOp, args *NodeList, location int) *MinMaxExpr {
-	return &MinMaxExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_MinMaxExpr, Loc: location}},
-		MinMaxType:   minMaxType,
-		MinMaxCollid: minMaxCollid,
-		InputCollid:  inputCollid,
-		Op:           op,
-		Args:         args,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *MinMaxExpr) ExpressionType() string {
-	return "MinMaxExpr"
-}
+func (m *MinMaxExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (m *MinMaxExpr) String() string {
-	opStr := "GREATEST"
-	if m.Op == IS_LEAST {
-		opStr = "LEAST"
-	}
-	argCount := 0
-	if m.Args != nil {
-		argCount = len(m.Args.Items)
-	}
-	return fmt.Sprintf("MinMaxExpr{%s, %d args}@%d", opStr, argCount, m.Location())
-}
+func (m *MinMaxExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of MinMaxExpr
-func (m *MinMaxExpr) SqlString() string {
-	var result strings.Builder
+func (m *MinMaxExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Write the function name
-	if m.Op == IS_LEAST {
-		result.WriteString("LEAST")
-	} else {
-		result.WriteString("GREATEST")
-	}
+// Write the function name
 
-	result.WriteString("(")
-
-	// Write the arguments
-	if m.Args != nil && len(m.Args.Items) > 0 {
-		for i, arg := range m.Args.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			if expr, ok := arg.(Expression); ok {
-				result.WriteString(expr.SqlString())
-			} else {
-				result.WriteString("<unknown>")
-			}
-		}
-	}
-
-	result.WriteString(")")
-	return result.String()
-}
+// Write the arguments
 
 // RowCompareExpr represents a row comparison expression
 // Ported from postgres/src/include/nodes/primnodes.h:1463-1474
@@ -1833,41 +1053,13 @@ type RowCompareExpr struct {
 
 // NewRowCompareExpr creates a new RowCompareExpr node.
 func NewRowCompareExpr(rctype RowCompareType, opnos, opfamilies, inputCollids []Oid, largs, rargs []Expression, location int) *RowCompareExpr {
-	return &RowCompareExpr{
-		BaseExpr:     BaseExpr{BaseNode: BaseNode{Tag: T_RowCompareExpr, Loc: location}},
-		Rctype:       rctype,
-		Opnos:        opnos,
-		Opfamilies:   opfamilies,
-		InputCollids: inputCollids,
-		Largs:        largs,
-		Rargs:        rargs,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RowCompareExpr) ExpressionType() string {
-	return "RowCompareExpr"
-}
+func (r *RowCompareExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (r *RowCompareExpr) String() string {
-	var opStr string
-	switch r.Rctype {
-	case ROWCOMPARE_LT:
-		opStr = "<"
-	case ROWCOMPARE_LE:
-		opStr = "<="
-	case ROWCOMPARE_EQ:
-		opStr = "="
-	case ROWCOMPARE_GE:
-		opStr = ">="
-	case ROWCOMPARE_GT:
-		opStr = ">"
-	case ROWCOMPARE_NE:
-		opStr = "<>"
-	default:
-		opStr = "?"
-	}
-	return fmt.Sprintf("RowCompareExpr{(%d) %s (%d)}@%d", len(r.Largs), opStr, len(r.Rargs), r.Location())
-}
+func (r *RowCompareExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SQLValueFunction represents parameterless functions with special grammar
 // Ported from postgres/src/include/nodes/primnodes.h:1553-1563
@@ -1880,86 +1072,16 @@ type SQLValueFunction struct {
 
 // NewSQLValueFunction creates a new SQLValueFunction node.
 func NewSQLValueFunction(op SQLValueFunctionOp, typ Oid, typeMod, location int) *SQLValueFunction {
-	return &SQLValueFunction{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_SQLValueFunction, Loc: location}},
-		Op:       op,
-		Type:     typ,
-		TypeMod:  typeMod,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *SQLValueFunction) ExpressionType() string {
-	return "SQLValueFunction"
-}
+func (s *SQLValueFunction) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (s *SQLValueFunction) String() string {
-	var opStr string
-	switch s.Op {
-	case SVFOP_CURRENT_DATE:
-		opStr = "CURRENT_DATE"
-	case SVFOP_CURRENT_TIME:
-		opStr = "CURRENT_TIME"
-	case SVFOP_CURRENT_TIMESTAMP:
-		opStr = "CURRENT_TIMESTAMP"
-	case SVFOP_LOCALTIME:
-		opStr = "LOCALTIME"
-	case SVFOP_LOCALTIMESTAMP:
-		opStr = "LOCALTIMESTAMP"
-	case SVFOP_CURRENT_ROLE:
-		opStr = "CURRENT_ROLE"
-	case SVFOP_CURRENT_USER:
-		opStr = "CURRENT_USER"
-	case SVFOP_USER:
-		opStr = "USER"
-	case SVFOP_SESSION_USER:
-		opStr = "SESSION_USER"
-	case SVFOP_CURRENT_CATALOG:
-		opStr = "CURRENT_CATALOG"
-	case SVFOP_CURRENT_SCHEMA:
-		opStr = "CURRENT_SCHEMA"
-	default:
-		opStr = "UNKNOWN"
-	}
-	return fmt.Sprintf("SQLValueFunction{%s}@%d", opStr, s.Location())
-}
+func (s *SQLValueFunction) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of SQLValueFunction
-func (s *SQLValueFunction) SqlString() string {
-	switch s.Op {
-	case SVFOP_CURRENT_DATE:
-		return "CURRENT_DATE"
-	case SVFOP_CURRENT_TIME:
-		return "CURRENT_TIME"
-	case SVFOP_CURRENT_TIME_N:
-		return fmt.Sprintf("CURRENT_TIME(%d)", s.TypeMod)
-	case SVFOP_CURRENT_TIMESTAMP:
-		return "CURRENT_TIMESTAMP"
-	case SVFOP_CURRENT_TIMESTAMP_N:
-		return fmt.Sprintf("CURRENT_TIMESTAMP(%d)", s.TypeMod)
-	case SVFOP_LOCALTIME:
-		return "LOCALTIME"
-	case SVFOP_LOCALTIME_N:
-		return fmt.Sprintf("LOCALTIME(%d)", s.TypeMod)
-	case SVFOP_LOCALTIMESTAMP:
-		return "LOCALTIMESTAMP"
-	case SVFOP_LOCALTIMESTAMP_N:
-		return fmt.Sprintf("LOCALTIMESTAMP(%d)", s.TypeMod)
-	case SVFOP_CURRENT_ROLE:
-		return "CURRENT_ROLE"
-	case SVFOP_CURRENT_USER:
-		return "CURRENT_USER"
-	case SVFOP_USER:
-		return "USER"
-	case SVFOP_SESSION_USER:
-		return "SESSION_USER"
-	case SVFOP_CURRENT_CATALOG:
-		return "CURRENT_CATALOG"
-	case SVFOP_CURRENT_SCHEMA:
-		return "CURRENT_SCHEMA"
-	default:
-		return "UNKNOWN_VALUE_FUNCTION"
-	}
-}
+func (s *SQLValueFunction) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // XmlExpr represents various SQL/XML functions requiring special grammar
 // Ported from postgres/src/include/nodes/primnodes.h:1596-1618
@@ -1978,206 +1100,26 @@ type XmlExpr struct {
 
 // NewXmlExpr creates a new XmlExpr node.
 func NewXmlExpr(op XmlExprOp, name string, namedArgs, argNames, args *NodeList, xmloption XmlOptionType, indent bool, typ Oid, typeMod, location int) *XmlExpr {
-	return &XmlExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_XmlExpr, Loc: location}},
-		Op:        op,
-		Name:      name,
-		NamedArgs: namedArgs,
-		ArgNames:  argNames,
-		Args:      args,
-		Xmloption: xmloption,
-		Indent:    indent,
-		Type:      typ,
-		TypeMod:   typeMod,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (x *XmlExpr) ExpressionType() string {
-	return "XmlExpr"
-}
+func (x *XmlExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *XmlExpr) String() string {
-	var opStr string
-	switch x.Op {
-	case IS_XMLCONCAT:
-		opStr = "XMLCONCAT"
-	case IS_XMLELEMENT:
-		opStr = "XMLELEMENT"
-	case IS_XMLFOREST:
-		opStr = "XMLFOREST"
-	case IS_XMLPARSE:
-		opStr = "XMLPARSE"
-	case IS_XMLPI:
-		opStr = "XMLPI"
-	case IS_XMLROOT:
-		opStr = "XMLROOT"
-	case IS_XMLSERIALIZE:
-		opStr = "XMLSERIALIZE"
-	case IS_DOCUMENT:
-		opStr = "IS_DOCUMENT"
-	default:
-		opStr = "UNKNOWN"
-	}
-	argCount := 0
-	if x.Args != nil {
-		argCount = len(x.Args.Items)
-	}
-	return fmt.Sprintf("XmlExpr{%s, %d args}@%d", opStr, argCount, x.Location())
-}
+func (x *XmlExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of XmlExpr
-func (x *XmlExpr) SqlString() string {
-	var result strings.Builder
+func (x *XmlExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	switch x.Op {
-	case IS_XMLCONCAT:
-		result.WriteString("XMLCONCAT(")
-		if x.Args != nil {
-			for i, arg := range x.Args.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				if arg != nil {
-					result.WriteString(arg.SqlString())
-				}
-			}
-		}
-		result.WriteString(")")
+// NamedArgs hold the XMLATTRIBUTES (each a ResTarget rendering as
+// `value [AS name]`), which come right after the element name.
 
-	case IS_XMLELEMENT:
-		result.WriteString("XMLELEMENT(NAME ")
-		result.WriteString(QuoteIdentifier(x.Name))
-		// NamedArgs hold the XMLATTRIBUTES (each a ResTarget rendering as
-		// `value [AS name]`), which come right after the element name.
-		if x.NamedArgs != nil && len(x.NamedArgs.Items) > 0 {
-			result.WriteString(", XMLATTRIBUTES(")
-			for i, arg := range x.NamedArgs.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				if arg != nil {
-					result.WriteString(arg.SqlString())
-				}
-			}
-			result.WriteString(")")
-		}
-		if x.Args != nil && len(x.Args.Items) > 0 {
-			result.WriteString(", ")
-			for i, arg := range x.Args.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				if arg != nil {
-					result.WriteString(arg.SqlString())
-				}
-			}
-		}
-		result.WriteString(")")
+// Args are [xml, version, standalone]. The version is a NULL A_Const for
+// VERSION NO VALUE; the standalone is an integer A_Const holding an
+// XmlStandaloneType.
 
-	case IS_XMLFOREST:
-		result.WriteString("XMLFOREST(")
-		if x.NamedArgs != nil {
-			for i, arg := range x.NamedArgs.Items {
-				if i > 0 {
-					result.WriteString(", ")
-				}
-				if arg != nil {
-					result.WriteString(arg.SqlString())
-				}
-			}
-		}
-		result.WriteString(")")
-
-	case IS_XMLPARSE:
-		result.WriteString("XMLPARSE(")
-		switch x.Xmloption {
-		case XMLOPTION_DOCUMENT:
-			result.WriteString("DOCUMENT ")
-		case XMLOPTION_CONTENT:
-			result.WriteString("CONTENT ")
-		}
-		if x.Args != nil && len(x.Args.Items) > 0 && x.Args.Items[0] != nil {
-			result.WriteString(x.Args.Items[0].SqlString())
-		}
-		result.WriteString(")")
-
-	case IS_XMLPI:
-		result.WriteString("XMLPI(NAME ")
-		result.WriteString(QuoteIdentifier(x.Name))
-		if x.Args != nil && len(x.Args.Items) > 0 {
-			result.WriteString(", ")
-			result.WriteString(x.Args.Items[0].SqlString())
-		}
-		result.WriteString(")")
-
-	case IS_XMLROOT:
-		// Args are [xml, version, standalone]. The version is a NULL A_Const for
-		// VERSION NO VALUE; the standalone is an integer A_Const holding an
-		// XmlStandaloneType.
-		result.WriteString("XMLROOT(")
-		if x.Args != nil && len(x.Args.Items) > 0 {
-			result.WriteString(x.Args.Items[0].SqlString())
-			if len(x.Args.Items) > 1 && x.Args.Items[1] != nil {
-				result.WriteString(", VERSION ")
-				if ac, ok := x.Args.Items[1].(*A_Const); ok {
-					if _, isNull := ac.Val.(*Null); isNull {
-						result.WriteString("NO VALUE")
-					} else {
-						result.WriteString(x.Args.Items[1].SqlString())
-					}
-				} else {
-					result.WriteString(x.Args.Items[1].SqlString())
-				}
-			}
-			if len(x.Args.Items) > 2 {
-				if ac, ok := x.Args.Items[2].(*A_Const); ok {
-					if iv, ok := ac.Val.(*Integer); ok {
-						switch XmlStandaloneType(iv.IVal) {
-						case XML_STANDALONE_YES:
-							result.WriteString(", STANDALONE YES")
-						case XML_STANDALONE_NO:
-							result.WriteString(", STANDALONE NO")
-						case XML_STANDALONE_NO_VALUE:
-							result.WriteString(", STANDALONE NO VALUE")
-						}
-					}
-				}
-			}
-		}
-		result.WriteString(")")
-
-	case IS_XMLSERIALIZE:
-		result.WriteString("XMLSERIALIZE(")
-		switch x.Xmloption {
-		case XMLOPTION_DOCUMENT:
-			result.WriteString("DOCUMENT ")
-		case XMLOPTION_CONTENT:
-			result.WriteString("CONTENT ")
-		}
-		if x.Args != nil && len(x.Args.Items) > 0 && x.Args.Items[0] != nil {
-			result.WriteString(x.Args.Items[0].SqlString())
-		}
-		result.WriteString(" AS ")
-		// Type information would be in the Type field, but for basic implementation
-		// we'll just use a placeholder
-		result.WriteString("TEXT")
-		if x.Indent {
-			result.WriteString(" INDENT")
-		}
-		result.WriteString(")")
-
-	case IS_DOCUMENT:
-		if x.Args != nil && len(x.Args.Items) > 0 && x.Args.Items[0] != nil {
-			result.WriteString(x.Args.Items[0].SqlString())
-		}
-		result.WriteString(" IS DOCUMENT")
-
-	default:
-		result.WriteString("UNKNOWN_XML_EXPR")
-	}
-
-	return result.String()
-}
+// Type information would be in the Type field, but for basic implementation
+// we'll just use a placeholder
 
 // TableFunc represents a table function such as XMLTABLE and JSON_TABLE
 // Ported from postgres/src/include/nodes/primnodes.h:109-146
@@ -2203,38 +1145,13 @@ type TableFunc struct {
 
 // NewTableFunc creates a new TableFunc node.
 func NewTableFunc(functype TableFuncType, nsUris []Expression, nsNames []string, docexpr, rowexpr Expression, colnames []string, coltypes []Oid, coltypmods []int, colcollations []Oid, colexprs, coldefexprs, colvalexprs, passingvalexprs []Expression, notnulls []bool, plan Node, ordinalitycol, location int) *TableFunc {
-	return &TableFunc{
-		BaseNode:        BaseNode{Tag: T_TableFunc, Loc: location},
-		Functype:        functype,
-		NsUris:          nsUris,
-		NsNames:         nsNames,
-		Docexpr:         docexpr,
-		Rowexpr:         rowexpr,
-		Colnames:        colnames,
-		Coltypes:        coltypes,
-		Coltypmods:      coltypmods,
-		Colcollations:   colcollations,
-		Colexprs:        colexprs,
-		Coldefexprs:     coldefexprs,
-		Colvalexprs:     colvalexprs,
-		Passingvalexprs: passingvalexprs,
-		Notnulls:        notnulls,
-		Plan:            plan,
-		Ordinalitycol:   ordinalitycol,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (t *TableFunc) String() string {
-	funcStr := "XMLTABLE"
-	if t.Functype == TFT_JSON_TABLE {
-		funcStr = "JSON_TABLE"
-	}
-	return fmt.Sprintf("TableFunc{%s, %d cols}@%d", funcStr, len(t.Colnames), t.Location())
-}
+func (t *TableFunc) String() string { _ = "STUB: not implemented"; return "" }
 
-func (t *TableFunc) StatementType() string {
-	return "TABLE_FUNC"
-}
+func (t *TableFunc) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // IntoClause represents target information for SELECT INTO, CREATE TABLE AS, and CREATE MATERIALIZED VIEW
 // Ported from postgres/src/include/nodes/primnodes.h:158-171
@@ -2252,125 +1169,37 @@ type IntoClause struct {
 
 // NewIntoClause creates a new IntoClause node.
 func NewIntoClause(rel *RangeVar, colNames *NodeList, accessMethod string, options *NodeList, onCommit OnCommitAction, tableSpaceName string, viewQuery Node, skipData bool, location int) *IntoClause {
-	return &IntoClause{
-		BaseNode:       BaseNode{Tag: T_IntoClause, Loc: location},
-		Rel:            rel,
-		ColNames:       colNames,
-		AccessMethod:   accessMethod,
-		Options:        options,
-		OnCommit:       onCommit,
-		TableSpaceName: tableSpaceName,
-		ViewQuery:      viewQuery,
-		SkipData:       skipData,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (i *IntoClause) String() string {
-	var target string
-	if i.Rel != nil {
-		target = i.Rel.String()
-	} else {
-		target = "?"
-	}
-	return fmt.Sprintf("IntoClause{%s, skipData=%t}@%d", target, i.SkipData, i.Location())
-}
+func (i *IntoClause) String() string { _ = "STUB: not implemented"; return "" }
 
-func (i *IntoClause) StatementType() string {
-	return "INTO_CLAUSE"
-}
+func (i *IntoClause) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the IntoClause
 // TargetString returns just the target relation and column list without "INTO"
-func (i *IntoClause) TargetString() string {
-	if i.Rel == nil {
-		return ""
-	}
+func (i *IntoClause) TargetString() string { _ = "STUB: not implemented"; return "" }
 
-	var parts []string
+// Add the target relation
 
-	// Add the target relation
-	parts = append(parts, i.Rel.SqlString())
+// Add column names if specified
 
-	// Add column names if specified
-	if i.ColNames != nil && len(i.ColNames.Items) > 0 {
-		var colNames []string
-		for _, item := range i.ColNames.Items {
-			if str, ok := item.(*String); ok {
-				colNames = append(colNames, str.SVal)
-			}
-		}
-		if len(colNames) > 0 {
-			parts = append(parts, fmt.Sprintf("(%s)", strings.Join(colNames, ", ")))
-		}
-	}
+func (i *IntoClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	return strings.Join(parts, " ")
-}
+// Add persistence keywords if present
 
-func (i *IntoClause) SqlString() string {
-	if i.Rel == nil {
-		return ""
-	}
+// Add the target relation
 
-	parts := []string{"INTO"}
+// Add column names if specified
 
-	// Add persistence keywords if present
-	switch i.Rel.RelPersistence {
-	case RELPERSISTENCE_TEMP:
-		parts = append(parts, "TEMPORARY")
-	case RELPERSISTENCE_UNLOGGED:
-		parts = append(parts, "UNLOGGED")
-	}
+// Add WITH options if present
 
-	// Add the target relation
-	parts = append(parts, i.Rel.SqlString())
+// Add ON COMMIT clause
 
-	// Add column names if specified
-	if i.ColNames != nil && len(i.ColNames.Items) > 0 {
-		var colNames []string
-		for _, item := range i.ColNames.Items {
-			if str, ok := item.(*String); ok {
-				colNames = append(colNames, str.SVal)
-			}
-		}
-		if len(colNames) > 0 {
-			parts = append(parts, fmt.Sprintf("(%s)", strings.Join(colNames, ", ")))
-		}
-	}
+// Add TABLESPACE clause
 
-	// Add WITH options if present
-	if i.Options != nil && len(i.Options.Items) > 0 {
-		var opts []string
-		for _, opt := range i.Options.Items {
-			if opt != nil {
-				opts = append(opts, opt.SqlString())
-			}
-		}
-		parts = append(parts, "WITH", fmt.Sprintf("(%s)", strings.Join(opts, ", ")))
-	}
-
-	// Add ON COMMIT clause
-	switch i.OnCommit {
-	case ONCOMMIT_DROP:
-		parts = append(parts, "ON COMMIT DROP")
-	case ONCOMMIT_DELETE_ROWS:
-		parts = append(parts, "ON COMMIT DELETE ROWS")
-	case ONCOMMIT_PRESERVE_ROWS:
-		parts = append(parts, "ON COMMIT PRESERVE ROWS")
-	}
-
-	// Add TABLESPACE clause
-	if i.TableSpaceName != "" {
-		parts = append(parts, "TABLESPACE", QuoteIdentifier(i.TableSpaceName))
-	}
-
-	// Add WITH NO DATA if specified
-	if i.SkipData {
-		parts = append(parts, "WITH NO DATA")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add WITH NO DATA if specified
 
 // MergeAction represents a MERGE action
 // Ported from postgres/src/include/nodes/primnodes.h:2003-2013
@@ -2386,42 +1215,10 @@ type MergeAction struct {
 
 // NewMergeAction creates a new MergeAction node.
 func NewMergeAction(matchKind MergeMatchKind, commandType CmdType, override OverridingKind, qual Node, targetList []*TargetEntry, updateColnos []AttrNumber, location int) *MergeAction {
-	return &MergeAction{
-		BaseNode:     BaseNode{Tag: T_MergeAction, Loc: location},
-		MatchKind:    matchKind,
-		CommandType:  commandType,
-		Override:     override,
-		Qual:         qual,
-		TargetList:   targetList,
-		UpdateColnos: updateColnos,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (m *MergeAction) String() string {
-	var matchStr, cmdStr string
-	switch m.MatchKind {
-	case MERGE_WHEN_MATCHED:
-		matchStr = "MATCHED"
-	case MERGE_WHEN_NOT_MATCHED_BY_SOURCE:
-		matchStr = "NOT MATCHED BY SOURCE"
-	case MERGE_WHEN_NOT_MATCHED_BY_TARGET:
-		matchStr = "NOT MATCHED BY TARGET"
-	default:
-		matchStr = "UNKNOWN"
-	}
-	switch m.CommandType {
-	case CMD_INSERT:
-		cmdStr = "INSERT"
-	case CMD_UPDATE:
-		cmdStr = "UPDATE"
-	case CMD_DELETE:
-		cmdStr = "DELETE"
-	default:
-		cmdStr = "DO NOTHING"
-	}
-	return fmt.Sprintf("MergeAction{%s %s, %d targets}@%d", matchStr, cmdStr, len(m.TargetList), m.Location())
-}
+func (m *MergeAction) String() string { _ = "STUB: not implemented"; return "" }
 
-func (m *MergeAction) StatementType() string {
-	return "MERGE_ACTION"
-}
+func (m *MergeAction) StatementType() string { _ = "STUB: not implemented"; return "" }

@@ -20,13 +20,8 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"strings"
 
 	"github.com/spf13/pflag"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/peer"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -36,9 +31,7 @@ var (
 	_ Authenticator = (*MtlsAuthPlugin)(nil)
 )
 
-func registerGRPCServerAuthMTLSFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&clientCertSubstrings, "grpc-auth-mtls-allowed-substrings", clientCertSubstrings, "List of substrings of at least one of the client certificate names (separated by colon).")
-}
+func registerGRPCServerAuthMTLSFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // MtlsAuthPlugin  implements static username/password authentication for grpc. It contains an array of username/passwords
 // that will be authorized to connect to the grpc server.
@@ -49,37 +42,18 @@ type MtlsAuthPlugin struct {
 // Authenticate implements Authenticator interface. This method will be used inside a middleware in grpc_server to authenticate
 // incoming requests.
 func (ma *MtlsAuthPlugin) Authenticate(ctx context.Context, fullMethod string) (context.Context, error) {
-	p, ok := peer.FromContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "no peer connection info")
-	}
-	tlsInfo, ok := p.AuthInfo.(credentials.TLSInfo)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "not connected via TLS")
-	}
-	for _, substring := range ma.clientCertSubstrings {
-		for _, cert := range tlsInfo.State.PeerCertificates {
-			if strings.Contains(cert.Subject.String(), substring) {
-				return ctx, nil
-			}
-		}
-	}
-	return nil, status.Errorf(codes.Unauthenticated, "client certificate not authorized")
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
 func mtlsAuthPluginInitializer() (Authenticator, error) {
-	mtlsAuthPlugin := &MtlsAuthPlugin{
-		clientCertSubstrings: strings.Split(clientCertSubstrings, ":"),
-	}
-	slog.Info("mtls auth plugin have initialized successfully with allowed client cert name substrings", "clientSubstrings", clientCertSubstrings)
-	return mtlsAuthPlugin, nil
+	_ = "STUB: not implemented"
+	return *new(Authenticator), nil
 }
 
 // ClientCertSubstrings returns the value of the
 // `--grpc-auth-mtls-allowed-substrings` flag.
-func ClientCertSubstrings() string {
-	return clientCertSubstrings
-}
+func ClientCertSubstrings() string { _ = "STUB: not implemented"; return "" }
 
 func init() {
 	if err := RegisterAuthPlugin("mtls", mtlsAuthPluginInitializer); err != nil {

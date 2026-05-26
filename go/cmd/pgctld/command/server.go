@@ -16,42 +16,22 @@ package command
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
-	"math"
-	"os"
-	"os/signal"
-	"path/filepath"
 	"sync"
-	"syscall"
-	"time"
 
-	"github.com/multigres/multigres/go/common/backup"
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/servenv"
 	"github.com/multigres/multigres/go/services/pgctld"
-	"github.com/multigres/multigres/go/tools/ctxutil"
 	"github.com/multigres/multigres/go/tools/executil"
-	"github.com/multigres/multigres/go/tools/retry"
 	"github.com/multigres/multigres/go/tools/viperutil"
 
 	"github.com/spf13/cobra"
-
-	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/multigres/multigres/go/pb/pgctldservice"
 )
 
 // intToInt32 safely converts int to int32 for protobuf fields.
 // Returns an error if value exceeds int32 range (should never happen for PIDs/ports).
-func intToInt32(v int) (int32, error) {
-	if v < math.MinInt32 || v > math.MaxInt32 {
-		return 0, fmt.Errorf("value %d exceeds int32 range", v)
-	}
-	return int32(v), nil
-}
+func intToInt32(v int) (int32, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // PgCtldServerCmd holds the server command configuration
 type PgCtldServerCmd struct {
@@ -63,150 +43,47 @@ type PgCtldServerCmd struct {
 }
 
 // AddServerCommand adds the server subcommand to the root command
-func AddServerCommand(root *cobra.Command, pc *PgCtlCommand) {
-	serverCmd := &PgCtldServerCmd{
-		pgCtlCmd:   pc,
-		grpcServer: servenv.NewGrpcServer(pc.reg),
-		senv:       servenv.NewServEnvWithConfig(pc.reg, pc.lg, pc.vc, pc.telemetry),
-		pgbackrestPort: viperutil.Configure(pc.reg, "pgbackrest-port", viperutil.Options[int]{
-			Default:  0,
-			FlagName: "pgbackrest-port",
-			Dynamic:  false,
-		}),
-		pgbackrestCertDir: viperutil.Configure(pc.reg, "pgbackrest-cert-dir", viperutil.Options[string]{
-			Default:  "",
-			FlagName: "pgbackrest-cert-dir",
-			Dynamic:  false,
-		}),
-	}
-	serverCmd.senv.InitServiceMap("grpc", constants.ServicePgctld)
-	root.AddCommand(serverCmd.createCommand())
-}
+func AddServerCommand(root *cobra.Command, pc *PgCtlCommand) { _ = "STUB: not implemented"; return }
 
 // validateServerFlags validates required flags for the server command
 func (s *PgCtldServerCmd) validateServerFlags(cmd *cobra.Command, args []string) error {
-	if err := s.senv.CobraPreRunE(cmd); err != nil {
-		return err
-	}
-	return s.pgCtlCmd.validateGlobalFlags(cmd, args)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *PgCtldServerCmd) createCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "server",
-		Short:   "Run pgctld as a gRPC server daemon",
-		Long:    `Run pgctld as a background gRPC server daemon to handle PostgreSQL management requests.`,
-		RunE:    s.runServer,
-		Args:    cobra.NoArgs,
-		PreRunE: s.validateServerFlags,
-	}
+func (s *PgCtldServerCmd) createCommand() *cobra.Command { _ = "STUB: not implemented"; return nil }
 
-	s.grpcServer.RegisterFlags(cmd.Flags())
-	// Don't register logger and viper config flags since they're already registered
-	// as persistent flags in the root command and we're sharing those instances
-	s.senv.RegisterFlagsWithoutLoggerAndConfig(cmd.Flags())
+// Don't register logger and viper config flags since they're already registered
+// as persistent flags in the root command and we're sharing those instances
 
-	// pgBackRest TLS server flags (server command only)
-	cmd.Flags().Int("pgbackrest-port", s.pgbackrestPort.Default(), "pgBackRest TLS server port")
-	cmd.Flags().String("pgbackrest-cert-dir", s.pgbackrestCertDir.Default(), "Directory containing ca.crt, pgbackrest.crt, pgbackrest.key")
-	viperutil.BindFlags(cmd.Flags(), s.pgbackrestPort, s.pgbackrestCertDir)
-
-	return cmd
-}
+// pgBackRest TLS server flags (server command only)
 
 func (s *PgCtldServerCmd) runServer(cmd *cobra.Command, args []string) error {
+	_ = "STUB: not implemented"
 	// TODO(dweitzman): Add ServiceInstanceID and Cell that relate to the multipooler this pgctld serves
-	if err := s.senv.Init(servenv.ServiceIdentity{
-		ServiceName: constants.ServicePgctld,
-	}); err != nil {
-		return fmt.Errorf("servenv init: %w", err)
-	}
-
-	// Get the configured logger
-	logger := s.senv.GetLogger()
-
-	// Start reaping orphaned children to prevent zombie processes.
-	// Only start when running as PID 1 (container init process). pg_ctl with -W
-	// forks a child that gets reparented to PID 1 on exit; without this reaper
-	// those children become zombies.
-	//
-	// When pgctld is NOT PID 1 (tests, CI, systemd), orphaned children are
-	// reparented to the system init — not pgctld — so the reaper is unnecessary.
-	// Starting it anyway races with cmd.Wait() in RPC handlers (initdb, pg_rewind)
-	// causing "waitid: no child processes" errors.
-	if os.Getpid() == 1 {
-		go reapOrphanedChildren(logger)
-	}
-
-	// Create and register our service
-	poolerDir := s.pgCtlCmd.GetPoolerDir()
-	pgbackrestPort := s.pgbackrestPort.Get()
-	pgbackrestCertDir := s.pgbackrestCertDir.Get()
-
-	pgctldConfig, err := s.pgCtlCmd.buildServiceConfig()
-	if err != nil {
-		return err
-	}
-
-	pgctldService, err := NewPgCtldService(
-		logger,
-		pgctldConfig,
-		s.pgCtlCmd.timeout.Get(),
-		poolerDir,
-		s.pgCtlCmd.pgListenAddresses.Get(),
-		pgbackrestPort,
-		pgbackrestCertDir,
-	)
-	if err != nil {
-		return err
-	}
-
-	// Register /ready probe: postgres socket accepting + gRPC accepting.
-	// Replication health is intentionally excluded (see pgctldReadyHandler).
-	pgSocketPath := filepath.Join(
-		pgctld.PostgresSocketDir(poolerDir),
-		fmt.Sprintf(".s.PGSQL.%d", s.pgCtlCmd.pgPort.Get()),
-	)
-	s.senv.RegisterReadyCheck(func() error {
-		if !unixSocketAccepting(pgSocketPath) {
-			return errors.New("postgres socket not accepting")
-		}
-		return nil
-	})
-
-	grpcSocketPath := s.grpcServer.SocketFile()
-	grpcBindAddress := s.grpcServer.BindAddress()
-	grpcPort := s.grpcServer.Port()
-
-	s.senv.RegisterReadyCheck(func() error {
-		if !grpcAccepting(grpcSocketPath, grpcBindAddress, grpcPort) {
-			return errors.New("grpc not accepting")
-		}
-		return nil
-	})
-
-	s.senv.OnRun(func() {
-		logger.Info("pgctld server starting up",
-			"grpc_port", s.grpcServer.Port(),
-			"http_port", s.senv.GetHTTPPort(),
-		)
-
-		// Start pgBackRest management
-		pgctldService.StartPgBackRestManagement()
-
-		// Register gRPC service with the global GRPCServer
-		if s.grpcServer.CheckServiceMap(constants.ServicePgctld, s.senv) {
-			pb.RegisterPgCtldServer(s.grpcServer.Server, pgctldService)
-		}
-	})
-
-	s.senv.OnClose(func() {
-		logger.Info("pgctld server shutting down")
-		pgctldService.Close()
-	})
-
-	return s.senv.RunDefault(s.grpcServer)
+	return nil
 }
+
+// Get the configured logger
+
+// Start reaping orphaned children to prevent zombie processes.
+// Only start when running as PID 1 (container init process). pg_ctl with -W
+// forks a child that gets reparented to PID 1 on exit; without this reaper
+// those children become zombies.
+//
+// When pgctld is NOT PID 1 (tests, CI, systemd), orphaned children are
+// reparented to the system init — not pgctld — so the reaper is unnecessary.
+// Starting it anyway races with cmd.Wait() in RPC handlers (initdb, pg_rewind)
+// causing "waitid: no child processes" errors.
+
+// Create and register our service
+
+// Register /ready probe: postgres socket accepting + gRPC accepting.
+// Replication health is intentionally excluded (see pgctldReadyHandler).
+
+// Start pgBackRest management
+
+// Register gRPC service with the global GRPCServer
 
 // reapOrphanedChildren handles SIGCHLD signals to reap zombie processes.
 // This is necessary because pg_ctl with -W flag creates child processes that get
@@ -215,23 +92,11 @@ func (s *PgCtldServerCmd) runServer(cmd *cobra.Command, args []string) error {
 //
 // The function runs in a goroutine and continuously waits for SIGCHLD signals,
 // then reaps all available zombie children using Wait4 with WNOHANG.
-func reapOrphanedChildren(logger *slog.Logger) {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGCHLD)
+func reapOrphanedChildren(logger *slog.Logger) { _ = "STUB: not implemented"; return }
 
-	for range sigCh {
-		// Reap all zombie children
-		for {
-			var status syscall.WaitStatus
-			pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
-			if err != nil || pid <= 0 {
-				// No more children to reap
-				break
-			}
-			logger.Debug("Reaped orphaned child process", "pid", pid, "status", status)
-		}
-	}
-}
+// Reap all zombie children
+
+// No more children to reap
 
 // PgCtldServiceConfig holds the PostgreSQL instance identity and initialization
 // parameters. These are the most commonly passed parameters and are grouped
@@ -275,9 +140,7 @@ type PgCtldService struct {
 }
 
 // pgbackrestServerConfigPath returns the path to the pgbackrest server config file.
-func (s *PgCtldService) pgbackrestServerConfigPath() string {
-	return filepath.Join(s.poolerDir, "pgbackrest", "pgbackrest-server.conf")
-}
+func (s *PgCtldService) pgbackrestServerConfigPath() string { _ = "STUB: not implemented"; return "" }
 
 // NewPgCtldService creates a new PgCtldService with validation
 func NewPgCtldService(
@@ -289,479 +152,170 @@ func NewPgCtldService(
 	pgbackrestPort int,
 	pgbackrestCertDir string,
 ) (*PgCtldService, error) {
+	_ = "STUB: not implemented"
 	// Validate essential parameters for service creation
 	// Note: We don't validate postgresDataDir or postgresConfigFile existence here
 	// because the server should be able to start even with uninitialized data directory
-	if poolerDir == "" {
-		return nil, errors.New("pooler-dir needs to be set")
-	}
-	if cfg.Port == 0 {
-		return nil, errors.New("pg-port needs to be set")
-	}
-	if cfg.User == "" {
-		return nil, errors.New("pg-user needs to be set")
-	}
-	if cfg.Database == "" {
-		return nil, errors.New("pg-database needs to be set")
-	}
-	if timeout == 0 {
-		return nil, errors.New("timeout needs to be set")
-	}
-	if listenAddresses == "" {
-		return nil, errors.New("listen-addresses needs to be set")
-	}
-	// cfg.Password emptiness is not re-checked here: production callers
-	// (runServer) populate it via PgCtlCommand.GetPostgresPassword, which
-	// returns an error when no password source is configured.
-
-	// Write a pgpass file and set PGPASSFILE so pgbackrest (archive-push runs as a
-	// postgres subprocess and inherits this process's environment) can authenticate
-	// against PostgreSQL without exposing the password in the process environment.
-	pgpassDir := filepath.Join(poolerDir, "pgbackrest")
-	if err := os.MkdirAll(pgpassDir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create pgbackrest directory: %w", err)
-	}
-	pgpassPath := filepath.Join(pgpassDir, "pgbackrest.pgpass")
-	pgpassContent := fmt.Sprintf("*:*:*:%s:%s\n", cfg.User, cfg.Password)
-	if err := os.WriteFile(pgpassPath, []byte(pgpassContent), 0o600); err != nil {
-		return nil, fmt.Errorf("failed to write pgbackrest pgpass file: %w", err)
-	}
-	if err := os.Setenv("PGPASSFILE", pgpassPath); err != nil {
-		return nil, fmt.Errorf("failed to set PGPASSFILE: %w", err)
-	}
-
-	// Create the PostgreSQL config once during service initialization
-	pgConfig, err := pgctld.NewPostgresCtlConfig(
-		cfg.Port,
-		cfg.User,
-		cfg.Database,
-		timeout,
-		pgctld.PostgresDataDir(),
-		pgctld.PostgresConfigFile(),
-		poolerDir,
-		listenAddresses,
-		pgctld.PostgresSocketDir(poolerDir),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create postgres config: %w", err)
-	}
-	pgConfig.Password = cfg.Password
-
-	// Generate pgbackrest-server.conf if pgbackrest port and cert dir provided
-	if pgbackrestPort > 0 && pgbackrestCertDir != "" {
-		configPath, err := backup.WriteServerConfig(backup.ServerConfigOpts{
-			PoolerDir:     poolerDir,
-			CertDir:       pgbackrestCertDir,
-			Port:          pgbackrestPort,
-			Pg1Port:       cfg.Port,
-			Pg1SocketPath: pgctld.PostgresSocketDir(poolerDir),
-			Pg1Path:       pgctld.PostgresDataDir(),
-			Pg1User:       cfg.User,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate pgbackrest-server.conf: %w", err)
-		}
-		logger.Info("Generated pgbackrest-server.conf", "path", configPath)
-	}
-
-	metrics, metricsErr := NewMetrics()
-	if metricsErr != nil {
-		logger.Warn("Failed to register pgctld metrics", "error", metricsErr)
-	}
-
-	//nolint:gocritic // Background context for pgBackRest lifecycle management
-	ctx, cancel := context.WithCancel(context.Background())
-
-	return &PgCtldService{
-		logger:     logger,
-		ctldConfig: cfg,
-		timeout:    timeout,
-		poolerDir:  poolerDir,
-		pgConfig:   pgConfig,
-		ctx:        ctx,
-		cancel:     cancel,
-		metrics:    metrics,
-		pgBackRestStatus: &pb.PgBackRestStatus{
-			Running: false,
-		},
-	}, nil
+	return nil, nil
 }
+
+// cfg.Password emptiness is not re-checked here: production callers
+// (runServer) populate it via PgCtlCommand.GetPostgresPassword, which
+// returns an error when no password source is configured.
+
+// Write a pgpass file and set PGPASSFILE so pgbackrest (archive-push runs as a
+// postgres subprocess and inherits this process's environment) can authenticate
+// against PostgreSQL without exposing the password in the process environment.
+
+// Create the PostgreSQL config once during service initialization
+
+// Generate pgbackrest-server.conf if pgbackrest port and cert dir provided
+
+//nolint:gocritic // Background context for pgBackRest lifecycle management
 
 // setPgBackRestStatus updates the pgBackRest status thread-safely and returns the current restart count
 func (s *PgCtldService) setPgBackRestStatus(running bool, errorMessage string, incrementRestart bool) int32 {
-	s.statusMu.Lock()
-	defer s.statusMu.Unlock()
-
-	if incrementRestart {
-		s.restartCount++
-	}
-
-	s.pgBackRestStatus.Running = running
-	s.pgBackRestStatus.ErrorMessage = errorMessage
-	s.pgBackRestStatus.RestartCount = s.restartCount
-
-	if running {
-		s.pgBackRestStatus.LastStarted = timestamppb.Now()
-	}
-
-	s.metrics.SetServerUp(running)
-	s.metrics.SetRestartCount(s.restartCount)
-
-	return s.restartCount
+	_ = "STUB: not implemented"
+	return 0
 }
 
 // getPgBackRestStatus returns a copy of the current status thread-safely
 func (s *PgCtldService) getPgBackRestStatus() *pb.PgBackRestStatus {
-	s.statusMu.RLock()
-	defer s.statusMu.RUnlock()
-
-	// Return a copy to avoid race conditions
-	return &pb.PgBackRestStatus{
-		Running:      s.pgBackRestStatus.Running,
-		ErrorMessage: s.pgBackRestStatus.ErrorMessage,
-		RestartCount: s.pgBackRestStatus.RestartCount,
-		LastStarted:  s.pgBackRestStatus.LastStarted,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Return a copy to avoid race conditions
 
 // Close shuts down the pgctld service gracefully
-func (s *PgCtldService) Close() {
-	s.logger.Info("Shutting down pgctld service")
+func (s *PgCtldService) Close() { _ = "STUB: not implemented"; return }
 
-	// Signal managePgBackRest goroutine to stop
-	s.cancel()
+// Signal managePgBackRest goroutine to stop
 
-	// Kill pgBackRest process if running
-	if s.pgBackRestCmd != nil {
-		s.logger.Info("Terminating pgBackRest server")
-		killCtx, killCancel := context.WithTimeout(ctxutil.Detach(s.ctx), 100*time.Millisecond)
-		_, _ = s.pgBackRestCmd.Stop(killCtx)
-		killCancel()
-	}
+// Kill pgBackRest process if running
 
-	// Wait for goroutines to fully exit
-	s.wg.Wait()
-	s.logger.Info("pgctld service shutdown complete")
-}
+// Wait for goroutines to fully exit
 
 // startPgBackRest starts the pgBackRest TLS server process
 // Returns the command on success, or error on failure
 func (s *PgCtldService) startPgBackRest(ctx context.Context) (*executil.Cmd, error) {
-	configPath := s.pgbackrestServerConfigPath()
-
-	// Verify config exists
-	if _, err := os.Stat(configPath); err != nil {
-		return nil, fmt.Errorf("pgbackrest-server.conf not found at %s: %w", configPath, err)
-	}
-
-	// Build command: pgbackrest server
-	// Note: Config is passed via PGBACKREST_CONFIG environment variable
-	cmd := executil.Command(ctx, "pgbackrest", "server")
-	cmd.AddEnv("PGBACKREST_CONFIG=" + configPath)
-
-	// Start the process
-	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("failed to start pgbackrest server: %w", err)
-	}
-
-	logPath := filepath.Join(s.poolerDir, "pgbackrest", "log")
-	s.logger.InfoContext(ctx, "pgBackRest TLS server started",
-		"pid", cmd.Process.Pid,
-		"config", configPath,
-		"logs", logPath)
-	return cmd, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Verify config exists
+
+// Build command: pgbackrest server
+// Note: Config is passed via PGBACKREST_CONFIG environment variable
+
+// Start the process
 
 // managePgBackRest manages the pgBackRest TLS server lifecycle with retry and restart logic
 func (s *PgCtldService) managePgBackRest(ctx context.Context) {
+	_ = "STUB: not implemented"
 	// Check if pgbackrest config exists before attempting to start
-	configPath := s.pgbackrestServerConfigPath()
-	if _, err := os.Stat(configPath); err != nil {
-		s.logger.InfoContext(ctx, "pgBackRest config not found, skipping pgBackRest server startup", "config_path", configPath)
-		s.setPgBackRestStatus(false, "config not found", false)
-		return
-	}
-
-	r := retry.New(1*time.Second, 10*time.Second)
-
-	for {
-		var cmd *executil.Cmd
-
-		// Try to start with retry policy (max 5 attempts)
-		for attempt, err := range r.Attempts(ctx) {
-			if err != nil {
-				// Context cancelled during startup - clean shutdown
-				s.setPgBackRestStatus(false, fmt.Sprintf("context cancelled: %v", err), false)
-				return
-			}
-			if attempt >= 4 {
-				s.setPgBackRestStatus(false, "failed after 5 attempts", false)
-				return
-			}
-
-			var startErr error
-			cmd, startErr = s.startPgBackRest(ctx)
-			if startErr == nil {
-				s.setPgBackRestStatus(true, "", false)
-				s.pgBackRestCmd = cmd
-				break // Success, exit retry loop
-			}
-			s.logger.WarnContext(ctx, "pgBackRest startup failed", "attempt", attempt+1, "error", startErr)
-		}
-
-		if cmd == nil {
-			// Failed to start after retries
-			return
-		}
-
-		// Wait for exit OR context cancellation
-		done := make(chan struct{})
-		go func() {
-			_ = cmd.Wait() // Ignore error - process exit is expected
-			close(done)
-		}()
-
-		select {
-		case <-done:
-			// Process exited, restart
-			currentCount := s.setPgBackRestStatus(false, "process exited, restarting", true)
-			s.logger.InfoContext(ctx, "pgBackRest exited, restarting", "restart_count", currentCount)
-
-		case <-ctx.Done():
-			// Shutdown requested, stop process
-			killCtx, cancel := context.WithTimeout(ctxutil.Detach(ctx), 5*time.Second)
-			_, _ = cmd.Stop(killCtx) // Ignore error - process may already be dead
-			cancel()
-			<-done // Wait for Wait() to complete
-			return
-		}
-	}
+	return
 }
+
+// Try to start with retry policy (max 5 attempts)
+
+// Context cancelled during startup - clean shutdown
+
+// Success, exit retry loop
+
+// Failed to start after retries
+
+// Wait for exit OR context cancellation
+
+// Ignore error - process exit is expected
+
+// Process exited, restart
+
+// Shutdown requested, stop process
+
+// Ignore error - process may already be dead
+
+// Wait for Wait() to complete
 
 // StartPgBackRestManagement begins pgBackRest management in background
-func (s *PgCtldService) StartPgBackRestManagement() {
-	s.wg.Go(func() {
-		s.managePgBackRest(s.ctx)
-	})
-}
+func (s *PgCtldService) StartPgBackRestManagement() { _ = "STUB: not implemented"; return }
 
 func (s *PgCtldService) Start(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC Start request", "port", req.Port)
-
-	// Check if data directory is initialized
-	if !pgctld.IsDataDirInitialized() {
-		dataDir := pgctld.PostgresDataDir()
-		return nil, fmt.Errorf("data directory not initialized: %s. Run 'pgctld init' first", dataDir)
-	}
-
-	// Use the pre-configured PostgreSQL config for start operation
-	result, err := StartPostgreSQLWithResult(s.logger, s.pgConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to start PostgreSQL: %w", err)
-	}
-
-	pid, err := intToInt32(result.PID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid PID: %w", err)
-	}
-
-	return &pb.StartResponse{
-		Pid:     pid,
-		Message: result.Message,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if data directory is initialized
+
+// Use the pre-configured PostgreSQL config for start operation
 
 func (s *PgCtldService) Stop(ctx context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC Stop request", "mode", req.Mode)
-
-	// Check if data directory is initialized
-	if !pgctld.IsDataDirInitialized() {
-		dataDir := pgctld.PostgresDataDir()
-		return nil, fmt.Errorf("data directory not initialized: %s. Run 'pgctld init' first", dataDir)
-	}
-
-	// Use the pre-configured PostgreSQL config for stop operation
-	result, err := StopPostgreSQLWithResult(s.logger, s.pgConfig, req.Mode)
-	if err != nil {
-		return nil, fmt.Errorf("failed to stop PostgreSQL: %w", err)
-	}
-
-	return &pb.StopResponse{
-		Message: result.Message,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if data directory is initialized
+
+// Use the pre-configured PostgreSQL config for stop operation
 
 func (s *PgCtldService) Restart(ctx context.Context, req *pb.RestartRequest) (*pb.RestartResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC Restart request", "mode", req.Mode, "port", req.Port, "as_standby", req.AsStandby)
-
-	// Check if data directory is initialized
-	if !pgctld.IsDataDirInitialized() {
-		dataDir := pgctld.PostgresDataDir()
-		return nil, fmt.Errorf("data directory not initialized: %s. Run 'pgctld init' first", dataDir)
-	}
-
-	// Use the pre-configured PostgreSQL config for restart operation
-	result, err := RestartPostgreSQLWithResult(s.logger, s.pgConfig, req.Mode, req.AsStandby)
-	if err != nil {
-		return nil, fmt.Errorf("failed to restart PostgreSQL: %w", err)
-	}
-
-	pid, err := intToInt32(result.PID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid PID: %w", err)
-	}
-
-	return &pb.RestartResponse{
-		Pid:     pid,
-		Message: result.Message,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if data directory is initialized
+
+// Use the pre-configured PostgreSQL config for restart operation
 
 func (s *PgCtldService) ReloadConfig(ctx context.Context, req *pb.ReloadConfigRequest) (*pb.ReloadConfigResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC ReloadConfig request")
-
-	// Check if data directory is initialized
-	if !pgctld.IsDataDirInitialized() {
-		dataDir := pgctld.PostgresDataDir()
-		return nil, fmt.Errorf("data directory not initialized: %s. Run 'pgctld init' first", dataDir)
-	}
-
-	// Use the pre-configured PostgreSQL config for reload operation
-	result, err := ReloadPostgreSQLConfigWithResult(s.logger, s.pgConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to reload PostgreSQL configuration: %w", err)
-	}
-
-	return &pb.ReloadConfigResponse{
-		Message: result.Message,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if data directory is initialized
+
+// Use the pre-configured PostgreSQL config for reload operation
 
 func (s *PgCtldService) Status(ctx context.Context, req *pb.StatusRequest) (*pb.StatusResponse, error) {
-	s.logger.DebugContext(ctx, "gRPC Status request")
-
-	// First check if data directory is initialized
-	if !pgctld.IsDataDirInitialized() {
-		port, err := intToInt32(s.ctldConfig.Port)
-		if err != nil {
-			return nil, fmt.Errorf("invalid port: %w", err)
-		}
-		return &pb.StatusResponse{
-			Status:           pb.ServerStatus_NOT_INITIALIZED,
-			DataDir:          pgctld.PostgresDataDir(),
-			Port:             port,
-			Message:          "Data directory is not initialized",
-			PgbackrestStatus: s.getPgBackRestStatus(),
-		}, nil
-	}
-
-	// Use the pre-configured PostgreSQL config for status operation
-	result, err := GetStatusWithResult(ctx, s.logger, s.pgConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get status: %w", err)
-	}
-
-	// Convert status string to protobuf enum
-	var status pb.ServerStatus
-	switch result.Status {
-	case statusStopped:
-		status = pb.ServerStatus_STOPPED
-	case statusRunning:
-		status = pb.ServerStatus_RUNNING
-	default:
-		status = pb.ServerStatus_STOPPED
-	}
-
-	pid, err := intToInt32(result.PID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid PID: %w", err)
-	}
-	port, err := intToInt32(result.Port)
-	if err != nil {
-		return nil, fmt.Errorf("invalid port: %w", err)
-	}
-
-	return &pb.StatusResponse{
-		Status:           status,
-		Pid:              pid,
-		Version:          result.Version,
-		Uptime:           durationpb.New(time.Duration(result.UptimeSeconds) * time.Second),
-		DataDir:          result.DataDir,
-		Port:             port,
-		Ready:            result.Ready,
-		Message:          result.Message,
-		PgbackrestStatus: s.getPgBackRestStatus(),
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *PgCtldService) Version(ctx context.Context, req *pb.VersionRequest) (*pb.VersionResponse, error) {
-	s.logger.DebugContext(ctx, "gRPC Version request")
-	result, err := GetVersionWithResult(ctx, s.pgConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get version: %w", err)
-	}
+// First check if data directory is initialized
 
-	return &pb.VersionResponse{
-		Version: result.Version,
-		Message: result.Message,
-	}, nil
+// Use the pre-configured PostgreSQL config for status operation
+
+// Convert status string to protobuf enum
+
+func (s *PgCtldService) Version(ctx context.Context, req *pb.VersionRequest) (*pb.VersionResponse, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *PgCtldService) InitDataDir(ctx context.Context, req *pb.InitDataDirRequest) (*pb.InitDataDirResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC InitDataDir request")
-
-	// Use the shared init function with detailed result
-	result, err := InitDataDirWithResult(s.logger, s.poolerDir, s.ctldConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize data directory: %w", err)
-	}
-
-	return &pb.InitDataDirResponse{
-		Message: result.Message,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Use the shared init function with detailed result
 
 func (s *PgCtldService) PgRewind(ctx context.Context, req *pb.PgRewindRequest) (*pb.PgRewindResponse, error) {
-	s.logger.InfoContext(ctx, "gRPC PgRewind request",
-		"source_host", req.GetSourceHost(),
-		"source_port", req.GetSourcePort(),
-		"dry_run", req.GetDryRun())
-
-	// Check if postgres is cleanly stopped before pg_rewind
-	// If not, try crash recovery - this is needed for rewind dry-run to work
-	// This check is best effort. It's not harmful to try the pg_rewind if
-	// crash recovery fails, the dry run is just unlikely to succeed in that case.
-	cleanlyStopped, err := isPostgresCleanlyStopped(ctx)
-	if err != nil {
-		s.logger.WarnContext(ctx, "Failed to check postgres state (continuing anyway)", "error", err)
-	} else if !cleanlyStopped {
-		// Try to run crash recovery.
-		// It's not harmful to do this if postgres is already running.
-		if err := runCrashRecovery(ctx, s.logger); err != nil {
-			s.logger.WarnContext(ctx, "Crash recovery failed (continuing anyway)", "error", err)
-		}
-	}
-
-	// Construct source server connection string (without password - will use PGPASSWORD env var)
-	// Include application_name if provided (used for replication identification)
-	// connect_timeout ensures pg_rewind fails fast if the source is not yet ready to accept
-	// connections (e.g. newly-promoted primary still in crash recovery), allowing the caller
-	// to retry rather than blocking for the OS TCP timeout.
-	sourceServer := fmt.Sprintf("host=%s port=%d user=%s dbname=postgres connect_timeout=5",
-		req.GetSourceHost(), req.GetSourcePort(), s.ctldConfig.User)
-	if req.GetApplicationName() != "" {
-		sourceServer = fmt.Sprintf("%s application_name=%s", sourceServer, req.GetApplicationName())
-	}
-
-	// Use the shared rewind function with detailed result, passing password separately
-	result, err := PgRewindWithResult(ctx, s.logger, sourceServer, s.ctldConfig.Password, req.GetDryRun(), req.GetExtraArgs())
-	if err != nil {
-		s.logger.ErrorContext(ctx, "pg_rewind output", "output", result.Output)
-		return nil, fmt.Errorf("failed to rewind PostgreSQL: %w", err)
-	}
-
-	return &pb.PgRewindResponse{
-		Message: result.Message,
-		Output:  result.Output,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if postgres is cleanly stopped before pg_rewind
+// If not, try crash recovery - this is needed for rewind dry-run to work
+// This check is best effort. It's not harmful to try the pg_rewind if
+// crash recovery fails, the dry run is just unlikely to succeed in that case.
+
+// Try to run crash recovery.
+// It's not harmful to do this if postgres is already running.
+
+// Construct source server connection string (without password - will use PGPASSWORD env var)
+// Include application_name if provided (used for replication identification)
+// connect_timeout ensures pg_rewind fails fast if the source is not yet ready to accept
+// connections (e.g. newly-promoted primary still in crash recovery), allowing the caller
+// to retry rather than blocking for the OS TCP timeout.
+
+// Use the shared rewind function with detailed result, passing password separately

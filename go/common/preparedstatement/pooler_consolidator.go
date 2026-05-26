@@ -15,8 +15,6 @@
 package preparedstatement
 
 import (
-	"fmt"
-	"strings"
 	"sync"
 )
 
@@ -40,46 +38,17 @@ type PoolerConsolidator struct {
 }
 
 // NewPoolerConsolidator creates a new PoolerConsolidator.
-func NewPoolerConsolidator() *PoolerConsolidator {
-	return &PoolerConsolidator{
-		stmts: make(map[string]string),
-	}
-}
+func NewPoolerConsolidator() *PoolerConsolidator { _ = "STUB: not implemented"; return nil }
 
 // CanonicalName returns a stable canonical name for the given query and param
 // types. If this (query, paramTypes) combination has been seen before, the
 // same name is returned. Otherwise a new unique name is generated.
 func (pc *PoolerConsolidator) CanonicalName(query string, paramTypes []uint32) string {
-	key := dedupKey(query, paramTypes)
-
-	pc.mu.Lock()
-	defer pc.mu.Unlock()
-
-	if name, ok := pc.stmts[key]; ok {
-		return name
-	}
-
-	name := fmt.Sprintf("ppstmt%d", pc.lastID)
-	pc.lastID++
-	pc.stmts[key] = name
-	return name
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // dedupKey builds a deduplication key from query text and param type OIDs.
 // The key is length-prefixed so that no query text can collide with the
 // separator/paramTypes suffix.
-func dedupKey(query string, paramTypes []uint32) string {
-	if len(paramTypes) == 0 {
-		return query
-	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "%d:", len(query))
-	b.WriteString(query)
-	for i, oid := range paramTypes {
-		if i > 0 {
-			b.WriteByte(',')
-		}
-		fmt.Fprintf(&b, "%d", oid)
-	}
-	return b.String()
-}
+func dedupKey(query string, paramTypes []uint32) string { _ = "STUB: not implemented"; return "" }

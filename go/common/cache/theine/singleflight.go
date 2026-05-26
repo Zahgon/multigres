@@ -22,11 +22,7 @@
 package theine
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
-	"runtime"
-	"runtime/debug"
 	"sync"
 	"sync/atomic"
 )
@@ -43,21 +39,13 @@ type panicError struct {
 }
 
 // Error implements error interface.
-func (p *panicError) Error() string {
-	return fmt.Sprintf("%v\n\n%s", p.value, p.stack)
-}
+func (p *panicError) Error() string { _ = "STUB: not implemented"; return "" }
 
-func newPanicError(v any) error {
-	stack := debug.Stack()
+func newPanicError(v any) error { _ = "STUB: not implemented"; return nil }
 
-	// The first line of the stack trace is of the form "goroutine N [status]:"
-	// but by the time the panic reaches Do the goroutine may no longer exist
-	// and its status will have changed. Trim out the misleading line.
-	if line := bytes.IndexByte(stack[:], '\n'); line >= 0 {
-		stack = stack[line+1:]
-	}
-	return &panicError{value: v, stack: stack}
-}
+// The first line of the stack trace is of the form "goroutine N [status]:"
+// but by the time the panic reaches Do the goroutine may no longer exist
+// and its status will have changed. Trim out the misleading line.
 
 // call is an in-flight or completed singleflight.Do call
 type call[V any] struct {
@@ -82,13 +70,7 @@ type Group[K comparable, V any] struct {
 	callPool sync.Pool
 }
 
-func NewGroup[K comparable, V any]() *Group[K, V] {
-	return &Group[K, V]{
-		callPool: sync.Pool{New: func() any {
-			return new(call[V])
-		}},
-	}
-}
+func NewGroup[K comparable, V any]() *Group[K, V] { _ = "STUB: not implemented"; return nil }
 
 // Result holds the results of Do, so they can be passed
 // on a channel.
@@ -104,93 +86,27 @@ type Result struct {
 // original to complete and receives the same results.
 // The return value shared indicates whether v was given to multiple callers.
 func (g *Group[K, V]) Do(key K, fn func() (V, error)) (v V, err error, shared bool) {
-	g.mu.Lock()
-	if g.m == nil {
-		g.m = make(map[K]*call[V])
-	}
-	if c, ok := g.m[key]; ok {
-		_ = c.dups.Add(1)
-		g.mu.Unlock()
-		c.wg.Wait()
-
-		var e *panicError
-		if errors.As(c.err, &e) {
-			panic(e)
-		} else if errors.Is(c.err, errGoexit) {
-			runtime.Goexit()
-		}
-		// assign value/err before put back to pool to avoid race
-		v = c.val
-		err = c.err
-		n := c.dups.Add(-1)
-		if n == 0 {
-			g.callPool.Put(c)
-		}
-		return v, err, true
-	}
-	c := g.callPool.Get().(*call[V])
-	defer func() {
-		n := c.dups.Add(-1)
-		if n == 0 {
-			g.callPool.Put(c)
-		}
-	}()
-	_ = c.dups.Add(1)
-	c.wg.Add(1)
-	g.m[key] = c
-	g.mu.Unlock()
-
-	g.doCall(c, key, fn)
-	return c.val, c.err, true
+	_ = "STUB: not implemented"
+	return *new(V), nil, false
 }
+
+// assign value/err before put back to pool to avoid race
 
 // doCall handles the single call for a key.
 func (g *Group[K, V]) doCall(c *call[V], key K, fn func() (V, error)) {
-	normalReturn := false
-	recovered := false
-
-	// use double-defer to distinguish panic from runtime.Goexit,
-	// more details see https://golang.org/cl/134395
-	defer func() {
-		// the given function invoked runtime.Goexit
-		if !normalReturn && !recovered {
-			c.err = errGoexit
-		}
-
-		g.mu.Lock()
-		defer g.mu.Unlock()
-		c.wg.Done()
-		if g.m[key] == c {
-			delete(g.m, key)
-		}
-
-		var e *panicError
-		if errors.As(c.err, &e) {
-			panic(e)
-		}
-	}()
-
-	func() {
-		defer func() {
-			if !normalReturn {
-				// Ideally, we would wait to take a stack trace until we've determined
-				// whether this is a panic or a runtime.Goexit.
-				//
-				// Unfortunately, the only way we can distinguish the two is to see
-				// whether the recover stopped the goroutine from terminating, and by
-				// the time we know that, the part of the stack trace relevant to the
-				// panic has been discarded.
-				if r := recover(); r != nil {
-					c.err = newPanicError(r)
-				}
-			}
-		}()
-
-		c.val, c.err = fn()
-		normalReturn = true
-	}()
-
-	if !normalReturn {
-		recovered = true
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// use double-defer to distinguish panic from runtime.Goexit,
+// more details see https://golang.org/cl/134395
+
+// the given function invoked runtime.Goexit
+
+// Ideally, we would wait to take a stack trace until we've determined
+// whether this is a panic or a runtime.Goexit.
+//
+// Unfortunately, the only way we can distinguish the two is to see
+// whether the recover stopped the goroutine from terminating, and by
+// the time we know that, the part of the stack trace relevant to the
+// panic has been discarded.

@@ -16,87 +16,31 @@ package cluster
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/multigres/multigres/go/provisioner"
 
 	"github.com/spf13/cobra"
 )
 
 // teardownAllServices stops all provisioned services using the provisioner's Teardown method
 func teardownAllServices(ctx context.Context, provisionerName string, configPaths []string, clean bool) error {
+	_ = "STUB: not implemented"
 	// Create provisioner instance
-	p, err := provisioner.GetProvisioner(provisionerName)
-	if err != nil {
-		return fmt.Errorf("failed to create provisioner '%s': %w", provisionerName, err)
-	}
-
-	// Let provisioner load its own configuration
-	if err := p.LoadConfig(configPaths); err != nil {
-		return fmt.Errorf("failed to load provisioner config: %w", err)
-	}
-
-	// Use the provisioner's teardown method
-	if err := p.Teardown(ctx, clean); err != nil {
-		return fmt.Errorf("failed to teardown services: %w", err)
-	}
-
 	return nil
 }
+
+// Let provisioner load its own configuration
+
+// Use the provisioner's teardown method
 
 // down handles the cluster down command
-func down(cmd *cobra.Command, args []string) error {
-	fmt.Println("Stopping Multigres cluster...")
+func down(cmd *cobra.Command, args []string) error { _ = "STUB: not implemented"; return nil }
 
-	// Get the clean flag
-	clean, err := cmd.Flags().GetBool("clean")
-	if err != nil {
-		return fmt.Errorf("failed to get clean flag: %w", err)
-	}
+// Get the clean flag
 
-	if clean {
-		fmt.Println("Warning: clean mode, all data for this local cluster will be deleted")
-	}
+// Get config paths from flags
 
-	// Get config paths from flags
-	configPaths, err := cmd.Flags().GetStringSlice("config-path")
-	if err != nil {
-		return fmt.Errorf("failed to get config-path flag: %w", err)
-	}
-	if len(configPaths) == 0 {
-		configPaths = []string{"."}
-	}
+// Load configuration to determine provisioner type
 
-	// Load configuration to determine provisioner type
-	config, configFile, err := LoadConfig(configPaths)
-	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w. Run 'multigres cluster init' first", err)
-	}
-
-	fmt.Printf("Using configuration from: %s\n", configFile)
-	fmt.Printf("Stopping cluster with provisioner: %s\n", config.Provisioner)
-
-	ctx := cmd.Context()
-
-	// Teardown all services using the provisioner
-	if err := teardownAllServices(ctx, config.Provisioner, configPaths, clean); err != nil {
-		return fmt.Errorf("failed to teardown services: %w", err)
-	}
-
-	fmt.Println("Multigres cluster stopped successfully!")
-	return nil
-}
+// Teardown all services using the provisioner
 
 // AddStopCommand adds the stop subcommand to the cluster command
-func AddStopCommand(clusterCmd *cobra.Command) {
-	stopCmd := &cobra.Command{
-		Use:   "stop",
-		Short: "Stop local cluster",
-		Long:  "Stop the local Multigres cluster. Use --clean to fully tear down all resources.",
-		RunE:  down,
-	}
-
-	stopCmd.Flags().Bool("clean", false, "Fully tear down all cluster resources")
-
-	clusterCmd.AddCommand(stopCmd)
-}
+func AddStopCommand(clusterCmd *cobra.Command) { _ = "STUB: not implemented"; return }

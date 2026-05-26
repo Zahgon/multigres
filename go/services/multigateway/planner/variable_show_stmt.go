@@ -28,12 +28,6 @@ func (p *Planner) planVariableShowStmt(
 	stmt *ast.VariableShowStmt,
 	conn *server.Conn,
 ) (*engine.Plan, error) {
-	if !isGatewayManagedVariable(stmt.Name) {
-		return p.planDefault(sql, stmt, conn)
-	}
-
-	p.logger.Debug("planning SHOW gateway-managed variable", "variable", stmt.Name)
-	primitive := engine.NewGatewayShowVariable(sql, stmt.Name)
-	plan := engine.NewPlan(sql, primitive)
-	return plan, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

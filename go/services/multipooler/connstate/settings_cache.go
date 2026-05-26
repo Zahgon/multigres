@@ -16,8 +16,6 @@ package connstate
 
 import (
 	"container/list"
-	"sort"
-	"strings"
 	"sync"
 )
 
@@ -54,113 +52,53 @@ type cacheEntry struct {
 
 // NewSettingsCache creates a new SettingsCache with the specified max size.
 // The maxSize must be > 0; the caller is responsible for providing a valid size.
-func NewSettingsCache(maxSize int) *SettingsCache {
-	return &SettingsCache{
-		cache:   make(map[SettingsCacheKey]*list.Element),
-		lru:     list.New(),
-		maxSize: maxSize,
-	}
-}
+func NewSettingsCache(maxSize int) *SettingsCache { _ = "STUB: not implemented"; return nil }
 
 // GetOrCreate returns a cached Settings for the given variables, or creates
 // and caches a new one if it doesn't exist. This ensures that the same
 // settings configuration always returns the same *Settings pointer.
 func (c *SettingsCache) GetOrCreate(vars map[string]string) *Settings {
-	if len(vars) == 0 {
-		return nil
-	}
-
-	// Generate a deterministic cache key from the vars
-	key := c.makeKey(vars)
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	// Check if already cached
-	if elem, ok := c.cache[key]; ok {
-		// Move to front (most recently used)
-		c.lru.MoveToFront(elem)
-		c.hits++
-		return elem.Value.(*cacheEntry).settings
-	}
-
-	// Create new Settings with a unique bucket number
-	c.misses++
-	c.bucketCounter++
-	s := NewSettings(vars, c.bucketCounter)
-
-	// Add to cache
-	entry := &cacheEntry{key: key, settings: s}
-	elem := c.lru.PushFront(entry)
-	c.cache[key] = elem
-
-	// Evict oldest if over capacity
-	for c.lru.Len() > c.maxSize {
-		oldest := c.lru.Back()
-		if oldest != nil {
-			c.lru.Remove(oldest)
-			delete(c.cache, oldest.Value.(*cacheEntry).key)
-		}
-	}
-
-	return s
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Generate a deterministic cache key from the vars
+
+// Check if already cached
+
+// Move to front (most recently used)
+
+// Create new Settings with a unique bucket number
+
+// Add to cache
+
+// Evict oldest if over capacity
 
 // makeKey generates a deterministic cache key from the settings variables.
 // The key is created by sorting the variable names and concatenating them.
 func (c *SettingsCache) makeKey(vars map[string]string) SettingsCacheKey {
+	_ = "STUB: not implemented"
 	// Sort keys for deterministic ordering
-	keys := make([]string, 0, len(vars))
-	for k := range vars {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	// Build key string: "key1=value1;key2=value2;..."
-	var b strings.Builder
-	for i, k := range keys {
-		if i > 0 {
-			b.WriteByte(';')
-		}
-		b.WriteString(k)
-		b.WriteByte('=')
-		b.WriteString(vars[k])
-	}
-	return SettingsCacheKey(b.String())
+	return *new(SettingsCacheKey)
 }
+
+// Build key string: "key1=value1;key2=value2;..."
 
 // Size returns the number of cached settings.
-func (c *SettingsCache) Size() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return len(c.cache)
-}
+func (c *SettingsCache) Size() int { _ = "STUB: not implemented"; return 0 }
 
 // MaxSize returns the maximum number of settings that can be cached.
 func (c *SettingsCache) MaxSize() int {
-	return c.maxSize
+	_ = "STUB: not implemented"
+
+	// Hits returns the number of cache hits.
+	return 0
 }
 
-// Hits returns the number of cache hits.
-func (c *SettingsCache) Hits() int64 {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.hits
-}
+func (c *SettingsCache) Hits() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Misses returns the number of cache misses.
-func (c *SettingsCache) Misses() int64 {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.misses
-}
+func (c *SettingsCache) Misses() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Clear removes all cached settings and resets metrics.
-func (c *SettingsCache) Clear() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.cache = make(map[SettingsCacheKey]*list.Element)
-	c.lru.Init()
-	c.hits = 0
-	c.misses = 0
-}
+func (c *SettingsCache) Clear() { _ = "STUB: not implemented"; return }

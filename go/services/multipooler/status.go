@@ -16,11 +16,8 @@
 package multipooler
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
-
-	"github.com/multigres/multigres/go/common/web"
 )
 
 // Link represents a link on the status page.
@@ -51,19 +48,6 @@ type Status struct {
 
 // handleIndex serves the index page
 func (mp *MultiPooler) handleIndex(w http.ResponseWriter, r *http.Request) {
-	mp.serverStatus.mu.Lock()
-	defer mp.serverStatus.mu.Unlock()
-
-	mp.serverStatus.Cell = mp.cell.Get()
-	mp.serverStatus.ServiceID = mp.serviceID.Get()
-	mp.serverStatus.Database = mp.database.Get()
-	mp.serverStatus.TableGroup = mp.tableGroup.Get()
-	mp.serverStatus.PgctldAddr = mp.pgctldAddr.Get()
-	mp.serverStatus.SocketFilePath = mp.socketFilePath.Get()
-	mp.serverStatus.TopoStatus = mp.ts.Status()
-	err := web.Templates.ExecuteTemplate(w, "pooler_index.html", &mp.serverStatus)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to execute template: %v", err), http.StatusInternalServerError)
-		return
-	}
+	_ = "STUB: not implemented"
+	return
 }

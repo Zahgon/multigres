@@ -34,10 +34,6 @@
 
 package parser
 
-import (
-	"sort"
-)
-
 // KeywordCategory represents the different categories of SQL keywords.
 // Ported from postgres/src/include/parser/kwlist.h
 type KeywordCategory int
@@ -582,17 +578,14 @@ func init() {
 // Returns the keyword info if found, nil otherwise.
 // Based on postgres/src/common/kwlookup.c:ScanKeywordLookup lines 37-85
 func LookupKeyword(name string) *KeywordInfo {
+	_ = "STUB: not implemented"
 	// Early termination for very long strings (PostgreSQL pattern)
 	// Most keywords are short, so this saves work on long identifiers
-	if len(name) > maxKeywordLength {
-		return nil
-	}
-
-	// PostgreSQL does ASCII-only case conversion for SQL99 compliance
-	// normalizeKeywordCase has a fast path for strings without uppercase letters
-	lowerName := normalizeKeywordCase(name)
-	return keywordLookupMap[lowerName]
+	return nil
 }
+
+// PostgreSQL does ASCII-only case conversion for SQL99 compliance
+// normalizeKeywordCase has a fast path for strings without uppercase letters
 
 // maxKeywordLength is the maximum length of any PostgreSQL keyword
 // Calculated from the Keywords slice - avoids checking impossibly long strings
@@ -601,81 +594,34 @@ const maxKeywordLength = 17 // "current_timestamp" is longest at 17 chars
 // normalizeKeywordCase performs PostgreSQL-style ASCII-only case normalization.
 // Based on postgres/src/common/kwlookup.c:75-76 (ch >= 'A' && ch <= 'Z' conversion)
 func normalizeKeywordCase(s string) string {
+	_ = "STUB: not implemented"
 	// Fast path: check if string contains any uppercase letters
-	hasUpper := false
-	for i := 0; i < len(s); i++ {
-		if s[i] >= 'A' && s[i] <= 'Z' {
-			hasUpper = true
-			break
-		}
-	}
-
-	// If no uppercase, return original string (avoid allocation)
-	if !hasUpper {
-		return s
-	}
-
-	// Need to convert case - create new string
-	result := make([]byte, len(s))
-	for i := 0; i < len(s); i++ {
-		ch := s[i]
-		if ch >= 'A' && ch <= 'Z' {
-			ch += 'a' - 'A' // PostgreSQL ASCII-only conversion
-		}
-		result[i] = ch
-	}
-	return string(result)
+	return ""
 }
+
+// If no uppercase, return original string (avoid allocation)
+
+// Need to convert case - create new string
+
+// PostgreSQL ASCII-only conversion
 
 // IsKeyword returns true if the given name is a SQL keyword.
 // Ported from postgres keyword lookup functionality
-func IsKeyword(name string) bool {
-	return LookupKeyword(name) != nil
-}
+func IsKeyword(name string) bool { _ = "STUB: not implemented"; return false }
 
 // IsReservedKeyword returns true if the given name is a reserved keyword.
 // Ported from postgres keyword categorization logic
-func IsReservedKeyword(name string) bool {
-	if kw := LookupKeyword(name); kw != nil {
-		return kw.Category == ReservedKeyword
-	}
-	return false
-}
+func IsReservedKeyword(name string) bool { _ = "STUB: not implemented"; return false }
 
 // GetKeywordNames returns a sorted slice of all keyword names.
 // Useful for debugging and testing.
-func GetKeywordNames() []string {
-	names := make([]string, len(Keywords))
-	for i, kw := range Keywords {
-		names[i] = kw.Name
-	}
-	sort.Strings(names)
-	return names
-}
+func GetKeywordNames() []string { _ = "STUB: not implemented"; return nil }
 
 // GetKeywordsByCategory returns all keywords in a specific category.
 func GetKeywordsByCategory(category KeywordCategory) []KeywordInfo {
-	var result []KeywordInfo
-	for _, kw := range Keywords {
-		if kw.Category == category {
-			result = append(result, kw)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // String returns the string representation of a KeywordCategory.
-func (kc KeywordCategory) String() string {
-	switch kc {
-	case UnreservedKeyword:
-		return "UNRESERVED_KEYWORD"
-	case ColNameKeyword:
-		return "COL_NAME_KEYWORD"
-	case TypeFuncNameKeyword:
-		return "TYPE_FUNC_NAME_KEYWORD"
-	case ReservedKeyword:
-		return "RESERVED_KEYWORD"
-	default:
-		return "UNKNOWN_KEYWORD_CATEGORY"
-	}
-}
+func (kc KeywordCategory) String() string { _ = "STUB: not implemented"; return "" }

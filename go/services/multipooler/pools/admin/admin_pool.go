@@ -16,7 +16,6 @@ package admin
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/pgprotocol/client"
 	"github.com/multigres/multigres/go/services/multipooler/pools/connpool"
@@ -48,47 +47,28 @@ type Pool struct {
 // NewPool creates a new admin connection pool.
 // The context is used for background pool operations and OTel tracking.
 // The pool must be opened with Open() before use.
-func NewPool(ctx context.Context, config *PoolConfig) *Pool {
-	pool := connpool.NewPool[*Conn](ctx, config.ConnPoolConfig)
-
-	return &Pool{
-		pool:   pool,
-		config: config,
-	}
-}
+func NewPool(ctx context.Context, config *PoolConfig) *Pool { _ = "STUB: not implemented"; return nil }
 
 // Open opens the pool and starts background workers.
 // Must be called before using the pool.
-func (p *Pool) Open() {
-	connector := func(ctx context.Context, poolCtx context.Context) (*Conn, error) {
-		conn, err := client.Connect(ctx, poolCtx, p.config.ClientConfig)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create admin connection: %w", err)
-		}
-		return NewConn(conn), nil
-	}
-
-	p.pool.Open(connector, nil)
-}
+func (p *Pool) Open() { _ = "STUB: not implemented"; return }
 
 // Get acquires an admin connection from the pool.
 // The caller must call Recycle() on the returned PooledConn to return the connection.
 func (p *Pool) Get(ctx context.Context) (PooledConn, error) {
-	return p.pool.Get(ctx)
+	_ = "STUB: not implemented"
+	return *
+
+	// TerminateBackend terminates a backend process using pg_terminate_backend().
+	// This is a convenience method that handles getting/returning connections.
+	// Returns true if the backend was terminated, false if it was not found or
+	// the caller lacks permission.
+	new(PooledConn), nil
 }
 
-// TerminateBackend terminates a backend process using pg_terminate_backend().
-// This is a convenience method that handles getting/returning connections.
-// Returns true if the backend was terminated, false if it was not found or
-// the caller lacks permission.
 func (p *Pool) TerminateBackend(ctx context.Context, processID uint32) (bool, error) {
-	pooled, err := p.pool.Get(ctx)
-	if err != nil {
-		return false, err
-	}
-	defer pooled.Recycle()
-
-	return pooled.Conn.TerminateBackend(ctx, processID)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // CancelBackend cancels the current query on a backend process using pg_cancel_backend().
@@ -96,21 +76,19 @@ func (p *Pool) TerminateBackend(ctx context.Context, processID uint32) (bool, er
 // Returns true if the signal was sent, false if the backend was not found or
 // the caller lacks permission.
 func (p *Pool) CancelBackend(ctx context.Context, processID uint32) (bool, error) {
-	pooled, err := p.pool.Get(ctx)
-	if err != nil {
-		return false, err
-	}
-	defer pooled.Recycle()
-
-	return pooled.Conn.CancelBackend(ctx, processID)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // Close closes all connections in the pool.
 func (p *Pool) Close() {
-	p.pool.Close()
+	_ = "STUB: not implemented"
+
+	// Stats returns current pool statistics.
+	return
 }
 
-// Stats returns current pool statistics.
 func (p *Pool) Stats() connpool.PoolStats {
-	return p.pool.Stats()
+	_ = "STUB: not implemented"
+	return *new(connpool.PoolStats)
 }

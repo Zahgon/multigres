@@ -44,46 +44,18 @@ func (s *handlerSubSync) SyncSubscriptions(
 	subscribes, unsubscribes []string,
 	unsubscribeAll bool,
 ) {
-	notifCh := ensureNotifCh(state)
-
-	if unsubscribeAll {
-		s.notifMgr.UnsubscribeAll(notifCh)
-	}
-
-	for _, ch := range unsubscribes {
-		s.notifMgr.Unsubscribe(ch, notifCh)
-	}
-
-	for _, ch := range subscribes {
-		s.notifMgr.Subscribe(ch, notifCh)
-	}
-
-	// Start async notification pusher if we have listen channels and no pusher yet.
-	listenCount := len(state.GetListenChannels())
-	if listenCount > 0 && state.AsyncNotifCh == nil {
-		asyncCh := conn.EnableAsyncNotifications(ctx)
-		state.AsyncNotifCh = asyncCh
-		fwdCtx, cancel := context.WithCancel(ctx)
-		s.forwardCancel = cancel
-		go s.forwardNotifications(fwdCtx, notifCh, asyncCh)
-	}
-
-	// Stop async pusher and release notification channel if no more listen channels.
-	if listenCount == 0 && state.AsyncNotifCh != nil {
-		s.forwardCancel()
-		s.forwardCancel = nil
-		conn.StopAsyncNotifications()
-		state.AsyncNotifCh = nil
-		state.NotifCh = nil
-	}
+	_ = "STUB: not implemented"
+	return
 }
+
+// Start async notification pusher if we have listen channels and no pusher yet.
+
+// Stop async pusher and release notification channel if no more listen channels.
 
 // ensureNotifCh creates the notification channel for a connection if needed.
 func ensureNotifCh(state *MultiGatewayConnectionState) chan *sqltypes.Notification {
-	if state.NotifCh == nil {
-		state.NotifCh = make(chan *sqltypes.Notification, 256)
-	}
-	return state.NotifCh
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // forwardNotifications reads from the handler notifCh and forwards to the
@@ -93,23 +65,6 @@ func (s *handlerSubSync) forwardNotifications(
 	notifCh chan *sqltypes.Notification,
 	asyncCh chan<- *sqltypes.Notification,
 ) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case notif, ok := <-notifCh:
-			if !ok {
-				return
-			}
-			select {
-			case asyncCh <- notif:
-			default:
-				s.logger.WarnContext(ctx, "async notification channel full, dropping notification",
-					"channel", notif.Channel)
-				if s.onNotifDropped != nil {
-					s.onNotifDropped(ctx)
-				}
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }

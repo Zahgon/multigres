@@ -14,16 +14,6 @@
 
 package backup
 
-import (
-	"bytes"
-	"fmt"
-	"os"
-	"path/filepath"
-	"text/template"
-
-	"github.com/multigres/multigres/config"
-)
-
 // ClientConfigOpts holds options for generating pgbackrest.conf for client operations.
 type ClientConfigOpts struct {
 	PoolerDir     string // Base directory for pooler data
@@ -36,80 +26,20 @@ type ClientConfigOpts struct {
 // WriteClientConfig generates pgbackrest.conf for client operations (backup, restore, info).
 // Returns the path to the generated config file.
 func WriteClientConfig(opts ClientConfigOpts, backupCfg *Config) (string, error) {
-	pgbackrestDir := filepath.Join(opts.PoolerDir, "pgbackrest")
-	logPath := filepath.Join(pgbackrestDir, "log")
-	spoolPath := filepath.Join(pgbackrestDir, "spool")
-	lockPath := filepath.Join(pgbackrestDir, "lock")
-
-	// Create directories
-	for _, dir := range []string{pgbackrestDir, logPath, spoolPath, lockPath} {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
-		}
-	}
-
-	// Parse the template
-	tmpl, err := template.New("pgbackrest").Parse(config.PgBackRestConfigTmpl)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse pgbackrest config template: %w", err)
-	}
-
-	// Generate repo configuration
-	repoConfig, err := backupCfg.PgBackRestConfig("multigres")
-	if err != nil {
-		return "", fmt.Errorf("failed to generate pgBackRest config: %w", err)
-	}
-
-	// Get credentials if using environment credentials
-	repoCredentials, err := backupCfg.PgBackRestCredentials()
-	if err != nil {
-		return "", fmt.Errorf("failed to get pgBackRest credentials: %w", err)
-	}
-
-	// Prepare template data
-	templateData := struct {
-		LogPath   string
-		SpoolPath string
-		LockPath  string
-
-		RetentionConfig map[string]string
-		RepoConfig      map[string]string
-		RepoCredentials map[string]string
-
-		Pg1SocketPath string
-		Pg1Port       int
-		Pg1Path       string
-		Pg1User       string
-	}{
-		LogPath:   logPath,
-		SpoolPath: spoolPath,
-		LockPath:  lockPath,
-
-		RetentionConfig: DefaultRetentionConfig(),
-		RepoConfig:      repoConfig,
-		RepoCredentials: repoCredentials,
-
-		Pg1SocketPath: opts.Pg1SocketPath,
-		Pg1Port:       opts.Pg1Port,
-		Pg1Path:       opts.Pg1Path,
-		Pg1User:       opts.Pg1User,
-	}
-
-	// Execute template
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, templateData); err != nil {
-		return "", fmt.Errorf("failed to execute pgbackrest config template: %w", err)
-	}
-
-	// Write config with appropriate permissions
-	configPath := filepath.Join(pgbackrestDir, "pgbackrest.conf")
-	fileMode := os.FileMode(0o644)
-	if len(repoCredentials) > 0 {
-		fileMode = 0o600
-	}
-	if err := os.WriteFile(configPath, buf.Bytes(), fileMode); err != nil {
-		return "", fmt.Errorf("failed to write pgbackrest.conf: %w", err)
-	}
-
-	return configPath, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Create directories
+
+// Parse the template
+
+// Generate repo configuration
+
+// Get credentials if using environment credentials
+
+// Prepare template data
+
+// Execute template
+
+// Write config with appropriate permissions

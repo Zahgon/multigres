@@ -16,13 +16,7 @@ package executil
 
 import (
 	"context"
-	"errors"
 	"os"
-	"strings"
-	"syscall"
-	"time"
-
-	"github.com/multigres/multigres/go/tools/ctxutil"
 )
 
 // TerminateProcess sends SIGTERM to a process and waits for graceful exit.
@@ -37,10 +31,8 @@ import (
 // process than the currently-running one (e.g., orphaned processes, processes
 // from PID files, or processes discovered via OS APIs).
 func TerminateProcess(ctx context.Context, process *os.Process) bool {
-	if process == nil {
-		return true
-	}
-	return TerminatePID(ctx, process.Pid)
+	_ = "STUB: not implemented"
+	return false
 }
 
 // KillProcess sends SIGKILL to a process and waits for it to exit.
@@ -55,10 +47,8 @@ func TerminateProcess(ctx context.Context, process *os.Process) bool {
 // process than the currently-running one (e.g., orphaned processes, processes
 // from PID files, or processes discovered via OS APIs).
 func KillProcess(ctx context.Context, process *os.Process) (error, bool) {
-	if process == nil {
-		return nil, true
-	}
-	return KillPID(ctx, process.Pid)
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 // TerminatePID sends SIGTERM to a process by PID and waits for graceful exit.
@@ -72,24 +62,15 @@ func KillProcess(ctx context.Context, process *os.Process) (error, bool) {
 // Only use TerminatePID() when dealing with a process started by a different
 // process than the currently-running one (e.g., orphaned processes, processes
 // from PID files, or processes discovered via OS APIs).
-func TerminatePID(ctx context.Context, pid int) bool {
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		return true // Process doesn't exist
-	}
+func TerminatePID(ctx context.Context, pid int) bool { _ = "STUB: not implemented"; return false }
 
-	// Send SIGTERM
-	if err := process.Signal(syscall.SIGTERM); err != nil {
-		if isProcessGone(err) {
-			return true
-		}
-		// SIGTERM failed for unexpected reason - process state unknown
-		return false
-	}
+// Process doesn't exist
 
-	// Wait for process to exit or context timeout
-	return waitForProcessExit(ctx, process)
-}
+// Send SIGTERM
+
+// SIGTERM failed for unexpected reason - process state unknown
+
+// Wait for process to exit or context timeout
 
 // KillPID sends SIGKILL to a process by PID and waits for it to exit.
 //
@@ -103,26 +84,15 @@ func TerminatePID(ctx context.Context, pid int) bool {
 // process than the currently-running one (e.g., orphaned processes, processes
 // from PID files, or processes discovered via OS APIs).
 func KillPID(ctx context.Context, pid int) (error, bool) {
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		//nolint:nilerr // err means process doesn't exist, which is success for kill
-		return nil, true
-	}
-
-	// Send SIGKILL
-	if err := process.Kill(); err != nil {
-		if isProcessGone(err) {
-			return nil, true
-		}
-		return err, false
-	}
-
-	// Wait for process to exit
-	if waitForProcessExit(ctx, process) {
-		return nil, true
-	}
-	return ctx.Err(), false
+	_ = "STUB: not implemented"
+	return nil, false
 }
+
+//nolint:nilerr // err means process doesn't exist, which is success for kill
+
+// Send SIGKILL
+
+// Wait for process to exit
 
 // StopProcess gracefully stops a process: SIGTERM first, then SIGKILL if needed.
 //
@@ -135,10 +105,8 @@ func KillPID(ctx context.Context, pid int) (error, bool) {
 //
 // This is the recommended way to stop a process - always try graceful termination first.
 func StopProcess(ctx context.Context, process *os.Process) (error, bool) {
-	if process == nil {
-		return nil, true
-	}
-	return StopPID(ctx, process.Pid)
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 // StopPID gracefully stops a process by PID: SIGTERM first, then SIGKILL if needed.
@@ -152,35 +120,18 @@ func StopProcess(ctx context.Context, process *os.Process) (error, bool) {
 //
 // This is the recommended way to stop a process - always try graceful termination first.
 func StopPID(ctx context.Context, pid int) (error, bool) {
+	_ = "STUB: not implemented"
 	// Try SIGTERM with caller's timeout
-	exited := TerminatePID(ctx, pid)
-	if exited {
-		return nil, true
-	}
-
-	// SIGTERM didn't work, escalate to SIGKILL with fixed short timeout
-	// Fresh context for kill - parent context already expired
-	killCtx, killCancel := context.WithTimeout(ctxutil.Detach(ctx), 100*time.Millisecond)
-	defer killCancel()
-	return KillPID(killCtx, pid)
+	return nil, false
 }
+
+// SIGTERM didn't work, escalate to SIGKILL with fixed short timeout
+// Fresh context for kill - parent context already expired
 
 // isProcessGone returns true if the error indicates the process doesn't exist.
-func isProcessGone(err error) bool {
-	if err == nil {
-		return false
-	}
-	if errors.Is(err, os.ErrProcessDone) {
-		return true
-	}
-	if errors.Is(err, syscall.ESRCH) {
-		return true
-	}
-	// Fallback to string matching for edge cases
-	errMsg := err.Error()
-	return strings.Contains(errMsg, "no such process") ||
-		strings.Contains(errMsg, "process already finished")
-}
+func isProcessGone(err error) bool { _ = "STUB: not implemented"; return false }
+
+// Fallback to string matching for edge cases
 
 // waitForProcessExit polls until the process exits or context is done.
 // Returns true if process exited, false if context was cancelled/timed out.
@@ -188,25 +139,7 @@ func isProcessGone(err error) bool {
 // Uses exponential backoff starting at 1ms, doubling each time up to 100ms.
 // This responds quickly for fast exits while reducing CPU usage for slow exits.
 func waitForProcessExit(ctx context.Context, process *os.Process) bool {
+	_ = "STUB: not implemented"
 	// Check immediately before starting the timer
-	if err := process.Signal(syscall.Signal(0)); err != nil {
-		return true
-	}
-
-	delay, maxDelay := time.Millisecond, 100*time.Millisecond
-	timer := time.NewTimer(delay)
-	defer timer.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return false
-		case <-timer.C:
-			if err := process.Signal(syscall.Signal(0)); err != nil {
-				return true
-			}
-			delay = min(delay*2, maxDelay)
-			timer.Reset(delay)
-		}
-	}
+	return false
 }

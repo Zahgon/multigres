@@ -41,34 +41,19 @@ type Pooled[C Connection] struct {
 
 // Close closes the underlying connection.
 func (p *Pooled[C]) Close() {
-	p.Conn.Close()
+	_ = "STUB: not implemented"
+
+	// Recycle returns the connection to its pool.
+	// If the connection is closed, a new connection will be created to replace it.
+	// If the pool reference is nil, the connection is closed instead.
+	return
 }
 
-// Recycle returns the connection to its pool.
-// If the connection is closed, a new connection will be created to replace it.
-// If the pool reference is nil, the connection is closed instead.
-func (p *Pooled[C]) Recycle() {
-	switch {
-	case p.pool == nil:
-		p.Conn.Close()
-	case p.Conn.IsClosed():
-		p.pool.put(nil)
-	default:
-		p.pool.put(p)
-	}
-}
+func (p *Pooled[C]) Recycle() { _ = "STUB: not implemented"; return }
 
 // Taint marks this connection as unusable and removes it from the pool.
 // The connection will be closed and a new one created when recycled.
-func (p *Pooled[C]) Taint() {
-	if p.pool == nil {
-		return
-	}
-	p.pool.put(nil)
-	p.pool = nil
-}
+func (p *Pooled[C]) Taint() { _ = "STUB: not implemented"; return }
 
 // Settings returns the current settings of the connection from the underlying connection.
-func (p *Pooled[C]) Settings() *connstate.Settings {
-	return p.Conn.Settings()
-}
+func (p *Pooled[C]) Settings() *connstate.Settings { _ = "STUB: not implemented"; return nil }

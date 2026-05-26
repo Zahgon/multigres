@@ -24,15 +24,14 @@
 package multipoolerservice
 
 import (
+	sync "sync"
+
 	clustermetadata "github.com/multigres/multigres/go/pb/clustermetadata"
 	mtrpc "github.com/multigres/multigres/go/pb/mtrpc"
 	query "github.com/multigres/multigres/go/pb/query"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -87,31 +86,29 @@ var (
 	}
 )
 
-func (x ReservationReason) Enum() *ReservationReason {
-	p := new(ReservationReason)
-	*p = x
-	return p
-}
+func (x ReservationReason) Enum() *ReservationReason { _ = "STUB: not implemented"; return nil }
 
-func (x ReservationReason) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x ReservationReason) String() string { _ = "STUB: not implemented"; return "" }
 
 func (ReservationReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_multipoolerservice_proto_enumTypes[0].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (ReservationReason) Type() protoreflect.EnumType {
-	return &file_multipoolerservice_proto_enumTypes[0]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x ReservationReason) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use ReservationReason.Descriptor instead.
 func (ReservationReason) EnumDescriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // TransactionConclusion specifies how to conclude a transaction.
@@ -139,31 +136,29 @@ var (
 	}
 )
 
-func (x TransactionConclusion) Enum() *TransactionConclusion {
-	p := new(TransactionConclusion)
-	*p = x
-	return p
-}
+func (x TransactionConclusion) Enum() *TransactionConclusion { _ = "STUB: not implemented"; return nil }
 
-func (x TransactionConclusion) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x TransactionConclusion) String() string { _ = "STUB: not implemented"; return "" }
 
 func (TransactionConclusion) Descriptor() protoreflect.EnumDescriptor {
-	return file_multipoolerservice_proto_enumTypes[1].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (TransactionConclusion) Type() protoreflect.EnumType {
-	return &file_multipoolerservice_proto_enumTypes[1]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x TransactionConclusion) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use TransactionConclusion.Descriptor instead.
 func (TransactionConclusion) EnumDescriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Phase indicates which phase of the operation this message represents
@@ -193,30 +188,31 @@ var (
 )
 
 func (x CopyBidiExecuteRequest_Phase) Enum() *CopyBidiExecuteRequest_Phase {
-	p := new(CopyBidiExecuteRequest_Phase)
-	*p = x
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (x CopyBidiExecuteRequest_Phase) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x CopyBidiExecuteRequest_Phase) String() string { _ = "STUB: not implemented"; return "" }
 
 func (CopyBidiExecuteRequest_Phase) Descriptor() protoreflect.EnumDescriptor {
-	return file_multipoolerservice_proto_enumTypes[2].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (CopyBidiExecuteRequest_Phase) Type() protoreflect.EnumType {
-	return &file_multipoolerservice_proto_enumTypes[2]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x CopyBidiExecuteRequest_Phase) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use CopyBidiExecuteRequest_Phase.Descriptor instead.
 func (CopyBidiExecuteRequest_Phase) EnumDescriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{11, 0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Phase indicates which phase of the response this represents
@@ -248,30 +244,31 @@ var (
 )
 
 func (x CopyBidiExecuteResponse_Phase) Enum() *CopyBidiExecuteResponse_Phase {
-	p := new(CopyBidiExecuteResponse_Phase)
-	*p = x
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (x CopyBidiExecuteResponse_Phase) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
+func (x CopyBidiExecuteResponse_Phase) String() string { _ = "STUB: not implemented"; return "" }
 
 func (CopyBidiExecuteResponse_Phase) Descriptor() protoreflect.EnumDescriptor {
-	return file_multipoolerservice_proto_enumTypes[3].Descriptor()
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumDescriptor)
 }
 
 func (CopyBidiExecuteResponse_Phase) Type() protoreflect.EnumType {
-	return &file_multipoolerservice_proto_enumTypes[3]
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumType)
 }
 
 func (x CopyBidiExecuteResponse_Phase) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.EnumNumber)
 }
 
 // Deprecated: Use CopyBidiExecuteResponse_Phase.Descriptor instead.
 func (CopyBidiExecuteResponse_Phase) EnumDescriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{12, 0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ExecuteQueryRequest represents a request to execute a SQL query
@@ -290,68 +287,33 @@ type ExecuteQueryRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ExecuteQueryRequest) Reset() {
-	*x = ExecuteQueryRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ExecuteQueryRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ExecuteQueryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ExecuteQueryRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ExecuteQueryRequest) ProtoMessage() {}
+func (*ExecuteQueryRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ExecuteQueryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ExecuteQueryRequest.ProtoReflect.Descriptor instead.
 func (*ExecuteQueryRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *ExecuteQueryRequest) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
+func (x *ExecuteQueryRequest) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ExecuteQueryRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
+func (x *ExecuteQueryRequest) GetTarget() *query.Target { _ = "STUB: not implemented"; return nil }
 
-func (x *ExecuteQueryRequest) GetMaxRows() uint64 {
-	if x != nil {
-		return x.MaxRows
-	}
-	return 0
-}
+func (x *ExecuteQueryRequest) GetMaxRows() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ExecuteQueryRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
-	return nil
-}
+func (x *ExecuteQueryRequest) GetCallerId() *mtrpc.CallerID { _ = "STUB: not implemented"; return nil }
 
 func (x *ExecuteQueryRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -365,47 +327,30 @@ type ExecuteQueryResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ExecuteQueryResponse) Reset() {
-	*x = ExecuteQueryResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ExecuteQueryResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ExecuteQueryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ExecuteQueryResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ExecuteQueryResponse) ProtoMessage() {}
+func (*ExecuteQueryResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ExecuteQueryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ExecuteQueryResponse.ProtoReflect.Descriptor instead.
 func (*ExecuteQueryResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{1}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ExecuteQueryResponse) GetResult() *query.QueryResult {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ExecuteQueryResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -429,68 +374,36 @@ type StreamExecuteRequest struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *StreamExecuteRequest) Reset() {
-	*x = StreamExecuteRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamExecuteRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamExecuteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamExecuteRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamExecuteRequest) ProtoMessage() {}
+func (*StreamExecuteRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamExecuteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamExecuteRequest.ProtoReflect.Descriptor instead.
 func (*StreamExecuteRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{2}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *StreamExecuteRequest) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
+func (x *StreamExecuteRequest) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *StreamExecuteRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
+func (x *StreamExecuteRequest) GetTarget() *query.Target { _ = "STUB: not implemented"; return nil }
 
-func (x *StreamExecuteRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
-	return nil
-}
+func (x *StreamExecuteRequest) GetCallerId() *mtrpc.CallerID { _ = "STUB: not implemented"; return nil }
 
 func (x *StreamExecuteRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamExecuteRequest) GetReservationOptions() *query.ReservationOptions {
-	if x != nil {
-		return x.ReservationOptions
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -506,47 +419,30 @@ type StreamExecuteResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StreamExecuteResponse) Reset() {
-	*x = StreamExecuteResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamExecuteResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamExecuteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamExecuteResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamExecuteResponse) ProtoMessage() {}
+func (*StreamExecuteResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamExecuteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamExecuteResponse.ProtoReflect.Descriptor instead.
 func (*StreamExecuteResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{3}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *StreamExecuteResponse) GetResult() *query.QueryResultPayload {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamExecuteResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -572,75 +468,50 @@ type PortalStreamExecuteRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PortalStreamExecuteRequest) Reset() {
-	*x = PortalStreamExecuteRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PortalStreamExecuteRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PortalStreamExecuteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PortalStreamExecuteRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PortalStreamExecuteRequest) ProtoMessage() {}
+func (*PortalStreamExecuteRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PortalStreamExecuteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PortalStreamExecuteRequest.ProtoReflect.Descriptor instead.
 func (*PortalStreamExecuteRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{4}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *PortalStreamExecuteRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteRequest) GetPreparedStatement() *query.PreparedStatement {
-	if x != nil {
-		return x.PreparedStatement
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteRequest) GetPortal() *query.Portal {
-	if x != nil {
-		return x.Portal
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteRequest) GetPortalOptions() *PortalExecuteOptions {
-	if x != nil {
-		return x.PortalOptions
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -658,42 +529,24 @@ type PortalExecuteOptions struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *PortalExecuteOptions) Reset() {
-	*x = PortalExecuteOptions{}
-	mi := &file_multipoolerservice_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PortalExecuteOptions) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PortalExecuteOptions) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PortalExecuteOptions) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PortalExecuteOptions) ProtoMessage() {}
+func (*PortalExecuteOptions) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PortalExecuteOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PortalExecuteOptions.ProtoReflect.Descriptor instead.
 func (*PortalExecuteOptions) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{5}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *PortalExecuteOptions) GetIncludeDescribe() bool {
-	if x != nil {
-		return x.IncludeDescribe
-	}
-	return false
-}
+func (x *PortalExecuteOptions) GetIncludeDescribe() bool { _ = "STUB: not implemented"; return false }
 
 // PortalStreamExecuteResponse represents a response in the portal execution stream
 type PortalStreamExecuteResponse struct {
@@ -707,47 +560,30 @@ type PortalStreamExecuteResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PortalStreamExecuteResponse) Reset() {
-	*x = PortalStreamExecuteResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PortalStreamExecuteResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PortalStreamExecuteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PortalStreamExecuteResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PortalStreamExecuteResponse) ProtoMessage() {}
+func (*PortalStreamExecuteResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PortalStreamExecuteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PortalStreamExecuteResponse.ProtoReflect.Descriptor instead.
 func (*PortalStreamExecuteResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{6}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *PortalStreamExecuteResponse) GetResult() *query.QueryResultPayload {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PortalStreamExecuteResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -768,70 +604,32 @@ type DescribeRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DescribeRequest) Reset() {
-	*x = DescribeRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DescribeRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DescribeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DescribeRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DescribeRequest) ProtoMessage() {}
+func (*DescribeRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DescribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DescribeRequest.ProtoReflect.Descriptor instead.
-func (*DescribeRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{7}
-}
+func (*DescribeRequest) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *DescribeRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
+func (x *DescribeRequest) GetTarget() *query.Target { _ = "STUB: not implemented"; return nil }
 
 func (x *DescribeRequest) GetPreparedStatement() *query.PreparedStatement {
-	if x != nil {
-		return x.PreparedStatement
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *DescribeRequest) GetPortal() *query.Portal {
-	if x != nil {
-		return x.Portal
-	}
-	return nil
-}
+func (x *DescribeRequest) GetPortal() *query.Portal { _ = "STUB: not implemented"; return nil }
 
-func (x *DescribeRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
-	return nil
-}
+func (x *DescribeRequest) GetCallerId() *mtrpc.CallerID { _ = "STUB: not implemented"; return nil }
 
-func (x *DescribeRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
-	return nil
-}
+func (x *DescribeRequest) GetOptions() *query.ExecuteOptions { _ = "STUB: not implemented"; return nil }
 
 // DescribeResponse represents the response from describing a statement or portal
 type DescribeResponse struct {
@@ -842,40 +640,22 @@ type DescribeResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DescribeResponse) Reset() {
-	*x = DescribeResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DescribeResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DescribeResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DescribeResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DescribeResponse) ProtoMessage() {}
+func (*DescribeResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DescribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DescribeResponse.ProtoReflect.Descriptor instead.
-func (*DescribeResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{8}
-}
+func (*DescribeResponse) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *DescribeResponse) GetDescription() *query.StatementDescription {
-	if x != nil {
-		return x.Description
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -890,49 +670,26 @@ type GetAuthCredentialsRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetAuthCredentialsRequest) Reset() {
-	*x = GetAuthCredentialsRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetAuthCredentialsRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetAuthCredentialsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetAuthCredentialsRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetAuthCredentialsRequest) ProtoMessage() {}
+func (*GetAuthCredentialsRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetAuthCredentialsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetAuthCredentialsRequest.ProtoReflect.Descriptor instead.
 func (*GetAuthCredentialsRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{9}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetAuthCredentialsRequest) GetDatabase() string {
-	if x != nil {
-		return x.Database
-	}
-	return ""
-}
+func (x *GetAuthCredentialsRequest) GetDatabase() string { _ = "STUB: not implemented"; return "" }
 
-func (x *GetAuthCredentialsRequest) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
+func (x *GetAuthCredentialsRequest) GetUsername() string { _ = "STUB: not implemented"; return "" }
 
 // GetAuthCredentialsResponse represents the response containing authentication credentials.
 // Returns codes.NotFound if the user does not exist.
@@ -951,47 +708,27 @@ type GetAuthCredentialsResponse struct {
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *GetAuthCredentialsResponse) Reset() {
-	*x = GetAuthCredentialsResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *GetAuthCredentialsResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *GetAuthCredentialsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *GetAuthCredentialsResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*GetAuthCredentialsResponse) ProtoMessage() {}
+func (*GetAuthCredentialsResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *GetAuthCredentialsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use GetAuthCredentialsResponse.ProtoReflect.Descriptor instead.
 func (*GetAuthCredentialsResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{10}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *GetAuthCredentialsResponse) GetScramHash() string {
-	if x != nil {
-		return x.ScramHash
-	}
-	return ""
-}
+func (x *GetAuthCredentialsResponse) GetScramHash() string { _ = "STUB: not implemented"; return "" }
 
 func (x *GetAuthCredentialsResponse) GetIsReplicationRole() bool {
-	if x != nil {
-		return x.IsReplicationRole
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
@@ -1021,89 +758,48 @@ type CopyBidiExecuteRequest struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *CopyBidiExecuteRequest) Reset() {
-	*x = CopyBidiExecuteRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *CopyBidiExecuteRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *CopyBidiExecuteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *CopyBidiExecuteRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*CopyBidiExecuteRequest) ProtoMessage() {}
+func (*CopyBidiExecuteRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *CopyBidiExecuteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use CopyBidiExecuteRequest.ProtoReflect.Descriptor instead.
 func (*CopyBidiExecuteRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{11}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *CopyBidiExecuteRequest) GetPhase() CopyBidiExecuteRequest_Phase {
-	if x != nil {
-		return x.Phase
-	}
-	return CopyBidiExecuteRequest_INITIATE
+	_ = "STUB: not implemented"
+	return *new(CopyBidiExecuteRequest_Phase)
 }
 
-func (x *CopyBidiExecuteRequest) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
+func (x *CopyBidiExecuteRequest) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *CopyBidiExecuteRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
+func (x *CopyBidiExecuteRequest) GetTarget() *query.Target { _ = "STUB: not implemented"; return nil }
 
 func (x *CopyBidiExecuteRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *CopyBidiExecuteRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *CopyBidiExecuteRequest) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
+func (x *CopyBidiExecuteRequest) GetData() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *CopyBidiExecuteRequest) GetErrorMessage() string {
-	if x != nil {
-		return x.ErrorMessage
-	}
-	return ""
-}
+func (x *CopyBidiExecuteRequest) GetErrorMessage() string { _ = "STUB: not implemented"; return "" }
 
 func (x *CopyBidiExecuteRequest) GetReservationOptions() *query.ReservationOptions {
-	if x != nil {
-		return x.ReservationOptions
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1132,84 +828,45 @@ type CopyBidiExecuteResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CopyBidiExecuteResponse) Reset() {
-	*x = CopyBidiExecuteResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *CopyBidiExecuteResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *CopyBidiExecuteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *CopyBidiExecuteResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*CopyBidiExecuteResponse) ProtoMessage() {}
+func (*CopyBidiExecuteResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *CopyBidiExecuteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use CopyBidiExecuteResponse.ProtoReflect.Descriptor instead.
 func (*CopyBidiExecuteResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{12}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *CopyBidiExecuteResponse) GetPhase() CopyBidiExecuteResponse_Phase {
-	if x != nil {
-		return x.Phase
-	}
-	return CopyBidiExecuteResponse_READY
+	_ = "STUB: not implemented"
+	return *new(CopyBidiExecuteResponse_Phase)
 }
 
 func (x *CopyBidiExecuteResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *CopyBidiExecuteResponse) GetFormat() int32 {
-	if x != nil {
-		return x.Format
-	}
-	return 0
-}
+func (x *CopyBidiExecuteResponse) GetFormat() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *CopyBidiExecuteResponse) GetColumnFormats() []int32 {
-	if x != nil {
-		return x.ColumnFormats
-	}
-	return nil
-}
+func (x *CopyBidiExecuteResponse) GetColumnFormats() []int32 { _ = "STUB: not implemented"; return nil }
 
-func (x *CopyBidiExecuteResponse) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
+func (x *CopyBidiExecuteResponse) GetData() []byte { _ = "STUB: not implemented"; return nil }
 
 func (x *CopyBidiExecuteResponse) GetResult() *query.QueryResult {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *CopyBidiExecuteResponse) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
+func (x *CopyBidiExecuteResponse) GetError() string { _ = "STUB: not implemented"; return "" }
 
 // ConcludeTransactionRequest represents a request to conclude a transaction on a reserved connection.
 // The connection may or may not be released back to the pool depending on whether there are
@@ -1245,75 +902,50 @@ type ConcludeTransactionRequest struct {
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *ConcludeTransactionRequest) Reset() {
-	*x = ConcludeTransactionRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConcludeTransactionRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConcludeTransactionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConcludeTransactionRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConcludeTransactionRequest) ProtoMessage() {}
+func (*ConcludeTransactionRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConcludeTransactionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConcludeTransactionRequest.ProtoReflect.Descriptor instead.
 func (*ConcludeTransactionRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{13}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ConcludeTransactionRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConcludeTransactionRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConcludeTransactionRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConcludeTransactionRequest) GetConclusion() TransactionConclusion {
-	if x != nil {
-		return x.Conclusion
-	}
-	return TransactionConclusion_TRANSACTION_CONCLUSION_UNSPECIFIED
+	_ = "STUB: not implemented"
+	return *new(TransactionConclusion)
 }
 
 func (x *ConcludeTransactionRequest) GetReleasePortalNames() []string {
-	if x != nil {
-		return x.ReleasePortalNames
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConcludeTransactionRequest) GetReleaseAllPortals() bool {
-	if x != nil {
-		return x.ReleaseAllPortals
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
@@ -1329,47 +961,30 @@ type ConcludeTransactionResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ConcludeTransactionResponse) Reset() {
-	*x = ConcludeTransactionResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ConcludeTransactionResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ConcludeTransactionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ConcludeTransactionResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ConcludeTransactionResponse) ProtoMessage() {}
+func (*ConcludeTransactionResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ConcludeTransactionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ConcludeTransactionResponse.ProtoReflect.Descriptor instead.
 func (*ConcludeTransactionResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{14}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ConcludeTransactionResponse) GetResult() *query.QueryResult {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ConcludeTransactionResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1388,54 +1003,32 @@ type DiscardTempTablesRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DiscardTempTablesRequest) Reset() {
-	*x = DiscardTempTablesRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DiscardTempTablesRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DiscardTempTablesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DiscardTempTablesRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DiscardTempTablesRequest) ProtoMessage() {}
+func (*DiscardTempTablesRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DiscardTempTablesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DiscardTempTablesRequest.ProtoReflect.Descriptor instead.
 func (*DiscardTempTablesRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{15}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *DiscardTempTablesRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
+func (x *DiscardTempTablesRequest) GetTarget() *query.Target { _ = "STUB: not implemented"; return nil }
 
 func (x *DiscardTempTablesRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *DiscardTempTablesRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1451,47 +1044,30 @@ type DiscardTempTablesResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DiscardTempTablesResponse) Reset() {
-	*x = DiscardTempTablesResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *DiscardTempTablesResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *DiscardTempTablesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *DiscardTempTablesResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*DiscardTempTablesResponse) ProtoMessage() {}
+func (*DiscardTempTablesResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *DiscardTempTablesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use DiscardTempTablesResponse.ProtoReflect.Descriptor instead.
 func (*DiscardTempTablesResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{16}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *DiscardTempTablesResponse) GetResult() *query.QueryResult {
-	if x != nil {
-		return x.Result
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *DiscardTempTablesResponse) GetReservedState() *query.ReservedState {
-	if x != nil {
-		return x.ReservedState
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1510,54 +1086,35 @@ type ReleaseReservedConnectionRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReleaseReservedConnectionRequest) Reset() {
-	*x = ReleaseReservedConnectionRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReleaseReservedConnectionRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReleaseReservedConnectionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReleaseReservedConnectionRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReleaseReservedConnectionRequest) ProtoMessage() {}
+func (*ReleaseReservedConnectionRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReleaseReservedConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReleaseReservedConnectionRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseReservedConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{17}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *ReleaseReservedConnectionRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ReleaseReservedConnectionRequest) GetCallerId() *mtrpc.CallerID {
-	if x != nil {
-		return x.CallerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *ReleaseReservedConnectionRequest) GetOptions() *query.ExecuteOptions {
-	if x != nil {
-		return x.Options
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1569,34 +1126,21 @@ type ReleaseReservedConnectionResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReleaseReservedConnectionResponse) Reset() {
-	*x = ReleaseReservedConnectionResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReleaseReservedConnectionResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReleaseReservedConnectionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReleaseReservedConnectionResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReleaseReservedConnectionResponse) ProtoMessage() {}
+func (*ReleaseReservedConnectionResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReleaseReservedConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReleaseReservedConnectionResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseReservedConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{18}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // StreamPoolerHealthRequest initiates a health stream from the multipooler.
@@ -1607,34 +1151,21 @@ type StreamPoolerHealthRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StreamPoolerHealthRequest) Reset() {
-	*x = StreamPoolerHealthRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamPoolerHealthRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamPoolerHealthRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamPoolerHealthRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamPoolerHealthRequest) ProtoMessage() {}
+func (*StreamPoolerHealthRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamPoolerHealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamPoolerHealthRequest.ProtoReflect.Descriptor instead.
 func (*StreamPoolerHealthRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{19}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // StreamPoolerHealthResponse contains the current health state of the multipooler.
@@ -1661,75 +1192,50 @@ type StreamPoolerHealthResponse struct {
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *StreamPoolerHealthResponse) Reset() {
-	*x = StreamPoolerHealthResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamPoolerHealthResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamPoolerHealthResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamPoolerHealthResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamPoolerHealthResponse) ProtoMessage() {}
+func (*StreamPoolerHealthResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamPoolerHealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamPoolerHealthResponse.ProtoReflect.Descriptor instead.
 func (*StreamPoolerHealthResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{20}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *StreamPoolerHealthResponse) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamPoolerHealthResponse) GetPoolerId() *clustermetadata.ID {
-	if x != nil {
-		return x.PoolerId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamPoolerHealthResponse) GetServingStatus() clustermetadata.PoolerServingStatus {
-	if x != nil {
-		return x.ServingStatus
-	}
-	return clustermetadata.PoolerServingStatus(0)
+	_ = "STUB: not implemented"
+	return *new(clustermetadata.PoolerServingStatus)
 }
 
 func (x *StreamPoolerHealthResponse) GetLeaderObservation() *LeaderObservation {
-	if x != nil {
-		return x.LeaderObservation
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamPoolerHealthResponse) GetRecommendedStalenessTimeout() *durationpb.Duration {
-	if x != nil {
-		return x.RecommendedStalenessTimeout
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *StreamPoolerHealthResponse) GetReplicationLagNs() int64 {
-	if x != nil {
-		return x.ReplicationLagNs
-	}
+	_ = "STUB: not implemented"
 	return 0
 }
 
@@ -1747,49 +1253,26 @@ type LeaderObservation struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LeaderObservation) Reset() {
-	*x = LeaderObservation{}
-	mi := &file_multipoolerservice_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *LeaderObservation) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *LeaderObservation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *LeaderObservation) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*LeaderObservation) ProtoMessage() {}
+func (*LeaderObservation) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *LeaderObservation) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use LeaderObservation.ProtoReflect.Descriptor instead.
-func (*LeaderObservation) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{21}
-}
+func (*LeaderObservation) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *LeaderObservation) GetLeaderId() *clustermetadata.ID {
-	if x != nil {
-		return x.LeaderId
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *LeaderObservation) GetLeaderTerm() int64 {
-	if x != nil {
-		return x.LeaderTerm
-	}
-	return 0
-}
+func (x *LeaderObservation) GetLeaderTerm() int64 { _ = "STUB: not implemented"; return 0 }
 
 // StreamNotificationsRequest subscribes to or unsubscribes from PG notification channels.
 type StreamNotificationsRequest struct {
@@ -1802,49 +1285,29 @@ type StreamNotificationsRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StreamNotificationsRequest) Reset() {
-	*x = StreamNotificationsRequest{}
-	mi := &file_multipoolerservice_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamNotificationsRequest) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamNotificationsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamNotificationsRequest) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamNotificationsRequest) ProtoMessage() {}
+func (*StreamNotificationsRequest) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamNotificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamNotificationsRequest.ProtoReflect.Descriptor instead.
 func (*StreamNotificationsRequest) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{22}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *StreamNotificationsRequest) GetTarget() *query.Target {
-	if x != nil {
-		return x.Target
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *StreamNotificationsRequest) GetChannels() []string {
-	if x != nil {
-		return x.Channels
-	}
-	return nil
-}
+func (x *StreamNotificationsRequest) GetChannels() []string { _ = "STUB: not implemented"; return nil }
 
 // StreamNotificationsResponse delivers a notification from the shared listener.
 type StreamNotificationsResponse struct {
@@ -1855,40 +1318,25 @@ type StreamNotificationsResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StreamNotificationsResponse) Reset() {
-	*x = StreamNotificationsResponse{}
-	mi := &file_multipoolerservice_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StreamNotificationsResponse) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StreamNotificationsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StreamNotificationsResponse) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StreamNotificationsResponse) ProtoMessage() {}
+func (*StreamNotificationsResponse) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StreamNotificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_multipoolerservice_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StreamNotificationsResponse.ProtoReflect.Descriptor instead.
 func (*StreamNotificationsResponse) Descriptor() ([]byte, []int) {
-	return file_multipoolerservice_proto_rawDescGZIP(), []int{23}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *StreamNotificationsResponse) GetNotification() *query.PgNotification {
-	if x != nil {
-		return x.Notification
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -2042,12 +1490,7 @@ var (
 	file_multipoolerservice_proto_rawDescData []byte
 )
 
-func file_multipoolerservice_proto_rawDescGZIP() []byte {
-	file_multipoolerservice_proto_rawDescOnce.Do(func() {
-		file_multipoolerservice_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_multipoolerservice_proto_rawDesc), len(file_multipoolerservice_proto_rawDesc)))
-	})
-	return file_multipoolerservice_proto_rawDescData
-}
+func file_multipoolerservice_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_multipoolerservice_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
 var file_multipoolerservice_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
@@ -2180,27 +1623,5 @@ var file_multipoolerservice_proto_depIdxs = []int32{
 	0,  // [0:55] is the sub-list for field type_name
 }
 
-func init() { file_multipoolerservice_proto_init() }
-func file_multipoolerservice_proto_init() {
-	if File_multipoolerservice_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multipoolerservice_proto_rawDesc), len(file_multipoolerservice_proto_rawDesc)),
-			NumEnums:      4,
-			NumMessages:   24,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_multipoolerservice_proto_goTypes,
-		DependencyIndexes: file_multipoolerservice_proto_depIdxs,
-		EnumInfos:         file_multipoolerservice_proto_enumTypes,
-		MessageInfos:      file_multipoolerservice_proto_msgTypes,
-	}.Build()
-	File_multipoolerservice_proto = out.File
-	file_multipoolerservice_proto_goTypes = nil
-	file_multipoolerservice_proto_depIdxs = nil
-}
+func init()                               { file_multipoolerservice_proto_init() }
+func file_multipoolerservice_proto_init() { _ = "STUB: not implemented"; return }

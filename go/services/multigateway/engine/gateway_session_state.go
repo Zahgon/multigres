@@ -16,10 +16,8 @@ package engine
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
@@ -66,12 +64,8 @@ type GatewaySessionState struct {
 // When isLocal is true, the value is treated as a transaction-local override
 // (SET LOCAL), cleared on COMMIT/ROLLBACK.
 func NewStatementTimeoutSet(sql string, statementTimeout time.Duration, isLocal bool) *GatewaySessionState {
-	return &GatewaySessionState{
-		sql:              sql,
-		variable:         "statement_timeout",
-		statementTimeout: statementTimeout,
-		isLocal:          isLocal,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewGatewaySessionStateReset creates a primitive that RESETs a
@@ -84,13 +78,8 @@ func NewStatementTimeoutSet(sql string, statementTimeout time.Duration, isLocal 
 // DEFAULT` (VAR_SET_DEFAULT) it must be false so the CommandTag is "SET",
 // matching PostgreSQL.
 func NewGatewaySessionStateReset(sql string, variable string, isLocal bool, isResetStmt bool) *GatewaySessionState {
-	return &GatewaySessionState{
-		sql:         sql,
-		variable:    variable,
-		isReset:     true,
-		isLocal:     isLocal,
-		isResetStmt: isResetStmt,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute applies the state mutation and sends the CommandComplete.
@@ -102,60 +91,35 @@ func (g *GatewaySessionState) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
+	_ = "STUB: not implemented"
 	// PostgreSQL returns "RESET" only for the literal `RESET var` statement.
 	// `SET [LOCAL] var TO DEFAULT` and all other SET forms return "SET", even
 	// though VAR_SET_DEFAULT shares semantics with RESET. Use isResetStmt
 	// (set by the planner from stmt.Kind == VAR_RESET) so the tag matches PG.
-	commandTag := "SET"
-	if g.isResetStmt {
-		commandTag = "RESET"
-	}
-
-	// SET LOCAL outside a transaction block is a no-op in PostgreSQL — it emits
-	// a WARNING with SQLSTATE 25P01 (no_active_sql_transaction) and the value is
-	// discarded immediately by the implicit-autocommit boundary. We mirror that
-	// here: skip the state mutation and surface the WARNING as a NoticeResponse.
-	// Without this guard, isLocalSet would persist for the lifetime of the
-	// connection because no COMMIT/ROLLBACK ever fires to clear it.
-	if g.isLocal && !conn.IsInTransaction() {
-		warning := mterrors.NewPgNotice("WARNING", "25P01",
-			"SET LOCAL can only be used in transaction blocks", "")
-		return callback(ctx, &sqltypes.Result{
-			CommandTag: commandTag,
-			Notices:    []*mterrors.PgDiagnostic{warning},
-		})
-	}
-
-	switch g.variable {
-	case "statement_timeout":
-		switch {
-		case g.isReset && g.isLocal:
-			// SET LOCAL var TO DEFAULT: install a transaction-scoped override
-			// equal to the server default so SHOW returns default during the
-			// transaction, but the session-level value (if any) is preserved
-			// and will be restored when ResetAllLocalGUCs fires at txn end.
-			state.SetLocalStatementTimeoutToDefault()
-		case g.isReset:
-			// RESET (or SET ... TO DEFAULT, non-LOCAL): clear both the
-			// session-level override and any active transaction-local override.
-			// Matches PostgreSQL: RESET inside a transaction with a prior
-			// SET LOCAL supersedes the LOCAL — effective value becomes the
-			// default (verified against PG 17).
-			state.ResetStatementTimeout()
-		case g.isLocal:
-			state.SetLocalStatementTimeout(g.statementTimeout)
-		default:
-			state.SetStatementTimeout(g.statementTimeout)
-		}
-	default:
-		// Unreachable: the planner validates the variable name before creating
-		// this primitive. If we get here, there's a code bug (new variable added
-		// to isGatewayManagedVariable but not here).
-		panic(fmt.Sprintf("BUG: unhandled gateway-managed variable %q in GatewaySessionState", g.variable))
-	}
-
-	return callback(ctx, &sqltypes.Result{CommandTag: commandTag})
+	return nil
 }
+
+// SET LOCAL outside a transaction block is a no-op in PostgreSQL — it emits
+// a WARNING with SQLSTATE 25P01 (no_active_sql_transaction) and the value is
+// discarded immediately by the implicit-autocommit boundary. We mirror that
+// here: skip the state mutation and surface the WARNING as a NoticeResponse.
+// Without this guard, isLocalSet would persist for the lifetime of the
+// connection because no COMMIT/ROLLBACK ever fires to clear it.
+
+// SET LOCAL var TO DEFAULT: install a transaction-scoped override
+// equal to the server default so SHOW returns default during the
+// transaction, but the session-level value (if any) is preserved
+// and will be restored when ResetAllLocalGUCs fires at txn end.
+
+// RESET (or SET ... TO DEFAULT, non-LOCAL): clear both the
+// session-level override and any active transaction-local override.
+// Matches PostgreSQL: RESET inside a transaction with a prior
+// SET LOCAL supersedes the LOCAL — effective value becomes the
+// default (verified against PG 17).
+
+// Unreachable: the planner validates the variable name before creating
+// this primitive. If we get here, there's a code bug (new variable added
+// to isGatewayManagedVariable but not here).
 
 // PortalStreamExecute satisfies the Primitive interface for the
 // extended-protocol path. Gateway-managed SET/RESET targets carry no
@@ -171,23 +135,26 @@ func (g *GatewaySessionState) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return g.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns empty string as this primitive doesn't target a tablegroup.
 func (g *GatewaySessionState) GetTableGroup() string {
+	_ = "STUB: not implemented"
+
+	// GetQuery returns empty string as this primitive doesn't execute a query.
 	return ""
 }
 
-// GetQuery returns empty string as this primitive doesn't execute a query.
 func (g *GatewaySessionState) GetQuery() string {
+	_ = "STUB: not implemented"
+
+	// String returns a description for logging/debugging.
 	return ""
 }
 
-// String returns a description for logging/debugging.
-func (g *GatewaySessionState) String() string {
-	return fmt.Sprintf("GatewaySessionState(%s)", g.sql)
-}
+func (g *GatewaySessionState) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure GatewaySessionState implements Primitive interface.
 var _ Primitive = (*GatewaySessionState)(nil)

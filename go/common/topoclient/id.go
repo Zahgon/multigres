@@ -15,9 +15,6 @@
 package topoclient
 
 import (
-	"fmt"
-	"strings"
-
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -25,38 +22,22 @@ import (
 // This function uses the generated name map to be resilient to refactors.
 // It's not specific to any single component type and can be used across the topology system.
 func ComponentTypeToString(component clustermetadatapb.ID_ComponentType) string {
+	_ = "STUB: not implemented"
 	// Use the generated name map for resilience - this automatically updates when the proto changes
-	if name, exists := clustermetadatapb.ID_ComponentType_name[int32(component)]; exists {
-		// Convert the generated name (e.g., "MULTIPOOLER") to lowercase for consistency
-		return strings.ToLower(name)
-	}
-	return "unknown"
+	return ""
 }
+
+// Convert the generated name (e.g., "MULTIPOOLER") to lowercase for consistency
 
 // ClusterIDString returns a string representation of the cluster ID in cell_name format.
 // Returns empty string if id is nil.
-func ClusterIDString(id *clustermetadatapb.ID) string {
-	if id == nil {
-		return ""
-	}
-	return fmt.Sprintf("%s_%s", id.Cell, id.Name)
-}
+func ClusterIDString(id *clustermetadatapb.ID) string { _ = "STUB: not implemented"; return "" }
 
 // SplitClusterID is the inverse of ClusterIDString. It splits the cell_name
 // encoding into its two parts. The encoding assumes cell names cannot contain
 // underscores, which matches the cluster's naming convention. Returns an error
 // for malformed input (missing separator, empty cell, or empty name).
 func SplitClusterID(s string) (cell, name string, err error) {
-	parts := strings.SplitN(s, "_", 2)
-	if len(parts) != 2 {
-		return "", "", fmt.Errorf("invalid cell_name format: %q (expected cell_name)", s)
-	}
-	cell, name = parts[0], parts[1]
-	if cell == "" {
-		return "", "", fmt.Errorf("invalid cell_name: cell cannot be empty in %q", s)
-	}
-	if name == "" {
-		return "", "", fmt.Errorf("invalid cell_name: name cannot be empty in %q", s)
-	}
-	return cell, name, nil
+	_ = "STUB: not implemented"
+	return "", "", nil
 }

@@ -20,17 +20,12 @@ package memorytopo
 import (
 	"context"
 	"errors"
-	"fmt"
-	"log/slog"
-	"math/rand/v2"
 	"regexp"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/multigres/multigres/go/common/topoclient"
-	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
 const (
@@ -109,32 +104,15 @@ type errorSpec struct {
 
 // Create is part of the topoclient.Factory interface.
 func (f *Factory) Create(cell, root string, serverAddrs []string) (topoclient.Conn, error) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if _, ok := f.cells[cell]; !ok {
-		return nil, topoclient.NewError(topoclient.NoNode, cell)
-	}
-	//  note (root, doesn't matter for the in memory topo, hence we don't use it).
-	return &conn{
-		factory:     f,
-		cell:        cell,
-		serverAddrs: serverAddrs,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(topoclient.Conn), nil
 }
+
+//  note (root, doesn't matter for the in memory topo, hence we don't use it).
 
 // SetError forces the given error to be returned from all calls and propagates
 // the error to all active watches.
-func (f *Factory) SetError(err error) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	f.err = err
-	if err != nil {
-		for _, node := range f.cells {
-			node.PropagateWatchError(err)
-		}
-	}
-}
+func (f *Factory) SetError(err error) { _ = "STUB: not implemented"; return }
 
 // func (f *Factory) GetCallStats() *stats.CountersWithMultiLabels {
 //	return f.callstats
@@ -143,17 +121,21 @@ func (f *Factory) SetError(err error) {
 // Lock blocks all requests to the topo and is exposed to allow tests to
 // simulate an unresponsive topo server
 func (f *Factory) Lock() {
-	f.mu.Lock()
+	_ = "STUB: not implemented"
+
+	// Unlock unblocks all requests to the topo and is exposed to allow tests to
+	// simulate an unresponsive topo server
+	return
 }
 
-// Unlock unblocks all requests to the topo and is exposed to allow tests to
-// simulate an unresponsive topo server
 func (f *Factory) Unlock() {
-	f.mu.Unlock()
+	_ = "STUB: not implemented"
+
+	// conn implements the topoclient.Conn interface. It remembers the cell and serverAddr,
+	// and points at the Factory that has all the data.
+	return
 }
 
-// conn implements the topoclient.Conn interface. It remembers the cell and serverAddr,
-// and points at the Factory that has all the data.
 type conn struct {
 	factory     *Factory
 	cell        string
@@ -165,23 +147,12 @@ var _ topoclient.Conn = (*conn)(nil)
 
 // dial returns immediately, unless the conn points to the sentinel
 // UnreachableServerAddr, in which case it will block until the context expires.
-func (c *conn) dial(ctx context.Context) error {
-	if c.closed.Load() {
-		return ErrConnectionClosed
-	}
-	for _, addr := range c.serverAddrs {
-		if addr == UnreachableServerAddr {
-			<-ctx.Done()
-		}
-	}
-
-	return ctx.Err()
-}
+func (c *conn) dial(ctx context.Context) error { _ = "STUB: not implemented"; return nil }
 
 // Close is part of the topoclient.Conn interface.
 func (c *conn) Close() error {
+	_ = "STUB: not implemented"
 	// c.factory.callstats.Add([]string{"Close"}, 1)
-	c.closed.Store(true)
 	return nil
 }
 
@@ -221,41 +192,17 @@ type node struct {
 	lockTTLTimer *time.Timer
 }
 
-func (n *node) isDirectory() bool {
-	return n.children != nil
-}
+func (n *node) isDirectory() bool { _ = "STUB: not implemented"; return false }
 
 // fullPath returns the full path of this node from the cell root.
 // It builds the path by walking up the parent chain.
-func (n *node) fullPath() string {
-	if n.parent == nil {
-		return ""
-	}
-	parts := []string{n.name}
-	for p := n.parent; p != nil && p.parent != nil; p = p.parent {
-		parts = append([]string{p.name}, parts...)
-	}
-	return strings.Join(parts, "/")
-}
+func (n *node) fullPath() string { _ = "STUB: not implemented"; return "" }
 
-func (n *node) recurseContents(callback func(n *node)) {
-	if n.isDirectory() {
-		for _, child := range n.children {
-			child.recurseContents(callback)
-		}
-	} else {
-		callback(n)
-	}
-}
+func (n *node) recurseContents(callback func(n *node)) { _ = "STUB: not implemented"; return }
 
 func (n *node) propagateRecursiveWatch(ev *topoclient.WatchDataRecursive) {
-	for parent := n.parent; parent != nil; parent = parent.parent {
-		for _, w := range parent.watches {
-			if w.recursive != nil {
-				w.recursive <- ev
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 var (
@@ -263,249 +210,111 @@ var (
 	nextWatchIndexMu sync.Mutex
 )
 
-func (n *node) addWatch(w watch) int {
-	nextWatchIndexMu.Lock()
-	defer nextWatchIndexMu.Unlock()
-	watchIndex := nextWatchIndex
-	nextWatchIndex++
-	n.watches[watchIndex] = w
-	return watchIndex
-}
+func (n *node) addWatch(w watch) int { _ = "STUB: not implemented"; return 0 }
 
 // PropagateWatchError propagates the given error to all watches on this node
 // and recursively applies to all children
-func (n *node) PropagateWatchError(err error) {
-	for _, ch := range n.watches {
-		if ch.contents == nil {
-			continue
-		}
-		ch.contents <- &topoclient.WatchData{
-			Err: err,
-		}
-	}
-
-	for _, c := range n.children {
-		c.PropagateWatchError(err)
-	}
-}
+func (n *node) PropagateWatchError(err error) { _ = "STUB: not implemented"; return }
 
 // CloseWatches closes all watch channels for the given path and its children.
 // This simulates what happens when etcd compacts history or a watch is forcibly cancelled.
 // It's useful for testing how clients handle watch channel closures.
-func (f *Factory) CloseWatches(cell, path string) {
-	f.Lock()
-	defer f.Unlock()
+func (f *Factory) CloseWatches(cell, path string) { _ = "STUB: not implemented"; return }
 
-	n := f.nodeByPath(cell, path)
-	if n == nil {
-		return
-	}
-
-	// Cancel all watches on this node and its children
-	var cancelWatches func(*node)
-	cancelWatches = func(node *node) {
-		for _, w := range node.watches {
-			if w.cancel != nil {
-				w.cancel()
-			}
-		}
-		for _, child := range node.children {
-			cancelWatches(child)
-		}
-	}
-	cancelWatches(n)
-}
+// Cancel all watches on this node and its children
 
 // AddCell dynamically registers a new cell in the in-memory topology.
 // This enables tests to simulate cells appearing after server startup,
 // e.g. when multiorch registers cells after multigateway has already started.
 func (f *Factory) AddCell(ctx context.Context, ts topoclient.Store, cell string) error {
-	f.mu.Lock()
-	f.cells[cell] = f.newDirectory(cell, nil)
-	f.mu.Unlock()
-
-	cellInfo := &clustermetadatapb.Cell{
-		Name:            cell,
-		ServerAddresses: []string{fmt.Sprintf("localhost:%d", 2379+len(f.cells))},
-		Root:            "/multigres/" + cell,
-	}
-	return ts.CreateCell(ctx, cell, cellInfo)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewServerAndFactory returns a new MemoryTopo and the backing factory for all
 // the cells. It will create one cell for each parameter passed in.  It will log.Exit out
 // in case of a problem.
 func NewServerAndFactory(ctx context.Context, cells ...string) (topoclient.Store, *Factory) {
-	return NewServerAndFactoryWithConfig(ctx, topoclient.NewDefaultTopoConfig(), cells...)
+	_ = "STUB: not implemented"
+	return *new(topoclient.Store), nil
 }
 
 // NewServerAndFactoryWithConfig is like NewServerAndFactory but allows specifying a custom TopoConfig.
 // This is useful for tests that need to customize lock timeouts.
 func NewServerAndFactoryWithConfig(ctx context.Context, config *topoclient.TopoConfig, cells ...string) (topoclient.Store, *Factory) {
-	f := &Factory{
-		cells:      make(map[string]*node),
-		generation: uint64(rand.Int64N(1 << 60)),
-		// callstats:       stats.NewCountersWithMultiLabels("", "", []string{"Call"}),
-		operationErrors: make(map[Operation][]errorSpec),
-	}
-	f.cells[topoclient.GlobalCell] = f.newDirectory(topoclient.GlobalCell, nil)
-
-	ts := topoclient.NewWithFactory(f, "" /*root*/, []string{""} /*serverAddrs*/, config)
-	for _, cell := range cells {
-		f.cells[cell] = f.newDirectory(cell, nil)
-		// Create cell with mock server addresses for testing
-		cellInfo := &clustermetadatapb.Cell{
-			Name:            cell,
-			ServerAddresses: []string{fmt.Sprintf("localhost:%d", 2379+len(f.cells))},
-			Root:            "/multigres/" + cell,
-		}
-		if err := ts.CreateCell(ctx, cell, cellInfo); err != nil {
-			slog.ErrorContext(ctx, "ts.CreateCellInfo failed", "cell", cell, "error", err)
-		}
-	}
-	return ts, f
+	_ = "STUB: not implemented"
+	return *new(topoclient.Store), nil
 }
+
+// callstats:       stats.NewCountersWithMultiLabels("", "", []string{"Call"}),
+
+/*root*/ /*serverAddrs*/
+
+// Create cell with mock server addresses for testing
 
 // NewServer returns the new server
 func NewServer(ctx context.Context, cells ...string) topoclient.Store {
-	store, _ := NewServerAndFactory(ctx, cells...)
-	return store
+	_ = "STUB: not implemented"
+	return *new(topoclient.Store)
 }
 
-func (f *Factory) getNextVersion() uint64 {
-	f.generation++
-	return f.generation
-}
+func (f *Factory) getNextVersion() uint64 { _ = "STUB: not implemented"; return 0 }
 
 func (f *Factory) newFile(name string, contents []byte, parent *node) *node {
-	return &node{
-		name:     name,
-		version:  f.getNextVersion(),
-		contents: contents,
-		parent:   parent,
-		watches:  make(map[int]watch),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (f *Factory) newDirectory(name string, parent *node) *node {
-	return &node{
-		name:     name,
-		version:  f.getNextVersion(),
-		children: make(map[string]*node),
-		parent:   parent,
-		watches:  make(map[int]watch),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (f *Factory) nodeByPath(cell, filePath string) *node {
-	n, ok := f.cells[cell]
-	if !ok {
-		return nil
-	}
+func (f *Factory) nodeByPath(cell, filePath string) *node { _ = "STUB: not implemented"; return nil }
 
-	parts := strings.SplitSeq(filePath, "/")
-	for part := range parts {
-		if part == "" {
-			// Skip empty parts, usually happens at the end.
-			continue
-		}
-		if n.children == nil {
-			// This is a file.
-			return nil
-		}
-		child, ok := n.children[part]
-		if !ok {
-			// Path doesn't exist.
-			return nil
-		}
-		n = child
-	}
-	return n
-}
+// Skip empty parts, usually happens at the end.
+
+// This is a file.
+
+// Path doesn't exist.
 
 func (f *Factory) getOrCreatePath(cell, filePath string) *node {
-	n, ok := f.cells[cell]
-	if !ok {
-		return nil
-	}
-
-	parts := strings.SplitSeq(filePath, "/")
-	for part := range parts {
-		if part == "" {
-			// Skip empty parts, usually happens at the end.
-			continue
-		}
-		if n.children == nil {
-			// This is a file.
-			return nil
-		}
-		child, ok := n.children[part]
-		if !ok {
-			// Path doesn't exist, create it.
-			child = f.newDirectory(part, n)
-			n.children[part] = child
-		}
-		n = child
-	}
-	return n
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Skip empty parts, usually happens at the end.
+
+// This is a file.
+
+// Path doesn't exist, create it.
 
 // recursiveDelete deletes a node and its parent directory if empty.
-func (f *Factory) recursiveDelete(n *node) {
-	parent := n.parent
-	if parent == nil {
-		return
-	}
-	delete(parent.children, n.name)
-	if len(parent.children) == 0 {
-		f.recursiveDelete(parent)
-	}
-}
+func (f *Factory) recursiveDelete(n *node) { _ = "STUB: not implemented"; return }
 
 func (f *Factory) AddOperationError(op Operation, pathPattern string, err error) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	f.operationErrors[op] = append(f.operationErrors[op], errorSpec{
-		op:          op,
-		pathPattern: regexp.MustCompile(pathPattern),
-		err:         err,
-		maxCalls:    0, // unlimited
-	})
+	_ = "STUB: not implemented"
+	return
 }
+
+// unlimited
 
 // AddOneTimeOperationError adds an error that will only be returned once
 func (f *Factory) AddOneTimeOperationError(op Operation, pathPattern string, err error) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	f.operationErrors[op] = append(f.operationErrors[op], errorSpec{
-		op:          op,
-		pathPattern: regexp.MustCompile(pathPattern),
-		err:         err,
-		maxCalls:    1, // only fail once
-	})
+	_ = "STUB: not implemented"
+	return
 }
+
+// only fail once
 
 // ClearOperationErrors clears all operation errors for testing purposes.
-func (f *Factory) ClearOperationErrors() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.operationErrors = make(map[Operation][]errorSpec)
-}
+func (f *Factory) ClearOperationErrors() { _ = "STUB: not implemented"; return }
 
 func (f *Factory) getOperationError(op Operation, path string) error {
-	specs := f.operationErrors[op]
-	for i, spec := range specs {
-		if spec.pathPattern.MatchString(path) {
-			// Check if this error should still be returned
-			if spec.maxCalls > 0 && spec.callCount >= spec.maxCalls {
-				continue
-			}
-			// Increment call count
-			f.operationErrors[op][i].callCount++
-			return spec.err
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Check if this error should still be returned
+
+// Increment call count

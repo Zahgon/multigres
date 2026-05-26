@@ -34,14 +34,8 @@ var errReplSyntax = errors.New("syntax error in replication command")
 // commands (BASE_BACKUP, TIMELINE_HISTORY, UPLOAD_MANIFEST, physical
 // START_REPLICATION) are intentionally unparseable in this implementation.
 func ParseReplicationCommand(input string) (ast.Stmt, error) {
-	l := newReplLexer(input)
-	if rc := replYyParse(l); rc != 0 && l.err == nil {
-		l.err = errReplSyntax
-	}
-	if l.err != nil {
-		return nil, l.err
-	}
-	return l.result, nil
+	_ = "STUB: not implemented"
+	return *new(ast.Stmt), nil
 }
 
 // IsReplicationCommand reports whether the first token of input is one of
@@ -49,18 +43,4 @@ func ParseReplicationCommand(input string) (ast.Stmt, error) {
 //
 // Mirrors PG's replication_scanner_is_replication_command
 // (postgres/src/backend/replication/repl_scanner.l:294-318).
-func IsReplicationCommand(input string) bool {
-	l := newReplLexer(input)
-	var lval replYySymType
-	switch l.Lex(&lval) {
-	case K_IDENTIFY_SYSTEM,
-		K_START_REPLICATION,
-		K_CREATE_REPLICATION_SLOT,
-		K_DROP_REPLICATION_SLOT,
-		K_ALTER_REPLICATION_SLOT,
-		K_READ_REPLICATION_SLOT,
-		K_SHOW:
-		return true
-	}
-	return false
-}
+func IsReplicationCommand(input string) bool { _ = "STUB: not implemented"; return false }

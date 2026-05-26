@@ -15,78 +15,35 @@
 
 package mterrors
 
-import (
-	"errors"
-	"fmt"
-	"io"
-	"log/slog"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	mtrpcpb "github.com/multigres/multigres/go/pb/mtrpc"
-)
-
 // This file contains functions to convert errors to and from gRPC codes.
 // Use these methods to return an error through gRPC and still
 // retain its code.
 
 // truncateError shortens errors because gRPC has a size restriction on them.
 func truncateError(err error) string {
+	_ = "STUB: not implemented"
 	// For more details see: https://github.com/grpc/grpc-go/issues/443
 	// The gRPC spec says "Clients may limit the size of Response-Headers,
 	// Trailers, and Trailers-Only, with a default of 8 KiB each suggested."
 	// Therefore, we assume 8 KiB minus some headroom.
-	GRPCErrorLimit := 8*1024 - 512
-	if len(err.Error()) <= GRPCErrorLimit {
-		return err.Error()
-	}
-	truncateInfo := "[...] [remainder of the error is truncated because gRPC has a size limit on errors.]"
-	truncatedErr := err.Error()[:GRPCErrorLimit]
-	return fmt.Sprintf("%v %v", truncatedErr, truncateInfo)
+	return ""
 }
 
 // ToGRPC returns an error as a gRPC error, with the appropriate error code.
 // If the error is a *PgDiagnostic, it includes the PgDiagnostic in the gRPC status details
 // so that all PostgreSQL error fields are preserved through the RPC.
-func ToGRPC(err error) error {
-	if err == nil {
-		return nil
-	}
+func ToGRPC(err error) error { _ = "STUB: not implemented"; return nil }
 
-	// Check if this is a PostgreSQL error
-	var diag *PgDiagnostic
-	if errors.As(err, &diag) {
-		// Create gRPC status with RPCError containing the PgDiagnostic
-		st := status.New(codes.Code(Code(err)), truncateError(err))
-		rpcErr := &mtrpcpb.RPCError{
-			Message:      err.Error(),
-			Code:         mtrpcpb.Code_UNKNOWN,
-			PgDiagnostic: PgDiagnosticToProto(diag),
-		}
-		// Attach the RPCError as a detail to the status
-		stWithDetails, detailErr := st.WithDetails(rpcErr)
-		if detailErr != nil {
-			// Log a warning with context about the error being lost.
-			// This can happen if the error details are too large for gRPC limits.
-			truncatedMsg := diag.Message
-			if len(truncatedMsg) > 100 {
-				truncatedMsg = truncatedMsg[:100] + "..."
-			}
-			slog.Warn("failed to attach PgDiagnostic to gRPC status; PostgreSQL error details may be lost",
-				slog.String("error", detailErr.Error()),
-				slog.String("sqlstate", diag.Code),
-				slog.String("severity", diag.Severity),
-				slog.String("message", truncatedMsg),
-			)
-			// Fall back to basic error without PgDiagnostic details
-			return st.Err()
-		}
-		return stWithDetails.Err()
-	}
+// Check if this is a PostgreSQL error
 
-	return status.Errorf(codes.Code(Code(err)), "%v", truncateError(err))
-}
+// Create gRPC status with RPCError containing the PgDiagnostic
+
+// Attach the RPCError as a detail to the status
+
+// Log a warning with context about the error being lost.
+// This can happen if the error details are too large for gRPC limits.
+
+// Fall back to basic error without PgDiagnostic details
 
 // FromGRPC returns a gRPC error as a mterrors error, translating between error codes.
 // If the gRPC error contains a PgDiagnostic in its details, it returns a *PgDiagnostic
@@ -94,43 +51,19 @@ func ToGRPC(err error) error {
 // However, there are a few errors which are not translated and passed as they
 // are. For example, io.EOF since our code base checks for this error to find
 // out that a stream has finished.
-func FromGRPC(err error) error {
-	if err == nil {
-		return nil
-	}
-	if err == io.EOF {
-		// Do not wrap io.EOF because we compare against it for finished streams.
-		return err
-	}
-	st, ok := status.FromError(err)
-	if !ok {
-		return New(mtrpcpb.Code_UNKNOWN, err.Error())
-	}
+func FromGRPC(err error) error { _ = "STUB: not implemented"; return nil }
 
-	// Map gRPC context errors to PostgreSQL query_canceled errors.
-	// gRPC converts context.DeadlineExceeded / context.Canceled into status
-	// errors that don't wrap the original sentinels, so we return the proper
-	// PgDiagnostic directly.
-	switch st.Code() {
-	case codes.DeadlineExceeded:
-		return NewStatementTimeout()
-	case codes.Canceled:
-		return NewQueryCanceled()
-	}
+// Do not wrap io.EOF because we compare against it for finished streams.
 
-	// Check for RPCError in status details
-	for _, detail := range st.Details() {
-		if rpcErr, ok := detail.(*mtrpcpb.RPCError); ok {
-			// If PgDiagnostic is present, return it directly
-			if rpcErr.GetPgDiagnostic() != nil {
-				diag := PgDiagnosticFromProto(rpcErr.GetPgDiagnostic())
-				return diag
-			}
-			// Otherwise use the RPCError message and code
-			return New(rpcErr.Code, rpcErr.Message)
-		}
-	}
+// Map gRPC context errors to PostgreSQL query_canceled errors.
+// gRPC converts context.DeadlineExceeded / context.Canceled into status
+// errors that don't wrap the original sentinels, so we return the proper
+// PgDiagnostic directly.
 
-	// No RPCError details, fall back to basic conversion
-	return New(mtrpcpb.Code(st.Code()), st.Message())
-}
+// Check for RPCError in status details
+
+// If PgDiagnostic is present, return it directly
+
+// Otherwise use the RPCError message and code
+
+// No RPCError details, fall back to basic conversion

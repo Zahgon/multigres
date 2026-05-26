@@ -17,7 +17,6 @@ package rpcclient
 import (
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
 
@@ -32,7 +31,6 @@ import (
 // TODO: Add peer.service="multipooler" to match OTel semantic conventions where
 // peer.service should match the remote service's service.name resource attribute.
 func PoolerSpanAttributes(poolerID *clustermetadatapb.ID) []attribute.KeyValue {
-	return []attribute.KeyValue{
-		attribute.String("multigres.pooler.id", topoclient.MultiPoolerIDString(poolerID)),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

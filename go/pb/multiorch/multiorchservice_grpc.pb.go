@@ -22,9 +22,8 @@ package multiorch
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -82,67 +81,38 @@ type multiOrchServiceClient struct {
 }
 
 func NewMultiOrchServiceClient(cc grpc.ClientConnInterface) MultiOrchServiceClient {
-	return &multiOrchServiceClient{cc}
+	_ = "STUB: not implemented"
+	return *new(MultiOrchServiceClient)
 }
 
 func (c *multiOrchServiceClient) GetShardStatus(ctx context.Context, in *ShardStatusRequest, opts ...grpc.CallOption) (*ShardStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ShardStatusResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_GetShardStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiOrchServiceClient) DisableRecovery(ctx context.Context, in *DisableRecoveryRequest, opts ...grpc.CallOption) (*DisableRecoveryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DisableRecoveryResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_DisableRecovery_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiOrchServiceClient) EnableRecovery(ctx context.Context, in *EnableRecoveryRequest, opts ...grpc.CallOption) (*EnableRecoveryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(EnableRecoveryResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_EnableRecovery_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiOrchServiceClient) GetRecoveryStatus(ctx context.Context, in *GetRecoveryStatusRequest, opts ...grpc.CallOption) (*GetRecoveryStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetRecoveryStatusResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_GetRecoveryStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiOrchServiceClient) TriggerRecoveryNow(ctx context.Context, in *TriggerRecoveryNowRequest, opts ...grpc.CallOption) (*TriggerRecoveryNowResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TriggerRecoveryNowResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_TriggerRecoveryNow_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiOrchServiceClient) ApplyCertifiedRuleChange(ctx context.Context, in *ApplyCertifiedRuleChangeRequest, opts ...grpc.CallOption) (*ApplyCertifiedRuleChangeResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ApplyCertifiedRuleChangeResponse)
-	err := c.cc.Invoke(ctx, MultiOrchService_ApplyCertifiedRuleChange_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiOrchServiceServer is the server API for MultiOrchService service.
@@ -190,25 +160,40 @@ type MultiOrchServiceServer interface {
 type UnimplementedMultiOrchServiceServer struct{}
 
 func (UnimplementedMultiOrchServiceServer) GetShardStatus(context.Context, *ShardStatusRequest) (*ShardStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetShardStatus not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiOrchServiceServer) DisableRecovery(context.Context, *DisableRecoveryRequest) (*DisableRecoveryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DisableRecovery not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiOrchServiceServer) EnableRecovery(context.Context, *EnableRecoveryRequest) (*EnableRecoveryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EnableRecovery not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiOrchServiceServer) GetRecoveryStatus(context.Context, *GetRecoveryStatusRequest) (*GetRecoveryStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRecoveryStatus not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiOrchServiceServer) TriggerRecoveryNow(context.Context, *TriggerRecoveryNowRequest) (*TriggerRecoveryNowResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TriggerRecoveryNow not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiOrchServiceServer) ApplyCertifiedRuleChange(context.Context, *ApplyCertifiedRuleChangeRequest) (*ApplyCertifiedRuleChangeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ApplyCertifiedRuleChange not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedMultiOrchServiceServer) mustEmbedUnimplementedMultiOrchServiceServer() {}
-func (UnimplementedMultiOrchServiceServer) testEmbeddedByValue()                          {}
+
+func (UnimplementedMultiOrchServiceServer) mustEmbedUnimplementedMultiOrchServiceServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedMultiOrchServiceServer) testEmbeddedByValue() { _ = "STUB: not implemented"; return }
 
 // UnsafeMultiOrchServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to MultiOrchServiceServer will
@@ -218,122 +203,42 @@ type UnsafeMultiOrchServiceServer interface {
 }
 
 func RegisterMultiOrchServiceServer(s grpc.ServiceRegistrar, srv MultiOrchServiceServer) {
+	_ = "STUB: not implemented"
 	// If the following call pancis, it indicates UnimplementedMultiOrchServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MultiOrchService_ServiceDesc, srv)
+	return
 }
 
 func _MultiOrchService_GetShardStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ShardStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).GetShardStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_GetShardStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).GetShardStatus(ctx, req.(*ShardStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiOrchService_DisableRecovery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DisableRecoveryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).DisableRecovery(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_DisableRecovery_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).DisableRecovery(ctx, req.(*DisableRecoveryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiOrchService_EnableRecovery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnableRecoveryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).EnableRecovery(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_EnableRecovery_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).EnableRecovery(ctx, req.(*EnableRecoveryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiOrchService_GetRecoveryStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRecoveryStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).GetRecoveryStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_GetRecoveryStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).GetRecoveryStatus(ctx, req.(*GetRecoveryStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiOrchService_TriggerRecoveryNow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TriggerRecoveryNowRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).TriggerRecoveryNow(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_TriggerRecoveryNow_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).TriggerRecoveryNow(ctx, req.(*TriggerRecoveryNowRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiOrchService_ApplyCertifiedRuleChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ApplyCertifiedRuleChangeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiOrchServiceServer).ApplyCertifiedRuleChange(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiOrchService_ApplyCertifiedRuleChange_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiOrchServiceServer).ApplyCertifiedRuleChange(ctx, req.(*ApplyCertifiedRuleChangeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiOrchService_ServiceDesc is the grpc.ServiceDesc for MultiOrchService service.

@@ -14,10 +14,6 @@
 
 package topoclient
 
-import (
-	"fmt"
-)
-
 // ErrorCode is the error code for topo errors.
 type ErrorCode int
 
@@ -44,51 +40,10 @@ type TopoError struct {
 }
 
 // NewError creates a new topo error.
-func NewError(code ErrorCode, node string) error {
-	var message string
-	switch code {
-	case NodeExists:
-		message = "node already exists: " + node
-	case NoNode:
-		message = "node doesn't exist: " + node
-	case NodeNotEmpty:
-		message = "node not empty: " + node
-	case Timeout:
-		message = "deadline exceeded: " + node
-	case Interrupted:
-		message = "interrupted: " + node
-	case BadVersion:
-		message = "bad node version: " + node
-	case PartialResult:
-		message = "partial result: " + node
-	case NoUpdateNeeded:
-		message = "no update needed: " + node
-	case NoImplementation:
-		message = "no such topology implementation: " + node
-	case NoReadOnlyImplementation:
-		message = "no read-only topology implementation " + node
-	case ResourceExhausted:
-		message = "server resource exhausted: " + node
-	case BadInput:
-		message = node
-	default:
-		message = "unknown code: " + node
-	}
-	return TopoError{
-		Code:    code,
-		Message: message,
-	}
-}
+func NewError(code ErrorCode, node string) error { _ = "STUB: not implemented"; return nil }
 
 // Error satisfies error.
-func (e TopoError) Error() string {
-	return fmt.Sprintf("topo error [%d]: %s", e.Code, e.Message)
-}
+func (e TopoError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Is implements error comparison for errors.Is.
-func (e TopoError) Is(target error) bool {
-	if targetTopo, ok := target.(*TopoError); ok {
-		return e.Code == targetTopo.Code
-	}
-	return false
-}
+func (e TopoError) Is(target error) bool { _ = "STUB: not implemented"; return false }

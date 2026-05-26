@@ -21,7 +21,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/services/multigateway"
 
 	"github.com/spf13/cobra"
@@ -29,24 +28,8 @@ import (
 
 // CreateMultiGatewayCommand creates a cobra command with a MultiGateway instance and registers its flags
 func CreateMultiGatewayCommand() (*cobra.Command, *multigateway.MultiGateway) {
-	mg := multigateway.NewMultiGateway()
-
-	cmd := &cobra.Command{
-		Use:   constants.ServiceMultigateway,
-		Short: "Multigateway is a stateless proxy responsible for accepting requests from applications and routing them to the appropriate multipooler server(s) for query execution. It speaks both the PostgreSQL Protocol and a gRPC protocol.",
-		Long:  "Multigateway is a stateless proxy responsible for accepting requests from applications and routing them to the appropriate multipooler server(s) for query execution. It speaks both the PostgreSQL Protocol and a gRPC protocol.",
-		Args:  cobra.NoArgs,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return mg.CobraPreRunE(cmd)
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return run(cmd.Context(), mg)
-		},
-	}
-
-	mg.RegisterFlags(cmd.Flags())
-
-	return cmd, mg
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func main() {
@@ -59,8 +42,6 @@ func main() {
 }
 
 func run(ctx context.Context, mg *multigateway.MultiGateway) error {
-	if err := mg.Init(ctx); err != nil {
-		return err
-	}
-	return mg.RunDefault()
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -58,6 +58,4 @@ type Value[T any] interface {
 // which is not defined on the flag set. Therefore, this function should usually
 // be called in an OnParse or OnParseFor hook after defining the flags for the
 // values in question.
-func BindFlags(fs *pflag.FlagSet, values ...value.Registerable) {
-	value.BindFlags(fs, values...)
-}
+func BindFlags(fs *pflag.FlagSet, values ...value.Registerable) { _ = "STUB: not implemented"; return }

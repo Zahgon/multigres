@@ -14,33 +14,24 @@
 
 package protocol
 
-import "fmt"
-
 // ProtocolVersion represents a frontend/backend protocol version number.
 type ProtocolVersion uint32
 
 // NewProtocolVersion creates a protocol version from major and minor numbers.
 func NewProtocolVersion(major, minor uint16) ProtocolVersion {
-	return ProtocolVersion((uint32(major) << 16) | uint32(minor))
+	_ = "STUB: not implemented"
+	return *new(ProtocolVersion)
 }
 
 // Major returns the major version number.
-func (v ProtocolVersion) Major() uint16 {
-	return uint16(v >> 16)
-}
+func (v ProtocolVersion) Major() uint16 { _ = "STUB: not implemented"; return 0 }
 
 // Minor returns the minor version number.
-func (v ProtocolVersion) Minor() uint16 {
-	return uint16(v & 0xFFFF)
-}
+func (v ProtocolVersion) Minor() uint16 { _ = "STUB: not implemented"; return 0 }
 
 // String returns a string representation of the protocol version.
-func (v ProtocolVersion) String() string {
-	return fmt.Sprintf("%d.%d", v.Major(), v.Minor())
-}
+func (v ProtocolVersion) String() string { _ = "STUB: not implemented"; return "" }
 
 // IsSupported returns true if this protocol version is supported.
 // Currently only protocol 3.0 is supported.
-func (v ProtocolVersion) IsSupported() bool {
-	return v == ProtocolVersionNumber
-}
+func (v ProtocolVersion) IsSupported() bool { _ = "STUB: not implemented"; return false }

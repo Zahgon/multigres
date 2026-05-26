@@ -16,7 +16,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
@@ -44,12 +43,8 @@ type HoldCursorRoute struct {
 
 // NewHoldCursorRoute creates a HoldCursorRoute for the given cursor name.
 func NewHoldCursorRoute(tableGroup, shard, sql, cursorName string) *HoldCursorRoute {
-	return &HoldCursorRoute{
-		TableGroup: tableGroup,
-		Shard:      shard,
-		Query:      sql,
-		CursorName: cursorName,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute schedules the cursor name for portal pinning, runs the
@@ -70,11 +65,7 @@ func (h *HoldCursorRoute) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	state.AppendPendingPinPortals(h.CursorName)
-	if err := exec.StreamExecute(ctx, conn, h.TableGroup, h.Shard, h.Query, nil, state, callback); err != nil {
-		return err
-	}
-	state.AddOpenHoldCursor(h.CursorName)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -91,15 +82,14 @@ func (h *HoldCursorRoute) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return h.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (h *HoldCursorRoute) GetTableGroup() string { return h.TableGroup }
+func (h *HoldCursorRoute) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
-func (h *HoldCursorRoute) GetQuery() string { return h.Query }
+func (h *HoldCursorRoute) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (h *HoldCursorRoute) String() string {
-	return fmt.Sprintf("HoldCursorRoute(%s: %s)", h.CursorName, h.Query)
-}
+func (h *HoldCursorRoute) String() string { _ = "STUB: not implemented"; return "" }
 
 var _ Primitive = (*HoldCursorRoute)(nil)

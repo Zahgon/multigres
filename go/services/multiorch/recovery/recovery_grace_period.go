@@ -63,53 +63,33 @@ type RecoveryGracePeriodTrackerOption func(*RecoveryGracePeriodTracker)
 // WithRand sets a custom random generator for jitter generation.
 // Useful for deterministic testing with a fixed seed.
 func WithRand(rng *rand.Rand) RecoveryGracePeriodTrackerOption {
-	return func(dt *RecoveryGracePeriodTracker) {
-		dt.rng = rng
-	}
+	_ = "STUB: not implemented"
+	return *new(RecoveryGracePeriodTrackerOption)
 }
 
 // WithLogger sets a custom logger for the tracker.
 func WithLogger(logger *slog.Logger) RecoveryGracePeriodTrackerOption {
-	return func(dt *RecoveryGracePeriodTracker) {
-		dt.logger = logger
-	}
+	_ = "STUB: not implemented"
+	return *new(RecoveryGracePeriodTrackerOption)
 }
 
 // NewRecoveryGracePeriodTracker creates a new deadline tracker.
 // By default, uses a random seed for jitter generation and slog.Default() for logging.
 func NewRecoveryGracePeriodTracker(ctx context.Context, config *config.Config, opts ...RecoveryGracePeriodTrackerOption) *RecoveryGracePeriodTracker {
-	dt := &RecoveryGracePeriodTracker{
-		ctx:       ctx,
-		config:    config,
-		logger:    slog.Default(),
-		deadlines: make(map[gracePeriodKey]time.Time),
-		rng:       rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), uint64(time.Now().UnixNano()))),
-	}
-
-	for _, opt := range opts {
-		opt(dt)
-	}
-
-	return dt
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // calculateDeadline computes a new deadline with base + jitter for the given grace period config.
 // Must be called while holding dt.mu lock.
 func (dt *RecoveryGracePeriodTracker) calculateDeadline(cfg types.GracePeriodConfig) time.Time {
-	base := cfg.BaseDelay
-	maxJitter := cfg.MaxJitter
-
-	// Clamp to reasonable bounds
-	maxJitter = max(0, min(maxJitter, maxAllowedJitter))
-
-	var jitter time.Duration
-	if maxJitter > 0 {
-		// Use [0, maxJitter) range (exclusive upper bound)
-		jitter = time.Duration(dt.rng.Int64N(int64(maxJitter)))
-	}
-
-	return time.Now().Add(base + jitter)
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
+
+// Clamp to reasonable bounds
+
+// Use [0, maxJitter) range (exclusive upper bound)
 
 // Observe records the health state of a problem type for a specific entity.
 // entityID is a pooler ID string for pooler-scoped problems, or a shard key
@@ -122,28 +102,19 @@ func (dt *RecoveryGracePeriodTracker) calculateDeadline(cfg types.GracePeriodCon
 //
 // If the action doesn't require grace period tracking, this is a noop.
 func (dt *RecoveryGracePeriodTracker) Observe(code types.ProblemCode, entityID string, action types.RecoveryAction, isHealthy bool) {
-	dt.mu.Lock()
-	defer dt.mu.Unlock()
-
-	// Get grace period config from the action
-	gracePeriodCfg := action.GracePeriod()
-	if gracePeriodCfg == nil {
-		// Action doesn't require grace period tracking
-		return
-	}
-
-	key := gracePeriodKey{code: code, entityID: entityID}
-	_, exists := dt.deadlines[key]
-
-	if isHealthy {
-		// Reset deadline with fresh jitter
-		dt.deadlines[key] = dt.calculateDeadline(*gracePeriodCfg)
-	} else if !exists {
-		// First time seeing this problem unhealthy - initialize deadline with base + jitter
-		dt.deadlines[key] = dt.calculateDeadline(*gracePeriodCfg)
-	}
-	// If unhealthy and exists, freeze (do nothing - deadline unchanged)
+	_ = "STUB: not implemented"
+	return
 }
+
+// Get grace period config from the action
+
+// Action doesn't require grace period tracking
+
+// Reset deadline with fresh jitter
+
+// First time seeing this problem unhealthy - initialize deadline with base + jitter
+
+// If unhealthy and exists, freeze (do nothing - deadline unchanged)
 
 // ForceExpireAll immediately expires all tracked grace period deadlines.
 // After this call, ShouldExecute returns true for all tracked problems regardless
@@ -151,15 +122,9 @@ func (dt *RecoveryGracePeriodTracker) Observe(code types.ProblemCode, entityID s
 //
 // Intended for use in TriggerRecoveryNow so that an explicit operator request
 // can bypass the normal grace period wait and act on detected problems immediately.
-func (dt *RecoveryGracePeriodTracker) ForceExpireAll() {
-	dt.mu.Lock()
-	defer dt.mu.Unlock()
+func (dt *RecoveryGracePeriodTracker) ForceExpireAll() { _ = "STUB: not implemented"; return }
 
-	past := time.Time{} // zero value is before all real timestamps
-	for key := range dt.deadlines {
-		dt.deadlines[key] = past
-	}
-}
+// zero value is before all real timestamps
 
 // ShouldExecute checks if recovery action should execute for this problem.
 // Returns true if action should execute (deadline expired or no grace period needed).
@@ -168,41 +133,17 @@ func (dt *RecoveryGracePeriodTracker) ForceExpireAll() {
 // This assumes Observe() has already been called for the (problem type, entity) combination.
 // If the action doesn't require grace period tracking, returns true (execute immediately).
 func (dt *RecoveryGracePeriodTracker) ShouldExecute(problem types.Problem) bool {
-	dt.mu.Lock()
-	defer dt.mu.Unlock()
-
-	// Get grace period config from the action
-	gracePeriodCfg := problem.RecoveryAction.GracePeriod()
-	if gracePeriodCfg == nil {
-		// Action doesn't require grace period tracking - execute immediately
-		return true
-	}
-
-	entityID := problem.EntityID()
-
-	key := gracePeriodKey{code: problem.Code, entityID: entityID}
-	deadline, exists := dt.deadlines[key]
-	if !exists {
-		// Problem has grace period but no deadline - this is unexpected
-		// Observe() should have been called before ShouldExecute()
-		dt.logger.WarnContext(dt.ctx, "Grace period deadline not found, skipping recovery",
-			"problem_code", problem.Code,
-			"entity_id", entityID)
-		return false
-	}
-
-	// Check if deadline has expired
-	now := time.Now()
-	if now.After(deadline) || now.Equal(deadline) {
-		return true
-	}
-
-	// Deadline not reached yet - log that we're deferring
-	timeRemaining := deadline.Sub(now)
-	dt.logger.InfoContext(dt.ctx, "Deferring recovery action, waiting for grace period to expire",
-		"problem_code", problem.Code,
-		"time_remaining_seconds", timeRemaining.Seconds(),
-		"deadline", deadline,
-	)
+	_ = "STUB: not implemented"
 	return false
 }
+
+// Get grace period config from the action
+
+// Action doesn't require grace period tracking - execute immediately
+
+// Problem has grace period but no deadline - this is unexpected
+// Observe() should have been called before ShouldExecute()
+
+// Check if deadline has expired
+
+// Deadline not reached yet - log that we're deferring

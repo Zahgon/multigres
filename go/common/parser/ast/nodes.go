@@ -28,12 +28,6 @@
 // Ported from postgres/src/include/nodes/nodes.h and related header files.
 package ast
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
-
 // NodeTag represents the type of an AST node.
 // Ported from postgres/src/include/nodes/nodes.h:26-31 (NodeTag enum)
 type NodeTag int
@@ -351,563 +345,9 @@ const (
 
 // String returns the string representation of a NodeTag.
 // Used for debugging and error reporting.
-func (nt NodeTag) String() string {
-	switch nt {
-	case T_Invalid:
-		return "T_Invalid"
-	case T_Node:
-		return "T_Node"
-	case T_Query:
-		return "T_Query"
-	case T_SelectStmt:
-		return "T_SelectStmt"
-	case T_InsertStmt:
-		return "T_InsertStmt"
-	case T_UpdateStmt:
-		return "T_UpdateStmt"
-	case T_DeleteStmt:
-		return "T_DeleteStmt"
-	case T_MergeStmt:
-		return "T_MergeStmt"
-	case T_CreateStmt:
-		return "T_CreateStmt"
-	case T_DropStmt:
-		return "T_DropStmt"
-	case T_AlterStmt:
-		return "T_AlterStmt"
-	case T_AlterTableStmt:
-		return "T_AlterTableStmt"
-	case T_AlterTableMoveAllStmt:
-		return "T_AlterTableMoveAllStmt"
-	case T_AlterTableCmd:
-		return "T_AlterTableCmd"
-	case T_ReplicaIdentityStmt:
-		return "T_ReplicaIdentityStmt"
-	case T_AlterDomainStmt:
-		return "T_AlterDomainStmt"
-	case T_IndexStmt:
-		return "T_IndexStmt"
-	case T_IndexElem:
-		return "T_IndexElem"
-	case T_DefElem:
-		return "T_DefElem"
-	case T_Constraint:
-		return "T_Constraint"
-	case T_ViewStmt:
-		return "T_ViewStmt"
-	case T_CreateSchemaStmt:
-		return "T_CreateSchemaStmt"
-	case T_CreateSeqStmt:
-		return "T_CreateSeqStmt"
-	case T_AlterSeqStmt:
-		return "T_AlterSeqStmt"
-	case T_CreateTableAsStmt:
-		return "T_CreateTableAsStmt"
-	case T_CreateAssertionStmt:
-		return "T_CreateAssertionStmt"
-	case T_RefreshMatViewStmt:
-		return "T_RefreshMatViewStmt"
-	case T_CreateExtensionStmt:
-		return "T_CreateExtensionStmt"
-	case T_AlterExtensionStmt:
-		return "T_AlterExtensionStmt"
-	case T_AlterExtensionContentsStmt:
-		return "T_AlterExtensionContentsStmt"
-	case T_CreateFdwStmt:
-		return "T_CreateFdwStmt"
-	case T_AlterFdwStmt:
-		return "T_AlterFdwStmt"
-	case T_AlterForeignServerStmt:
-		return "T_AlterForeignServerStmt"
-	case T_AlterUserMappingStmt:
-		return "T_AlterUserMappingStmt"
-	case T_CreateEventTrigStmt:
-		return "T_CreateEventTrigStmt"
-	case T_AlterEventTrigStmt:
-		return "T_AlterEventTrigStmt"
-	case T_CreatedbStmt:
-		return "T_CreatedbStmt"
-	case T_DropdbStmt:
-		return "T_DropdbStmt"
-	case T_DropTableSpaceStmt:
-		return "T_DropTableSpaceStmt"
-	case T_DropOwnedStmt:
-		return "T_DropOwnedStmt"
-	case T_ReassignOwnedStmt:
-		return "T_ReassignOwnedStmt"
-	case T_ImportForeignSchemaStmt:
-		return "T_ImportForeignSchemaStmt"
-	case T_CreateTableSpaceStmt:
-		return "T_CreateTableSpaceStmt"
-	case T_AlterTableSpaceStmt:
-		return "T_AlterTableSpaceStmt"
-	case T_CreateAmStmt:
-		return "T_CreateAmStmt"
-	case T_CreateStatsStmt:
-		return "T_CreateStatsStmt"
-	case T_CreateCastStmt:
-		return "T_CreateCastStmt"
-	case T_AlterStatsStmt:
-		return "T_AlterStatsStmt"
-	case T_AlterFunctionStmt:
-		return "T_AlterFunctionStmt"
-	case T_AlterTypeStmt:
-		return "T_AlterTypeStmt"
-	case T_CreatePublicationStmt:
-		return "T_CreatePublicationStmt"
-	case T_AlterPublicationStmt:
-		return "T_AlterPublicationStmt"
-	case T_PublicationTable:
-		return "T_PublicationTable"
-	case T_PublicationObjSpec:
-		return "T_PublicationObjSpec"
-	case T_CreateSubscriptionStmt:
-		return "T_CreateSubscriptionStmt"
-	case T_AlterSubscriptionStmt:
-		return "T_AlterSubscriptionStmt"
-	case T_AlterOpFamilyStmt:
-		return "T_AlterOpFamilyStmt"
-	case T_CreateOpClassItem:
-		return "T_CreateOpClassItem"
-	case T_CreateOpClassStmt:
-		return "T_CreateOpClassStmt"
-	case T_CreateOpFamilyStmt:
-		return "T_CreateOpFamilyStmt"
-	case T_DropUserMappingStmt:
-		return "T_DropUserMappingStmt"
-	case T_CreateDomainStmt:
-		return "T_CreateDomainStmt"
-	case T_DefineStmt:
-		return "T_DefineStmt"
-	case T_CreateEnumStmt:
-		return "T_CreateEnumStmt"
-	case T_CreateRangeStmt:
-		return "T_CreateRangeStmt"
-	case T_AlterEnumStmt:
-		return "T_AlterEnumStmt"
-	case T_CompositeTypeStmt:
-		return "T_CompositeTypeStmt"
-	case T_CreateFunctionStmt:
-		return "T_CreateFunctionStmt"
-	case T_FunctionParameter:
-		return "T_FunctionParameter"
-	case T_CreateConversionStmt:
-		return "T_CreateConversionStmt"
-	case T_CreateTransformStmt:
-		return "T_CreateTransformStmt"
-	case T_CreatePLangStmt:
-		return "T_CreatePLangStmt"
-	case T_RoleSpec:
-		return "T_RoleSpec"
-	case T_TypeName:
-		return "T_TypeName"
-	case T_CollateClause:
-		return "T_CollateClause"
-	case T_TransactionStmt:
-		return "T_TransactionStmt"
-	case T_GrantStmt:
-		return "T_GrantStmt"
-	case T_GrantRoleStmt:
-		return "T_GrantRoleStmt"
-	case T_AlterDefaultPrivilegesStmt:
-		return "T_AlterDefaultPrivilegesStmt"
-	case T_AccessPriv:
-		return "T_AccessPriv"
-	case T_CreateRoleStmt:
-		return "T_CreateRoleStmt"
-	case T_AlterRoleStmt:
-		return "T_AlterRoleStmt"
-	case T_AlterRoleSetStmt:
-		return "T_AlterRoleSetStmt"
-	case T_DropRoleStmt:
-		return "T_DropRoleStmt"
-	case T_VariableSetStmt:
-		return "T_VariableSetStmt"
-	case T_VariableShowStmt:
-		return "T_VariableShowStmt"
-	case T_ExplainStmt:
-		return "T_ExplainStmt"
-	case T_PrepareStmt:
-		return "T_PrepareStmt"
-	case T_ExecuteStmt:
-		return "T_ExecuteStmt"
-	case T_DeallocateStmt:
-		return "T_DeallocateStmt"
-	case T_DeclareCursorStmt:
-		return "T_DeclareCursorStmt"
-	case T_FetchStmt:
-		return "T_FetchStmt"
-	case T_ClosePortalStmt:
-		return "T_ClosePortalStmt"
-	case T_CopyStmt:
-		return "T_CopyStmt"
-	case T_VacuumStmt:
-		return "T_VacuumStmt"
-	case T_VacuumRelation:
-		return "T_VacuumRelation"
-	case T_ReindexStmt:
-		return "T_ReindexStmt"
-	case T_ClusterStmt:
-		return "T_ClusterStmt"
-	case T_CheckPointStmt:
-		return "T_CheckPointStmt"
-	case T_DiscardStmt:
-		return "T_DiscardStmt"
-	case T_LoadStmt:
-		return "T_LoadStmt"
-	case T_NotifyStmt:
-		return "T_NotifyStmt"
-	case T_ListenStmt:
-		return "T_ListenStmt"
-	case T_UnlistenStmt:
-		return "T_UnlistenStmt"
-	case T_ConstraintsSetStmt:
-		return "T_ConstraintsSetStmt"
-	case T_IdentifySystemCmd:
-		return "T_IdentifySystemCmd"
-	case T_CreateReplicationSlotCmd:
-		return "T_CreateReplicationSlotCmd"
-	case T_DropReplicationSlotCmd:
-		return "T_DropReplicationSlotCmd"
-	case T_AlterReplicationSlotCmd:
-		return "T_AlterReplicationSlotCmd"
-	case T_StartReplicationCmd:
-		return "T_StartReplicationCmd"
-	case T_ReadReplicationSlotCmd:
-		return "T_ReadReplicationSlotCmd"
-	case T_Expr:
-		return "T_Expr"
-	case T_Var:
-		return "T_Var"
-	case T_Const:
-		return "T_Const"
-	case T_Param:
-		return "T_Param"
-	case T_Aggref:
-		return "T_Aggref"
-	case T_WindowFunc:
-		return "T_WindowFunc"
-	case T_FuncExpr:
-		return "T_FuncExpr"
-	case T_OpExpr:
-		return "T_OpExpr"
-	case T_BoolExpr:
-		return "T_BoolExpr"
-	case T_CaseExpr:
-		return "T_CaseExpr"
-	case T_ArrayExpr:
-		return "T_ArrayExpr"
-	case T_RowExpr:
-		return "T_RowExpr"
-	case T_CoalesceExpr:
-		return "T_CoalesceExpr"
-	case T_ScalarArrayOpExpr:
-		return "T_ScalarArrayOpExpr"
-	case T_SubLink:
-		return "T_SubLink"
-	case T_TargetEntry:
-		return "T_TargetEntry"
-	case T_FromExpr:
-		return "T_FromExpr"
-	case T_JoinExpr:
-		return "T_JoinExpr"
-	case T_SubPlan:
-		return "T_SubPlan"
-	case T_AlternativeSubPlan:
-		return "T_AlternativeSubPlan"
-	case T_CommonTableExpr:
-		return "T_CommonTableExpr"
-	case T_WindowClause:
-		return "T_WindowClause"
-	case T_SortGroupClause:
-		return "T_SortGroupClause"
-	case T_RowMarkClause:
-		return "T_RowMarkClause"
-	case T_OnConflictExpr:
-		return "T_OnConflictExpr"
-	case T_RelabelType:
-		return "T_RelabelType"
-	case T_CoerceViaIO:
-		return "T_CoerceViaIO"
-	case T_ArrayCoerceExpr:
-		return "T_ArrayCoerceExpr"
-	case T_ConvertRowtypeExpr:
-		return "T_ConvertRowtypeExpr"
-	case T_CollateExpr:
-		return "T_CollateExpr"
-	case T_FieldSelect:
-		return "T_FieldSelect"
-	case T_FieldStore:
-		return "T_FieldStore"
-	case T_SubscriptingRef:
-		return "T_SubscriptingRef"
-	case T_NullTest:
-		return "T_NullTest"
-	case T_BooleanTest:
-		return "T_BooleanTest"
-	case T_CoerceToDomain:
-		return "T_CoerceToDomain"
-	case T_CoerceToDomainValue:
-		return "T_CoerceToDomainValue"
-	case T_SetToDefault:
-		return "T_SetToDefault"
-	case T_CurrentOfExpr:
-		return "T_CurrentOfExpr"
-	case T_NextValueExpr:
-		return "T_NextValueExpr"
-	case T_InferenceElem:
-		return "T_InferenceElem"
-	case T_TableLikeClause:
-		return "T_TableLikeClause"
-	case T_PartitionSpec:
-		return "T_PartitionSpec"
-	case T_PartitionBoundSpec:
-		return "T_PartitionBoundSpec"
-	case T_PartitionRangeDatum:
-		return "T_PartitionRangeDatum"
-	case T_StatsElem:
-		return "T_StatsElem"
-	case T_CreateForeignServerStmt:
-		return "T_CreateForeignServerStmt"
-	case T_CreateForeignTableStmt:
-		return "T_CreateForeignTableStmt"
-	case T_CreateUserMappingStmt:
-		return "T_CreateUserMappingStmt"
-	case T_CreateTriggerStmt:
-		return "T_CreateTriggerStmt"
-	case T_CreatePolicyStmt:
-		return "T_CreatePolicyStmt"
-	case T_AlterPolicyStmt:
-		return "T_AlterPolicyStmt"
-	case T_TriggerTransition:
-		return "T_TriggerTransition"
-	case T_List:
-		return "T_List"
-	case T_ResTarget:
-		return "T_ResTarget"
-	case T_RangeVar:
-		return "T_RangeVar"
-	case T_ColumnRef:
-		return "T_ColumnRef"
-	case T_AConst:
-		return "T_AConst"
-	case T_Integer:
-		return "T_Integer"
-	case T_Float:
-		return "T_Float"
-	case T_Boolean:
-		return "T_Boolean"
-	case T_String:
-		return "T_String"
-	case T_BitString:
-		return "T_BitString"
-	case T_Null:
-		return "T_Null"
-	// Core parse infrastructure nodes - Stage 1A
-	case T_RawStmt:
-		return "T_RawStmt"
-	case T_A_Expr:
-		return "T_A_Expr"
-	case T_A_Const:
-		return "T_A_Const"
-	case T_ParamRef:
-		return "T_ParamRef"
-	case T_TypeCast:
-		return "T_TypeCast"
-	case T_ParenExpr:
-		return "T_ParenExpr"
-	case T_FuncCall:
-		return "T_FuncCall"
-	case T_A_Star:
-		return "T_A_Star"
-	case T_A_Indices:
-		return "T_A_Indices"
-	case T_A_Indirection:
-		return "T_A_Indirection"
-	case T_A_ArrayExpr:
-		return "T_A_ArrayExpr"
-	case T_ColumnDef:
-		return "T_ColumnDef"
-	case T_WithClause:
-		return "T_WithClause"
-	case T_CTESearchClause:
-		return "T_CTESearchClause"
-	case T_CTECycleClause:
-		return "T_CTECycleClause"
-	case T_MultiAssignRef:
-		return "T_MultiAssignRef"
-	case T_WindowDef:
-		return "T_WindowDef"
-	case T_SortBy:
-		return "T_SortBy"
-	case T_GroupingSet:
-		return "T_GroupingSet"
-	case T_LockingClause:
-		return "T_LockingClause"
-	case T_XmlSerialize:
-		return "T_XmlSerialize"
-	case T_PartitionElem:
-		return "T_PartitionElem"
-	case T_TableSampleClause:
-		return "T_TableSampleClause"
-	case T_ObjectWithArgs:
-		return "T_ObjectWithArgs"
-	case T_SinglePartitionSpec:
-		return "T_SinglePartitionSpec"
-	case T_PartitionCmd:
-		return "T_PartitionCmd"
-	case T_SetOperationStmt:
-		return "T_SetOperationStmt"
-	case T_ReturnStmt:
-		return "T_ReturnStmt"
-	case T_PLAssignStmt:
-		return "T_PLAssignStmt"
-	case T_OnConflictClause:
-		return "T_OnConflictClause"
-	case T_InferClause:
-		return "T_InferClause"
-	case T_WithCheckOption:
-		return "T_WithCheckOption"
-	case T_MergeWhenClause:
-		return "T_MergeWhenClause"
-	case T_TruncateStmt:
-		return "T_TruncateStmt"
-	case T_CommentStmt:
-		return "T_CommentStmt"
-	case T_SecLabelStmt:
-		return "T_SecLabelStmt"
-	case T_DoStmt:
-		return "T_DoStmt"
-	case T_CallStmt:
-		return "T_CallStmt"
-	case T_RenameStmt:
-		return "T_RenameStmt"
-	case T_AlterOwnerStmt:
-		return "T_AlterOwnerStmt"
-	case T_RuleStmt:
-		return "T_RuleStmt"
-	case T_LockStmt:
-		return "T_LockStmt"
-	case T_AlterObjectSchemaStmt:
-		return "T_AlterObjectSchemaStmt"
-	case T_AlterOperatorStmt:
-		return "T_AlterOperatorStmt"
-	case T_AlterObjectDependsStmt:
-		return "T_AlterObjectDependsStmt"
-	case T_AlterCollationStmt:
-		return "T_AlterCollationStmt"
-	case T_AlterDatabaseStmt:
-		return "T_AlterDatabaseStmt"
-	case T_AlterDatabaseSetStmt:
-		return "T_AlterDatabaseSetStmt"
-	case T_AlterDatabaseRefreshCollStmt:
-		return "T_AlterDatabaseRefreshCollStmt"
-	case T_AlterCompositeTypeStmt:
-		return "T_AlterCompositeTypeStmt"
-	case T_AlterTSConfigurationStmt:
-		return "T_AlterTSConfigurationStmt"
-	case T_AlterTSDictionaryStmt:
-		return "T_AlterTSDictionaryStmt"
-	case T_RangeTblEntry:
-		return "T_RangeTblEntry"
-	case T_RangeSubselect:
-		return "T_RangeSubselect"
-	case T_RangeFunction:
-		return "T_RangeFunction"
-	case T_RangeTableFunc:
-		return "T_RangeTableFunc"
-	case T_RangeTableFuncCol:
-		return "T_RangeTableFuncCol"
-	case T_RangeTableSample:
-		return "T_RangeTableSample"
-	case T_RangeTblFunction:
-		return "T_RangeTblFunction"
-	case T_RTEPermissionInfo:
-		return "T_RTEPermissionInfo"
-	case T_RangeTblRef:
-		return "T_RangeTblRef"
-	case T_JsonFormat:
-		return "T_JsonFormat"
-	case T_JsonReturning:
-		return "T_JsonReturning"
-	case T_JsonValueExpr:
-		return "T_JsonValueExpr"
-	case T_JsonBehavior:
-		return "T_JsonBehavior"
-	case T_JsonOutput:
-		return "T_JsonOutput"
-	case T_JsonArgument:
-		return "T_JsonArgument"
-	case T_JsonFuncExpr:
-		return "T_JsonFuncExpr"
-	case T_JsonTablePathSpec:
-		return "T_JsonTablePathSpec"
-	case T_JsonTable:
-		return "T_JsonTable"
-	case T_JsonTableColumn:
-		return "T_JsonTableColumn"
-	case T_JsonKeyValue:
-		return "T_JsonKeyValue"
-	case T_JsonParseExpr:
-		return "T_JsonParseExpr"
-	case T_JsonScalarExpr:
-		return "T_JsonScalarExpr"
-	case T_JsonSerializeExpr:
-		return "T_JsonSerializeExpr"
-	case T_JsonObjectConstructor:
-		return "T_JsonObjectConstructor"
-	case T_JsonArrayConstructor:
-		return "T_JsonArrayConstructor"
-	case T_JsonArrayQueryConstructor:
-		return "T_JsonArrayQueryConstructor"
-	case T_JsonAggConstructor:
-		return "T_JsonAggConstructor"
-	case T_JsonObjectAgg:
-		return "T_JsonObjectAgg"
-	case T_JsonArrayAgg:
-		return "T_JsonArrayAgg"
-	case T_JsonConstructorExpr:
-		return "T_JsonConstructorExpr"
-	case T_JsonIsPredicate:
-		return "T_JsonIsPredicate"
-	case T_JsonExpr:
-		return "T_JsonExpr"
-	case T_JsonTablePath:
-		return "T_JsonTablePath"
-	case T_JsonTablePlan:
-		return "T_JsonTablePlan"
-	case T_JsonTablePathScan:
-		return "T_JsonTablePathScan"
-	case T_JsonTableSiblingJoin:
-		return "T_JsonTableSiblingJoin"
-	case T_GroupingFunc:
-		return "T_GroupingFunc"
-	case T_WindowFuncRunCondition:
-		return "T_WindowFuncRunCondition"
-	case T_MergeSupportFunc:
-		return "T_MergeSupportFunc"
-	case T_NamedArgExpr:
-		return "T_NamedArgExpr"
-	case T_CaseTestExpr:
-		return "T_CaseTestExpr"
-	case T_MinMaxExpr:
-		return "T_MinMaxExpr"
-	case T_RowCompareExpr:
-		return "T_RowCompareExpr"
-	case T_SQLValueFunction:
-		return "T_SQLValueFunction"
-	case T_XmlExpr:
-		return "T_XmlExpr"
-	case T_MergeAction:
-		return "T_MergeAction"
-	case T_TableFunc:
-		return "T_TableFunc"
-	case T_IntoClause:
-		return "T_IntoClause"
-	default:
-		return fmt.Sprintf("NodeTag(%d)", int(nt))
-	}
-}
+func (nt NodeTag) String() string { _ = "STUB: not implemented"; return "" }
+
+// Core parse infrastructure nodes - Stage 1A
 
 // Node is the base interface for all PostgreSQL AST nodes.
 // Every node in the parse tree implements this interface.
@@ -942,84 +382,59 @@ type BaseNode struct {
 
 // NodeTag returns the node's type tag.
 func (n *BaseNode) NodeTag() NodeTag {
-	return n.Tag
+	_ = "STUB: not implemented"
+
+	// Location returns the node's source location.
+	return *new(NodeTag)
 }
 
-// Location returns the node's source location.
 func (n *BaseNode) Location() int {
-	return n.Loc
+	_ = "STUB: not implemented"
+
+	// String returns a basic string representation.
+	return 0
 }
 
-// String returns a basic string representation.
-func (n *BaseNode) String() string {
-	return fmt.Sprintf("%s@%d", n.Tag, n.Loc)
-}
+func (n *BaseNode) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString provides a default implementation that panics with helpful message.
 // Specific node types should override this method to provide actual SQL deparsing.
 func (n *BaseNode) SqlString() string {
+	_ = "STUB: not implemented"
 	// Handle T_Invalid nodes specially - they represent invalid/placeholder nodes
-	if n.Tag == T_Invalid {
-		return "<INVALID>"
-	}
-
-	panic(fmt.Sprintf("SqlString() not implemented for node type %s (tag: %d). "+
-		"Please implement SqlString() method for this node type to enable SQL deparsing.",
-		n.Tag, int(n.Tag)))
+	return ""
 }
 
 // SetLocation sets the source location for this node.
 // Used during parsing to track where nodes came from in the source.
 func (n *BaseNode) SetLocation(location int) {
-	n.Loc = location
+	_ = "STUB: not implemented"
+
+	// NodeList represents a list of nodes.
+	// This is a fundamental PostgreSQL concept used throughout the AST.
+	// Ported from postgres List structure concept
+	return
 }
 
-// NodeList represents a list of nodes.
-// This is a fundamental PostgreSQL concept used throughout the AST.
-// Ported from postgres List structure concept
 type NodeList struct {
 	BaseNode
 	Items []Node // List of nodes
 }
 
 // NewNodeList creates a new node list.
-func NewNodeList(items ...Node) *NodeList {
-	return &NodeList{
-		BaseNode: BaseNode{Tag: T_List},
-		Items:    items,
-	}
-}
+func NewNodeList(items ...Node) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // Append adds a node to the list.
-func (l *NodeList) Append(node Node) {
-	l.Items = append(l.Items, node)
-}
+func (l *NodeList) Append(node Node) { _ = "STUB: not implemented"; return }
 
 // Len returns the number of items in the list.
-func (l *NodeList) Len() int {
-	return len(l.Items)
-}
+func (l *NodeList) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // String returns a string representation of the list.
-func (l *NodeList) String() string {
-	return fmt.Sprintf("List[%d items]@%d", len(l.Items), l.Location())
-}
+func (l *NodeList) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of NodeList
-func (n *NodeList) SqlString() string {
-	if len(n.Items) == 0 {
-		return ""
-	}
-
-	var parts []string
-	for _, item := range n.Items {
-		if item != nil {
-			parts = append(parts, item.SqlString())
-		}
-	}
-
-	return strings.Join(parts, ", ")
-}
+func (n *NodeList) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // Stmt represents the base interface for all SQL statements.
 // All top-level SQL constructs implement this interface.
@@ -1045,22 +460,15 @@ type Identifier struct {
 }
 
 // NewIdentifier creates a new identifier node.
-func NewIdentifier(name string) *Identifier {
-	return &Identifier{
-		BaseNode: BaseNode{Tag: T_String}, // Use T_String for simple identifiers
-		Name:     name,
-	}
-}
+func NewIdentifier(name string) *Identifier { _ = "STUB: not implemented"; return nil }
+
+// Use T_String for simple identifiers
 
 // String returns the identifier name.
-func (i *Identifier) String() string {
-	return fmt.Sprintf("Identifier(%s)@%d", i.Name, i.Location())
-}
+func (i *Identifier) String() string { _ = "STUB: not implemented"; return "" }
 
 // ExpressionType returns the expression type for Expression interface.
-func (i *Identifier) ExpressionType() string {
-	return "Identifier"
-}
+func (i *Identifier) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // VALUE NODE SYSTEM - Complete PostgreSQL value.h implementation
@@ -1076,33 +484,21 @@ type Integer struct {
 
 // NewInteger creates a new integer literal node.
 // Ported from postgres/src/include/nodes/value.h:84 (makeInteger)
-func NewInteger(value int) *Integer {
-	return &Integer{
-		BaseNode: BaseNode{Tag: T_Integer},
-		IVal:     value,
-	}
-}
+func NewInteger(value int) *Integer { _ = "STUB: not implemented"; return nil }
 
-func (i *Integer) String() string {
-	return fmt.Sprintf("Integer(%d)@%d", i.IVal, i.Location())
-}
+func (i *Integer) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the Integer
-func (i *Integer) SqlString() string {
-	return strconv.Itoa(i.IVal)
-}
+func (i *Integer) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (i *Integer) ExpressionType() string {
-	return "Integer"
+	_ = "STUB: not implemented"
+
+	// IntVal extracts integer value - ported from postgres/src/include/nodes/value.h:79
+	return ""
 }
 
-// IntVal extracts integer value - ported from postgres/src/include/nodes/value.h:79
-func IntVal(node Node) int {
-	if i, ok := node.(*Integer); ok {
-		return i.IVal
-	}
-	return 0
-}
+func IntVal(node Node) int { _ = "STUB: not implemented"; return 0 }
 
 // Float represents a floating-point literal value node.
 // Stored as string to preserve precision, like PostgreSQL.
@@ -1114,36 +510,21 @@ type Float struct {
 
 // NewFloat creates a new float literal node.
 // Ported from postgres/src/include/nodes/value.h:85 (makeFloat)
-func NewFloat(value string) *Float {
-	return &Float{
-		BaseNode: BaseNode{Tag: T_Float},
-		FVal:     value,
-	}
-}
+func NewFloat(value string) *Float { _ = "STUB: not implemented"; return nil }
 
-func (f *Float) String() string {
-	return fmt.Sprintf("Float(%s)@%d", f.FVal, f.Location())
-}
+func (f *Float) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the Float
-func (f *Float) SqlString() string {
-	return f.FVal
-}
+func (f *Float) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (f *Float) ExpressionType() string {
-	return "Float"
+	_ = "STUB: not implemented"
+
+	// FloatVal extracts float value - ported from postgres/src/include/nodes/value.h:80
+	return ""
 }
 
-// FloatVal extracts float value - ported from postgres/src/include/nodes/value.h:80
-func FloatVal(node Node) float64 {
-	if f, ok := node.(*Float); ok {
-		var result float64
-		if _, err := fmt.Sscanf(f.FVal, "%f", &result); err == nil {
-			return result
-		}
-	}
-	return 0.0
-}
+func FloatVal(node Node) float64 { _ = "STUB: not implemented"; return 0 }
 
 // Boolean represents a boolean literal value node.
 // Ported from postgres/src/include/nodes/value.h:55-61
@@ -1154,36 +535,21 @@ type Boolean struct {
 
 // NewBoolean creates a new boolean literal node.
 // Ported from postgres/src/include/nodes/value.h:86 (makeBoolean)
-func NewBoolean(value bool) *Boolean {
-	return &Boolean{
-		BaseNode: BaseNode{Tag: T_Boolean},
-		BoolVal:  value,
-	}
-}
+func NewBoolean(value bool) *Boolean { _ = "STUB: not implemented"; return nil }
 
-func (b *Boolean) String() string {
-	return fmt.Sprintf("Boolean(%t)@%d", b.BoolVal, b.Location())
-}
+func (b *Boolean) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the Boolean
-func (b *Boolean) SqlString() string {
-	if b.BoolVal {
-		return "TRUE"
-	}
-	return "FALSE"
-}
+func (b *Boolean) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (b *Boolean) ExpressionType() string {
-	return "Boolean"
+	_ = "STUB: not implemented"
+
+	// BoolVal extracts boolean value - ported from postgres/src/include/nodes/value.h:81
+	return ""
 }
 
-// BoolVal extracts boolean value - ported from postgres/src/include/nodes/value.h:81
-func BoolVal(node Node) bool {
-	if b, ok := node.(*Boolean); ok {
-		return b.BoolVal
-	}
-	return false
-}
+func BoolVal(node Node) bool { _ = "STUB: not implemented"; return false }
 
 // String represents a string literal value node.
 // Ported from postgres/src/include/nodes/value.h:63-69
@@ -1194,33 +560,21 @@ type String struct {
 
 // NewString creates a new string literal node.
 // Ported from postgres/src/include/nodes/value.h:87 (makeString)
-func NewString(value string) *String {
-	return &String{
-		BaseNode: BaseNode{Tag: T_String},
-		SVal:     value,
-	}
-}
+func NewString(value string) *String { _ = "STUB: not implemented"; return nil }
 
-func (s *String) String() string {
-	return fmt.Sprintf("String(%q)@%d", s.SVal, s.Location())
-}
+func (s *String) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the String (properly quoted)
-func (s *String) SqlString() string {
-	return QuoteStringLiteral(s.SVal)
-}
+func (s *String) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (s *String) ExpressionType() string {
-	return "String"
-}
+	_ = "STUB: not implemented"
 
-// StrVal extracts string value - ported from postgres/src/include/nodes/value.h:82
-func StrVal(node Node) string {
-	if s, ok := node.(*String); ok {
-		return s.SVal
-	}
+	// StrVal extracts string value - ported from postgres/src/include/nodes/value.h:82
 	return ""
 }
+
+func StrVal(node Node) string { _ = "STUB: not implemented"; return "" }
 
 // BitString represents a bit string literal value node.
 // Ported from postgres/src/include/nodes/value.h:71-77
@@ -1233,42 +587,25 @@ type BitString struct {
 // Ported from postgres/src/include/nodes/value.h:88 (makeBitString)
 // The value should already include the prefix ('b' or 'x') from the lexer,
 // matching PostgreSQL's scan.l implementation
-func NewBitString(value string) *BitString {
-	return &BitString{
-		BaseNode: BaseNode{Tag: T_BitString},
-		BSVal:    value,
-	}
-}
+func NewBitString(value string) *BitString { _ = "STUB: not implemented"; return nil }
 
-func (bs *BitString) String() string {
-	return fmt.Sprintf("BitString(%q)@%d", bs.BSVal, bs.Location())
-}
+func (bs *BitString) String() string { _ = "STUB: not implemented"; return "" }
 
 func (bs *BitString) ExpressionType() string {
-	return "BitString"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of BitString
+	return ""
 }
 
-// SqlString returns the SQL representation of BitString
 func (bs *BitString) SqlString() string {
+	_ = "STUB: not implemented"
 	// The BSVal contains a prefix character ('b' or 'x') followed by the actual bit string
 	// This matches PostgreSQL's scan.l implementation
-	if len(bs.BSVal) == 0 {
-		return "B''"
-	}
-
-	prefix := bs.BSVal[0]
-	value := bs.BSVal[1:]
-
-	switch prefix {
-	case 'b':
-		return fmt.Sprintf("B'%s'", value)
-	case 'x':
-		return fmt.Sprintf("X'%s'", value)
-	default:
-		// Fallback for unexpected format
-		return fmt.Sprintf("B'%s'", bs.BSVal)
-	}
+	return ""
 }
+
+// Fallback for unexpected format
 
 // Null represents a NULL literal value node.
 type Null struct {
@@ -1276,106 +613,60 @@ type Null struct {
 }
 
 // NewNull creates a new NULL literal node.
-func NewNull() *Null {
-	return &Null{
-		BaseNode: BaseNode{Tag: T_Null},
-	}
-}
+func NewNull() *Null { _ = "STUB: not implemented"; return nil }
 
-func (n *Null) String() string {
-	return fmt.Sprintf("NULL@%d", n.Location())
-}
+func (n *Null) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the Null
-func (n *Null) SqlString() string {
-	return "NULL"
-}
+func (n *Null) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 func (n *Null) ExpressionType() string {
-	return "Null"
+	_ = "STUB: not implemented"
+
+	// Value is a generic interface for all value types.
+	// This provides a common interface for all literal values.
+	return ""
 }
 
-// Value is a generic interface for all value types.
-// This provides a common interface for all literal values.
 type Value interface {
 	Expression
 	IsValue() bool
 }
 
 // Implement Value interface for all value types
-func (i *Integer) IsValue() bool    { return true }
-func (f *Float) IsValue() bool      { return true }
-func (b *Boolean) IsValue() bool    { return true }
-func (s *String) IsValue() bool     { return true }
-func (bs *BitString) IsValue() bool { return true }
-func (n *Null) IsValue() bool       { return true }
+func (i *Integer) IsValue() bool    { _ = "STUB: not implemented"; return false }
+func (f *Float) IsValue() bool      { _ = "STUB: not implemented"; return false }
+func (b *Boolean) IsValue() bool    { _ = "STUB: not implemented"; return false }
+func (s *String) IsValue() bool     { _ = "STUB: not implemented"; return false }
+func (bs *BitString) IsValue() bool { _ = "STUB: not implemented"; return false }
+func (n *Null) IsValue() bool {
+	_ = "STUB: not implemented"
 
-// NewValue creates a properly typed value node based on the Go type.
-// This is a convenience function that delegates to the specific typed constructors.
-func NewValue(val any) Node {
-	switch v := val.(type) {
-	case string:
-		return NewString(v)
-	case int:
-		return NewInteger(v)
-	case int32:
-		return NewInteger(int(v))
-	case int64:
-		return NewInteger(int(v))
-	case float32:
-		return NewFloat(fmt.Sprintf("%g", v))
-	case float64:
-		return NewFloat(fmt.Sprintf("%g", v))
-	case bool:
-		return NewBoolean(v)
-	case nil:
-		return NewNull()
-	default:
-		// For unknown types, create a string representation
-		return NewString(fmt.Sprintf("%v", v))
-	}
+	// NewValue creates a properly typed value node based on the Go type.
+	// This is a convenience function that delegates to the specific typed constructors.
+	return false
 }
+
+func NewValue(val any) Node { _ = "STUB: not implemented"; return *new(Node) }
+
+// For unknown types, create a string representation
 
 // Helper functions for node creation and manipulation
 
 // IsNode checks if a value implements the Node interface.
-func IsNode(v any) bool {
-	_, ok := v.(Node)
-	return ok
-}
+func IsNode(v any) bool { _ = "STUB: not implemented"; return false }
 
 // NodeTagOf returns the NodeTag of a node, or T_Invalid if not a node.
-func NodeTagOf(v any) NodeTag {
-	if node, ok := v.(Node); ok {
-		return node.NodeTag()
-	}
-	return T_Invalid
-}
+func NodeTagOf(v any) NodeTag { _ = "STUB: not implemented"; return *new(NodeTag) }
 
 // LocationOf returns the location of a node, or -1 if not a node or no location.
-func LocationOf(v any) int {
-	if node, ok := v.(Node); ok {
-		return node.Location()
-	}
-	return -1
-}
+func LocationOf(v any) int { _ = "STUB: not implemented"; return 0 }
 
 // CastNode safely casts a value to a Node, returning nil if not a node.
-func CastNode(v any) Node {
-	if node, ok := v.(Node); ok {
-		return node
-	}
-	return nil
-}
+func CastNode(v any) Node { _ = "STUB: not implemented"; return *new(Node) }
 
 // NewQualifiedName creates a qualified name node (schema.name)
-func NewQualifiedName(schema, name string) Node {
-	return &RangeVar{
-		BaseNode:   BaseNode{Tag: T_RangeVar},
-		SchemaName: schema,
-		RelName:    name,
-	}
-}
+func NewQualifiedName(schema, name string) Node { _ = "STUB: not implemented"; return *new(Node) }
 
 // NodeWalker is a function type for walking the AST.
 // It receives a node and returns whether to continue walking.
@@ -1383,60 +674,23 @@ type NodeWalker func(Node) bool
 
 // WalkNodes recursively walks all nodes in an AST, calling the walker function.
 // This is useful for analysis, transformation, and debugging.
-func WalkNodes(node Node, walker NodeWalker) {
-	if node == nil || !walker(node) {
-		return
-	}
+func WalkNodes(node Node, walker NodeWalker) { _ = "STUB: not implemented"; return }
 
-	// Handle specific node types that contain other nodes
-	switch n := node.(type) {
-	case *NodeList:
-		for _, item := range n.Items {
-			if item != nil {
-				WalkNodes(item, walker)
-			}
-		}
-	// Value nodes are leaf nodes - no traversal needed
-	case *Integer, *Float, *Boolean, *String, *BitString, *Null:
-		// Leaf nodes - no children to traverse
-		return
-	// Additional node types will be handled as they're implemented
-	default:
-		// For now, we don't traverse into other node types
-		// This will be expanded as we implement more complex AST structures
-	}
-}
+// Handle specific node types that contain other nodes
+
+// Value nodes are leaf nodes - no traversal needed
+
+// Leaf nodes - no children to traverse
+
+// Additional node types will be handled as they're implemented
+
+// For now, we don't traverse into other node types
+// This will be expanded as we implement more complex AST structures
 
 // FindNodes finds all nodes of a specific type in an AST.
-func FindNodes(root Node, targetTag NodeTag) []Node {
-	var found []Node
-	WalkNodes(root, func(node Node) bool {
-		if node.NodeTag() == targetTag {
-			found = append(found, node)
-		}
-		return true
-	})
-	return found
-}
+func FindNodes(root Node, targetTag NodeTag) []Node { _ = "STUB: not implemented"; return nil }
 
 // PrintAST prints a simple representation of an AST for debugging.
-func PrintAST(node Node, indent int) {
-	if node == nil {
-		return
-	}
+func PrintAST(node Node, indent int) { _ = "STUB: not implemented"; return }
 
-	var prefix strings.Builder
-	for range indent {
-		prefix.WriteString("  ")
-	}
-
-	fmt.Printf("%s%s\n", prefix.String(), node.String())
-
-	// Print children for specific node types
-	switch n := node.(type) {
-	case *NodeList:
-		for _, item := range n.Items {
-			PrintAST(item, indent+1)
-		}
-	}
-}
+// Print children for specific node types

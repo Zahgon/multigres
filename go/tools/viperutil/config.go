@@ -18,23 +18,12 @@ package viperutil
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"log/slog"
-	"os"
-	"path/filepath"
 	"reflect"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-
-	"github.com/mitchellh/mapstructure"
-
-	"github.com/multigres/multigres/go/tools/viperutil/funcs"
-	"github.com/multigres/multigres/go/tools/viperutil/internal/value"
 )
 
 type ViperConfig struct {
@@ -46,96 +35,18 @@ type ViperConfig struct {
 	configPersistenceMinInterval Value[time.Duration]
 }
 
-func NewViperConfig(reg *Registry) *ViperConfig {
-	vc := &ViperConfig{
-		configPaths: Configure(
-			reg,
-			"config.paths",
-			Options[[]string]{
-				GetFunc:  funcs.GetPath,
-				EnvVars:  []string{"VT_CONFIG_PATH"},
-				FlagName: "config-path",
-			},
-		),
-		configType: Configure(
-			reg,
-			"config.type",
-			Options[string]{
-				EnvVars:  []string{"MT_CONFIG_TYPE"},
-				FlagName: "config-type",
-			},
-		),
-		configName: Configure(
-			reg,
-			"config.name",
-			Options[string]{
-				Default:  "mtconfig",
-				EnvVars:  []string{"MT_CONFIG_NAME"},
-				FlagName: "config-name",
-			},
-		),
-		configFile: Configure(
-			reg,
-			"config.file",
-			Options[string]{
-				EnvVars:  []string{"MT_CONFIG_FILE"},
-				FlagName: "config-file",
-			},
-		),
-		configFileNotFoundHandling: Configure(
-			reg,
-			"config.notfound.handling",
-			Options[ConfigFileNotFoundHandling]{
-				Default:  WarnOnConfigFileNotFound,
-				GetFunc:  getHandlingValue,
-				FlagName: "config-file-not-found-handling",
-			},
-		),
-		configPersistenceMinInterval: Configure(
-			reg,
-			"config.persistence.min_interval",
-			Options[time.Duration]{
-				Default:  time.Second,
-				EnvVars:  []string{"MT_CONFIG_PERSISTENCE_MIN_INTERVAL"},
-				FlagName: "config-persistence-min-interval",
-			},
-		),
-	}
+func NewViperConfig(reg *Registry) *ViperConfig { _ = "STUB: not implemented"; return nil }
 
-	// Use MTDATAROOT environment variable if set, otherwise fall back to pwd/multigres_local
-	baseDir := os.Getenv("MTDATAROOT")
-	if baseDir == "" {
-		if cur, err := os.Getwd(); err != nil {
-			slog.Warn("failed to get working directory", "err", err)
-			return vc
-		} else {
-			baseDir = filepath.Join(cur, "multigres_local")
-		}
-	}
+// Use MTDATAROOT environment variable if set, otherwise fall back to pwd/multigres_local
 
-	vc.configPaths.(*value.Static[[]string]).DefaultVal = []string{baseDir}
-	// Need to re-trigger the SetDefault call done during Configure.
-	reg.static.SetDefault(vc.configPaths.Key(), vc.configPaths.Default())
-	return vc
-}
+// Need to re-trigger the SetDefault call done during Configure.
 
 // RegisterFlags installs the flags that control viper config-loading behavior.
 // It is exported to be called by servenv before parsing flags for all binaries.
 //
 // It cannot be registered here via servenv.OnParse since this causes an import
 // cycle.
-func (vc *ViperConfig) RegisterFlags(fs *pflag.FlagSet) {
-	fs.StringSlice("config-path", vc.configPaths.Default(), "Paths to search for config files in.")
-	fs.String("config-type", vc.configType.Default(), "Config file type (omit to infer config type from file extension).")
-	fs.String("config-name", vc.configName.Default(), "Name of the config file (without extension) to search for.")
-	fs.String("config-file", vc.configFile.Default(), "Full path of the config file (with extension) to use. If set, --config-path, --config-type, and --config-name are ignored.")
-	fs.Duration("config-persistence-min-interval", vc.configPersistenceMinInterval.Default(), "minimum interval between persisting dynamic config changes back to disk (if no change has occurred, nothing is done).")
-
-	h := vc.configFileNotFoundHandling.Default()
-	fs.Var(&h, "config-file-not-found-handling", fmt.Sprintf("Behavior when a config file is not found. (Options: %s)", strings.Join(handlingNames, ", ")))
-
-	BindFlags(fs, vc.configPaths, vc.configType, vc.configName, vc.configFile, vc.configFileNotFoundHandling, vc.configPersistenceMinInterval)
-}
+func (vc *ViperConfig) RegisterFlags(fs *pflag.FlagSet) { _ = "STUB: not implemented"; return }
 
 // LoadConfig attempts to find, and then load, a config file for viper-backed
 // config values to use.
@@ -163,58 +74,15 @@ func (vc *ViperConfig) RegisterFlags(fs *pflag.FlagSet) {
 //
 // [1]: https://github.com/spf13/viper#reading-config-files.
 func (vc *ViperConfig) LoadConfig(reg *Registry) (context.CancelFunc, error) {
-	var err error
-	switch file := vc.configFile.Get(); file {
-	case "":
-		if name := vc.configName.Get(); name != "" {
-			reg.static.SetConfigName(name)
-
-			for _, path := range vc.configPaths.Get() {
-				reg.static.AddConfigPath(path)
-			}
-
-			if cfgType := vc.configType.Get(); cfgType != "" {
-				reg.static.SetConfigType(cfgType)
-			}
-
-			err = reg.static.ReadInConfig()
-		}
-	default:
-		reg.static.SetConfigFile(file)
-		err = reg.static.ReadInConfig()
-	}
-
-	if err != nil {
-		if isConfigFileNotFoundError(err) {
-			msg := "Failed to read in config %s: %s"
-			switch vc.configFileNotFoundHandling.Get() {
-			case WarnOnConfigFileNotFound:
-				// TODO: @rafael (add warning and point to docs)
-				fallthrough // after warning, ignore the error
-			case IgnoreConfigFileNotFound:
-				return func() {}, nil
-			case ErrorOnConfigFileNotFound:
-				slog.Error(fmt.Sprintf(msg, reg.static.ConfigFileUsed(), err.Error()))
-			case ExitOnConfigFileNotFound:
-				slog.Error(fmt.Sprintf(msg, reg.static.ConfigFileUsed(), err.Error()))
-			}
-		}
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return reg.dynamic.Watch(context.TODO(), reg.static, vc.configPersistenceMinInterval.Get())
+	_ = "STUB: not implemented"
+	return *new(context.CancelFunc), nil
 }
+
+// TODO: @rafael (add warning and point to docs)
+// after warning, ignore the error
 
 // isConfigFileNotFoundError checks if the error is caused because the file wasn't found.
-func isConfigFileNotFoundError(err error) bool {
-	if errors.As(err, &viper.ConfigFileNotFoundError{}) {
-		return true
-	}
-	return errors.Is(err, os.ErrNotExist)
-}
+func isConfigFileNotFoundError(err error) bool { _ = "STUB: not implemented"; return false }
 
 // NotifyConfigReload adds a subscription that the dynamic registry will attempt
 // to notify on config changes. The notification fires after the updated config
@@ -225,9 +93,7 @@ func isConfigFileNotFoundError(err error) bool {
 //
 // This function must be called prior to LoadConfig; it will panic if called
 // after the dynamic registry has started watching the loaded config.
-func NotifyConfigReload(reg *Registry, ch chan<- struct{}) {
-	reg.dynamic.Notify(ch)
-}
+func NotifyConfigReload(reg *Registry, ch chan<- struct{}) { _ = "STUB: not implemented"; return }
 
 // ConfigFileNotFoundHandling is an enum to control how LoadConfig treats errors
 // of type viper.ConfigFileNotFoundError when loading a config.
@@ -262,36 +128,13 @@ var (
 )
 
 func getHandlingValue(v *viper.Viper) func(key string) ConfigFileNotFoundHandling {
-	return func(key string) (h ConfigFileNotFoundHandling) {
-		if err := v.UnmarshalKey(key, &h, viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(decodeHandlingValue))); err != nil {
-			h = IgnoreConfigFileNotFound
-			slog.Warn(fmt.Sprintf("failed to unmarshal %s: %s; defaulting to %s", key, err.Error(), h.String()))
-		}
-
-		return h
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func decodeHandlingValue(from, to reflect.Type, data any) (any, error) {
-	var h ConfigFileNotFoundHandling
-	if to != reflect.TypeFor[ConfigFileNotFoundHandling]() {
-		return data, nil
-	}
-
-	switch {
-	case from == reflect.TypeFor[ConfigFileNotFoundHandling]():
-		return data.(ConfigFileNotFoundHandling), nil
-	case from.Kind() == reflect.Int:
-		return ConfigFileNotFoundHandling(data.(int)), nil
-	case from.Kind() == reflect.String:
-		if err := h.Set(data.(string)); err != nil {
-			return h, err
-		}
-
-		return h, nil
-	}
-
-	return data, fmt.Errorf("invalid value for ConfigHandlingType: %v", data)
+	_ = "STUB: not implemented"
+	return *new(any), nil
 }
 
 func init() {
@@ -306,22 +149,8 @@ func init() {
 	slices.Sort(handlingNames)
 }
 
-func (h *ConfigFileNotFoundHandling) Set(arg string) error {
-	argLower := strings.ToLower(arg)
-	if v, ok := handlingNamesToValues[argLower]; ok {
-		*h = ConfigFileNotFoundHandling(v)
-		return nil
-	}
+func (h *ConfigFileNotFoundHandling) Set(arg string) error { _ = "STUB: not implemented"; return nil }
 
-	return fmt.Errorf("unknown handling name %s", arg)
-}
+func (h *ConfigFileNotFoundHandling) String() string { _ = "STUB: not implemented"; return "" }
 
-func (h *ConfigFileNotFoundHandling) String() string {
-	if name, ok := handlingValuesToNames[int(*h)]; ok {
-		return name
-	}
-
-	return "<UNKNOWN>"
-}
-
-func (h *ConfigFileNotFoundHandling) Type() string { return "ConfigFileNotFoundHandling" }
+func (h *ConfigFileNotFoundHandling) Type() string { _ = "STUB: not implemented"; return "" }

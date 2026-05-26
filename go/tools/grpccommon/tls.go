@@ -16,11 +16,6 @@ package grpccommon
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"encoding/pem"
-	"errors"
-	"fmt"
-	"os"
 )
 
 // BuildServerTLSConfig creates a TLS configuration for a gRPC server.
@@ -32,76 +27,21 @@ import (
 // When serverCAFile is provided, the intermediate CA certificate is appended
 // to the server's certificate chain so clients receive the full chain.
 func BuildServerTLSConfig(certFile, keyFile, caFile, serverCAFile string) (*tls.Config, error) {
-	if certFile == "" && keyFile == "" {
-		// Reject ca/serverCA-only configurations: a user that set them
-		// likely intended TLS/mTLS and would otherwise silently get plaintext.
-		if caFile != "" || serverCAFile != "" {
-			return nil, errors.New("server CA configured without server cert and key")
-		}
-		return nil, nil
-	}
-	if certFile == "" {
-		return nil, errors.New("server cert is required when server key is set")
-	}
-	if keyFile == "" {
-		return nil, errors.New("server key is required when server cert is set")
-	}
-
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load gRPC server certificate: %w", err)
-	}
-
-	// Append intermediate CA certificates to the server's certificate chain
-	// so clients receive the full chain during the TLS handshake.
-	if serverCAFile != "" {
-		serverCAPEM, err := os.ReadFile(serverCAFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read server CA file: %w", err)
-		}
-		rest := serverCAPEM
-		found := false
-		for {
-			var block *pem.Block
-			block, rest = pem.Decode(rest)
-			if block == nil {
-				break
-			}
-			// Skip non-certificate blocks (e.g., a stray PRIVATE KEY block in a
-			// mixed PEM file). Appending them would corrupt the chain and only
-			// surface as a confusing TLS handshake error later.
-			if block.Type != "CERTIFICATE" {
-				continue
-			}
-			cert.Certificate = append(cert.Certificate, block.Bytes)
-			found = true
-		}
-		if !found {
-			return nil, errors.New("failed to decode any certificates from server CA PEM")
-		}
-	}
-
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
-	}
-
-	// Enable mutual TLS if a client CA is provided.
-	if caFile != "" {
-		caPEM, err := os.ReadFile(caFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read CA file: %w", err)
-		}
-		caPool := x509.NewCertPool()
-		if !caPool.AppendCertsFromPEM(caPEM) {
-			return nil, errors.New("failed to parse CA certificate")
-		}
-		tlsConfig.ClientCAs = caPool
-		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-	}
-
-	return tlsConfig, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Reject ca/serverCA-only configurations: a user that set them
+// likely intended TLS/mTLS and would otherwise silently get plaintext.
+
+// Append intermediate CA certificates to the server's certificate chain
+// so clients receive the full chain during the TLS handshake.
+
+// Skip non-certificate blocks (e.g., a stray PRIVATE KEY block in a
+// mixed PEM file). Appending them would corrupt the chain and only
+// surface as a confusing TLS handshake error later.
+
+// Enable mutual TLS if a client CA is provided.
 
 // BuildClientTLSConfig creates a TLS configuration for a gRPC client.
 // Returns nil if no TLS parameters are provided (insecure mode).
@@ -114,44 +54,10 @@ func BuildServerTLSConfig(certFile, keyFile, caFile, serverCAFile string) (*tls.
 // TLS against the system trust store, which is almost always a
 // misconfiguration rather than an intentional "use public CAs" choice.
 func BuildClientTLSConfig(certFile, keyFile, caFile, serverName string) (*tls.Config, error) {
-	if certFile == "" && keyFile == "" && caFile == "" {
-		if serverName != "" {
-			return nil, errors.New("client server name configured without CA or client cert+key")
-		}
-		return nil, nil
-	}
-
-	tlsConfig := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-	}
-
-	// Load CA for server certificate verification.
-	if caFile != "" {
-		caPEM, err := os.ReadFile(caFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read CA file: %w", err)
-		}
-		caPool := x509.NewCertPool()
-		if !caPool.AppendCertsFromPEM(caPEM) {
-			return nil, errors.New("failed to parse CA certificate")
-		}
-		tlsConfig.RootCAs = caPool
-	}
-
-	// Load client certificate for mutual TLS.
-	if certFile != "" && keyFile != "" {
-		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load gRPC client certificate: %w", err)
-		}
-		tlsConfig.Certificates = []tls.Certificate{cert}
-	} else if certFile != "" || keyFile != "" {
-		return nil, errors.New("both client cert and key must be provided for mTLS")
-	}
-
-	if serverName != "" {
-		tlsConfig.ServerName = serverName
-	}
-
-	return tlsConfig, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Load CA for server certificate verification.
+
+// Load client certificate for mutual TLS.

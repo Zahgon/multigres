@@ -16,13 +16,9 @@ package recovery
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // Metrics holds all OpenTelemetry metrics for the recovery engine.
@@ -49,7 +45,8 @@ type PoolerStoreSize struct {
 
 // Inst returns the underlying metric instrument for callback registration.
 func (m PoolerStoreSize) Inst() metric.Int64ObservableGauge {
-	return m.Int64ObservableGauge
+	_ = "STUB: not implemented"
+	return *new(metric.Int64ObservableGauge)
 }
 
 // RecoveryActionStatus represents the possible status values for a recovery action.
@@ -84,14 +81,8 @@ func (m RecoveryActionDuration) Record(
 	dbNamespace string,
 	shard string,
 ) {
-	m.Float64Histogram.Record(ctx, val,
-		metric.WithAttributes(
-			attribute.String("action", actionName),
-			attribute.String("problem_code", problemCode),
-			attribute.String("status", string(status)),
-			attribute.String("db.namespace", dbNamespace),
-			attribute.String("shard", shard),
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // ErrorsTotal wraps an Int64Counter for counting errors in the recovery engine.
@@ -107,13 +98,8 @@ type ErrorsTotal struct {
 //   - source: The component that produced the error (e.g., "analyzer", "recovery_action")
 //   - attrs: Optional additional attributes to include in the metric
 func (m ErrorsTotal) Add(ctx context.Context, source string, attrs ...attribute.KeyValue) {
-	m.Int64Counter.Add(ctx, 1,
-		metric.WithAttributes(
-			append(
-				attrs,
-				attribute.String("source", source),
-			)...,
-		))
+	_ = "STUB: not implemented"
+	return
 }
 
 // DetectedProblems wraps an Int64ObservableGauge for observing detected problems by type.
@@ -124,7 +110,8 @@ type DetectedProblems struct {
 
 // Inst returns the underlying metric instrument for callback registration.
 func (m DetectedProblems) Inst() metric.Int64ObservableGauge {
-	return m.Int64ObservableGauge
+	_ = "STUB: not implemented"
+	return *new(metric.Int64ObservableGauge)
 }
 
 // NewMetrics initializes OpenTelemetry metrics for the recovery engine.
@@ -134,112 +121,26 @@ func (m DetectedProblems) Inst() metric.Int64ObservableGauge {
 //
 // Returns a Metrics instance (with noop fallbacks for failed metrics) and any initialization
 // errors that occurred. The caller should log or handle these errors as appropriate.
-func NewMetrics() (*Metrics, error) {
-	m := &Metrics{
-		meter: otel.Meter("github.com/multigres/multigres/go/services/multiorch/recovery"),
-	}
+func NewMetrics() (*Metrics, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	var errs []error
+// Gauge for current pooler store size
 
-	// Gauge for current pooler store size
-	poolerStoreSizeGauge, err := m.meter.Int64ObservableGauge(
-		"multiorch.recovery.pooler.store.size",
-		metric.WithDescription("Current number of poolers tracked in the recovery engine store"),
-		metric.WithUnit("{pooler}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.pooler.store.size gauge: %w", err))
-		m.poolerStoreSize = PoolerStoreSize{noop.Int64ObservableGauge{}}
-	} else {
-		m.poolerStoreSize = PoolerStoreSize{poolerStoreSizeGauge}
-	}
+// Histogram for recovery action duration
 
-	// Histogram for recovery action duration
-	recoveryActionDurationHistogram, err := m.meter.Float64Histogram(
-		"multiorch.recovery.action.duration",
-		metric.WithDescription("Duration of recovery action executions"),
-		metric.WithUnit("ms"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.action.duration histogram: %w", err))
-		m.recoveryActionDuration = RecoveryActionDuration{noop.Float64Histogram{}}
-	} else {
-		m.recoveryActionDuration = RecoveryActionDuration{recoveryActionDurationHistogram}
-	}
+// Counter for errors
 
-	// Counter for errors
-	errorsTotalCounter, err := m.meter.Int64Counter(
-		"multiorch.recovery.errors.total",
-		metric.WithDescription("Total number of errors in the recovery engine"),
-		metric.WithUnit("{error}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.errors.total counter: %w", err))
-		m.errorsTotal = ErrorsTotal{noop.Int64Counter{}}
-	} else {
-		m.errorsTotal = ErrorsTotal{errorsTotalCounter}
-	}
+// Gauge for detected problems by type
 
-	// Gauge for detected problems by type
-	detectedProblemsGauge, err := m.meter.Int64ObservableGauge(
-		"multiorch.recovery.detected_problems",
-		metric.WithDescription("Current number of detected problems by analysis type"),
-		metric.WithUnit("{problem}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.detected_problems gauge: %w", err))
-		m.detectedProblems = DetectedProblems{noop.Int64ObservableGauge{}}
-	} else {
-		m.detectedProblems = DetectedProblems{detectedProblemsGauge}
-	}
+// Gauge for stream connection status per pooler (1 = connected, 0 = disconnected)
 
-	// Gauge for stream connection status per pooler (1 = connected, 0 = disconnected)
-	streamConnectedGauge, err := m.meter.Int64ObservableGauge(
-		"multiorch.recovery.stream.connected",
-		metric.WithDescription("Whether the ManagerHealthStream stream to the pooler is currently connected (1) or not (0)"),
-		metric.WithUnit("{bool}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.stream.connected gauge: %w", err))
-		m.streamConnected = StreamConnected{noop.Int64ObservableGauge{}}
-	} else {
-		m.streamConnected = StreamConnected{streamConnectedGauge}
-	}
-
-	// Gauge for cumulative snapshots received per pooler
-	streamSnapshotsTotalGauge, err := m.meter.Int64ObservableGauge(
-		"multiorch.recovery.stream.snapshots_received",
-		metric.WithDescription("Cumulative number of health snapshots received from the pooler via ManagerHealthStream"),
-		metric.WithUnit("{snapshot}"),
-	)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("multiorch.recovery.stream.snapshots_received gauge: %w", err))
-		m.streamSnapshotsTotal = StreamSnapshotsTotal{noop.Int64ObservableGauge{}}
-	} else {
-		m.streamSnapshotsTotal = StreamSnapshotsTotal{streamSnapshotsTotalGauge}
-	}
-
-	if len(errs) > 0 {
-		return m, errors.Join(errs...)
-	}
-	return m, nil
-}
+// Gauge for cumulative snapshots received per pooler
 
 // RegisterPoolerStoreSizeCallback registers a callback for the pooler store size observable gauge.
 // The poolerStoreGetter function is called periodically to observe the current store size.
 // Returns an error if callback registration fails.
 func (m *Metrics) RegisterPoolerStoreSizeCallback(poolerStoreGetter func() int) error {
-	if poolerStoreGetter == nil {
-		return nil
-	}
-	_, err := m.meter.RegisterCallback(
-		func(ctx context.Context, observer metric.Observer) error {
-			observer.ObserveInt64(m.poolerStoreSize.Inst(), int64(poolerStoreGetter()))
-			return nil
-		},
-		m.poolerStoreSize.Inst(),
-	)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamConnected wraps an Int64ObservableGauge that reports 1 when a pooler's
@@ -251,7 +152,8 @@ type StreamConnected struct {
 
 // Inst returns the underlying metric instrument for callback registration.
 func (m StreamConnected) Inst() metric.Int64ObservableGauge {
-	return m.Int64ObservableGauge
+	_ = "STUB: not implemented"
+	return *new(metric.Int64ObservableGauge)
 }
 
 // StreamSnapshotsTotal wraps an Int64ObservableGauge that reports the cumulative
@@ -263,7 +165,8 @@ type StreamSnapshotsTotal struct {
 
 // Inst returns the underlying metric instrument for callback registration.
 func (m StreamSnapshotsTotal) Inst() metric.Int64ObservableGauge {
-	return m.Int64ObservableGauge
+	_ = "STUB: not implemented"
+	return *new(metric.Int64ObservableGauge)
 }
 
 // StreamHealthData holds per-pooler stream health data for metric observation.
@@ -290,30 +193,8 @@ type DetectedProblemData struct {
 // are updated in the same callback to keep them consistent.
 // Returns an error if callback registration fails.
 func (m *Metrics) RegisterStreamHealthCallback(getter func() []StreamHealthData) error {
-	if getter == nil {
-		return nil
-	}
-	_, err := m.meter.RegisterCallback(
-		func(ctx context.Context, observer metric.Observer) error {
-			for _, data := range getter() {
-				attrs := metric.WithAttributes(
-					attribute.String("pooler_id", data.PoolerID),
-					attribute.String("db.namespace", data.DBNamespace),
-					attribute.String("shard", data.Shard),
-				)
-				connected := int64(0)
-				if data.Connected {
-					connected = 1
-				}
-				observer.ObserveInt64(m.streamConnected.Inst(), connected, attrs)
-				observer.ObserveInt64(m.streamSnapshotsTotal.Inst(), data.SnapshotsReceived, attrs)
-			}
-			return nil
-		},
-		m.streamConnected.Inst(),
-		m.streamSnapshotsTotal.Inst(),
-	)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RegisterDetectedProblemsCallback registers a callback for the detected problems observable gauge.
@@ -321,23 +202,6 @@ func (m *Metrics) RegisterStreamHealthCallback(getter func() []StreamHealthData)
 // Each problem is reported with value=1 per pooler.
 // Returns an error if callback registration fails.
 func (m *Metrics) RegisterDetectedProblemsCallback(getter func() []DetectedProblemData) error {
-	if getter == nil {
-		return nil
-	}
-	_, err := m.meter.RegisterCallback(
-		func(ctx context.Context, observer metric.Observer) error {
-			for _, data := range getter() {
-				observer.ObserveInt64(m.detectedProblems.Inst(), 1,
-					metric.WithAttributes(
-						attribute.String("analysis_type", data.AnalysisType),
-						attribute.String("db.namespace", data.DBNamespace),
-						attribute.String("shard", data.Shard),
-						attribute.String("entity_id", data.EntityID),
-					))
-			}
-			return nil
-		},
-		m.detectedProblems.Inst(),
-	)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }

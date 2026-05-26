@@ -15,11 +15,6 @@
 package server
 
 import (
-	"errors"
-	"fmt"
-	"io"
-	"strconv"
-
 	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/pgprotocol/protocol"
 	"github.com/multigres/multigres/go/common/sqltypes"
@@ -31,31 +26,13 @@ import (
 //   - Message type: 'Q' (already read)
 //   - Length: int32 (includes length field itself)
 //   - Query string: null-terminated string
-func (c *Conn) readQueryMessage() (string, error) {
-	bodyLen, err := c.ReadMessageLength()
-	if err != nil {
-		return "", fmt.Errorf("reading query length: %w", err)
-	}
-	if bodyLen < 1 {
-		return "", fmt.Errorf("invalid query message length: %d", bodyLen+4)
-	}
+func (c *Conn) readQueryMessage() (string, error) { _ = "STUB: not implemented"; return "", nil }
 
-	queryBytes, err := c.readMessageBody(bodyLen)
-	if err != nil {
-		return "", fmt.Errorf("reading query body: %w", err)
-	}
-	defer c.returnReadBuffer()
+// Verify null terminator.
 
-	// Verify null terminator.
-	if queryBytes[len(queryBytes)-1] != 0 {
-		return "", errors.New("query string missing null terminator")
-	}
-
-	// Convert to string (excluding null terminator). The string()
-	// conversion copies, so the body buffer can safely be returned
-	// to the pool by the deferred returnReadBuffer.
-	return string(queryBytes[:len(queryBytes)-1]), nil
-}
+// Convert to string (excluding null terminator). The string()
+// conversion copies, so the body buffer can safely be returned
+// to the pool by the deferred returnReadBuffer.
 
 // writeParameterDescription writes a 't' (ParameterDescription) message.
 // Format:
@@ -65,13 +42,8 @@ func (c *Conn) readQueryMessage() (string, error) {
 //   - For each parameter:
 //   - Type OID: int32
 func (c *Conn) writeParameterDescription(params []*query.ParameterDescription) error {
-	bodyLen := 2 + 4*len(params)
-	buf, pos := c.startPacket(protocol.MsgParameterDescription, bodyLen)
-	pos = writeInt16At(buf, pos, int16(len(params)))
-	for _, param := range params {
-		pos = writeInt32At(buf, pos, int32(param.DataTypeOid))
-	}
-	return c.writePacket(buf, pos)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // writeRowDescription writes a 'T' (RowDescription) message.
@@ -88,25 +60,12 @@ func (c *Conn) writeParameterDescription(params []*query.ParameterDescription) e
 //   - Type modifier: int32
 //   - Format code: int16 (0=text, 1=binary)
 func (c *Conn) writeRowDescription(fields []*query.Field) error {
-	bodyLen := 2 // field count
-	for _, field := range fields {
-		bodyLen += len(field.Name) + 1 // name + null terminator
-		bodyLen += 4 + 2 + 4 + 2 + 4 + 2
-	}
-
-	buf, pos := c.startPacket(protocol.MsgRowDescription, bodyLen)
-	pos = writeInt16At(buf, pos, int16(len(fields)))
-	for _, field := range fields {
-		pos = writeStringAt(buf, pos, field.Name)
-		pos = writeInt32At(buf, pos, int32(field.TableOid))
-		pos = writeInt16At(buf, pos, int16(field.TableAttributeNumber))
-		pos = writeInt32At(buf, pos, int32(field.DataTypeOid))
-		pos = writeInt16At(buf, pos, int16(field.DataTypeSize))
-		pos = writeInt32At(buf, pos, field.TypeModifier)
-		pos = writeInt16At(buf, pos, int16(field.Format))
-	}
-	return c.writePacket(buf, pos)
+	_ = "STUB: not implemented"
+	// field count
+	return nil
 }
+
+// name + null terminator
 
 // writeDataRow writes a 'D' (DataRow) message.
 // Format:
@@ -117,25 +76,9 @@ func (c *Conn) writeRowDescription(fields []*query.Field) error {
 //   - Value length: int32 (-1 for NULL)
 //   - Value bytes: []byte (if not NULL)
 func (c *Conn) writeDataRow(row *sqltypes.Row) error {
-	bodyLen := 2 // column count
-	for _, value := range row.Values {
-		bodyLen += 4
-		if value != nil {
-			bodyLen += len(value)
-		}
-	}
-
-	buf, pos := c.startPacket(protocol.MsgDataRow, bodyLen)
-	pos = writeInt16At(buf, pos, int16(len(row.Values)))
-	for _, value := range row.Values {
-		if value == nil {
-			pos = writeInt32At(buf, pos, -1)
-		} else {
-			pos = writeInt32At(buf, pos, int32(len(value)))
-			pos = writeBytesAt(buf, pos, value)
-		}
-	}
-	return c.writePacket(buf, pos)
+	_ = "STUB: not implemented"
+	// column count
+	return nil
 }
 
 // writeCommandComplete writes a 'C' (CommandComplete) message.
@@ -143,105 +86,46 @@ func (c *Conn) writeDataRow(row *sqltypes.Row) error {
 //   - Type: 'C'
 //   - Length: int32
 //   - Command tag: null-terminated string (e.g., "SELECT 5", "INSERT 0 1")
-func (c *Conn) writeCommandComplete(tag string) error {
-	buf, pos := c.startPacket(protocol.MsgCommandComplete, len(tag)+1)
-	pos = writeStringAt(buf, pos, tag)
-	return c.writePacket(buf, pos)
-}
+func (c *Conn) writeCommandComplete(tag string) error { _ = "STUB: not implemented"; return nil }
 
 // writeReadyForQuery writes a 'Z' (ReadyForQuery) message.
 // Format:
 //   - Type: 'Z'
 //   - Length: int32 (always 5)
 //   - Transaction status: byte ('I', 'T', or 'E')
-func (c *Conn) writeReadyForQuery() error {
-	buf, pos := c.startPacket(protocol.MsgReadyForQuery, 1)
-	pos = writeByteAt(buf, pos, byte(c.txnStatus))
-	return c.writePacket(buf, pos)
-}
+func (c *Conn) writeReadyForQuery() error { _ = "STUB: not implemented"; return nil }
 
 // writeEmptyQueryResponse writes an 'I' (EmptyQueryResponse) message.
 // This is sent when the client sends an empty query string.
 // Format:
 //   - Type: 'I'
 //   - Length: int32 (always 4)
-func (c *Conn) writeEmptyQueryResponse() error {
-	buf, pos := c.startPacket(protocol.MsgEmptyQueryResponse, 0)
-	return c.writePacket(buf, pos)
-}
+func (c *Conn) writeEmptyQueryResponse() error { _ = "STUB: not implemented"; return nil }
 
 // writeNoticeResponse writes an 'N' (NoticeResponse) message.
 // Format is identical to ErrorResponse but with different severity levels.
 func (c *Conn) writeNoticeResponse(diag *mterrors.PgDiagnostic) error {
-	return c.writePgDiagnosticResponse(protocol.MsgNoticeResponse, diag)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // writeError writes an error response to the client.
 // It handles both PostgreSQL errors (preserving all diagnostic fields)
 // and generic errors (creating synthetic PgDiagnostic).
-func (c *Conn) writeError(err error) error {
-	if err == nil {
-		return nil
-	}
+func (c *Conn) writeError(err error) error { _ = "STUB: not implemented"; return nil }
 
-	// Extract root cause - handles wrapped errors
-	rootErr := mterrors.RootCause(err)
+// Extract root cause - handles wrapped errors
 
-	// Check if root cause is a PostgreSQL error
-	var diag *mterrors.PgDiagnostic
-	if errors.As(rootErr, &diag) {
-		return c.writePgDiagnosticResponse(protocol.MsgErrorResponse, diag)
-	}
+// Check if root cause is a PostgreSQL error
 
-	// Generic error: use outer message for context
-	return c.writePgDiagnosticResponse(protocol.MsgErrorResponse,
-		mterrors.NewPgError("ERROR", mterrors.PgSSInternalError, err.Error(), ""))
-}
+// Generic error: use outer message for context
 
 // writePgDiagnosticResponse writes a PostgreSQL diagnostic response (error or notice).
 // The msgType should be MsgErrorResponse ('E') or MsgNoticeResponse ('N').
 // This unified function handles all 14 PostgreSQL diagnostic fields.
 func (c *Conn) writePgDiagnosticResponse(msgType byte, diag *mterrors.PgDiagnostic) error {
-	fields := make(map[byte]string)
-	fields[protocol.FieldSeverity] = diag.Severity
-	fields[protocol.FieldSeverityV] = diag.Severity
-	fields[protocol.FieldCode] = diag.Code
-	fields[protocol.FieldMessage] = diag.Message
-	if diag.Detail != "" {
-		fields[protocol.FieldDetail] = diag.Detail
-	}
-	if diag.Hint != "" {
-		fields[protocol.FieldHint] = diag.Hint
-	}
-	if diag.Position != 0 {
-		fields[protocol.FieldPosition] = strconv.Itoa(int(diag.Position))
-	}
-	if diag.InternalPosition != 0 {
-		fields[protocol.FieldInternalPosition] = strconv.Itoa(int(diag.InternalPosition))
-	}
-	if diag.InternalQuery != "" {
-		fields[protocol.FieldInternalQuery] = diag.InternalQuery
-	}
-	if diag.Where != "" {
-		fields[protocol.FieldWhere] = diag.Where
-	}
-	if diag.Schema != "" {
-		fields[protocol.FieldSchema] = diag.Schema
-	}
-	if diag.Table != "" {
-		fields[protocol.FieldTable] = diag.Table
-	}
-	if diag.Column != "" {
-		fields[protocol.FieldColumn] = diag.Column
-	}
-	if diag.DataType != "" {
-		fields[protocol.FieldDataType] = diag.DataType
-	}
-	if diag.Constraint != "" {
-		fields[protocol.FieldConstraint] = diag.Constraint
-	}
-
-	return c.writeErrorOrNotice(msgType, fields)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // writeErrorOrNotice writes an error or notice message with the given fields.
@@ -271,51 +155,26 @@ var diagFieldOrder = [...]byte{
 }
 
 func (c *Conn) writeErrorOrNotice(msgType byte, fields map[byte]string) error {
-	bodyLen := 1 // trailing null terminator
-	for _, fieldType := range diagFieldOrder {
-		if value, ok := fields[fieldType]; ok {
-			bodyLen += 1 + len(value) + 1 // type + value + null
-		}
-	}
-
-	buf, pos := c.startPacket(msgType, bodyLen)
-	for _, fieldType := range diagFieldOrder {
-		if value, ok := fields[fieldType]; ok {
-			pos = writeByteAt(buf, pos, fieldType)
-			pos = writeStringAt(buf, pos, value)
-		}
-	}
-	pos = writeByteAt(buf, pos, 0)
-	return c.writePacket(buf, pos)
+	_ = "STUB: not implemented"
+	// trailing null terminator
+	return nil
 }
+
+// type + value + null
 
 // WriteCopyInResponse writes a CopyInResponse ('G') message to the client
 // This tells the client that the server is ready to receive COPY data
 func (c *Conn) WriteCopyInResponse(format int16, columnFormats []int16) error {
-	bodyLen := 1 + 2 + 2*len(columnFormats)
-	buf, pos := c.startPacket(protocol.MsgCopyInResponse, bodyLen)
-	pos = writeByteAt(buf, pos, byte(format))
-	pos = writeInt16At(buf, pos, int16(len(columnFormats)))
-	for _, fmt := range columnFormats {
-		pos = writeInt16At(buf, pos, fmt)
-	}
-	return c.writePacket(buf, pos)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ReadCopyDataMessage reads a CopyData ('d') message body
 // The message type byte has already been read
 // length is the body length (already has 4 subtracted by ReadMessageLength)
 func (c *Conn) ReadCopyDataMessage(length int) ([]byte, error) {
-	if length < 0 {
-		return nil, fmt.Errorf("invalid CopyData message length: %d", length)
-	}
-
-	data := make([]byte, length)
-	if _, err := io.ReadFull(c.bufferedReader, data); err != nil {
-		return nil, fmt.Errorf("failed to read CopyData: %w", err)
-	}
-
-	return data, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ReadCopyDoneMessage reads a CopyDone ('c') message
@@ -323,10 +182,8 @@ func (c *Conn) ReadCopyDataMessage(length int) ([]byte, error) {
 // CopyDone has no body, just validates the length
 // length is the body length (already has 4 subtracted by ReadMessageLength)
 func (c *Conn) ReadCopyDoneMessage(length int) error {
+	_ = "STUB: not implemented"
 	// CopyDone has no body, so length should be 0
-	if length != 0 {
-		return fmt.Errorf("invalid CopyDone message length: %d (expected 0)", length)
-	}
 	return nil
 }
 
@@ -335,19 +192,8 @@ func (c *Conn) ReadCopyDoneMessage(length int) error {
 // Returns the error message string from the client
 // length is the body length (already has 4 subtracted by ReadMessageLength)
 func (c *Conn) ReadCopyFailMessage(length int) (string, error) {
-	if length < 0 {
-		return "", fmt.Errorf("invalid CopyFail message length: %d", length)
-	}
-
-	data := make([]byte, length)
-	if _, err := io.ReadFull(c.bufferedReader, data); err != nil {
-		return "", fmt.Errorf("failed to read CopyFail: %w", err)
-	}
-
-	// Message should be null-terminated
-	if len(data) > 0 && data[len(data)-1] == 0 {
-		data = data[:len(data)-1]
-	}
-
-	return string(data), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// Message should be null-terminated

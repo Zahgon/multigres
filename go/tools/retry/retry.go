@@ -69,9 +69,7 @@ type Option func(*retryConfig)
 
 // WithInitialDelay configures the retry to add a delay before the first attempt.
 // Use this when you've already tried once before calling Attempts().
-func WithInitialDelay() Option {
-	return func(c *retryConfig) { c.InitialDelay = true }
-}
+func WithInitialDelay() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // New creates a new Retry with the given baseDelay and maxDelay, plus optional configuration.
 // Panics if the parameters are invalid (represents a coding error).
@@ -83,34 +81,14 @@ func WithInitialDelay() Option {
 //   - baseDelay: Base delay for exponential backoff (delay = baseDelay × 2^attempt)
 //   - maxDelay: Maximum delay cap to prevent unbounded growth
 func New(baseDelay, maxDelay time.Duration, opts ...Option) *Retry {
+	_ = "STUB: not implemented"
 	// Validate required parameters (panic on coding errors)
-	if baseDelay <= 0 {
-		panic("retry: BaseDelay must be positive")
-	}
-	if maxDelay <= 0 {
-		panic("retry: MaxDelay must be positive")
-	}
-	if baseDelay > maxDelay {
-		panic("retry: BaseDelay cannot be greater than MaxDelay")
-	}
-
-	// Build config with defaults
-	cfg := retryConfig{
-		BaseDelay: baseDelay,
-		MaxDelay:  maxDelay,
-		backoff:   newExponentialFullJitterBackoff(baseDelay, maxDelay),
-	}
-
-	// Apply optional configuration
-	for _, opt := range opts {
-		opt(&cfg)
-	}
-
-	return &Retry{
-		cfg:   cfg,
-		timer: realTimer{},
-	}
+	return nil
 }
+
+// Build config with defaults
+
+// Apply optional configuration
 
 // startAttempt prepares for the next retry attempt by waiting for the backoff delay.
 // On the first call (attempt 0), it returns immediately unless WithInitialDelay was configured.
@@ -120,32 +98,20 @@ func New(baseDelay, maxDelay time.Duration, opts ...Option) *Retry {
 //   - nil if the caller should proceed with the next attempt
 //   - ctx.Err() if the context was cancelled or timed out during the wait
 func (r *Retry) startAttempt(ctx context.Context) error {
+	_ = "STUB: not implemented"
 	// Check context first
-	if err := ctx.Err(); err != nil {
-		return err
-	}
-
-	// Determine if we should wait before this attempt
-	shouldWait := r.attempt > 0 || r.cfg.InitialDelay
-
-	if shouldWait {
-		// Calculate delay with backoff strategy
-		delay := r.cfg.backoff.nextDelay()
-
-		// Wait for the delay or context cancellation
-		select {
-		case <-r.timer.After(delay):
-			// Delay completed
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-
-	// Increment attempt counter
-	r.attempt++
-
 	return nil
 }
+
+// Determine if we should wait before this attempt
+
+// Calculate delay with backoff strategy
+
+// Wait for the delay or context cancellation
+
+// Delay completed
+
+// Increment attempt counter
 
 // Reset resets the backoff state to the initial delay.
 // Use this when you've determined the system is healthy and future errors
@@ -182,9 +148,7 @@ func (r *Retry) startAttempt(ctx context.Context) error {
 //	        continue // Will retry with backoff
 //	    }
 //	}
-func (r *Retry) Reset() {
-	r.cfg.backoff.reset()
-}
+func (r *Retry) Reset() { _ = "STUB: not implemented"; return }
 
 // Attempts returns an iterator for range-based retry loops (Go 1.23+).
 // Yields (attempt number, error) pairs where error is nil for each retry attempt,
@@ -205,12 +169,6 @@ func (r *Retry) Reset() {
 //	    log.Printf("Attempt %d failed: %v", attempt, err)
 //	}
 func (r *Retry) Attempts(ctx context.Context) func(yield func(int, error) bool) {
-	return func(yield func(int, error) bool) {
-		for {
-			err := r.startAttempt(ctx)
-			if !yield(r.attempt, err) {
-				return
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

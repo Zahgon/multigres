@@ -16,13 +16,11 @@ package engine
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
 	"github.com/multigres/multigres/go/common/sqltypes"
-	"github.com/multigres/multigres/go/pb/query"
 	"github.com/multigres/multigres/go/services/multigateway/handler"
 )
 
@@ -38,10 +36,8 @@ type GatewayShowVariable struct {
 // NewGatewayShowVariable creates a primitive that returns the current effective
 // value of a gateway-managed variable.
 func NewGatewayShowVariable(sql string, variable string) *GatewayShowVariable {
-	return &GatewayShowVariable{
-		sql:      sql,
-		variable: variable,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute reads the variable's current value and returns it as a single-row result.
@@ -53,31 +49,15 @@ func (g *GatewayShowVariable) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	var value string
-	switch g.variable {
-	case "statement_timeout":
-		value = state.ShowStatementTimeout()
-	default:
-		// Unreachable: the planner validates the variable name before creating
-		// this primitive. If we get here, there's a code bug (new variable added
-		// to isGatewayManagedVariable but not here).
-		panic(fmt.Sprintf("BUG: unhandled gateway-managed variable %q in GatewayShowVariable", g.variable))
-	}
-
-	return callback(ctx, &sqltypes.Result{
-		Fields: []*query.Field{
-			{
-				Name:        g.variable,
-				Type:        "text",
-				DataTypeOid: 25, // text OID
-			},
-		},
-		Rows: []*sqltypes.Row{
-			sqltypes.MakeRow([][]byte{[]byte(value)}),
-		},
-		CommandTag: "SHOW",
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Unreachable: the planner validates the variable name before creating
+// this primitive. If we get here, there's a code bug (new variable added
+// to isGatewayManagedVariable but not here).
+
+// text OID
 
 // PortalStreamExecute satisfies the Primitive interface for the
 // extended-protocol path. SHOW on a gateway-managed variable carries no
@@ -92,23 +72,26 @@ func (g *GatewayShowVariable) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return g.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetTableGroup returns empty string as this primitive doesn't target a tablegroup.
 func (g *GatewayShowVariable) GetTableGroup() string {
+	_ = "STUB: not implemented"
+
+	// GetQuery returns empty string as this primitive doesn't execute a query.
 	return ""
 }
 
-// GetQuery returns empty string as this primitive doesn't execute a query.
 func (g *GatewayShowVariable) GetQuery() string {
+	_ = "STUB: not implemented"
+
+	// String returns a description for logging/debugging.
 	return ""
 }
 
-// String returns a description for logging/debugging.
-func (g *GatewayShowVariable) String() string {
-	return fmt.Sprintf("GatewayShowVariable(%s)", g.sql)
-}
+func (g *GatewayShowVariable) String() string { _ = "STUB: not implemented"; return "" }
 
 // Ensure GatewayShowVariable implements Primitive interface.
 var _ Primitive = (*GatewayShowVariable)(nil)

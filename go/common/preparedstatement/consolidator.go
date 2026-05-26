@@ -15,14 +15,9 @@
 package preparedstatement
 
 import (
-	"errors"
-	"fmt"
-	"log/slog"
 	"sync"
 
-	"github.com/multigres/multigres/go/common/parser"
 	"github.com/multigres/multigres/go/common/parser/ast"
-	"github.com/multigres/multigres/go/common/protoutil"
 	querypb "github.com/multigres/multigres/go/pb/query"
 )
 
@@ -79,166 +74,69 @@ type PreparedStatementInfo struct {
 
 // AstStmt returns the parsed AST statement for this prepared statement.
 func (psi *PreparedStatementInfo) AstStmt() ast.Stmt {
-	return psi.astStruct
+	_ = "STUB: not implemented"
+	return *
+
+	// NewPreparedStatementInfo parses the query in the prepared statement and stores it along with the
+	// prepared statement information for future use.
+	new(ast.Stmt)
 }
 
-// NewPreparedStatementInfo parses the query in the prepared statement and stores it along with the
-// prepared statement information for future use.
 func NewPreparedStatementInfo(ps *querypb.PreparedStatement) (*PreparedStatementInfo, error) {
-	asts, err := parser.ParseSQL(ps.Query)
-	if err != nil {
-		return nil, err
-	}
-	if len(asts) != 1 {
-		return nil, errors.New("more than 1 query in prepare statement")
-	}
-	return &PreparedStatementInfo{
-		PreparedStatement: ps,
-		astStruct:         asts[0],
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // NewPortalInfo creates the PortalInfo.
 func NewPortalInfo(psi *PreparedStatementInfo, portal *querypb.Portal) *PortalInfo {
-	return &PortalInfo{
-		Portal:                portal,
-		PreparedStatementInfo: psi,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewConsolidator gets a new prepared statement consolidator
 // used to consolidate and reuse the same prepared statements.
-func NewConsolidator() *Consolidator {
-	return &Consolidator{
-		stmts:      make(map[string]*PreparedStatementInfo),
-		incoming:   make(map[uint32]map[string]*PreparedStatementInfo),
-		usageCount: make(map[*PreparedStatementInfo]int),
-		lastUsedID: 0,
-	}
-}
+func NewConsolidator() *Consolidator { _ = "STUB: not implemented"; return nil }
 
 // AddPreparedStatement adds a prepared statement to the consolidator.
 // Returns the PreparedStatementInfo (either existing or newly created) and any error.
 func (psc *Consolidator) AddPreparedStatement(connId uint32, name, queryStr string, paramTypes []uint32) (*PreparedStatementInfo, error) {
-	psc.mu.Lock()
-	defer psc.mu.Unlock()
-
-	// Initialize the map for this connection if it doesn't exist
-	if psc.incoming[connId] == nil {
-		psc.incoming[connId] = make(map[string]*PreparedStatementInfo)
-	}
-
-	// If the name is non-empty and a prepared statement for this name already exists
-	// on the connection, replace it. This matches PostgreSQL behavior where re-parsing
-	// with an existing name replaces the old statement. This is necessary to handle
-	// the case where Parse succeeds (adding to consolidator) but the subsequent
-	// Describe fails — the client retries Parse with the same name.
-	if existing, exists := psc.incoming[connId][name]; exists && name != "" {
-		slog.Debug("replacing existing prepared statement",
-			"connId", connId,
-			"name", name,
-			"oldQuery", existing.Query,
-			"newQuery", queryStr,
-		)
-		psc.usageCount[existing]--
-		if psc.usageCount[existing] == 0 {
-			delete(psc.stmts, existing.Query)
-			delete(psc.usageCount, existing)
-		}
-		delete(psc.incoming[connId], name)
-	}
-
-	// Let's check if a prepared statement with this (query, paramTypes) already exists.
-	key := dedupKey(queryStr, paramTypes)
-	existingPs, foundExisting := psc.stmts[key]
-	if foundExisting {
-		// We found an existing prepared statement, we should be using that.
-		psc.usageCount[existingPs] += 1
-		psc.incoming[connId][name] = existingPs
-		return existingPs, nil
-	}
-
-	// We didn't find any existing prepared statement with this (query, paramTypes).
-	// Create a new one in our stmts list tracking unique prepared statements.
-	newName := fmt.Sprintf("stmt%d", psc.lastUsedID)
-	psc.lastUsedID += 1
-	newPS, err := NewPreparedStatementInfo(protoutil.NewPreparedStatement(newName, queryStr, paramTypes))
-	if err != nil {
-		return nil, err
-	}
-
-	psc.stmts[key] = newPS
-	psc.usageCount[newPS] += 1
-	psc.incoming[connId][name] = newPS
-	return newPS, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Initialize the map for this connection if it doesn't exist
+
+// If the name is non-empty and a prepared statement for this name already exists
+// on the connection, replace it. This matches PostgreSQL behavior where re-parsing
+// with an existing name replaces the old statement. This is necessary to handle
+// the case where Parse succeeds (adding to consolidator) but the subsequent
+// Describe fails — the client retries Parse with the same name.
+
+// Let's check if a prepared statement with this (query, paramTypes) already exists.
+
+// We found an existing prepared statement, we should be using that.
+
+// We didn't find any existing prepared statement with this (query, paramTypes).
+// Create a new one in our stmts list tracking unique prepared statements.
 
 // GetPreparedStatementInfo gets the information for a previously added prepared statement to the consolidator.
 func (psc *Consolidator) GetPreparedStatementInfo(connId uint32, name string) *PreparedStatementInfo {
-	psc.mu.Lock()
-	defer psc.mu.Unlock()
-
-	return psc.incoming[connId][name]
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RemovePreparedStatement removes prepared statement.
 func (psc *Consolidator) RemovePreparedStatement(connId uint32, name string) {
-	psc.mu.Lock()
-	defer psc.mu.Unlock()
-
-	psi, exists := psc.incoming[connId][name]
-	if exists {
-		psc.usageCount[psi] -= 1
-		if psc.usageCount[psi] == 0 {
-			delete(psc.stmts, dedupKey(psi.Query, psi.ParamTypes))
-			delete(psc.usageCount, psi)
-		}
-		delete(psc.incoming[connId], name)
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // RemoveConnection removes all prepared statements associated with a connection.
 // This should be called when a client connection is closed.
-func (psc *Consolidator) RemoveConnection(connId uint32) {
-	psc.mu.Lock()
-	defer psc.mu.Unlock()
-
-	connStmts, exists := psc.incoming[connId]
-	if !exists {
-		return
-	}
-
-	for _, psi := range connStmts {
-		psc.usageCount[psi]--
-		if psc.usageCount[psi] == 0 {
-			delete(psc.stmts, dedupKey(psi.Query, psi.ParamTypes))
-			delete(psc.usageCount, psi)
-		}
-	}
-	delete(psc.incoming, connId)
-}
+func (psc *Consolidator) RemoveConnection(connId uint32) { _ = "STUB: not implemented"; return }
 
 // Stats returns statistics about the consolidator's current state.
 func (psc *Consolidator) Stats() ConsolidatorStats {
-	psc.mu.Lock()
-	defer psc.mu.Unlock()
-
-	stats := ConsolidatorStats{
-		UniqueStatements: len(psc.stmts),
-		TotalReferences:  0,
-		ConnectionCount:  len(psc.incoming),
-		Statements:       make([]StatementStats, 0, len(psc.stmts)),
-	}
-
-	for _, psi := range psc.stmts {
-		usageCount := psc.usageCount[psi]
-		stats.TotalReferences += usageCount
-		stats.Statements = append(stats.Statements, StatementStats{
-			Name:       psi.Name,
-			Query:      psi.Query,
-			UsageCount: usageCount,
-		})
-	}
-
-	return stats
+	_ = "STUB: not implemented"
+	return *new(ConsolidatorStats)
 }

@@ -15,10 +15,6 @@
 package analysis
 
 import (
-	"errors"
-	"fmt"
-	"time"
-
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 )
 
@@ -29,75 +25,48 @@ type ReplicaNotReplicatingAnalyzer struct {
 }
 
 func (a *ReplicaNotReplicatingAnalyzer) Name() types.CheckName {
-	return "ReplicaNotReplicating"
+	_ = "STUB: not implemented"
+	return *new(types.CheckName)
 }
 
 func (a *ReplicaNotReplicatingAnalyzer) ProblemCode() types.ProblemCode {
-	return types.ProblemReplicaNotReplicating
+	_ = "STUB: not implemented"
+	return *new(types.ProblemCode)
 }
 
 func (a *ReplicaNotReplicatingAnalyzer) RecoveryAction() types.RecoveryAction {
-	return a.factory.NewFixReplicationAction()
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 func (a *ReplicaNotReplicatingAnalyzer) Analyze(sa *ShardAnalysis) ([]types.Problem, error) {
-	return analyzeAllPoolers(sa, a.analyzePooler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (a *ReplicaNotReplicatingAnalyzer) analyzePooler(sa *ShardAnalysis, poolerAnalysis *PoolerAnalysis) (*types.Problem, error) {
-	if a.factory == nil {
-		return nil, errors.New("recovery action factory not initialized")
-	}
-
-	// Only analyze replicas
-	if poolerAnalysis.IsLeader {
-		return nil, nil
-	}
-
-	// Skip if replica is not initialized (ShardNeedsInitialization handles that)
-	if !poolerAnalysis.IsInitialized {
-		return nil, nil
-	}
-
-	// Skip if there's no usable primary yet. HighestTermReachableLeader is
-	// non-nil only when the leader is reachable AND has published its rule
-	// (findHighestTermLeader filters out unobserved-rule leaders). Without a
-	// rule the recovery action can't populate SetTermPrimaryRequest.Rule — firing
-	// the problem now would produce a guaranteed-fail SetTermPrimary on the next
-	// cycle. PrimaryIsDead handles the unreachable case separately.
-	if sa.HighestTermReachableLeader == nil {
-		return nil, nil
-	}
-
-	// Check if replication is not configured or stopped
-	if !a.needsReplicationFix(poolerAnalysis) {
-		return nil, nil
-	}
-
-	return &types.Problem{
-		Code:           types.ProblemReplicaNotReplicating,
-		CheckName:      "ReplicaNotReplicating",
-		PoolerID:       poolerAnalysis.PoolerID,
-		ShardKey:       poolerAnalysis.ShardKey,
-		Description:    fmt.Sprintf("Replica %s has no replication configured", poolerAnalysis.PoolerID.Name),
-		Priority:       types.PriorityHigh,
-		Scope:          types.ScopePooler,
-		DetectedAt:     time.Now(),
-		RecoveryAction: a.factory.NewFixReplicationAction(),
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Only analyze replicas
+
+// Skip if replica is not initialized (ShardNeedsInitialization handles that)
+
+// Skip if there's no usable primary yet. HighestTermReachableLeader is
+// non-nil only when the leader is reachable AND has published its rule
+// (findHighestTermLeader filters out unobserved-rule leaders). Without a
+// rule the recovery action can't populate SetTermPrimaryRequest.Rule — firing
+// the problem now would produce a guaranteed-fail SetTermPrimary on the next
+// cycle. PrimaryIsDead handles the unreachable case separately.
+
+// Check if replication is not configured or stopped
 
 // needsReplicationFix returns true if replication is not configured or stopped.
 func (a *ReplicaNotReplicatingAnalyzer) needsReplicationFix(analysis *PoolerAnalysis) bool {
+	_ = "STUB: not implemented"
 	// No primary_conninfo configured
-	if analysis.PrimaryConnInfoHost == "" {
-		return true
-	}
-
-	// Replication explicitly stopped
-	if analysis.ReplicationStopped {
-		return true
-	}
-
 	return false
 }
+
+// Replication explicitly stopped

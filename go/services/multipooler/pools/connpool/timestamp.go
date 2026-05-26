@@ -40,69 +40,41 @@ const timestampBusy = math.MinInt64
 // monotonicNow returns the current monotonic time as a time.Duration.
 // This is a very efficient operation because time.Since performs direct
 // subtraction of monotonic times without considering the wall clock times.
-func monotonicNow() time.Duration {
-	return time.Since(monotonicRoot)
-}
+func monotonicNow() time.Duration { _ = "STUB: not implemented"; return *new(time.Duration) }
 
 // monotonicFromTime converts a wall-clock time from time.Now into a
 // monotonic timestamp.
 // This is a very efficient operation because time.(*Time).Sub performs direct
 // subtraction of monotonic times without considering the wall clock times.
 func monotonicFromTime(now time.Time) time.Duration {
-	return now.Sub(monotonicRoot)
+	_ = "STUB: not implemented"
+	return *new(time.Duration)
 }
 
 // set sets this timestamp to the given monotonic value
-func (t *timestamp) set(mono time.Duration) {
-	t.nano.Store(int64(mono))
-}
+func (t *timestamp) set(mono time.Duration) { _ = "STUB: not implemented"; return }
 
 // get returns the monotonic time of this timestamp as the number of nanoseconds
 // since the monotonic root.
-func (t *timestamp) get() time.Duration {
-	return time.Duration(t.nano.Load())
-}
+func (t *timestamp) get() time.Duration { _ = "STUB: not implemented"; return *new(time.Duration) }
 
 // elapsed returns the number of nanoseconds that have passed since
 // this timestamp was updated
-func (t *timestamp) elapsed() time.Duration {
-	return monotonicNow() - t.get()
-}
+func (t *timestamp) elapsed() time.Duration { _ = "STUB: not implemented"; return *new(time.Duration) }
 
 // update sets this timestamp's value to the current monotonic time
-func (t *timestamp) update() {
-	t.nano.Store(int64(monotonicNow()))
-}
+func (t *timestamp) update() { _ = "STUB: not implemented"; return }
 
 // borrow attempts to borrow this timestamp atomically.
 // It only succeeds if we can ensure that nobody else has marked
 // this timestamp as expired. When succeeded, the timestamp
 // is cleared as "busy" as it no longer tracks an expiration point.
-func (t *timestamp) borrow() bool {
-	stamp := t.nano.Load()
-	switch stamp {
-	case timestampExpired:
-		return false
-	case timestampBusy:
-		panic("timestampBusy when borrowing a time")
-	default:
-		return t.nano.CompareAndSwap(stamp, timestampBusy)
-	}
-}
+func (t *timestamp) borrow() bool { _ = "STUB: not implemented"; return false }
 
 // expired attempts to atomically expire this timestamp.
 // It only succeeds if we can ensure the timestamp hasn't been
 // concurrently expired or borrowed.
 func (t *timestamp) expired(now time.Duration, timeout time.Duration) bool {
-	stamp := t.nano.Load()
-	if stamp == timestampExpired {
-		return false
-	}
-	if stamp == timestampBusy {
-		return false
-	}
-	if now-time.Duration(stamp) > timeout {
-		return t.nano.CompareAndSwap(stamp, timestampExpired)
-	}
+	_ = "STUB: not implemented"
 	return false
 }

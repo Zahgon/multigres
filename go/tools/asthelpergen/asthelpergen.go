@@ -33,17 +33,10 @@
 package asthelpergen
 
 import (
-	"bytes"
-	"fmt"
 	"go/types"
-	"os"
-	"path"
-	"strings"
 
 	"github.com/dave/jennifer/jen"
 	"golang.org/x/tools/go/packages"
-
-	"github.com/multigres/multigres/go/tools/asthelpergen/internal"
 )
 
 const (
@@ -64,16 +57,7 @@ limitations under the License.`
 )
 
 // addLicenseHeader adds the license header as single-line // comments before the package declaration
-func addLicenseHeader(file *jen.File) {
-	lines := strings.SplitSeq(licenseFileHeader, "\n")
-	for line := range lines {
-		if line == "" {
-			file.PackageComment("")
-		} else {
-			file.PackageComment(line)
-		}
-	}
-}
+func addLicenseHeader(file *jen.File) { _ = "STUB: not implemented"; return }
 
 type (
 	// generatorSPI provides services to individual generators during code generation.
@@ -135,211 +119,87 @@ type (
 )
 
 func (gen *astHelperGen) iface() *types.Interface {
-	return gen._iface
-}
+	_ = "STUB: not implemented"
 
-// newGenerator creates a new AST helper generator with the specified configuration.
-//
-// Parameters:
-//   - mod: Go module information for path resolution
-//   - sizes: Platform-specific type size information
-//   - named: The root interface type for which helpers will be generated
-//   - generators: Specialized generators for different helper types (clone, rewrite, etc.)
-//
-// Returns a configured astHelperGen ready to process types and generate code.
-func newGenerator(mod *packages.Module, sizes types.Sizes, named *types.Named, generators ...generator) *astHelperGen {
-	return &astHelperGen{
-		DebugTypes: false,
-		mod:        mod,
-		sizes:      sizes,
-		namedIface: named,
-		_iface:     named.Underlying().(*types.Interface),
-		gens:       generators,
-	}
-}
-
-func findImplementations(scope *types.Scope, iff *types.Interface, impl func(types.Type) error) error {
-	for _, name := range scope.Names() {
-		obj := scope.Lookup(name)
-		if _, ok := obj.(*types.TypeName); !ok {
-			continue
-		}
-		baseType := obj.Type()
-
-		// Check if type implements the interface directly
-		if types.Implements(baseType, iff) {
-			if err := impl(baseType); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// Check if pointer to type implements the interface
-		pointerT := types.NewPointer(baseType)
-		if types.Implements(pointerT, iff) {
-			if err := impl(pointerT); err != nil {
-				return err
-			}
-			continue
-		}
-	}
+	// newGenerator creates a new AST helper generator with the specified configuration.
+	//
+	// Parameters:
+	//   - mod: Go module information for path resolution
+	//   - sizes: Platform-specific type size information
+	//   - named: The root interface type for which helpers will be generated
+	//   - generators: Specialized generators for different helper types (clone, rewrite, etc.)
+	//
+	// Returns a configured astHelperGen ready to process types and generate code.
 	return nil
 }
 
+func newGenerator(mod *packages.Module, sizes types.Sizes, named *types.Named, generators ...generator) *astHelperGen {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func findImplementations(scope *types.Scope, iff *types.Interface, impl func(types.Type) error) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+// Check if type implements the interface directly
+
+// Check if pointer to type implements the interface
+
 func (gen *astHelperGen) findImplementations(iff *types.Interface, impl func(types.Type) error) error {
-	return findImplementations(gen._scope, iff, impl)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (gen *astHelperGen) scope() *types.Scope {
-	return gen._scope
-}
+func (gen *astHelperGen) scope() *types.Scope { _ = "STUB: not implemented"; return nil }
 
-func (gen *astHelperGen) addType(t types.Type) {
-	gen.todo = append(gen.todo, t)
-}
+func (gen *astHelperGen) addType(t types.Type) { _ = "STUB: not implemented"; return }
 
 // GenerateCode is the main loop where we build up the code per file.
 func (gen *astHelperGen) GenerateCode() (map[string]*jen.File, error) {
-	pkg := gen.namedIface.Obj().Pkg()
-
-	gen._scope = pkg.Scope()
-	gen.todo = append(gen.todo, gen.namedIface)
-	jenFiles, err := gen.createFiles()
-	if err != nil {
-		return nil, err
-	}
-
-	result := map[string]*jen.File{}
-	for fName, genFile := range jenFiles {
-		fullPath := path.Join(gen.mod.Dir, strings.TrimPrefix(pkg.Path(), gen.mod.Path), fName)
-		result[fullPath] = genFile
-	}
-
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // VerifyFilesOnDisk compares the generated results from the codegen against the files that
 // currently exist on disk and returns any mismatches
 func VerifyFilesOnDisk(result map[string]*jen.File) (errors []error) {
-	for fullPath, file := range result {
-		existing, err := os.ReadFile(fullPath)
-		if err != nil {
-			errors = append(errors, fmt.Errorf("missing file on disk: %s (%w)", fullPath, err))
-			continue
-		}
-
-		genFile, err := internal.FormatJenFile(file)
-		if err != nil {
-			errors = append(errors, fmt.Errorf("goimport error: %w", err))
-			continue
-		}
-
-		if !bytes.Equal(existing, genFile) {
-			errors = append(errors, fmt.Errorf("'%s' has changed", fullPath))
-			continue
-		}
-	}
-	return errors
-}
-
-func (gen *astHelperGen) createFiles() (map[string]*jen.File, error) {
-	if err := gen.processTypeQueue(); err != nil {
-		return nil, err
-	}
-	return gen.generateOutputFiles(), nil
-}
-
-// processTypeQueue processes all types in the todo queue with all generators
-func (gen *astHelperGen) processTypeQueue() error {
-	alreadyDone := map[string]bool{}
-	for len(gen.todo) > 0 {
-		t := gen.todo[0]
-		typeName := printableTypeName(t)
-		gen.todo = gen.todo[1:]
-
-		if alreadyDone[typeName] {
-			continue
-		}
-
-		if err := gen.processTypeWithGenerators(t); err != nil {
-			return fmt.Errorf("failed to process type %s: %w", typeName, err)
-		}
-		alreadyDone[typeName] = true
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
+func (gen *astHelperGen) createFiles() (map[string]*jen.File, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+// processTypeQueue processes all types in the todo queue with all generators
+func (gen *astHelperGen) processTypeQueue() error { _ = "STUB: not implemented"; return nil }
+
 // processTypeWithGenerators dispatches a type to all generators based on its underlying type
 func (gen *astHelperGen) processTypeWithGenerators(t types.Type) error {
-	underlying := t.Underlying()
-	typeName := printableTypeName(t)
-
-	for _, g := range gen.gens {
-		var err error
-		switch underlying := underlying.(type) {
-		case *types.Interface:
-			err = g.interfaceMethod(t, underlying, gen)
-		case *types.Slice:
-			err = g.sliceMethod(t, underlying, gen)
-		case *types.Struct:
-			err = g.structMethod(t, underlying, gen)
-		case *types.Pointer:
-			err = gen.handlePointerType(t, underlying, g)
-		case *types.Basic:
-			err = g.basicMethod(t, underlying, gen)
-		default:
-			return fmt.Errorf("don't know how to handle type %s %T", typeName, underlying)
-		}
-		if err != nil {
-			return fmt.Errorf("generator failed for type %s: %w", typeName, err)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // handlePointerType handles pointer types by dispatching to the appropriate method
 func (gen *astHelperGen) handlePointerType(t types.Type, ptr *types.Pointer, g generator) error {
-	ptrToType := ptr.Elem().Underlying()
-	switch ptrToType := ptrToType.(type) {
-	case *types.Struct:
-		return g.ptrToStructMethod(t, ptrToType, gen)
-	case *types.Basic:
-		return g.ptrToBasicMethod(t, ptrToType, gen)
-	default:
-		return fmt.Errorf("unsupported pointer type %T", ptrToType)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // generateOutputFiles collects the generated files from all generators
 func (gen *astHelperGen) generateOutputFiles() map[string]*jen.File {
-	result := map[string]*jen.File{}
-	for _, g := range gen.gens {
-		fName, jenFile := g.genFile(gen)
-		result[fName] = jenFile
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // noQualifier is used to print types without package qualifiers
 var noQualifier = func(*types.Package) string { return "" }
 
 // printableTypeName returns a string that can be used as a valid golang identifier
-func printableTypeName(t types.Type) string {
-	switch t := t.(type) {
-	case *types.Pointer:
-		return "RefOf" + printableTypeName(t.Elem())
-	case *types.Slice:
-		return "SliceOf" + printableTypeName(t.Elem())
-	case *types.Named:
-		return t.Obj().Name()
-	case *types.Basic:
-		return internal.Title(t.Name())
-	case *types.Interface:
-		return t.String()
-	default:
-		panic(fmt.Sprintf("unknown type %T %v", t, t))
-	}
-}
+func printableTypeName(t types.Type) string { _ = "STUB: not implemented"; return "" }
 
 // Options configures the AST helper generation process.
 type Options struct {
@@ -378,64 +238,14 @@ type RewriteOptions struct{}
 // Returns an error if package loading fails, the root interface cannot be found,
 // or code generation encounters any issues.
 func GenerateASTHelpers(options *Options) (map[string]*jen.File, error) {
-	loaded, err := packages.Load(&packages.Config{
-		Mode: packages.NeedName | packages.NeedTypes | packages.NeedTypesSizes | packages.NeedTypesInfo | packages.NeedDeps | packages.NeedImports | packages.NeedModule,
-	}, options.Packages...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load packages: %w", err)
-	}
-
-	if err := internal.CheckErrors(loaded); err != nil {
-		return nil, err
-	}
-
-	scopes := make(map[string]*types.Scope)
-	for _, pkg := range loaded {
-		scopes[pkg.PkgPath] = pkg.Types.Scope()
-	}
-
-	tt, err := findTypeObject(options.RootInterface, scopes)
-	if err != nil {
-		return nil, err
-	}
-
-	nt := tt.Type().(*types.Named)
-	pName := nt.Obj().Pkg().Name()
-	ifaceName := types.TypeString(nt, noQualifier)
-
-	generator := newGenerator(loaded[0].Module, loaded[0].TypesSizes, nt,
-		newCloneGen(pName, &options.Clone),
-		newRewriterGen(pName, ifaceName),
-	)
-
-	it, err := generator.GenerateCode()
-	if err != nil {
-		return nil, err
-	}
-
-	return it, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // findTypeObject finds the types.Object for the given interface from the given scopes.
 func findTypeObject(interfaceToFind string, scopes map[string]*types.Scope) (types.Object, error) {
-	pos := strings.LastIndexByte(interfaceToFind, '.')
-	if pos < 0 {
-		return nil, fmt.Errorf("unexpected input type: %s", interfaceToFind)
-	}
-
-	pkgname := interfaceToFind[:pos]
-	typename := interfaceToFind[pos+1:]
-
-	scope := scopes[pkgname]
-	if scope == nil {
-		return nil, fmt.Errorf("no scope found for type '%s'", interfaceToFind)
-	}
-
-	tt := scope.Lookup(typename)
-	if tt == nil {
-		return nil, fmt.Errorf("no type called '%s' found in '%s'", typename, pkgname)
-	}
-	return tt, nil
+	_ = "STUB: not implemented"
+	return *new(types.Object), nil
 }
 
 var _ generatorSPI = (*astHelperGen)(nil)

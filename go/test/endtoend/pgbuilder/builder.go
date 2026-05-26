@@ -21,17 +21,8 @@
 package pgbuilder
 
 import (
-	"bytes"
 	"context"
-	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
-
-	"github.com/multigres/multigres/go/tools/executil"
 )
 
 const (
@@ -65,91 +56,22 @@ type Builder struct {
 // rooted at $MULTIGRES_PG_CACHE_DIR (or /tmp/multigres_pg_cache when unset).
 // Multiple concurrent callers get distinct build/install trees but share the
 // source checkout.
-func New(t *testing.T) *Builder {
-	t.Helper()
-
-	cacheDir := os.Getenv("MULTIGRES_PG_CACHE_DIR")
-	if cacheDir == "" {
-		cacheDir = PostgresCacheDir
-	}
-
-	timestamp := time.Now().Format("20060102-150405.000000")
-	buildRoot := filepath.Join(cacheDir, "builds", timestamp)
-
-	return &Builder{
-		SourceDir:  filepath.Join(cacheDir, "source", "postgres"),
-		BuildDir:   filepath.Join(buildRoot, "build"),
-		InstallDir: filepath.Join(buildRoot, "install"),
-		OutputDir:  filepath.Join(cacheDir, "results", timestamp),
-	}
-}
+func New(t *testing.T) *Builder { _ = "STUB: not implemented"; return nil }
 
 // BinDir is the directory containing the built PostgreSQL binaries (postgres,
 // initdb, psql, pg_ctl, ...).
-func (b *Builder) BinDir() string {
-	return filepath.Join(b.InstallDir, "bin")
-}
+func (b *Builder) BinDir() string { _ = "STUB: not implemented"; return "" }
 
 // CheckBuildDependencies verifies that required C toolchain is available on
 // the host. Callers that depend on building PostgreSQL from source should
 // invoke this early and skip the test on a clear error message.
-func CheckBuildDependencies(t *testing.T) error {
-	t.Helper()
-
-	required := []string{"make", "gcc"}
-	var missing []string
-	for _, tool := range required {
-		if _, err := exec.LookPath(tool); err != nil {
-			missing = append(missing, tool)
-		}
-	}
-	if len(missing) > 0 {
-		return fmt.Errorf("missing build dependencies: %v. Install with: apt-get install build-essential", missing)
-	}
-	return nil
-}
+func CheckBuildDependencies(t *testing.T) error { _ = "STUB: not implemented"; return nil }
 
 // EnsureSource ensures the pinned PostgreSQL source tree is available,
 // cloning it if missing or wrong version. The source is shared across
 // concurrent builders.
 func (b *Builder) EnsureSource(t *testing.T, ctx context.Context) error {
-	t.Helper()
-
-	if _, err := os.Stat(b.SourceDir); err == nil {
-		t.Logf("Found cached PostgreSQL source at %s, verifying version...", b.SourceDir)
-
-		cmd := executil.Command(ctx, "git", "-C", b.SourceDir, "describe", "--tags", "--exact-match")
-		output, err := cmd.Output()
-		if err == nil && strings.TrimSpace(string(output)) == PostgresVersion {
-			t.Logf("Using cached PostgreSQL source (version %s)", PostgresVersion)
-			return nil
-		}
-
-		t.Logf("Cached source version mismatch or invalid, re-cloning...")
-		if err := os.RemoveAll(b.SourceDir); err != nil {
-			return fmt.Errorf("failed to remove old cache: %w", err)
-		}
-	}
-
-	if err := os.MkdirAll(filepath.Dir(b.SourceDir), 0o755); err != nil {
-		return fmt.Errorf("failed to create cache directory: %w", err)
-	}
-
-	t.Logf("Cloning PostgreSQL %s from %s...", PostgresVersion, PostgresGitRepo)
-	cmd := executil.Command(ctx, "git", "clone",
-		"--depth=1",
-		"--branch", PostgresVersion,
-		PostgresGitRepo,
-		b.SourceDir)
-
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to clone PostgreSQL: %w (stderr: %s)", err, stderr.String())
-	}
-
-	t.Logf("Successfully cloned PostgreSQL %s", PostgresVersion)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -157,53 +79,10 @@ func (b *Builder) EnsureSource(t *testing.T, ctx context.Context) error {
 // ICU is disabled so the build does not require icu4c headers; that matches
 // what the existing pgregresstest suite already does.
 func (b *Builder) Build(t *testing.T, ctx context.Context) error {
-	t.Helper()
-
-	if err := os.MkdirAll(b.BuildDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create build directory: %w", err)
-	}
-
-	t.Logf("Configuring PostgreSQL with ./configure...")
-	configureCmd := executil.Command(ctx, filepath.Join(b.SourceDir, "configure"),
-		"--prefix="+b.InstallDir,
-		"--enable-cassert=no",
-		"--enable-tap-tests=no",
-		"--without-icu",
-	)
-	configureCmd.Dir = b.BuildDir
-	configureCmd.Stdout = os.Stdout
-	configureCmd.Stderr = os.Stderr
-	if err := configureCmd.Run(); err != nil {
-		return fmt.Errorf("configure failed: %w", err)
-	}
-
-	t.Logf("Building PostgreSQL with make...")
-	makeCmd := executil.Command(ctx, "make", "-j", "4")
-	makeCmd.Dir = b.BuildDir
-	makeCmd.Stdout = os.Stdout
-	makeCmd.Stderr = os.Stderr
-	if err := makeCmd.Run(); err != nil {
-		return fmt.Errorf("make failed: %w", err)
-	}
-
-	t.Logf("Installing PostgreSQL to %s...", b.InstallDir)
-	installCmd := executil.Command(ctx, "make", "install")
-	installCmd.Dir = b.BuildDir
-	installCmd.Stdout = os.Stdout
-	installCmd.Stderr = os.Stderr
-	if err := installCmd.Run(); err != nil {
-		return fmt.Errorf("make install failed: %w", err)
-	}
-
-	t.Logf("PostgreSQL build completed successfully")
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Cleanup removes per-invocation build and install artifacts but leaves the
 // shared source checkout in place so subsequent runs skip the clone.
-func (b *Builder) Cleanup() {
-	if b.BuildDir != "" {
-		buildRoot := filepath.Dir(b.BuildDir)
-		_ = os.RemoveAll(buildRoot)
-	}
-}
+func (b *Builder) Cleanup() { _ = "STUB: not implemented"; return }

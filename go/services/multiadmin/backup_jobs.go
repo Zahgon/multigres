@@ -15,12 +15,8 @@
 package multiadmin
 
 import (
-	"fmt"
 	"sync"
 	"time"
-
-	"github.com/google/uuid"
-	"google.golang.org/protobuf/proto"
 
 	multiadminpb "github.com/multigres/multigres/go/pb/multiadmin"
 )
@@ -50,134 +46,59 @@ type BackupJobTracker struct {
 }
 
 // NewBackupJobTracker creates a new backup job tracker with default expiration (24 hours)
-func NewBackupJobTracker() *BackupJobTracker {
-	return NewBackupJobTrackerWithExpiration(DefaultBackupJobExpiration)
-}
+func NewBackupJobTracker() *BackupJobTracker { _ = "STUB: not implemented"; return nil }
 
 // NewBackupJobTrackerWithExpiration creates a new backup job tracker with custom expiration
 func NewBackupJobTrackerWithExpiration(expiration time.Duration) *BackupJobTracker {
-	jt := &BackupJobTracker{
-		jobs:       make(map[string]*backupJobMetadata),
-		expiration: expiration,
-		stop:       make(chan struct{}),
-		done:       make(chan struct{}),
-	}
-	go jt.cleanupLoop()
-	return jt
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // cleanupLoop runs in the background and removes expired jobs
-func (jt *BackupJobTracker) cleanupLoop() {
-	defer close(jt.done)
-	ticker := time.NewTicker(time.Hour)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-jt.stop:
-			return
-		case <-ticker.C:
-			jt.removeExpiredJobs()
-		}
-	}
-}
+func (jt *BackupJobTracker) cleanupLoop() { _ = "STUB: not implemented"; return }
 
 // removeExpiredJobs removes jobs that have been completed/failed for longer than the expiration period
-func (jt *BackupJobTracker) removeExpiredJobs() {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	now := time.Now()
-	for jobID, job := range jt.jobs {
-		if job.completedAt != nil && now.Sub(*job.completedAt) > jt.expiration {
-			delete(jt.jobs, jobID)
-		}
-	}
-}
+func (jt *BackupJobTracker) removeExpiredJobs() { _ = "STUB: not implemented"; return }
 
 // Stop stops the background cleanup goroutine
-func (jt *BackupJobTracker) Stop() {
-	close(jt.stop)
-	<-jt.done
-}
+func (jt *BackupJobTracker) Stop() { _ = "STUB: not implemented"; return }
 
 // CreateJob creates a new backup job with an auto-generated UUID and returns its ID
 func (jt *BackupJobTracker) CreateJob(jobType multiadminpb.JobType, database, tableGroup, shard string) string {
-	return jt.CreateJobWithID(uuid.New().String(), jobType, database, tableGroup, shard)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // CreateJobWithID creates a new backup job with the specified ID
 func (jt *BackupJobTracker) CreateJobWithID(jobID string, jobType multiadminpb.JobType, database, tableGroup, shard string) string {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	now := time.Now()
-
-	jt.jobs[jobID] = &backupJobMetadata{
-		response: multiadminpb.GetBackupJobStatusResponse{ // Copies are ok here
-			JobId:      jobID,
-			JobType:    jobType,
-			Status:     multiadminpb.JobStatus_JOB_STATUS_PENDING,
-			Database:   database,
-			TableGroup: tableGroup,
-			Shard:      shard,
-		},
-		createdAt: now,
-		updatedAt: now,
-	}
-
-	return jobID
+	_ = "STUB: not implemented"
+	return ""
 }
+
+// Copies are ok here
 
 // GetJobStatus retrieves the status of a backup job
 func (jt *BackupJobTracker) GetJobStatus(jobID string) (*multiadminpb.GetBackupJobStatusResponse, error) {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	job, exists := jt.jobs[jobID]
-	if !exists {
-		return nil, fmt.Errorf("backup job not found: %s", jobID)
-	}
-
-	// Clone the response to prevent race conditions (protobuf messages contain internal mutexes)
-	return proto.Clone(&job.response).(*multiadminpb.GetBackupJobStatusResponse), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Clone the response to prevent race conditions (protobuf messages contain internal mutexes)
 
 // UpdateJobStatus updates the status of a backup job
 func (jt *BackupJobTracker) UpdateJobStatus(jobID string, status multiadminpb.JobStatus) {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	if job, exists := jt.jobs[jobID]; exists {
-		job.response.Status = status
-		job.updatedAt = time.Now()
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // CompleteJob marks a backup job as completed with results
 func (jt *BackupJobTracker) CompleteJob(jobID string, backupID string) {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	if job, exists := jt.jobs[jobID]; exists {
-		job.response.Status = multiadminpb.JobStatus_JOB_STATUS_COMPLETED
-		job.response.BackupId = backupID
-		now := time.Now()
-		job.updatedAt = now
-		job.completedAt = &now
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // FailJob marks a backup job as failed with error message
 func (jt *BackupJobTracker) FailJob(jobID string, errorMsg string) {
-	jt.mu.Lock()
-	defer jt.mu.Unlock()
-
-	if job, exists := jt.jobs[jobID]; exists {
-		job.response.Status = multiadminpb.JobStatus_JOB_STATUS_FAILED
-		job.response.ErrorMessage = errorMsg
-		now := time.Now()
-		job.updatedAt = now
-		job.completedAt = &now
-	}
+	_ = "STUB: not implemented"
+	return
 }

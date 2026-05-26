@@ -15,7 +15,6 @@
 package shardsetup
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/multigres/multigres/go/provisioner/local"
@@ -25,15 +24,6 @@ import (
 // Returns the certificate paths.
 // Uses the public function from go/provisioner/local package.
 func (s *ShardSetup) generatePgBackRestCerts(t *testing.T) *local.PgBackRestCertPaths {
-	t.Helper()
-
-	certDir := filepath.Join(s.TempDir, "certs")
-	certPaths, err := local.GeneratePgBackRestCerts(certDir)
-	if err != nil {
-		t.Fatalf("failed to generate pgBackRest certificates: %v", err)
-	}
-
-	t.Logf("Generated pgBackRest certificates in %s", certDir)
-
-	return certPaths
+	_ = "STUB: not implemented"
+	return nil
 }

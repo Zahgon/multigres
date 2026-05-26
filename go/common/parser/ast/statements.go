@@ -28,11 +28,6 @@
 // Ported from postgres/src/include/nodes/parsenodes.h
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // CORE STATEMENT FRAMEWORK - PostgreSQL parsenodes.h implementation
 // Ported from postgres/src/include/nodes/parsenodes.h
@@ -52,28 +47,7 @@ const (
 	CMD_NOTHING                // Dummy command for INSTEAD NOTHING rules
 )
 
-func (c CmdType) String() string {
-	switch c {
-	case CMD_UNKNOWN:
-		return "UNKNOWN"
-	case CMD_SELECT:
-		return "SELECT"
-	case CMD_UPDATE:
-		return "UPDATE"
-	case CMD_INSERT:
-		return "INSERT"
-	case CMD_DELETE:
-		return "DELETE"
-	case CMD_MERGE:
-		return "MERGE"
-	case CMD_UTILITY:
-		return "UTILITY"
-	case CMD_NOTHING:
-		return "NOTHING"
-	default:
-		return fmt.Sprintf("CmdType(%d)", int(c))
-	}
-}
+func (c CmdType) String() string { _ = "STUB: not implemented"; return "" }
 
 // QuerySource represents possible sources of a Query - ported from postgres/src/include/nodes/parsenodes.h:34
 type QuerySource int
@@ -144,54 +118,33 @@ type RangeVar struct {
 
 // SqlString returns the SQL representation of this table reference
 func (r *RangeVar) SqlString() string {
+	_ = "STUB: not implemented"
 	// Use utility function for qualified name formatting
-	result := FormatFullyQualifiedName(r.CatalogName, r.SchemaName, r.RelName)
-
-	// Add ONLY prefix if inheritance is disabled
-	if !r.Inh {
-		result = "ONLY " + result
-	}
-
-	// Add alias if present
-	if r.Alias != nil {
-		aliasStr := r.Alias.SqlString()
-		if aliasStr != "" {
-			result += " " + aliasStr
-		}
-	}
-
-	return result
+	return ""
 }
+
+// Add ONLY prefix if inheritance is disabled
+
+// Add alias if present
 
 // NewRangeVar creates a new RangeVar node.
 func NewRangeVar(relName string, schemaName, catalogName string) *RangeVar {
-	return &RangeVar{
-		BaseNode:    BaseNode{Tag: T_RangeVar},
-		RelName:     relName,
-		SchemaName:  schemaName,
-		CatalogName: catalogName,
-		Inh:         true, // Default to inheritance enabled (no ONLY)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (rv *RangeVar) String() string {
-	parts := []string{}
-	if rv.CatalogName != "" {
-		parts = append(parts, rv.CatalogName)
-	}
-	if rv.SchemaName != "" {
-		parts = append(parts, rv.SchemaName)
-	}
-	parts = append(parts, rv.RelName)
-	return fmt.Sprintf("RangeVar(%s)@%d", strings.Join(parts, "."), rv.Location())
-}
+// Default to inheritance enabled (no ONLY)
+
+func (rv *RangeVar) String() string { _ = "STUB: not implemented"; return "" }
 
 func (rv *RangeVar) StatementType() string {
-	return "RangeVar"
+	_ = "STUB: not implemented"
+
+	// Alias represents table and column aliases.
+	// Ported from postgres/src/include/nodes/primnodes.h:47
+	return ""
 }
 
-// Alias represents table and column aliases.
-// Ported from postgres/src/include/nodes/primnodes.h:47
 type Alias struct {
 	BaseNode
 	AliasName string    // Alias name - postgres/src/include/nodes/primnodes.h:50
@@ -199,39 +152,16 @@ type Alias struct {
 }
 
 // SqlString returns the SQL representation of this alias
-func (a *Alias) SqlString() string {
-	if a.AliasName == "" {
-		return ""
-	}
+func (a *Alias) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	result := FormatAlias(a.AliasName)
-
-	// Add column aliases if present
-	if a.ColNames != nil && len(a.ColNames.Items) > 0 {
-		var colAliases []string
-		for _, col := range a.ColNames.Items {
-			if str, ok := col.(*String); ok {
-				colAliases = append(colAliases, str.SVal)
-			}
-		}
-		result += FormatParentheses(FormatCommaList(colAliases))
-	}
-
-	return result
-}
+// Add column aliases if present
 
 // NewAlias creates a new Alias node.
-func NewAlias(aliasName string, colNames *NodeList) *Alias {
-	return &Alias{
-		BaseNode:  BaseNode{Tag: T_String}, // Use T_String for alias
-		AliasName: aliasName,
-		ColNames:  colNames,
-	}
-}
+func NewAlias(aliasName string, colNames *NodeList) *Alias { _ = "STUB: not implemented"; return nil }
 
-func (a *Alias) String() string {
-	return fmt.Sprintf("Alias(%s)@%d", a.AliasName, a.Location())
-}
+// Use T_String for alias
+
+func (a *Alias) String() string { _ = "STUB: not implemented"; return "" }
 
 // ResTarget represents a target item in a SELECT list or UPDATE SET clause.
 // Ported from postgres/src/include/nodes/parsenodes.h:514
@@ -243,154 +173,61 @@ type ResTarget struct {
 }
 
 // NewResTarget creates a new ResTarget node.
-func NewResTarget(name string, val Node) *ResTarget {
-	return &ResTarget{
-		BaseNode: BaseNode{Tag: T_ResTarget},
-		Name:     name,
-		Val:      val,
-	}
-}
+func NewResTarget(name string, val Node) *ResTarget { _ = "STUB: not implemented"; return nil }
 
 // NewResTargetWithIndirection creates a new ResTarget node with indirection (for column references with array subscripts).
 func NewResTargetWithIndirection(name string, indirection *NodeList) *ResTarget {
-	return &ResTarget{
-		BaseNode:    BaseNode{Tag: T_ResTarget},
-		Name:        name,
-		Indirection: indirection,
-		Val:         nil,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ColumnNameWithIndirection returns the column name with indirection (array subscripts, field access, etc.)
 // This is used for INSERT column lists where we need "column[index]" format
-func (r *ResTarget) ColumnNameWithIndirection() string {
-	if r.Name == "" {
-		return ""
-	}
+func (r *ResTarget) ColumnNameWithIndirection() string { _ = "STUB: not implemented"; return "" }
 
-	var result strings.Builder
-	result.WriteString(QuoteIdentifier(r.Name))
-	if r.Indirection != nil {
-		for _, ind := range r.Indirection.Items {
-			if ind != nil {
-				switch i := ind.(type) {
-				case *String:
-					// Field selection
-					result.WriteString("." + i.SVal)
-				case *A_Indices:
-					// Array index or slice
-					result.WriteString(i.SqlString())
-				default:
-					// Generic indirection
-					result.WriteString(ind.SqlString())
-				}
-			}
-		}
-	}
-	return result.String()
-}
+// Field selection
+
+// Array index or slice
+
+// Generic indirection
 
 // renderSetClauses renders the assignment list of a SET clause (UPDATE or
 // ON CONFLICT DO UPDATE). A multi-column assignment `SET (a, b, ...) = <source>`
 // is parsed into one ResTarget per column, each holding a MultiAssignRef that
 // points at the shared source; those are regrouped so the source is emitted once
 // (rendering each as `a = <source>` would be wrong).
-func renderSetClauses(items []Node) []string {
-	var setClauses []string
-	for i := 0; i < len(items); i++ {
-		target, ok := items[i].(*ResTarget)
-		if !ok || target.Name == "" || target.Val == nil {
-			continue
-		}
-		if mar, ok := target.Val.(*MultiAssignRef); ok && mar.Colno == 1 {
-			cols := []string{target.ColumnNameWithIndirection()}
-			j := i + 1
-			for ; j < len(items) && len(cols) < mar.Ncolumns; j++ {
-				next, ok := items[j].(*ResTarget)
-				if !ok {
-					break
-				}
-				nextMar, ok := next.Val.(*MultiAssignRef)
-				if !ok || nextMar.Colno != len(cols)+1 {
-					break
-				}
-				cols = append(cols, next.ColumnNameWithIndirection())
-			}
-			source := ""
-			if mar.Source != nil {
-				source = mar.Source.SqlString()
-			}
-			setClauses = append(setClauses, "("+strings.Join(cols, ", ")+") = "+source)
-			i = j - 1
-			continue
-		}
-		setClauses = append(setClauses, target.SetClauseString())
-	}
-	return setClauses
-}
+func renderSetClauses(items []Node) []string { _ = "STUB: not implemented"; return nil }
 
 // SetClauseString returns the SQL representation for SET clauses (UPDATE, ON CONFLICT DO UPDATE)
 // Format: "column[index] = value" instead of "value AS column"
-func (r *ResTarget) SetClauseString() string {
-	if r.Name == "" {
-		return ""
-	}
+func (r *ResTarget) SetClauseString() string { _ = "STUB: not implemented"; return "" }
 
-	// Build the column name with indirection (e.g., "col[1]", "col.field")
-	columnPart := r.ColumnNameWithIndirection()
+// Build the column name with indirection (e.g., "col[1]", "col.field")
 
-	if r.Val != nil {
-		return columnPart + " = " + r.Val.SqlString()
-	}
+// If no value, just return the column name
 
-	// If no value, just return the column name
-	return columnPart
-}
-
-func (rt *ResTarget) String() string {
-	return fmt.Sprintf("ResTarget(%s)@%d", rt.Name, rt.Location())
-}
+func (rt *ResTarget) String() string { _ = "STUB: not implemented"; return "" }
 
 func (rt *ResTarget) ExpressionType() string {
-	return "ResTarget"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the ResTarget
+	return ""
 }
 
-// SqlString returns the SQL representation of the ResTarget
-func (r *ResTarget) SqlString() string {
-	if r.Val == nil {
-		return ""
-	}
+func (r *ResTarget) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var result strings.Builder
-	result.WriteString(r.Val.SqlString())
+// Add indirection if present (e.g., array subscripts, field selection)
 
-	// Add indirection if present (e.g., array subscripts, field selection)
-	if r.Indirection != nil && len(r.Indirection.Items) > 0 {
-		for _, ind := range r.Indirection.Items {
-			if ind != nil {
-				// Handle different types of indirection
-				switch i := ind.(type) {
-				case *String:
-					// Field selection
-					result.WriteString("." + i.SVal)
-				case *A_Indices:
-					// Array index or slice
-					result.WriteString(i.SqlString())
-				default:
-					// Generic indirection
-					result.WriteString(ind.SqlString())
-				}
-			}
-		}
-	}
+// Handle different types of indirection
 
-	// Add alias if present
-	if r.Name != "" {
-		result.WriteString(" AS " + QuoteIdentifier(r.Name))
-	}
+// Field selection
 
-	return result.String()
-}
+// Array index or slice
+
+// Generic indirection
+
+// Add alias if present
 
 // ==============================================================================
 // CORE QUERY STRUCTURE
@@ -450,21 +287,11 @@ type Query struct {
 }
 
 // NewQuery creates a new Query node.
-func NewQuery(cmdType CmdType) *Query {
-	return &Query{
-		BaseNode:    BaseNode{Tag: T_Query},
-		CommandType: cmdType,
-		QuerySource: QSRC_ORIGINAL,
-	}
-}
+func NewQuery(cmdType CmdType) *Query { _ = "STUB: not implemented"; return nil }
 
-func (q *Query) String() string {
-	return fmt.Sprintf("Query(%s)@%d", q.CommandType, q.Location())
-}
+func (q *Query) String() string { _ = "STUB: not implemented"; return "" }
 
-func (q *Query) StatementType() string {
-	return q.CommandType.String()
-}
+func (q *Query) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // DML STATEMENTS
@@ -510,346 +337,110 @@ type SelectStmt struct {
 }
 
 // NewSelectStmt creates a new SelectStmt node.
-func NewSelectStmt() *SelectStmt {
-	return &SelectStmt{
-		BaseNode:       BaseNode{Tag: T_SelectStmt},
-		DistinctClause: nil,
-		TargetList:     NewNodeList(),
-		FromClause:     NewNodeList(),
-	}
-}
+func NewSelectStmt() *SelectStmt { _ = "STUB: not implemented"; return nil }
 
-func (s *SelectStmt) String() string {
-	return fmt.Sprintf("SelectStmt@%d", s.Location())
-}
+func (s *SelectStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (s *SelectStmt) StatementType() string {
-	return "SELECT"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the SelectStmt
+	return ""
 }
 
-// SqlString returns the SQL representation of the SelectStmt
 func (s *SelectStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Handle set operations (UNION, INTERSECT, EXCEPT)
-	if s.Op != SETOP_NONE {
-		// Add left operand, with parentheses only if needed for complex queries
-		if s.Larg != nil {
-			lstr := s.Larg.SqlString()
-			if s.Larg.needsParenthesesInSetOperation() {
-				parts = append(parts, "("+lstr+")")
-			} else {
-				parts = append(parts, lstr)
-			}
-		}
-
-		switch s.Op {
-		case SETOP_UNION:
-			if s.All {
-				parts = append(parts, "UNION ALL")
-			} else {
-				parts = append(parts, "UNION")
-			}
-		case SETOP_INTERSECT:
-			if s.All {
-				parts = append(parts, "INTERSECT ALL")
-			} else {
-				parts = append(parts, "INTERSECT")
-			}
-		case SETOP_EXCEPT:
-			if s.All {
-				parts = append(parts, "EXCEPT ALL")
-			} else {
-				parts = append(parts, "EXCEPT")
-			}
-		}
-
-		if s.Rarg != nil {
-			rstr := s.Rarg.SqlString()
-			if s.Rarg.needsParenthesesInSetOperation() {
-				parts = append(parts, "("+rstr+")")
-			} else {
-				parts = append(parts, rstr)
-			}
-		}
-
-		// Handle ORDER BY clause for set operations
-		if s.SortClause != nil && s.SortClause.Len() > 0 {
-			var sortItems []string
-			for _, sort := range s.SortClause.Items {
-				if sort != nil {
-					sortItems = append(sortItems, sort.SqlString())
-				}
-			}
-			parts = append(parts, "ORDER BY", strings.Join(sortItems, ", "))
-		}
-
-		// Handle LIMIT clause for set operations
-		if s.LimitCount != nil {
-			if s.LimitOption == LIMIT_OPTION_WITH_TIES {
-				// Use FETCH FIRST syntax for WITH TIES (required by SQL standard)
-				limitStr := "FETCH FIRST"
-
-				// Check if the limit count is a constant 1 (implicit case)
-				if isConstantOne(s.LimitCount) {
-					limitStr += " ROW"
-				} else {
-					limitStr += " " + s.LimitCount.SqlString() + " ROWS"
-				}
-
-				limitStr += " WITH TIES"
-				parts = append(parts, limitStr)
-			} else {
-				// Traditional LIMIT syntax (default for LIMIT_OPTION_COUNT)
-				// Handle LIMIT ALL case specially
-				limitValue := s.LimitCount.SqlString()
-				if limitValue == "NULL" {
-					limitValue = "ALL"
-				}
-				parts = append(parts, "LIMIT", limitValue)
-			}
-		}
-
-		// Handle OFFSET clause for set operations
-		if s.LimitOffset != nil {
-			parts = append(parts, "OFFSET", s.LimitOffset.SqlString())
-		}
-
-		// FOR UPDATE/SHARE clauses also attach to the set-operation node.
-		if s.LockingClause != nil && s.LockingClause.Len() > 0 {
-			for _, item := range s.LockingClause.Items {
-				if locking, ok := item.(*LockingClause); ok && locking != nil {
-					parts = append(parts, locking.SqlString())
-				}
-			}
-		}
-
-		// WITH clause attaches to the outer set-operation node and must be
-		// prepended here. The non-set-op branch handles WithClause below; the
-		// set-op branch returns early, so without this the CTE is silently
-		// dropped on round-trip and PG sees `relation "cte" does not exist`.
-		result := strings.Join(parts, " ")
-		if s.WithClause != nil {
-			result = s.WithClause.SqlString() + " " + result
-		}
-		return result
-	}
-
-	// Handle VALUES clause
-	if s.ValuesLists != nil && s.ValuesLists.Len() > 0 {
-		var valueRows []string
-		for _, row := range s.ValuesLists.Items {
-			if rowList, ok := row.(*NodeList); ok && rowList.Items != nil {
-				var values []string
-				for _, val := range rowList.Items {
-					values = append(values, val.SqlString())
-				}
-				valueRows = append(valueRows, fmt.Sprintf("(%s)", strings.Join(values, ", ")))
-			}
-		}
-		// WITH cte(...) AS (...) VALUES (...) attaches WithClause to the
-		// outer SelectStmt; same drop-on-round-trip class as the set-op
-		// branch above.
-		result := "VALUES " + strings.Join(valueRows, ", ")
-		if s.WithClause != nil {
-			result = s.WithClause.SqlString() + " " + result
-		}
-		return result
-	}
-
-	// Regular SELECT statement
-	parts = append(parts, "SELECT")
-
-	// DISTINCT clause
-	// Note: DistinctClause == nil means no DISTINCT
-	//       DistinctClause == &NodeList{Items: []} means plain DISTINCT
-	//       DistinctClause == &NodeList{Items: [expr1, expr2]} means DISTINCT ON (...)
-	if s.DistinctClause != nil {
-		distinctParts := []string{"DISTINCT"}
-
-		// Check if there are any expressions (means DISTINCT ON)
-		if len(s.DistinctClause.Items) > 0 {
-			var distinctOn []string
-			for _, d := range s.DistinctClause.Items {
-				if d != nil {
-					distinctOn = append(distinctOn, d.SqlString())
-				}
-			}
-			if len(distinctOn) > 0 {
-				distinctParts = append(distinctParts, fmt.Sprintf("ON (%s)", strings.Join(distinctOn, ", ")))
-			}
-		}
-		// Always add DISTINCT part if DistinctClause is not nil
-		parts = append(parts, strings.Join(distinctParts, " "))
-	}
-
-	// Target list (what to select)
-	if s.TargetList != nil && s.TargetList.Len() > 0 {
-		var targets []string
-		for _, item := range s.TargetList.Items {
-			if target, ok := item.(*ResTarget); ok && target != nil {
-				targets = append(targets, target.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(targets, ", "))
-	}
-
-	// INTO clause
-	if s.IntoClause != nil {
-		parts = append(parts, s.IntoClause.SqlString())
-	}
-
-	// FROM clause
-	if s.FromClause != nil && len(s.FromClause.Items) > 0 {
-		var fromItems []string
-		for _, from := range s.FromClause.Items {
-			if from != nil {
-				fromItems = append(fromItems, from.SqlString())
-			}
-		}
-		parts = append(parts, "FROM", strings.Join(fromItems, ", "))
-	}
-
-	// WHERE clause
-	if s.WhereClause != nil {
-		parts = append(parts, "WHERE", s.WhereClause.SqlString())
-	}
-
-	// GROUP BY clause
-	if s.GroupClause != nil && s.GroupClause.Len() > 0 {
-		var groupItems []string
-		for _, group := range s.GroupClause.Items {
-			if group != nil {
-				groupItems = append(groupItems, group.SqlString())
-			}
-		}
-		groupByStr := "GROUP BY"
-		if s.GroupDistinct {
-			groupByStr = "GROUP BY DISTINCT"
-		}
-		parts = append(parts, groupByStr, strings.Join(groupItems, ", "))
-	}
-
-	// HAVING clause
-	if s.HavingClause != nil {
-		parts = append(parts, "HAVING", s.HavingClause.SqlString())
-	}
-
-	// WINDOW clause
-	if s.WindowClause != nil && len(s.WindowClause.Items) > 0 {
-		var windowItems []string
-		for _, window := range s.WindowClause.Items {
-			if windowDef, ok := window.(*WindowDef); ok && windowDef != nil {
-				// For WINDOW clause, format as "name AS (specification)"
-				if windowDef.Name != "" {
-					spec := windowDef.SqlStringForContext(true)
-					quotedName := QuoteIdentifier(windowDef.Name)
-					if spec != "" {
-						windowItems = append(windowItems, quotedName+" AS ("+spec+")")
-					} else {
-						windowItems = append(windowItems, quotedName+" AS ()")
-					}
-				}
-			}
-		}
-		if len(windowItems) > 0 {
-			parts = append(parts, "WINDOW "+strings.Join(windowItems, ", "))
-		}
-	}
-
-	// ORDER BY clause (from SortClause)
-	if s.SortClause != nil && s.SortClause.Len() > 0 {
-		var sortItems []string
-		for _, sort := range s.SortClause.Items {
-			if sort != nil {
-				sortItems = append(sortItems, sort.SqlString())
-			}
-		}
-		parts = append(parts, "ORDER BY", strings.Join(sortItems, ", "))
-	}
-
-	// LIMIT clause
-	if s.LimitCount != nil {
-		if s.LimitOption == LIMIT_OPTION_WITH_TIES {
-			// Use FETCH FIRST syntax for WITH TIES (required by SQL standard)
-			limitStr := "FETCH FIRST"
-
-			// Check if the limit count is a constant 1 (implicit case)
-			if isConstantOne(s.LimitCount) {
-				limitStr += " ROW"
-			} else {
-				limitStr += " " + s.LimitCount.SqlString() + " ROWS"
-			}
-
-			limitStr += " WITH TIES"
-			parts = append(parts, limitStr)
-		} else {
-			// Traditional LIMIT syntax (default for LIMIT_OPTION_COUNT)
-			// Handle LIMIT ALL case specially
-			limitValue := s.LimitCount.SqlString()
-			if limitValue == "NULL" {
-				limitValue = "ALL"
-			}
-			parts = append(parts, "LIMIT", limitValue)
-		}
-	}
-
-	// OFFSET clause
-	if s.LimitOffset != nil {
-		parts = append(parts, "OFFSET", s.LimitOffset.SqlString())
-	}
-
-	// FOR UPDATE/SHARE clauses
-	if s.LockingClause != nil && s.LockingClause.Len() > 0 {
-		for _, item := range s.LockingClause.Items {
-			if locking, ok := item.(*LockingClause); ok && locking != nil {
-				parts = append(parts, locking.SqlString())
-			}
-		}
-	}
-
-	// WITH clause (CTEs)
-	if s.WithClause != nil {
-		// WITH clause typically comes first, so we need to prepend it
-		withStr := s.WithClause.SqlString()
-		return withStr + " " + strings.Join(parts, " ")
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add left operand, with parentheses only if needed for complex queries
+
+// Handle ORDER BY clause for set operations
+
+// Handle LIMIT clause for set operations
+
+// Use FETCH FIRST syntax for WITH TIES (required by SQL standard)
+
+// Check if the limit count is a constant 1 (implicit case)
+
+// Traditional LIMIT syntax (default for LIMIT_OPTION_COUNT)
+// Handle LIMIT ALL case specially
+
+// Handle OFFSET clause for set operations
+
+// FOR UPDATE/SHARE clauses also attach to the set-operation node.
+
+// WITH clause attaches to the outer set-operation node and must be
+// prepended here. The non-set-op branch handles WithClause below; the
+// set-op branch returns early, so without this the CTE is silently
+// dropped on round-trip and PG sees `relation "cte" does not exist`.
+
+// Handle VALUES clause
+
+// WITH cte(...) AS (...) VALUES (...) attaches WithClause to the
+// outer SelectStmt; same drop-on-round-trip class as the set-op
+// branch above.
+
+// Regular SELECT statement
+
+// DISTINCT clause
+// Note: DistinctClause == nil means no DISTINCT
+//       DistinctClause == &NodeList{Items: []} means plain DISTINCT
+//       DistinctClause == &NodeList{Items: [expr1, expr2]} means DISTINCT ON (...)
+
+// Check if there are any expressions (means DISTINCT ON)
+
+// Always add DISTINCT part if DistinctClause is not nil
+
+// Target list (what to select)
+
+// INTO clause
+
+// FROM clause
+
+// WHERE clause
+
+// GROUP BY clause
+
+// HAVING clause
+
+// WINDOW clause
+
+// For WINDOW clause, format as "name AS (specification)"
+
+// ORDER BY clause (from SortClause)
+
+// LIMIT clause
+
+// Use FETCH FIRST syntax for WITH TIES (required by SQL standard)
+
+// Check if the limit count is a constant 1 (implicit case)
+
+// Traditional LIMIT syntax (default for LIMIT_OPTION_COUNT)
+// Handle LIMIT ALL case specially
+
+// OFFSET clause
+
+// FOR UPDATE/SHARE clauses
+
+// WITH clause (CTEs)
+
+// WITH clause typically comes first, so we need to prepend it
 
 // needsParenthesesInSetOperation determines if a SelectStmt needs parentheses when used in a set operation
-func (s *SelectStmt) needsParenthesesInSetOperation() bool {
-	if s == nil {
-		return false
-	}
+func (s *SelectStmt) needsParenthesesInSetOperation() bool { _ = "STUB: not implemented"; return false }
 
-	// A SELECT needs parentheses if it has any of these complex clauses
-	return s.WhereClause != nil ||
-		s.GroupClause != nil && s.GroupClause.Len() > 0 ||
-		s.HavingClause != nil ||
-		s.SortClause != nil && s.SortClause.Len() > 0 ||
-		s.LimitOffset != nil ||
-		s.LimitCount != nil ||
-		s.WithClause != nil || // WITH clauses need parentheses in set operations
-		s.Op != SETOP_NONE // Nested set operations always need parentheses
-}
+// A SELECT needs parentheses if it has any of these complex clauses
+
+// WITH clauses need parentheses in set operations
+// Nested set operations always need parentheses
 
 // isConstantOne checks if a Node represents the constant integer 1
-func isConstantOne(node Node) bool {
-	if node == nil {
-		return false
-	}
+func isConstantOne(node Node) bool { _ = "STUB: not implemented"; return false }
 
-	// Check if it's an A_Const with integer value 1
-	if aConst, ok := node.(*A_Const); ok {
-		if intVal, ok := aConst.Val.(*Integer); ok {
-			return intVal.IVal == 1
-		}
-	}
-
-	return false
-}
+// Check if it's an A_Const with integer value 1
 
 // InsertStmt represents an INSERT statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2039
@@ -865,99 +456,47 @@ type InsertStmt struct {
 }
 
 // NewInsertStmt creates a new InsertStmt node.
-func NewInsertStmt(relation *RangeVar) *InsertStmt {
-	return &InsertStmt{
-		BaseNode: BaseNode{Tag: T_InsertStmt},
-		Relation: relation,
-	}
-}
+func NewInsertStmt(relation *RangeVar) *InsertStmt { _ = "STUB: not implemented"; return nil }
 
-func (i *InsertStmt) String() string {
-	relName := ""
-	if i.Relation != nil {
-		relName = i.Relation.RelName
-	}
-	return fmt.Sprintf("InsertStmt(%s)@%d", relName, i.Location())
-}
+func (i *InsertStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (i *InsertStmt) StatementType() string {
-	return "INSERT"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the InsertStmt
+	return ""
 }
 
-// SqlString returns the SQL representation of the InsertStmt
 func (i *InsertStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// WITH clause
-	if i.WithClause != nil {
-		parts = append(parts, i.WithClause.SqlString())
-	}
-
-	// INSERT INTO table
-	parts = append(parts, "INSERT INTO")
-	if i.Relation != nil {
-		parts = append(parts, i.Relation.SqlString())
-	}
-
-	// Column list (if specified)
-	if i.Cols != nil && i.Cols.Len() > 0 {
-		var cols []string
-		for _, item := range i.Cols.Items {
-			if col, ok := item.(*ResTarget); ok && col.Name != "" {
-				cols = append(cols, col.ColumnNameWithIndirection())
-			}
-		}
-		parts = append(parts, fmt.Sprintf("(%s)", strings.Join(cols, ", ")))
-	}
-
-	// OVERRIDING { SYSTEM | USER } VALUE clause — semantically significant
-	// when inserting into GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY columns.
-	if s := i.Override.SqlString(); s != "" {
-		parts = append(parts, s)
-	}
-
-	// SelectStmt/VALUES clause
-	if i.SelectStmt != nil {
-		selectStr := i.SelectStmt.SqlString()
-		// If the INSERT has parentheses around the SELECT, we need to preserve them
-		// This is determined by checking if the original query had parentheses
-		// For now, we'll check if this is a simple SELECT vs a subquery by looking at the SelectStmt
-		// If it has a WHERE clause or other complexity, it's likely a subquery that should be parenthesized
-		if selectStmt, ok := i.SelectStmt.(*SelectStmt); ok {
-			if selectStmt.WhereClause != nil || selectStmt.GroupClause != nil || selectStmt.HavingClause != nil ||
-				selectStmt.SortClause != nil || selectStmt.LimitOffset != nil || selectStmt.LimitCount != nil {
-				// This appears to be a complex SELECT that was likely parenthesized in the original
-				parts = append(parts, fmt.Sprintf("(%s)", selectStr))
-			} else {
-				parts = append(parts, selectStr)
-			}
-		} else {
-			// Not a SelectStmt, could be VALUES clause, append as is
-			parts = append(parts, selectStr)
-		}
-	} else {
-		// DEFAULT VALUES case (SelectStmt is nil)
-		parts = append(parts, "DEFAULT VALUES")
-	}
-
-	// ON CONFLICT clause
-	if i.OnConflictClause != nil {
-		parts = append(parts, i.OnConflictClause.SqlString())
-	}
-
-	// RETURNING clause
-	if i.ReturningList != nil && i.ReturningList.Len() > 0 {
-		var returning []string
-		for _, item := range i.ReturningList.Items {
-			if ret, ok := item.(*ResTarget); ok && ret != nil {
-				returning = append(returning, ret.SqlString())
-			}
-		}
-		parts = append(parts, "RETURNING", strings.Join(returning, ", "))
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// INSERT INTO table
+
+// Column list (if specified)
+
+// OVERRIDING { SYSTEM | USER } VALUE clause — semantically significant
+// when inserting into GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY columns.
+
+// SelectStmt/VALUES clause
+
+// If the INSERT has parentheses around the SELECT, we need to preserve them
+// This is determined by checking if the original query had parentheses
+// For now, we'll check if this is a simple SELECT vs a subquery by looking at the SelectStmt
+// If it has a WHERE clause or other complexity, it's likely a subquery that should be parenthesized
+
+// This appears to be a complex SELECT that was likely parenthesized in the original
+
+// Not a SelectStmt, could be VALUES clause, append as is
+
+// DEFAULT VALUES case (SelectStmt is nil)
+
+// ON CONFLICT clause
+
+// RETURNING clause
 
 // UpdateStmt represents an UPDATE statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2069
@@ -972,72 +511,33 @@ type UpdateStmt struct {
 }
 
 // NewUpdateStmt creates a new UpdateStmt node.
-func NewUpdateStmt(relation *RangeVar) *UpdateStmt {
-	return &UpdateStmt{
-		BaseNode: BaseNode{Tag: T_UpdateStmt},
-		Relation: relation,
-	}
-}
+func NewUpdateStmt(relation *RangeVar) *UpdateStmt { _ = "STUB: not implemented"; return nil }
 
-func (u *UpdateStmt) String() string {
-	relName := ""
-	if u.Relation != nil {
-		relName = u.Relation.RelName
-	}
-	return fmt.Sprintf("UpdateStmt(%s)@%d", relName, u.Location())
-}
+func (u *UpdateStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (u *UpdateStmt) StatementType() string {
-	return "UPDATE"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the UpdateStmt
+	return ""
 }
 
-// SqlString returns the SQL representation of the UpdateStmt
 func (u *UpdateStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// WITH clause
-	if u.WithClause != nil {
-		parts = append(parts, u.WithClause.SqlString())
-	}
-
-	// UPDATE table
-	parts = append(parts, "UPDATE")
-	if u.Relation != nil {
-		parts = append(parts, u.Relation.SqlString())
-	}
-
-	// SET clause
-	if u.TargetList != nil && u.TargetList.Len() > 0 {
-		parts = append(parts, "SET", strings.Join(renderSetClauses(u.TargetList.Items), ", "))
-	}
-
-	// FROM clause
-	if u.FromClause != nil && u.FromClause.Len() > 0 {
-		var fromParts []string
-		for _, item := range u.FromClause.Items {
-			fromParts = append(fromParts, item.SqlString())
-		}
-		parts = append(parts, "FROM", strings.Join(fromParts, ", "))
-	}
-
-	// WHERE clause
-	if u.WhereClause != nil {
-		parts = append(parts, "WHERE", u.WhereClause.SqlString())
-	}
-
-	// RETURNING clause
-	if u.ReturningList != nil && u.ReturningList.Len() > 0 {
-		var returning []string
-		for _, item := range u.ReturningList.Items {
-			if ret, ok := item.(*ResTarget); ok && ret != nil {
-				returning = append(returning, ret.SqlString())
-			}
-		}
-		parts = append(parts, "RETURNING", strings.Join(returning, ", "))
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// UPDATE table
+
+// SET clause
+
+// FROM clause
+
+// WHERE clause
+
+// RETURNING clause
 
 // DeleteStmt represents a DELETE statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2055
@@ -1051,67 +551,31 @@ type DeleteStmt struct {
 }
 
 // NewDeleteStmt creates a new DeleteStmt node.
-func NewDeleteStmt(relation *RangeVar) *DeleteStmt {
-	return &DeleteStmt{
-		BaseNode: BaseNode{Tag: T_DeleteStmt},
-		Relation: relation,
-	}
-}
+func NewDeleteStmt(relation *RangeVar) *DeleteStmt { _ = "STUB: not implemented"; return nil }
 
-func (d *DeleteStmt) String() string {
-	relName := ""
-	if d.Relation != nil {
-		relName = d.Relation.RelName
-	}
-	return fmt.Sprintf("DeleteStmt(%s)@%d", relName, d.Location())
-}
+func (d *DeleteStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (d *DeleteStmt) StatementType() string {
-	return "DELETE"
+	_ = "STUB: not implemented"
+
+	// SqlString returns the SQL representation of the DeleteStmt
+	return ""
 }
 
-// SqlString returns the SQL representation of the DeleteStmt
 func (d *DeleteStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// WITH clause
-	if d.WithClause != nil {
-		parts = append(parts, d.WithClause.SqlString())
-	}
-
-	// DELETE FROM table
-	parts = append(parts, "DELETE FROM")
-	if d.Relation != nil {
-		parts = append(parts, d.Relation.SqlString())
-	}
-
-	// USING clause
-	if d.UsingClause != nil && d.UsingClause.Len() > 0 {
-		var usingParts []string
-		for _, item := range d.UsingClause.Items {
-			usingParts = append(usingParts, item.SqlString())
-		}
-		parts = append(parts, "USING", strings.Join(usingParts, ", "))
-	}
-
-	// WHERE clause
-	if d.WhereClause != nil {
-		parts = append(parts, "WHERE", d.WhereClause.SqlString())
-	}
-
-	// RETURNING clause
-	if d.ReturningList != nil && d.ReturningList.Len() > 0 {
-		var returning []string
-		for _, item := range d.ReturningList.Items {
-			if ret, ok := item.(*ResTarget); ok && ret != nil {
-				returning = append(returning, ret.SqlString())
-			}
-		}
-		parts = append(parts, "RETURNING", strings.Join(returning, ", "))
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// DELETE FROM table
+
+// USING clause
+
+// WHERE clause
+
+// RETURNING clause
 
 // ==============================================================================
 // DDL STATEMENTS
@@ -1136,27 +600,18 @@ type CreateStmt struct {
 }
 
 // NewCreateStmt creates a new CreateStmt node.
-func NewCreateStmt(relation *RangeVar) *CreateStmt {
-	return &CreateStmt{
-		BaseNode: BaseNode{Tag: T_CreateStmt},
-		Relation: relation,
-	}
-}
+func NewCreateStmt(relation *RangeVar) *CreateStmt { _ = "STUB: not implemented"; return nil }
 
-func (c *CreateStmt) String() string {
-	relName := ""
-	if c.Relation != nil {
-		relName = c.Relation.RelName
-	}
-	return fmt.Sprintf("CreateStmt(%s)@%d", relName, c.Location())
-}
+func (c *CreateStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (c *CreateStmt) StatementType() string {
-	return "CREATE"
+	_ = "STUB: not implemented"
+
+	// DropStmt represents a DROP statement.
+	// Ported from postgres/src/include/nodes/parsenodes.h:3226
+	return ""
 }
 
-// DropStmt represents a DROP statement.
-// Ported from postgres/src/include/nodes/parsenodes.h:3226
 type DropStmt struct {
 	BaseNode
 	Objects    *NodeList    // List of names - postgres/src/include/nodes/parsenodes.h:3229
@@ -1168,29 +623,20 @@ type DropStmt struct {
 
 // NewDropStmt creates a new DropStmt node.
 func NewDropStmt(objects *NodeList, removeType ObjectType) *DropStmt {
-	return &DropStmt{
-		BaseNode:   BaseNode{Tag: T_DropStmt},
-		Objects:    objects,
-		RemoveType: removeType,
-		Behavior:   DropRestrict,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DropStmt) String() string {
-	count := 0
-	if d.Objects != nil {
-		count = len(d.Objects.Items)
-	}
-	return fmt.Sprintf("DropStmt(%d objects)@%d", count, d.Location())
-}
+func (d *DropStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (d *DropStmt) StatementType() string {
-	return "DROP"
-}
+	_ = "STUB: not implemented"
 
-// ==============================================================================
-// COLUMN REFERENCES
-// ==============================================================================
+	// ==============================================================================
+	// COLUMN REFERENCES
+	// ==============================================================================
+	return ""
+}
 
 // ColumnRef represents a column reference in expressions.
 // Ported from postgres/src/include/nodes/parsenodes.h:291
@@ -1200,91 +646,36 @@ type ColumnRef struct {
 }
 
 // NewColumnRef creates a new ColumnRef node.
-func NewColumnRef(fields ...Node) *ColumnRef {
-	return &ColumnRef{
-		BaseNode: BaseNode{Tag: T_ColumnRef},
-		Fields:   NewNodeList(fields...),
-	}
-}
+func NewColumnRef(fields ...Node) *ColumnRef { _ = "STUB: not implemented"; return nil }
 
-func (c *ColumnRef) String() string {
-	count := 0
-	if c.Fields != nil {
-		count = len(c.Fields.Items)
-	}
-	return fmt.Sprintf("ColumnRef[%d fields]@%d", count, c.Location())
-}
+func (c *ColumnRef) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the ColumnRef
-func (c *ColumnRef) SqlString() string {
-	if c.Fields == nil || len(c.Fields.Items) == 0 {
-		return ""
-	}
+func (c *ColumnRef) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var parts []string
-	for _, field := range c.Fields.Items {
-		if field == nil {
-			continue
-		}
+// Handle different field types (String for column names, A_Star for *, A_Indices for array access)
 
-		// Handle different field types (String for column names, A_Star for *, A_Indices for array access)
-		switch f := field.(type) {
-		case *String:
-			parts = append(parts, QuoteIdentifier(f.SVal))
-		case *A_Star:
-			parts = append(parts, "*")
-		case *A_Indices:
-			// Array access - format as [index] or [start:end]
-			if f.IsSlice {
-				startStr := ""
-				endStr := ""
-				if f.Lidx != nil {
-					startStr = f.Lidx.SqlString()
-				}
-				if f.Uidx != nil {
-					endStr = f.Uidx.SqlString()
-				}
-				parts = append(parts, fmt.Sprintf("[%s:%s]", startStr, endStr))
-			} else {
-				if f.Uidx != nil {
-					parts = append(parts, fmt.Sprintf("[%s]", f.Uidx.SqlString()))
-				}
-			}
-		default:
-			// For other field types, all nodes implement SqlString()
-			parts = append(parts, field.SqlString())
-		}
-	}
+// Array access - format as [index] or [start:end]
 
-	// For simple column references, join with dots
-	// For complex ones with array access, concatenate appropriately
-	result := ""
-	for i, part := range parts {
-		if i == 0 {
-			result = part
-		} else if strings.HasPrefix(part, "[") {
-			// Array access - no dot separator
-			result += part
-		} else {
-			// Regular field access - use dot separator
-			result += "." + part
-		}
-	}
+// For other field types, all nodes implement SqlString()
 
-	return result
-}
+// For simple column references, join with dots
+// For complex ones with array access, concatenate appropriately
 
-func (c *ColumnRef) ExpressionType() string {
-	return "ColumnRef"
-}
+// Array access - no dot separator
+
+// Regular field access - use dot separator
+
+func (c *ColumnRef) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
 func (c *ColumnRef) IsExpr() bool {
-	return true
-}
+	_ = "STUB: not implemented"
 
-// ==============================================================================
-// PLACEHOLDER TYPES - To be fully implemented later
-// ==============================================================================
+	// ==============================================================================
+	// PLACEHOLDER TYPES - To be fully implemented later
+	// ==============================================================================
+	return false
+}
 
 // These types are referenced by the main statements above and are now fully implemented.
 // Implementation moved to query_execution_nodes.go for better organization.
@@ -1345,146 +736,50 @@ type CTECycleClause struct {
 
 // NewCTESearchClause creates a new CTESearchClause node.
 func NewCTESearchClause(searchColList *NodeList, breadthFirst bool, seqColumn string) *CTESearchClause {
-	return &CTESearchClause{
-		BaseNode:           BaseNode{Tag: T_CTESearchClause},
-		SearchColList:      searchColList,
-		SearchBreadthFirst: breadthFirst,
-		SearchSeqColumn:    seqColumn,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SqlString returns the SQL representation of the CTESearchClause.
-func (sc *CTESearchClause) SqlString() string {
-	var direction string
-	if sc.SearchBreadthFirst {
-		direction = "BREADTH FIRST"
-	} else {
-		direction = "DEPTH FIRST"
-	}
-
-	colNames := make([]string, 0, sc.SearchColList.Len())
-	for _, item := range sc.SearchColList.Items {
-		if str, ok := item.(*String); ok {
-			colNames = append(colNames, str.SVal)
-		}
-	}
-
-	return fmt.Sprintf("SEARCH %s BY %s SET %s",
-		direction,
-		strings.Join(colNames, ", "),
-		sc.SearchSeqColumn)
-}
+func (sc *CTESearchClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewCTECycleClause creates a new CTECycleClause node.
 func NewCTECycleClause(cycleColList *NodeList, markColumn string, markValue, markDefault Expression, pathColumn string) *CTECycleClause {
-	return &CTECycleClause{
-		BaseNode:         BaseNode{Tag: T_CTECycleClause},
-		CycleColList:     cycleColList,
-		CycleMarkColumn:  markColumn,
-		CycleMarkValue:   markValue,
-		CycleMarkDefault: markDefault,
-		CyclePathColumn:  pathColumn,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SqlString returns the SQL representation of the CTECycleClause.
-func (cc *CTECycleClause) SqlString() string {
-	colNames := make([]string, 0, cc.CycleColList.Len())
-	for _, item := range cc.CycleColList.Items {
-		if str, ok := item.(*String); ok {
-			colNames = append(colNames, str.SVal)
-		}
-	}
-
-	result := fmt.Sprintf("CYCLE %s SET %s",
-		strings.Join(colNames, ", "),
-		cc.CycleMarkColumn)
-
-	if cc.CycleMarkValue != nil && cc.CycleMarkDefault != nil {
-		result += fmt.Sprintf(" TO %s DEFAULT %s",
-			PrintAExprConst(cc.CycleMarkValue),
-			PrintAExprConst(cc.CycleMarkDefault))
-	}
-
-	result += " USING " + cc.CyclePathColumn
-
-	return result
-}
+func (cc *CTECycleClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewCommonTableExpr creates a new CommonTableExpr node.
 func NewCommonTableExpr(ctename string, ctequery Node) *CommonTableExpr {
-	cte := &CommonTableExpr{
-		BaseNode: BaseNode{Tag: T_CommonTableExpr},
-		Ctename:  ctename,
-		Ctequery: ctequery,
-	}
-	cte.SetLocation(-1)
-	return cte
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewRecursiveCommonTableExpr creates a new recursive CommonTableExpr node.
 func NewRecursiveCommonTableExpr(ctename string, ctequery Node) *CommonTableExpr {
-	cte := &CommonTableExpr{
-		BaseNode:     BaseNode{Tag: T_CommonTableExpr},
-		Ctename:      ctename,
-		Ctequery:     ctequery,
-		Cterecursive: true,
-	}
-	cte.SetLocation(-1)
-	return cte
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (cte *CommonTableExpr) String() string {
-	recursive := ""
-	if cte.Cterecursive {
-		recursive = " RECURSIVE"
-	}
-	return fmt.Sprintf("CommonTableExpr(%s%s)", cte.Ctename, recursive)
-}
+func (cte *CommonTableExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the CommonTableExpr
-func (c *CommonTableExpr) SqlString() string {
-	parts := []string{QuoteIdentifier(c.Ctename)}
+func (c *CommonTableExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add column names if specified
-	if c.Aliascolnames != nil && len(c.Aliascolnames.Items) > 0 {
-		var cols []string
-		for _, col := range c.Aliascolnames.Items {
-			if str, ok := col.(*String); ok {
-				cols = append(cols, str.SVal)
-			}
-		}
-		parts[0] += fmt.Sprintf("(%s)", strings.Join(cols, ", "))
-	}
+// Add column names if specified
 
-	// Add the CTE query
-	parts = append(parts, "AS")
+// Add the CTE query
 
-	// Determine if materialized/not materialized
-	switch c.Ctematerialized {
-	case CTEMaterializeAlways:
-		parts = append(parts, "MATERIALIZED")
-	case CTEMaterializeNever:
-		parts = append(parts, "NOT MATERIALIZED")
-	}
+// Determine if materialized/not materialized
 
-	// Add the actual query (usually in parentheses)
-	if c.Ctequery != nil {
-		parts = append(parts, fmt.Sprintf("(%s)", c.Ctequery.SqlString()))
-	}
+// Add the actual query (usually in parentheses)
 
-	// Add SEARCH clause if present
-	if c.SearchClause != nil {
-		parts = append(parts, c.SearchClause.SqlString())
-	}
+// Add SEARCH clause if present
 
-	// Add CYCLE clause if present
-	if c.CycleClause != nil {
-		parts = append(parts, c.CycleClause.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add CYCLE clause if present
 
 // Placeholder structs for other query execution nodes implemented in query_execution_nodes.go
 // IntoClause placeholder removed - now implemented in expressions.go
@@ -1499,20 +794,7 @@ const (
 	SETOP_EXCEPT                        // EXCEPT
 )
 
-func (s SetOperation) String() string {
-	switch s {
-	case SETOP_NONE:
-		return ""
-	case SETOP_UNION:
-		return "UNION"
-	case SETOP_INTERSECT:
-		return "INTERSECT"
-	case SETOP_EXCEPT:
-		return "EXCEPT"
-	default:
-		return fmt.Sprintf("SetOperation(%d)", int(s))
-	}
-}
+func (s SetOperation) String() string { _ = "STUB: not implemented"; return "" }
 
 // OnConflictClause represents ON CONFLICT clause for INSERT statements
 // Ported from postgres/src/include/nodes/parsenodes.h:1621-1629
@@ -1524,67 +806,16 @@ type OnConflictClause struct {
 	WhereClause Node             `json:"whereClause"` // Qualifications
 }
 
-func (n *OnConflictClause) node() {}
+func (n *OnConflictClause) node() { _ = "STUB: not implemented"; return }
 
-func (n *OnConflictClause) String() string {
-	var parts []string
-	parts = append(parts, "ON CONFLICT")
+func (n *OnConflictClause) String() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Infer != nil {
-		parts = append(parts, n.Infer.String())
-	}
-
-	parts = append(parts, n.Action.String())
-
-	if n.Action == ONCONFLICT_UPDATE && n.TargetList != nil && n.TargetList.Len() > 0 {
-		var targets []string
-		for _, item := range n.TargetList.Items {
-			if target, ok := item.(*ResTarget); ok {
-				targets = append(targets, target.String())
-			}
-		}
-		if len(targets) > 0 {
-			parts = append(parts, "SET", strings.Join(targets, ", "))
-		}
-	}
-
-	if n.WhereClause != nil {
-		parts = append(parts, "WHERE", n.WhereClause.String())
-	}
-
-	return strings.Join(parts, " ")
-}
-
-func (n *OnConflictClause) SqlString() string {
-	var parts []string
-	parts = append(parts, "ON CONFLICT")
-
-	if n.Infer != nil {
-		parts = append(parts, n.Infer.SqlString())
-	}
-
-	parts = append(parts, n.Action.SqlString())
-
-	if n.Action == ONCONFLICT_UPDATE && n.TargetList != nil && n.TargetList.Len() > 0 {
-		targets := renderSetClauses(n.TargetList.Items)
-		if len(targets) > 0 {
-			parts = append(parts, "SET", strings.Join(targets, ", "))
-		}
-	}
-
-	if n.WhereClause != nil {
-		parts = append(parts, "WHERE", n.WhereClause.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *OnConflictClause) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewOnConflictClause creates a new OnConflictClause node
 func NewOnConflictClause(action OnConflictAction) *OnConflictClause {
-	return &OnConflictClause{
-		BaseNode: BaseNode{Tag: T_OnConflictClause},
-		Action:   action,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // OverridingKind represents OVERRIDING clause options
@@ -1597,518 +828,136 @@ const (
 	OVERRIDING_SYSTEM_VALUE                       // OVERRIDING SYSTEM VALUE
 )
 
-func (o OverridingKind) String() string {
-	switch o {
-	case OVERRIDING_NOT_SET:
-		return ""
-	case OVERRIDING_USER_VALUE:
-		return "OVERRIDING USER VALUE"
-	case OVERRIDING_SYSTEM_VALUE:
-		return "OVERRIDING SYSTEM VALUE"
-	default:
-		return fmt.Sprintf("OverridingKind(%d)", int(o))
-	}
-}
+func (o OverridingKind) String() string { _ = "STUB: not implemented"; return "" }
 
-func (o OverridingKind) SqlString() string {
-	switch o {
-	case OVERRIDING_NOT_SET:
-		return ""
-	case OVERRIDING_USER_VALUE:
-		return "OVERRIDING USER VALUE"
-	case OVERRIDING_SYSTEM_VALUE:
-		return "OVERRIDING SYSTEM VALUE"
-	default:
-		return fmt.Sprintf("OverridingKind(%d)", int(o))
-	}
-}
+func (o OverridingKind) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // Note: Constraint is now defined in ddl_statements.go
 
 // SqlString returns the SQL representation of CREATE TABLE statement
-func (c *CreateStmt) SqlString() string {
-	var parts []string
+func (c *CreateStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "CREATE")
+// Add TEMPORARY if specified
 
-	// Add TEMPORARY if specified
-	if c.Relation != nil && c.Relation.RelPersistence == 't' {
-		parts = append(parts, "TEMPORARY")
-	} else if c.Relation != nil && c.Relation.RelPersistence == 'u' {
-		parts = append(parts, "UNLOGGED")
-	}
+// Add IF NOT EXISTS if specified
 
-	parts = append(parts, "TABLE")
+// Add table name
 
-	// Add IF NOT EXISTS if specified
-	if c.IfNotExists {
-		parts = append(parts, "IF NOT EXISTS")
-	}
+// Handle different table types with correct ordering
 
-	// Add table name
-	if c.Relation != nil {
-		parts = append(parts, c.Relation.SqlString())
-	}
+// For partition tables: PARTITION OF parent [constraints] FOR VALUES [PARTITION BY]
 
-	// Handle different table types with correct ordering
-	isPartitionTable := c.PartBound != nil && c.InhRelations != nil && c.InhRelations.Len() > 0
-	isDefaultPartitionTable := isPartitionTable && c.PartSpec != nil
-	isTypedTable := c.OfTypename != nil
+// Add constraints for partition tables (but only if there are any)
 
-	if isPartitionTable {
-		// For partition tables: PARTITION OF parent [constraints] FOR VALUES [PARTITION BY]
-		var inhParts []string
-		for _, item := range c.InhRelations.Items {
-			if inh, ok := item.(*RangeVar); ok && inh != nil {
-				inhParts = append(inhParts, inh.SqlString())
-			}
-		}
-		parts = append(parts, "PARTITION OF", strings.Join(inhParts, ", "))
+// Add FOR VALUES clause
 
-		// Add constraints for partition tables (but only if there are any)
-		var columnParts []string
-		if c.TableElts != nil {
-			for _, col := range c.TableElts.Items {
-				if col != nil {
-					columnParts = append(columnParts, col.SqlString())
-				}
-			}
-		}
-		for _, constraint := range c.Constraints {
-			if constraint != nil {
-				columnParts = append(columnParts, constraint.SqlString())
-			}
-		}
-		if len(columnParts) > 0 {
-			parts = append(parts, "(", strings.Join(columnParts, ", "), ")")
-		}
+// Add PARTITION BY for default partition tables
 
-		// Add FOR VALUES clause
-		parts = append(parts, c.PartBound.SqlString())
+// For typed tables: OF typename [ ( column_options | table_constraint, ... ) ].
+// A typed-table column is a ColumnDef with no type (just constraints); the
+// optional WITH OPTIONS keyword is syntactic sugar (identical AST), so the
+// plain `colname <constraints>` rendering round-trips.
 
-		// Add PARTITION BY for default partition tables
-		if isDefaultPartitionTable {
-			parts = append(parts, c.PartSpec.SqlString())
-		}
-	} else if isTypedTable {
-		// For typed tables: OF typename [ ( column_options | table_constraint, ... ) ].
-		// A typed-table column is a ColumnDef with no type (just constraints); the
-		// optional WITH OPTIONS keyword is syntactic sugar (identical AST), so the
-		// plain `colname <constraints>` rendering round-trips.
-		parts = append(parts, "OF", c.OfTypename.SqlString())
-		var elts []string
-		if c.TableElts != nil {
-			for _, col := range c.TableElts.Items {
-				if col != nil {
-					elts = append(elts, col.SqlString())
-				}
-			}
-		}
-		for _, constraint := range c.Constraints {
-			if constraint != nil {
-				elts = append(elts, constraint.SqlString())
-			}
-		}
-		if len(elts) > 0 {
-			parts = append(parts, "("+strings.Join(elts, ", ")+")")
-		}
-		if c.PartSpec != nil {
-			parts = append(parts, c.PartSpec.SqlString())
-		}
-	} else {
-		// Regular table with columns and constraints
-		var columnParts []string
-		if c.TableElts != nil {
-			for _, col := range c.TableElts.Items {
-				if col != nil {
-					columnParts = append(columnParts, col.SqlString())
-				}
-			}
-		}
+// Regular table with columns and constraints
 
-		// Add table-level constraints
-		for _, constraint := range c.Constraints {
-			if constraint != nil {
-				columnParts = append(columnParts, constraint.SqlString())
-			}
-		}
-		if len(columnParts) > 0 {
-			parts = append(parts, "("+strings.Join(columnParts, ", ")+")")
-		} else {
-			parts = append(parts, "()")
-		}
+// Add table-level constraints
 
-		// Add INHERITS clause for regular inheritance
-		if c.InhRelations != nil && c.InhRelations.Len() > 0 {
-			var inhParts []string
-			for _, item := range c.InhRelations.Items {
-				if inh, ok := item.(*RangeVar); ok && inh != nil {
-					inhParts = append(inhParts, inh.SqlString())
-				}
-			}
-			parts = append(parts, "INHERITS", "("+strings.Join(inhParts, ", ")+")")
-		}
+// Add INHERITS clause for regular inheritance
 
-		// Add PARTITION BY clause for regular partitioned tables
-		if c.PartSpec != nil {
-			parts = append(parts, c.PartSpec.SqlString())
-		}
-	}
+// Add PARTITION BY clause for regular partitioned tables
 
-	// Add USING clause if specified (for table access method)
-	if c.AccessMethod != "" {
-		parts = append(parts, "USING", QuoteIdentifier(c.AccessMethod))
-	}
+// Add USING clause if specified (for table access method)
 
-	// Add WITH options if specified
-	if c.Options != nil && len(c.Options.Items) > 0 {
-		var optParts []string
-		for _, opt := range c.Options.Items {
-			if defElem, ok := opt.(*DefElem); ok {
-				optParts = append(optParts, defElem.SqlString())
-			}
-		}
-		if len(optParts) > 0 {
-			parts = append(parts, "WITH", "("+strings.Join(optParts, ", ")+")")
-		}
-	}
+// Add WITH options if specified
 
-	// Add ON COMMIT clause if specified
-	if c.OnCommit != 0 {
-		switch c.OnCommit {
-		case 1: // ONCOMMIT_PRESERVE_ROWS
-			parts = append(parts, "ON COMMIT PRESERVE ROWS")
-		case 2: // ONCOMMIT_DELETE_ROWS
-			parts = append(parts, "ON COMMIT DELETE ROWS")
-		case 3: // ONCOMMIT_DROP
-			parts = append(parts, "ON COMMIT DROP")
-		}
-	}
+// Add ON COMMIT clause if specified
 
-	// Add tablespace if specified
-	if c.TableSpaceName != "" {
-		parts = append(parts, "TABLESPACE", QuoteIdentifier(c.TableSpaceName))
-	}
+// ONCOMMIT_PRESERVE_ROWS
 
-	return strings.Join(parts, " ")
-}
+// ONCOMMIT_DELETE_ROWS
+
+// ONCOMMIT_DROP
+
+// Add tablespace if specified
 
 // SqlString returns the SQL representation of DROP statement
-func (d *DropStmt) SqlString() string {
-	var parts []string
+func (d *DropStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "DROP")
+// Handle special cases first
 
-	// Handle special cases first
-	switch d.RemoveType {
-	case OBJECT_CAST:
-		return d.sqlStringForDropCast()
-	case OBJECT_OPCLASS:
-		return d.sqlStringForDropOpClass()
-	case OBJECT_OPFAMILY:
-		return d.sqlStringForDropOpFamily()
-	case OBJECT_TRANSFORM:
-		return d.sqlStringForDropTransform()
-	case OBJECT_SUBSCRIPTION:
-		return d.sqlStringForDropSubscription()
-	case OBJECT_RULE, OBJECT_TRIGGER, OBJECT_POLICY:
-		return d.sqlStringForDropOnTable()
-	}
+// Add object type - always include it as all valid ObjectTypes should have string representations
 
-	// Add object type - always include it as all valid ObjectTypes should have string representations
-	parts = append(parts, d.RemoveType.String())
+// Add CONCURRENTLY if specified for indexes
 
-	// Add CONCURRENTLY if specified for indexes
-	if d.Concurrent && d.RemoveType == OBJECT_INDEX {
-		parts = append(parts, "CONCURRENTLY")
-	}
+// Add IF EXISTS if specified
 
-	// Add IF EXISTS if specified
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
+// Add object names
 
-	// Add object names
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		var nameParts []string
-		for _, obj := range d.Objects.Items {
-			if objWithArgs, ok := obj.(*ObjectWithArgs); ok {
-				// Handle functions, aggregates, operators with arguments
-				nameParts = append(nameParts, objWithArgs.SqlString())
-			} else if nodeList, ok := obj.(*NodeList); ok {
-				// Handle qualified names (schema.table)
-				var qualParts []string
-				for _, nameItem := range nodeList.Items {
-					if strVal, ok := nameItem.(*String); ok {
-						qualParts = append(qualParts, QuoteIdentifier(strVal.SVal))
-					}
-				}
-				if len(qualParts) > 0 {
-					nameParts = append(nameParts, strings.Join(qualParts, "."))
-				}
-			} else if strVal, ok := obj.(*String); ok {
-				nameParts = append(nameParts, QuoteIdentifier(strVal.SVal))
-			} else if typeName, ok := obj.(*TypeName); ok {
-				// Handle type names (for DROP TYPE, etc.)
-				nameParts = append(nameParts, typeName.SqlString())
-			}
-		}
-		if len(nameParts) > 0 {
-			parts = append(parts, strings.Join(nameParts, ", "))
-		}
-	}
+// Handle functions, aggregates, operators with arguments
 
-	// Add CASCADE/RESTRICT behavior
-	if d.Behavior == DropCascade {
-		parts = append(parts, "CASCADE")
-	}
-	// Note: We don't output RESTRICT as it's the default behavior in PostgreSQL
-	// Only CASCADE needs to be explicitly specified
+// Handle qualified names (schema.table)
 
-	return strings.Join(parts, " ")
-}
+// Handle type names (for DROP TYPE, etc.)
+
+// Add CASCADE/RESTRICT behavior
+
+// Note: We don't output RESTRICT as it's the default behavior in PostgreSQL
+// Only CASCADE needs to be explicitly specified
 
 // sqlStringForDropCast handles DROP CAST (source_type AS target_type)
-func (d *DropStmt) sqlStringForDropCast() string {
-	var parts []string
-	parts = append(parts, "DROP CAST")
+func (d *DropStmt) sqlStringForDropCast() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	// Objects should contain a single NodeList with [source_type, target_type]
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		if typeList, ok := d.Objects.Items[0].(*NodeList); ok && len(typeList.Items) >= 2 {
-			sourceType := typeList.Items[0]
-			targetType := typeList.Items[1]
-
-			parts = append(parts, "(")
-			if srcTypeName, ok := sourceType.(*TypeName); ok {
-				parts = append(parts, srcTypeName.SqlString())
-			}
-			parts = append(parts, "AS")
-			if tgtTypeName, ok := targetType.(*TypeName); ok {
-				parts = append(parts, tgtTypeName.SqlString())
-			}
-			parts = append(parts, ")")
-		}
-	}
-
-	switch d.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Objects should contain a single NodeList with [source_type, target_type]
 
 // sqlStringForDropOpClass handles DROP OPERATOR CLASS name USING access_method
-func (d *DropStmt) sqlStringForDropOpClass() string {
-	var parts []string
-	parts = append(parts, "DROP OPERATOR CLASS")
+func (d *DropStmt) sqlStringForDropOpClass() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
+// Objects should contain a single NodeList with [access_method, ...names]
 
-	// Objects should contain a single NodeList with [access_method, ...names]
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		if objList, ok := d.Objects.Items[0].(*NodeList); ok {
-			// First item is access method, rest are qualified name parts
-			if len(objList.Items) > 0 {
-				accessMethod := ""
-				var nameParts []string
+// First item is access method, rest are qualified name parts
 
-				// First item is access method
-				if strVal, ok := objList.Items[0].(*String); ok {
-					accessMethod = strVal.SVal
-				}
+// First item is access method
 
-				// Rest are name parts
-				for i := 1; i < len(objList.Items); i++ {
-					if strVal, ok := objList.Items[i].(*String); ok {
-						nameParts = append(nameParts, strVal.SVal)
-					}
-				}
+// Rest are name parts
 
-				// Add qualified name
-				if len(nameParts) > 0 {
-					parts = append(parts, strings.Join(nameParts, "."))
-				}
+// Add qualified name
 
-				// Add USING access_method
-				if accessMethod != "" {
-					parts = append(parts, "USING", accessMethod)
-				}
-			}
-		}
-	}
-
-	switch d.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add USING access_method
 
 // sqlStringForDropOpFamily handles DROP OPERATOR FAMILY name USING access_method
-func (d *DropStmt) sqlStringForDropOpFamily() string {
-	var parts []string
-	parts = append(parts, "DROP OPERATOR FAMILY")
+func (d *DropStmt) sqlStringForDropOpFamily() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
+// Same logic as DROP OPERATOR CLASS
 
-	// Same logic as DROP OPERATOR CLASS
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		if objList, ok := d.Objects.Items[0].(*NodeList); ok {
-			if len(objList.Items) > 0 {
-				accessMethod := ""
-				var nameParts []string
+// First item is access method
 
-				// First item is access method
-				if strVal, ok := objList.Items[0].(*String); ok {
-					accessMethod = strVal.SVal
-				}
+// Rest are name parts
 
-				// Rest are name parts
-				for i := 1; i < len(objList.Items); i++ {
-					if strVal, ok := objList.Items[i].(*String); ok {
-						nameParts = append(nameParts, strVal.SVal)
-					}
-				}
+// Add qualified name
 
-				// Add qualified name
-				if len(nameParts) > 0 {
-					parts = append(parts, strings.Join(nameParts, "."))
-				}
-
-				// Add USING access_method
-				if accessMethod != "" {
-					parts = append(parts, "USING", accessMethod)
-				}
-			}
-		}
-	}
-
-	switch d.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add USING access_method
 
 // sqlStringForDropTransform handles DROP TRANSFORM FOR type LANGUAGE lang
-func (d *DropStmt) sqlStringForDropTransform() string {
-	var parts []string
-	parts = append(parts, "DROP TRANSFORM")
+func (d *DropStmt) sqlStringForDropTransform() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	// Objects should contain a single NodeList with [type, language_name]
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		if typeList, ok := d.Objects.Items[0].(*NodeList); ok && len(typeList.Items) >= 2 {
-			typeName := typeList.Items[0]
-			langName := typeList.Items[1]
-
-			parts = append(parts, "FOR")
-			if typNode, ok := typeName.(*TypeName); ok {
-				parts = append(parts, typNode.SqlString())
-			}
-			parts = append(parts, "LANGUAGE")
-			if strVal, ok := langName.(*String); ok {
-				parts = append(parts, strVal.SVal)
-			}
-		}
-	}
-
-	switch d.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Objects should contain a single NodeList with [type, language_name]
 
 // sqlStringForDropSubscription handles DROP SUBSCRIPTION name
-func (d *DropStmt) sqlStringForDropSubscription() string {
-	var parts []string
-	parts = append(parts, "DROP SUBSCRIPTION")
+func (d *DropStmt) sqlStringForDropSubscription() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	// Objects should contain a single NodeList with subscription name
-	if d.Objects != nil && len(d.Objects.Items) > 0 {
-		if nameList, ok := d.Objects.Items[0].(*NodeList); ok && len(nameList.Items) > 0 {
-			if strVal, ok := nameList.Items[0].(*String); ok {
-				parts = append(parts, strVal.SVal)
-			}
-		}
-	}
-
-	switch d.Behavior {
-	case DropCascade:
-		parts = append(parts, "CASCADE")
-	case DropRestrict:
-		parts = append(parts, "RESTRICT")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Objects should contain a single NodeList with subscription name
 
 // sqlStringForDropOnTable handles DROP RULE/TRIGGER/POLICY name ON table
-func (d *DropStmt) sqlStringForDropOnTable() string {
-	var parts []string
-	parts = append(parts, "DROP")
+func (d *DropStmt) sqlStringForDropOnTable() string { _ = "STUB: not implemented"; return "" }
 
-	// Add object type
-	if d.RemoveType != 0 {
-		parts = append(parts, d.RemoveType.String())
-	}
+// Add object type
 
-	// Add IF EXISTS if specified
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
+// Add IF EXISTS if specified
 
-	// For RULE/TRIGGER/POLICY the object is one flat qualified name whose last
-	// part is the rule/trigger/policy name and whose preceding parts form the
-	// (optionally schema-qualified) table: DROP TRIGGER <name> ON <table>.
-	if d.Objects != nil && len(d.Objects.Items) >= 2 {
-		var nameParts []string
-		for _, item := range d.Objects.Items {
-			if strVal, ok := item.(*String); ok {
-				nameParts = append(nameParts, QuoteIdentifier(strVal.SVal))
-			}
-		}
-		if len(nameParts) >= 2 {
-			objectName := nameParts[len(nameParts)-1]
-			tableName := strings.Join(nameParts[:len(nameParts)-1], ".")
-			parts = append(parts, objectName, "ON", tableName)
-		}
-	}
+// For RULE/TRIGGER/POLICY the object is one flat qualified name whose last
+// part is the rule/trigger/policy name and whose preceding parts form the
+// (optionally schema-qualified) table: DROP TRIGGER <name> ON <table>.
 
-	// Add CASCADE/RESTRICT behavior
-	if d.Behavior == DropCascade {
-		parts = append(parts, "CASCADE")
-	}
-	// Note: We don't output RESTRICT as it's the default behavior in PostgreSQL
+// Add CASCADE/RESTRICT behavior
 
-	return strings.Join(parts, " ")
-}
+// Note: We don't output RESTRICT as it's the default behavior in PostgreSQL

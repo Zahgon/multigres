@@ -16,11 +16,7 @@ package engine
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-	"strings"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
@@ -64,10 +60,8 @@ type ApplySessionState struct {
 
 // NewApplySessionState creates a new ApplySessionState primitive.
 func NewApplySessionState(sql string, stmt *ast.VariableSetStmt) *ApplySessionState {
-	return &ApplySessionState{
-		VariableStmt: stmt,
-		Query:        sql,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewApplySessionStateSilent creates an ApplySessionState that updates the
@@ -75,11 +69,8 @@ func NewApplySessionState(sql string, stmt *ast.VariableSetStmt) *ApplySessionSt
 // Sequence where a Route primitive owns the client-facing response — see
 // planner.planSelectStmt for the `SELECT set_config(...), * FROM t` case.
 func NewApplySessionStateSilent(sql string, stmt *ast.VariableSetStmt) *ApplySessionState {
-	return &ApplySessionState{
-		VariableStmt:   stmt,
-		Query:          sql,
-		SilentTracking: true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PortalStreamExecute handles SET/RESET on the extended-protocol path. The
@@ -98,7 +89,8 @@ func (s *ApplySessionState) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return s.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // StreamExecute handles the SET/RESET command.
@@ -110,14 +102,8 @@ func (s *ApplySessionState) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	switch s.VariableStmt.Kind {
-	case ast.VAR_SET_VALUE:
-		return s.executeSet(ctx, state, callback)
-	case ast.VAR_RESET, ast.VAR_RESET_ALL:
-		return s.executeReset(ctx, state, callback)
-	default:
-		return mterrors.NewFeatureNotSupported(fmt.Sprintf("SET/RESET kind %d is not supported", s.VariableStmt.Kind))
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // executeSet handles SET commands: update local state and return a synthetic
@@ -133,16 +119,8 @@ func (s *ApplySessionState) executeSet(
 	state *handler.MultiGatewayConnectionState,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	value := extractVariableValue(s.VariableStmt.Args)
-	state.SetSessionVariable(s.VariableStmt.Name, value)
-
-	if s.SilentTracking {
-		return nil
-	}
-
-	return callback(ctx, &sqltypes.Result{
-		CommandTag: "SET",
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // executeReset handles RESET/RESET ALL: update state, return synthetic response.
@@ -158,84 +136,38 @@ func (s *ApplySessionState) executeReset(
 	state *handler.MultiGatewayConnectionState,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	switch s.VariableStmt.Kind {
-	case ast.VAR_RESET:
-		// RESET variable
-		state.ResetSessionVariable(s.VariableStmt.Name)
-
-	case ast.VAR_RESET_ALL:
-		state.ResetAllSessionVariables()
-		// Also reset gateway-managed variables that live outside SessionSettings.
-		state.ResetStatementTimeout()
-	default:
-		return mterrors.NewFeatureNotSupported(fmt.Sprintf("RESET kind %d is not supported", s.VariableStmt.Kind))
-	}
-
-	if s.SilentTracking {
-		return nil
-	}
-
-	// Return synthetic CommandComplete
-	return callback(ctx, &sqltypes.Result{
-		CommandTag: "RESET",
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// RESET variable
+
+// Also reset gateway-managed variables that live outside SessionSettings.
+
+// Return synthetic CommandComplete
 
 // GetTableGroup returns empty string — SET/RESET are local-only and don't target a tablegroup.
 func (s *ApplySessionState) GetTableGroup() string {
+	_ = "STUB: not implemented"
+
+	// GetQuery returns the original SQL string.
 	return ""
 }
 
-// GetQuery returns the original SQL string.
 func (s *ApplySessionState) GetQuery() string {
-	return s.Query
+	_ = "STUB: not implemented"
+
+	// String returns a string representation for debugging.
+	return ""
 }
 
-// String returns a string representation for debugging.
-func (s *ApplySessionState) String() string {
-	return fmt.Sprintf("ApplySessionState(%s)", s.VariableStmt.SqlString())
-}
+func (s *ApplySessionState) String() string { _ = "STUB: not implemented"; return "" }
 
 // extractVariableValue converts AST NodeList arguments to a string value.
-func extractVariableValue(args *ast.NodeList) string {
-	if args == nil || args.Len() == 0 {
-		return ""
-	}
-
-	var values []string
-	for _, arg := range args.Items {
-		switch v := arg.(type) {
-		case *ast.A_Const:
-			values = append(values, extractConstValue(v))
-		case *ast.String:
-			values = append(values, v.SVal)
-		case *ast.Integer:
-			values = append(values, strconv.Itoa(v.IVal))
-		default:
-			values = append(values, arg.SqlString())
-		}
-	}
-
-	return strings.Join(values, ", ")
-}
+func extractVariableValue(args *ast.NodeList) string { _ = "STUB: not implemented"; return "" }
 
 // extractConstValue extracts string value from A_Const node.
-func extractConstValue(aConst *ast.A_Const) string {
-	if aConst == nil || aConst.Val == nil {
-		return ""
-	}
-
-	switch val := aConst.Val.(type) {
-	case *ast.String:
-		return val.SVal
-	case *ast.Integer:
-		return strconv.Itoa(val.IVal)
-	case *ast.Float:
-		return val.FVal
-	default:
-		return aConst.SqlString()
-	}
-}
+func extractConstValue(aConst *ast.A_Const) string { _ = "STUB: not implemented"; return "" }
 
 // Ensure ApplySessionState implements Primitive interface.
 var _ Primitive = (*ApplySessionState)(nil)

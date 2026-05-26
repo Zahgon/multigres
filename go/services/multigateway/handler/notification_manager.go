@@ -39,15 +39,25 @@ type NotificationManager interface {
 type noopNotificationManager struct{}
 
 func (n *noopNotificationManager) Subscribe(pgChannel string, notifCh chan *sqltypes.Notification) {
+	_ = "STUB: not implemented"
+	return
 }
 
 func (n *noopNotificationManager) Unsubscribe(pgChannel string, notifCh chan *sqltypes.Notification) {
+	_ = "STUB: not implemented"
+	return
 }
-func (n *noopNotificationManager) UnsubscribeAll(notifCh chan *sqltypes.Notification) {}
 
-// DefaultNotificationManager returns a no-op manager.
+func (n *noopNotificationManager) UnsubscribeAll(notifCh chan *sqltypes.Notification) {
+	_ = "STUB: not implemented"
+
+	// DefaultNotificationManager returns a no-op manager.
+	return
+}
+
 func DefaultNotificationManager() NotificationManager {
-	return &noopNotificationManager{}
+	_ = "STUB: not implemented"
+	return *new(NotificationManager)
 }
 
 // SubscriptionSync coordinates LISTEN/NOTIFY subscriptions for a connection.

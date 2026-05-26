@@ -17,7 +17,6 @@
 package bufpool
 
 import (
-	"math/bits"
 	"sync"
 )
 
@@ -28,17 +27,7 @@ type sizedPool struct {
 }
 
 // newSizedPool creates a new sized pool.
-func newSizedPool(size int) *sizedPool {
-	return &sizedPool{
-		size: size,
-		pool: sync.Pool{
-			New: func() any {
-				buf := make([]byte, size)
-				return &buf
-			},
-		},
-	}
-}
+func newSizedPool(size int) *sizedPool { _ = "STUB: not implemented"; return nil }
 
 // Pool is a collection of pools for buffers of different sizes.
 // It provides efficient allocation and recycling of byte buffers.
@@ -53,86 +42,39 @@ type Pool struct {
 
 // New creates a new buffer pool with buckets from minSize to maxSize.
 // Bucket sizes increase by powers of 2: [minSize, minSize*2, minSize*4, ..., maxSize].
-func New(minSize, maxSize int) *Pool {
-	if maxSize < minSize {
-		panic("maxSize must be >= minSize")
-	}
+func New(minSize, maxSize int) *Pool { _ = "STUB: not implemented"; return nil }
 
-	const multiplier = 2
-	var pools []*sizedPool
+// Create pools for each power of 2 from minSize to maxSize.
 
-	// Create pools for each power of 2 from minSize to maxSize.
-	curSize := minSize
-	for curSize < maxSize {
-		pools = append(pools, newSizedPool(curSize))
-		curSize *= multiplier
-	}
-	// Add final pool for maxSize.
-	pools = append(pools, newSizedPool(maxSize))
-
-	return &Pool{
-		minSize: minSize,
-		maxSize: maxSize,
-		pools:   pools,
-	}
-}
+// Add final pool for maxSize.
 
 // findPool finds the appropriate pool for the given size.
 // Returns nil if size exceeds maxSize.
-func (p *Pool) findPool(size int) *sizedPool {
-	if size > p.maxSize {
-		return nil
-	}
+func (p *Pool) findPool(size int) *sizedPool { _ = "STUB: not implemented"; return nil }
 
-	// Calculate the bucket index based on size.
-	// We need to find the smallest bucket that can hold 'size' bytes.
-	div, rem := bits.Div64(0, uint64(size), uint64(p.minSize))
-	idx := bits.Len64(div)
+// Calculate the bucket index based on size.
+// We need to find the smallest bucket that can hold 'size' bytes.
 
-	// If size is an exact power-of-2 multiple of minSize, adjust index.
-	if rem == 0 && div != 0 && (div&(div-1)) == 0 {
-		idx = idx - 1
-	}
+// If size is an exact power-of-2 multiple of minSize, adjust index.
 
-	// Ensure index is within bounds.
-	if idx >= len(p.pools) {
-		idx = len(p.pools) - 1
-	}
-
-	return p.pools[idx]
-}
+// Ensure index is within bounds.
 
 // Get returns a pointer to a byte slice with at least 'size' bytes.
 // The slice's length is set to 'size', and capacity may be larger.
 //
 // If no pool bucket can accommodate the size, a new slice is allocated on the heap.
 // The caller is responsible for returning the buffer using Put() when done.
-func (p *Pool) Get(size int) *[]byte {
-	sp := p.findPool(size)
-	if sp == nil {
-		// Size exceeds maxSize, allocate directly.
-		buf := make([]byte, size)
-		return &buf
-	}
+func (p *Pool) Get(size int) *[]byte { _ = "STUB: not implemented"; return nil }
 
-	buf := sp.pool.Get().(*[]byte)
-	*buf = (*buf)[:size]
-	return buf
-}
+// Size exceeds maxSize, allocate directly.
 
 // Put returns a buffer to the pool for reuse.
 // The buffer's capacity determines which pool bucket it goes to.
 //
 // If the buffer's capacity doesn't match any pool bucket, it's discarded.
 // After calling Put(), the caller should not use the buffer anymore.
-func (p *Pool) Put(buf *[]byte) {
-	sp := p.findPool(cap(*buf))
-	if sp == nil {
-		// Buffer too large or too small, discard it.
-		return
-	}
+func (p *Pool) Put(buf *[]byte) { _ = "STUB: not implemented"; return }
 
-	// Reset length to capacity before returning to pool.
-	*buf = (*buf)[:cap(*buf)]
-	sp.pool.Put(buf)
-}
+// Buffer too large or too small, discard it.
+
+// Reset length to capacity before returning to pool.

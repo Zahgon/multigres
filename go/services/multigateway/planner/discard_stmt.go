@@ -15,7 +15,6 @@
 package planner
 
 import (
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/services/multigateway/engine"
@@ -42,29 +41,14 @@ func (p *Planner) planDiscardStmt(
 	stmt *ast.DiscardStmt,
 	conn *server.Conn,
 ) (*engine.Plan, error) {
-	if stmt.Target == ast.DISCARD_TEMP {
-		p.logger.Debug("planning discard temp statement", "sql", sql)
-
-		primitive := engine.NewDiscardTempPrimitive(sql, p.defaultTableGroup)
-		plan := engine.NewPlan(sql, primitive)
-
-		p.logger.Debug("created discard temp plan", "plan", plan.String())
-		return plan, nil
-	}
-
-	if stmt.Target == ast.DISCARD_ALL {
-		p.logger.Debug("planning discard all statement", "sql", sql)
-		// CloseCursorRoute snapshots OpenHoldCursorNames at execution
-		// time and forwards them as release_portal_names, so any HOLD
-		// pin on the reserved backend is drained before/with the
-		// DISCARD ALL itself. The actual SQL forwarded to PG is
-		// unchanged — PG handles every other DISCARD ALL side effect.
-		route := engine.NewCloseAllCursorRoute(p.defaultTableGroup, constants.DefaultShard, sql)
-		plan := engine.NewPlan(sql, route)
-		plan.Type = engine.PlanTypeCloseCursorRoute
-		return plan, nil
-	}
-
-	// DISCARD PLANS / DISCARD SEQUENCES — route to PostgreSQL.
-	return p.planDefault(sql, stmt, conn)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// CloseCursorRoute snapshots OpenHoldCursorNames at execution
+// time and forwards them as release_portal_names, so any HOLD
+// pin on the reserved backend is drained before/with the
+// DISCARD ALL itself. The actual SQL forwarded to PG is
+// unchanged — PG handles every other DISCARD ALL side effect.
+
+// DISCARD PLANS / DISCARD SEQUENCES — route to PostgreSQL.

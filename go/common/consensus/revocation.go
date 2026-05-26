@@ -15,16 +15,7 @@
 package consensus
 
 import (
-	"errors"
-	"fmt"
-
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	"github.com/multigres/multigres/go/tools/pgutil"
 )
 
 // NewTermRevocation constructs a TermRevocation for a coordinator-led safe
@@ -46,40 +37,14 @@ func NewTermRevocation(
 	statuses []*clustermetadatapb.ConsensusStatus,
 	coordinatorID *clustermetadatapb.ID,
 ) (*clustermetadatapb.TermRevocation, error) {
-	if len(statuses) == 0 {
-		return nil, errors.New("NewTermRevocation: statuses must be non-empty")
-	}
-	var maxTerm int64
-	var maxRule *clustermetadatapb.RuleNumber
-	for _, cs := range statuses {
-		if t := cs.GetTermRevocation().GetRevokedBelowTerm(); t > maxTerm {
-			maxTerm = t
-		}
-		ruleNum := cs.GetCurrentPosition().GetRule().GetRuleNumber()
-		if ruleNum == nil {
-			continue
-		}
-		if t := ruleNum.GetCoordinatorTerm(); t > maxTerm {
-			maxTerm = t
-		}
-		// Capture the first non-nil RuleNumber we see; bump only on strictly
-		// greater. The "first non-nil" path matters when the recorded rule
-		// is the zero RuleNumber — CompareRuleNumbers treats zero == nil, so
-		// without the explicit nil check we'd never lift maxRule above nil.
-		if maxRule == nil || CompareRuleNumbers(ruleNum, maxRule) > 0 {
-			maxRule = ruleNum
-		}
-	}
-	if maxRule == nil {
-		return nil, errors.New("NewTermRevocation: no cohort member reports a recorded rule; agent should construct revocation directly with explicit outgoing_rule")
-	}
-	return &clustermetadatapb.TermRevocation{
-		RevokedBelowTerm:       maxTerm + 1,
-		AcceptedCoordinatorId:  coordinatorID,
-		CoordinatorInitiatedAt: timestamppb.Now(),
-		OutgoingRule:           maxRule,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Capture the first non-nil RuleNumber we see; bump only on strictly
+// greater. The "first non-nil" path matters when the recorded rule
+// is the zero RuleNumber — CompareRuleNumbers treats zero == nil, so
+// without the explicit nil check we'd never lift maxRule above nil.
 
 // IsRuleRevoked reports whether the pooler's recorded revocation forbids
 // applying a rule (e.g. one delivered by a follower-side rule-propagation
@@ -104,18 +69,8 @@ func NewTermRevocation(
 // on revocations written by older code that predates the field; nil means
 // "no override available" and the override branch cannot fire.
 func IsRuleRevoked(rule *clustermetadatapb.ShardRule, revocation *clustermetadatapb.TermRevocation) bool {
-	revokedBelow := revocation.GetRevokedBelowTerm()
-	if revokedBelow == 0 {
-		return false
-	}
-	if rule.GetRuleNumber().GetCoordinatorTerm() >= revokedBelow {
-		return false
-	}
-	outgoing := revocation.GetOutgoingRule()
-	if outgoing != nil && CompareRuleNumbers(rule.GetRuleNumber(), outgoing) > 0 {
-		return false
-	}
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
 // ValidateRevocation reports whether the given revocation is safe for a node
@@ -148,80 +103,25 @@ func IsRuleRevoked(rule *clustermetadatapb.ShardRule, revocation *clustermetadat
 // A nil term_revocation in status means the node has not previously accepted
 // any revocation, so conditions 2 and 3 pass for any incoming revocation.
 func ValidateRevocation(status *clustermetadatapb.ConsensusStatus, revocation *clustermetadatapb.TermRevocation) error {
-	if revocation == nil {
-		return errors.New("cannot accept revocation: revocation is nil")
-	}
-	if revocation.GetAcceptedCoordinatorId().GetName() == "" {
-		return errors.New("cannot accept revocation: accepted_coordinator_id is required")
-	}
-	if revocation.GetCoordinatorInitiatedAt() == nil {
-		return errors.New("cannot accept revocation: coordinator_initiated_at is required")
-	}
-	if revocation.GetOutgoingRule() == nil {
-		return errors.New("cannot accept revocation: outgoing_rule is required")
-	}
-	revokedBelowTerm := revocation.GetRevokedBelowTerm()
-	// Invariant: outgoing_rule represents the rule the coordinator is
-	// transitioning from. Its coordinator_term must be strictly less than
-	// revoked_below_term — the new term is by construction max(observed) + 1,
-	// so outgoing_rule.coordinator_term <= max(observed) < revoked_below_term.
-	// A violation indicates a malformed revocation (or future code paths
-	// constructing revocations by hand without using NewTermRevocation).
-	if outTerm := revocation.GetOutgoingRule().GetCoordinatorTerm(); outTerm >= revokedBelowTerm {
-		return fmt.Errorf(
-			"cannot accept revocation: outgoing_rule coordinator_term %d >= revoked_below_term %d",
-			outTerm, revokedBelowTerm,
-		)
-	}
-
-	// Condition 1: WAL position safety.
-	pos := status.GetCurrentPosition()
-	if pos == nil {
-		return errors.New("cannot accept revocation: unknown WAL position")
-	}
-	if _, err := pgutil.ParseLSN(pos.Lsn); err != nil {
-		return mterrors.Wrap(err, "cannot accept revocation")
-	}
-	ruleCoordTerm := pos.GetRule().GetRuleNumber().GetCoordinatorTerm()
-	if ruleCoordTerm >= revokedBelowTerm {
-		return fmt.Errorf(
-			"cannot accept revocation: recorded rule is at coordinator term %d >= revoked_below_term %d",
-			ruleCoordTerm, revokedBelowTerm,
-		)
-	}
-	// TODO: reject revocations whose outgoing_rule is known to be obsolete.
-	// This may require us to first have more clarity about what's a proposal vs
-	// what's a decision.
-
-	// Conditions 2 and 3: stored-revocation consistency.
-	stored := status.GetTermRevocation()
-	if stored != nil {
-		storedTerm := stored.GetRevokedBelowTerm()
-		if storedTerm > revokedBelowTerm {
-			return fmt.Errorf(
-				"cannot accept revocation: already accepted term %d > requested %d",
-				storedTerm, revokedBelowTerm,
-			)
-		}
-		if storedTerm == revokedBelowTerm {
-			storedCoord := topoclient.ClusterIDString(stored.GetAcceptedCoordinatorId())
-			reqCoord := topoclient.ClusterIDString(revocation.GetAcceptedCoordinatorId())
-			if storedCoord != reqCoord {
-				return fmt.Errorf(
-					"cannot accept revocation: already accepted term %d from coordinator %s, requested by %s",
-					storedTerm, storedCoord, reqCoord,
-				)
-			}
-			// Same coordinator, same term: verify the recruitment round matches.
-			if !proto.Equal(stored.GetCoordinatorInitiatedAt(), revocation.GetCoordinatorInitiatedAt()) {
-				return fmt.Errorf(
-					"cannot accept revocation: coordinator %s reused term %d with a different coordinator_initiated_at",
-					storedCoord, storedTerm,
-				)
-			}
-			// All fields match: idempotent acceptance.
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Invariant: outgoing_rule represents the rule the coordinator is
+// transitioning from. Its coordinator_term must be strictly less than
+// revoked_below_term — the new term is by construction max(observed) + 1,
+// so outgoing_rule.coordinator_term <= max(observed) < revoked_below_term.
+// A violation indicates a malformed revocation (or future code paths
+// constructing revocations by hand without using NewTermRevocation).
+
+// Condition 1: WAL position safety.
+
+// TODO: reject revocations whose outgoing_rule is known to be obsolete.
+// This may require us to first have more clarity about what's a proposal vs
+// what's a decision.
+
+// Conditions 2 and 3: stored-revocation consistency.
+
+// Same coordinator, same term: verify the recruitment round matches.
+
+// All fields match: idempotent acceptance.

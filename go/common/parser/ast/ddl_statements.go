@@ -25,12 +25,6 @@
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 package ast
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
-
 // ==============================================================================
 // DDL FRAMEWORK - PostgreSQL parsenodes.h DDL implementation
 // Ported from postgres/src/include/nodes/parsenodes.h
@@ -96,114 +90,7 @@ const (
 	OBJECT_VIEW
 )
 
-func (o ObjectType) String() string {
-	switch o {
-	case OBJECT_ACCESS_METHOD:
-		return "ACCESS METHOD"
-	case OBJECT_AGGREGATE:
-		return "AGGREGATE"
-	case OBJECT_AMOP:
-		return "AMOP"
-	case OBJECT_AMPROC:
-		return "AMPROC"
-	case OBJECT_ATTRIBUTE:
-		return "ATTRIBUTE"
-	case OBJECT_CAST:
-		return "CAST"
-	case OBJECT_COLUMN:
-		return "COLUMN"
-	case OBJECT_COLLATION:
-		return "COLLATION"
-	case OBJECT_CONVERSION:
-		return "CONVERSION"
-	case OBJECT_DATABASE:
-		return "DATABASE"
-	case OBJECT_DEFAULT:
-		return "DEFAULT"
-	case OBJECT_DEFACL:
-		return "DEFAULT PRIVILEGES"
-	case OBJECT_DOMAIN:
-		return "DOMAIN"
-	case OBJECT_DOMCONSTRAINT:
-		return "CONSTRAINT"
-	case OBJECT_EVENT_TRIGGER:
-		return "EVENT TRIGGER"
-	case OBJECT_EXTENSION:
-		return "EXTENSION"
-	case OBJECT_FDW:
-		return "FOREIGN DATA WRAPPER"
-	case OBJECT_FOREIGN_SERVER:
-		return "SERVER"
-	case OBJECT_FOREIGN_TABLE:
-		return "FOREIGN TABLE"
-	case OBJECT_FUNCTION:
-		return "FUNCTION"
-	case OBJECT_INDEX:
-		return "INDEX"
-	case OBJECT_LANGUAGE:
-		return "LANGUAGE"
-	case OBJECT_LARGEOBJECT:
-		return "LARGE OBJECT"
-	case OBJECT_MATVIEW:
-		return "MATERIALIZED VIEW"
-	case OBJECT_OPCLASS:
-		return "OPERATOR CLASS"
-	case OBJECT_OPERATOR:
-		return "OPERATOR"
-	case OBJECT_OPFAMILY:
-		return "OPERATOR FAMILY"
-	case OBJECT_PARAMETER_ACL:
-		return "PARAMETER"
-	case OBJECT_POLICY:
-		return "POLICY"
-	case OBJECT_PROCEDURE:
-		return "PROCEDURE"
-	case OBJECT_PUBLICATION:
-		return "PUBLICATION"
-	case OBJECT_PUBLICATION_NAMESPACE:
-		return "PUBLICATION NAMESPACE"
-	case OBJECT_PUBLICATION_REL:
-		return "PUBLICATION RELATION"
-	case OBJECT_ROLE:
-		return "ROLE"
-	case OBJECT_ROUTINE:
-		return "ROUTINE"
-	case OBJECT_RULE:
-		return "RULE"
-	case OBJECT_SCHEMA:
-		return "SCHEMA"
-	case OBJECT_SEQUENCE:
-		return "SEQUENCE"
-	case OBJECT_SUBSCRIPTION:
-		return "SUBSCRIPTION"
-	case OBJECT_STATISTIC_EXT:
-		return "STATISTICS"
-	case OBJECT_TABCONSTRAINT:
-		return "CONSTRAINT"
-	case OBJECT_TABLE:
-		return "TABLE"
-	case OBJECT_TABLESPACE:
-		return "TABLESPACE"
-	case OBJECT_TRANSFORM:
-		return "TRANSFORM"
-	case OBJECT_TRIGGER:
-		return "TRIGGER"
-	case OBJECT_TSCONFIGURATION:
-		return "TEXT SEARCH CONFIGURATION"
-	case OBJECT_TSDICTIONARY:
-		return "TEXT SEARCH DICTIONARY"
-	case OBJECT_TSPARSER:
-		return "TEXT SEARCH PARSER"
-	case OBJECT_TSTEMPLATE:
-		return "TEXT SEARCH TEMPLATE"
-	case OBJECT_TYPE:
-		return "TYPE"
-	case OBJECT_VIEW:
-		return "VIEW"
-	default:
-		return fmt.Sprintf("ObjectType(%d)", int(o))
-	}
-}
+func (o ObjectType) String() string { _ = "STUB: not implemented"; return "" }
 
 // DropBehavior represents CASCADE/RESTRICT behavior - ported from postgres/src/include/nodes/parsenodes.h:2329-2333
 type DropBehavior int
@@ -213,16 +100,7 @@ const (
 	DropCascade                      // remove dependent objects too
 )
 
-func (d DropBehavior) String() string {
-	switch d {
-	case DropRestrict:
-		return "RESTRICT"
-	case DropCascade:
-		return "CASCADE"
-	default:
-		return fmt.Sprintf("DropBehavior(%d)", int(d))
-	}
-}
+func (d DropBehavior) String() string { _ = "STUB: not implemented"; return "" }
 
 // ConstrType represents types of constraints - ported from postgres/src/include/nodes/parsenodes.h:2697-2714
 type ConstrType int
@@ -305,66 +183,11 @@ type KeyActions struct {
 }
 
 // SqlString returns the SQL representation of KeyAction
-func (ka *KeyAction) SqlString() string {
-	if ka == nil {
-		return ""
-	}
+func (ka *KeyAction) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var result string
-	switch ka.Action {
-	case FKCONSTR_ACTION_NOACTION:
-		result = "NO ACTION"
-	case FKCONSTR_ACTION_RESTRICT:
-		result = "RESTRICT"
-	case FKCONSTR_ACTION_CASCADE:
-		result = "CASCADE"
-	case FKCONSTR_ACTION_SETNULL:
-		result = "SET NULL"
-	case FKCONSTR_ACTION_SETDEFAULT:
-		result = "SET DEFAULT"
-	default:
-		result = "NO ACTION"
-	}
+// Add column list if present (only valid for SET NULL and SET DEFAULT)
 
-	// Add column list if present (only valid for SET NULL and SET DEFAULT)
-	if ka.Cols != nil && len(ka.Cols.Items) > 0 {
-		if ka.Action == FKCONSTR_ACTION_SETNULL || ka.Action == FKCONSTR_ACTION_SETDEFAULT {
-			result += " ("
-			var colsBuilder strings.Builder
-			for i, col := range ka.Cols.Items {
-				if i > 0 {
-					colsBuilder.WriteString(", ")
-				}
-				colsBuilder.WriteString(col.SqlString())
-			}
-			result += colsBuilder.String()
-			result += ")"
-		}
-	}
-
-	return result
-}
-
-func (c ConstrType) String() string {
-	switch c {
-	case CONSTR_NULL:
-		return "NULL"
-	case CONSTR_NOTNULL:
-		return "NOT_NULL"
-	case CONSTR_DEFAULT:
-		return "DEFAULT"
-	case CONSTR_CHECK:
-		return "CHECK"
-	case CONSTR_PRIMARY:
-		return "PRIMARY_KEY"
-	case CONSTR_UNIQUE:
-		return "UNIQUE"
-	case CONSTR_FOREIGN:
-		return "FOREIGN_KEY"
-	default:
-		return fmt.Sprintf("ConstrType(%d)", int(c))
-	}
-}
+func (c ConstrType) String() string { _ = "STUB: not implemented"; return "" }
 
 // ViewCheckOption represents WITH CHECK OPTION - ported from postgres/src/include/nodes/parsenodes.h:3773-3777
 type ViewCheckOption int
@@ -375,18 +198,7 @@ const (
 	CASCADED_CHECK_OPTION
 )
 
-func (v ViewCheckOption) String() string {
-	switch v {
-	case NO_CHECK_OPTION:
-		return "NO_CHECK"
-	case LOCAL_CHECK_OPTION:
-		return "LOCAL"
-	case CASCADED_CHECK_OPTION:
-		return "CASCADED"
-	default:
-		return fmt.Sprintf("ViewCheckOption(%d)", int(v))
-	}
-}
+func (v ViewCheckOption) String() string { _ = "STUB: not implemented"; return "" }
 
 // AlterTableType represents types of ALTER TABLE operations - ported from postgres/src/include/nodes/parsenodes.h:2348-2417
 type AlterTableType int
@@ -462,40 +274,7 @@ const (
 	AT_ReAddStatistics                                 // internal to commands/tablecmds.c
 )
 
-func (a AlterTableType) String() string {
-	switch a {
-	case AT_AddColumn:
-		return "ADD_COLUMN"
-	case AT_DropColumn:
-		return "DROP_COLUMN"
-	case AT_ColumnDefault:
-		return "COLUMN_DEFAULT"
-	case AT_DropNotNull:
-		return "DROP_NOT_NULL"
-	case AT_SetNotNull:
-		return "SET_NOT_NULL"
-	case AT_AddConstraint:
-		return "ADD_CONSTRAINT"
-	case AT_DropConstraint:
-		return "DROP_CONSTRAINT"
-	case AT_AlterColumnType:
-		return "ALTER_COLUMN_TYPE"
-	case AT_ChangeOwner:
-		return "CHANGE_OWNER"
-	case AT_SetTableSpace:
-		return "SET_TABLESPACE"
-	case AT_EnableRule:
-		return "ENABLE RULE"
-	case AT_EnableAlwaysRule:
-		return "ENABLE ALWAYS RULE"
-	case AT_EnableReplicaRule:
-		return "ENABLE REPLICA RULE"
-	case AT_DisableRule:
-		return "DISABLE RULE"
-	default:
-		return fmt.Sprintf("AlterTableType(%d)", int(a))
-	}
-}
+func (a AlterTableType) String() string { _ = "STUB: not implemented"; return "" }
 
 // DefElemAction represents actions for DefElem - ported from postgres/src/include/nodes/parsenodes.h:803-809
 type DefElemAction int
@@ -507,20 +286,7 @@ const (
 	DEFELEM_DROP                        // DROP
 )
 
-func (d DefElemAction) String() string {
-	switch d {
-	case DEFELEM_UNSPEC:
-		return "UNSPEC"
-	case DEFELEM_SET:
-		return "SET"
-	case DEFELEM_ADD:
-		return "ADD"
-	case DEFELEM_DROP:
-		return "DROP"
-	default:
-		return fmt.Sprintf("DefElemAction(%d)", int(d))
-	}
-}
+func (d DefElemAction) String() string { _ = "STUB: not implemented"; return "" }
 
 // SortByDir represents sort direction - ported from postgres/src/include/nodes/parsenodes.h:57-62
 type SortByDir int
@@ -532,20 +298,7 @@ const (
 	SORTBY_USING // not used in indexes
 )
 
-func (s SortByDir) String() string {
-	switch s {
-	case SORTBY_DEFAULT:
-		return "DEFAULT"
-	case SORTBY_ASC:
-		return "ASC"
-	case SORTBY_DESC:
-		return "DESC"
-	case SORTBY_USING:
-		return "USING"
-	default:
-		return fmt.Sprintf("SortByDir(%d)", int(s))
-	}
-}
+func (s SortByDir) String() string { _ = "STUB: not implemented"; return "" }
 
 // SortByNulls represents null ordering - ported from postgres/src/include/nodes/parsenodes.h:64-69
 type SortByNulls int
@@ -556,18 +309,7 @@ const (
 	SORTBY_NULLS_LAST
 )
 
-func (s SortByNulls) String() string {
-	switch s {
-	case SORTBY_NULLS_DEFAULT:
-		return "DEFAULT"
-	case SORTBY_NULLS_FIRST:
-		return "NULLS_FIRST"
-	case SORTBY_NULLS_LAST:
-		return "NULLS_LAST"
-	default:
-		return fmt.Sprintf("SortByNulls(%d)", int(s))
-	}
-}
+func (s SortByNulls) String() string { _ = "STUB: not implemented"; return "" }
 
 // RoleSpecType represents types of role specifications - ported from postgres/src/include/nodes/parsenodes.h:383-389
 type RoleSpecType int
@@ -580,22 +322,7 @@ const (
 	ROLESPEC_PUBLIC                           // role name is "public"
 )
 
-func (r RoleSpecType) String() string {
-	switch r {
-	case ROLESPEC_CSTRING:
-		return "CSTRING"
-	case ROLESPEC_CURRENT_ROLE:
-		return "CURRENT_ROLE"
-	case ROLESPEC_CURRENT_USER:
-		return "CURRENT_USER"
-	case ROLESPEC_SESSION_USER:
-		return "SESSION_USER"
-	case ROLESPEC_PUBLIC:
-		return "PUBLIC"
-	default:
-		return fmt.Sprintf("RoleSpecType(%d)", int(r))
-	}
-}
+func (r RoleSpecType) String() string { _ = "STUB: not implemented"; return "" }
 
 // RoleSpec represents a role specification.
 // Ported from postgres/src/include/nodes/parsenodes.h:401
@@ -607,37 +334,14 @@ type RoleSpec struct {
 
 // NewRoleSpec creates a new RoleSpec node.
 func NewRoleSpec(roletype RoleSpecType, rolename string) *RoleSpec {
-	return &RoleSpec{
-		BaseNode: BaseNode{Tag: T_RoleSpec},
-		Roletype: roletype,
-		Rolename: rolename,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *RoleSpec) String() string {
-	if r.Roletype == ROLESPEC_CSTRING {
-		return fmt.Sprintf("RoleSpec(%s)@%d", r.Rolename, r.Location())
-	}
-	return fmt.Sprintf("RoleSpec(%s)@%d", r.Roletype, r.Location())
-}
+func (r *RoleSpec) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the role specification
-func (r *RoleSpec) SqlString() string {
-	switch r.Roletype {
-	case ROLESPEC_CSTRING:
-		return QuoteIdentifier(r.Rolename)
-	case ROLESPEC_CURRENT_USER:
-		return "CURRENT_USER"
-	case ROLESPEC_SESSION_USER:
-		return "SESSION_USER"
-	case ROLESPEC_CURRENT_ROLE:
-		return "CURRENT_ROLE"
-	case ROLESPEC_PUBLIC:
-		return "PUBLIC"
-	default:
-		return QuoteIdentifier(r.Rolename)
-	}
-}
+func (r *RoleSpec) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // CORE DDL SUPPORTING STRUCTURES
@@ -657,342 +361,95 @@ type TypeName struct {
 }
 
 // stringsToNodeList converts a slice of strings to a NodeList of String nodes
-func stringsToNodeList(names []string) *NodeList {
-	if len(names) == 0 {
-		return nil
-	}
-	nodeList := NewNodeList()
-	for _, name := range names {
-		nodeList.Append(NewString(name))
-	}
-	return nodeList
-}
+func stringsToNodeList(names []string) *NodeList { _ = "STUB: not implemented"; return nil }
 
 // nodeListToStrings converts a NodeList of String nodes back to a slice of strings
-func nodeListToStrings(nodeList *NodeList) []string {
-	if nodeList == nil {
-		return nil
-	}
-	var names []string
-	for _, item := range nodeList.Items {
-		if str, ok := item.(*String); ok {
-			names = append(names, QuoteIdentifier(str.SVal))
-		}
-	}
-	return names
-}
+func nodeListToStrings(nodeList *NodeList) []string { _ = "STUB: not implemented"; return nil }
 
 // GetNames returns the Names as a slice of strings for testing purposes
-func (t *TypeName) GetNames() []string {
-	return nodeListToStrings(t.Names)
-}
+func (t *TypeName) GetNames() []string { _ = "STUB: not implemented"; return nil }
 
 // GetKeys returns the Keys as a slice of strings for testing purposes
-func (c *Constraint) GetKeys() []string {
-	return nodeListToStrings(c.Keys)
-}
+func (c *Constraint) GetKeys() []string { _ = "STUB: not implemented"; return nil }
 
 // GetIncluding returns the Including as a slice of strings for testing purposes
-func (c *Constraint) GetIncluding() []string {
-	return nodeListToStrings(c.Including)
-}
+func (c *Constraint) GetIncluding() []string { _ = "STUB: not implemented"; return nil }
 
 // GetFkAttrs returns the FkAttrs as a slice of strings for testing purposes
-func (c *Constraint) GetFkAttrs() []string {
-	return nodeListToStrings(c.FkAttrs)
-}
+func (c *Constraint) GetFkAttrs() []string { _ = "STUB: not implemented"; return nil }
 
 // GetPkAttrs returns the PkAttrs as a slice of strings for testing purposes
-func (c *Constraint) GetPkAttrs() []string {
-	return nodeListToStrings(c.PkAttrs)
-}
+func (c *Constraint) GetPkAttrs() []string { _ = "STUB: not implemented"; return nil }
 
 // GetFkDelSetCols returns the FkDelSetCols as a slice of strings for testing purposes
-func (c *Constraint) GetFkDelSetCols() []string {
-	return nodeListToStrings(c.FkDelSetCols)
-}
+func (c *Constraint) GetFkDelSetCols() []string { _ = "STUB: not implemented"; return nil }
 
 // NewTypeName creates a new TypeName node.
-func NewTypeName(names []string) *TypeName {
-	return &TypeName{
-		BaseNode: BaseNode{Tag: T_TypeName},
-		Names:    stringsToNodeList(names),
-	}
-}
+func NewTypeName(names []string) *TypeName { _ = "STUB: not implemented"; return nil }
 
-func (t *TypeName) String() string {
-	typeName := ""
-	if t.Names != nil && t.Names.Len() > 0 {
-		lastItem := t.Names.Items[t.Names.Len()-1]
-		if str, ok := lastItem.(*String); ok {
-			typeName = str.SVal
-		}
-	}
-	return fmt.Sprintf("TypeName(%s)@%d", typeName, t.Location())
-}
+func (t *TypeName) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the TypeName
 // normalizeTypeName converts PostgreSQL internal type names to standard SQL type names
-func normalizeTypeName(nameParts []string) string {
-	if len(nameParts) == 0 {
-		return ""
-	}
+func normalizeTypeName(nameParts []string) string { _ = "STUB: not implemented"; return "" }
 
-	// For qualified names, handle schema qualification
-	if len(nameParts) > 1 {
-		// Strip pg_catalog or public schema for built-in types only
-		if len(nameParts) == 2 && (nameParts[0] == "pg_catalog" || nameParts[0] == "public") {
-			typeName := nameParts[1]
-			if isBuiltInType(typeName) {
-				return normalizeSingleTypeName(typeName)
-			}
-		}
+// For qualified names, handle schema qualification
 
-		// For other qualified names, quote each part individually if needed
-		var quotedParts []string
-		for _, part := range nameParts {
-			quotedParts = append(quotedParts, QuoteIdentifier(part))
-		}
-		return strings.Join(quotedParts, ".")
-	}
+// Strip pg_catalog or public schema for built-in types only
 
-	// For single names, normalize if it's a built-in type
-	return normalizeSingleTypeName(nameParts[0])
-}
+// For other qualified names, quote each part individually if needed
+
+// For single names, normalize if it's a built-in type
 
 // isBuiltInType checks if a type name is a built-in PostgreSQL type
-func isBuiltInType(typeName string) bool {
-	switch strings.ToLower(typeName) {
-	case "int4", "int", "int8", "bigint", "int2", "smallint",
-		"float", "float4", "real", "float8", "double precision",
-		"bool", "boolean", "bpchar", "char", "varchar", "text",
-		"numeric", "decimal", "timestamp", "timestamptz",
-		"time", "timetz", "date", "interval", "bytea",
-		"uuid", "json", "jsonb", "xml":
-		return true
-	default:
-		return false
-	}
-}
+func isBuiltInType(typeName string) bool { _ = "STUB: not implemented"; return false }
 
 func normalizeSingleTypeName(typeName string) string {
+	_ = "STUB: not implemented"
 	// Map PostgreSQL internal names to standard SQL names
-	switch strings.ToLower(typeName) {
-	case "int4", "int":
-		return "INT"
-	case "int8", "bigint":
-		return "BIGINT"
-	case "int2", "smallint":
-		return "SMALLINT"
-	case "float":
-		return "FLOAT"
-	case "float4", "real":
-		return "REAL"
-	case "float8":
-		return "FLOAT8"
-	case "double precision":
-		return "DOUBLE PRECISION"
-	case "bool", "boolean":
-		return "BOOLEAN"
-	case "bpchar":
-		return "CHAR"
-	case "char":
-		// pg_catalog."char" is a one-byte ad-hoc type distinct from bpchar/CHAR;
-		// preserve the quoting so it does not collapse to bpchar(1) on the wire.
-		return `"char"`
-	case "varchar":
-		return "VARCHAR"
-	case "text":
-		return "TEXT"
-	case "numeric":
-		return "NUMERIC"
-	case "decimal":
-		return "DECIMAL"
-	case "timestamp":
-		return "TIMESTAMP"
-	case "timestamptz":
-		return "TIMESTAMPTZ"
-	case "time":
-		return "TIME"
-	case "timetz":
-		return "TIMETZ"
-	case "date":
-		return "DATE"
-	case "interval":
-		return "INTERVAL"
-	case "bytea":
-		return "BYTEA"
-	case "uuid":
-		return "UUID"
-	case "json":
-		return "JSON"
-	case "jsonb":
-		return "JSONB"
-	case "xml":
-		return "XML"
-	default:
-		return QuoteIdentifier(typeName)
-	}
+	return ""
 }
+
+// pg_catalog."char" is a one-byte ad-hoc type distinct from bpchar/CHAR;
+// preserve the quoting so it does not collapse to bpchar(1) on the wire.
 
 // intervalMaskToString converts an interval mask to its string representation
-func intervalMaskToString(mask int) string {
-	switch mask {
-	case INTERVAL_MASK_YEAR:
-		return "YEAR"
-	case INTERVAL_MASK_MONTH:
-		return "MONTH"
-	case INTERVAL_MASK_DAY:
-		return "DAY"
-	case INTERVAL_MASK_HOUR:
-		return "HOUR"
-	case INTERVAL_MASK_MINUTE:
-		return "MINUTE"
-	case INTERVAL_MASK_SECOND:
-		return "SECOND"
-	case INTERVAL_MASK_YEAR | INTERVAL_MASK_MONTH:
-		return "YEAR TO MONTH"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_HOUR:
-		return "DAY TO HOUR"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_MINUTE:
-		return "DAY TO MINUTE"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_HOUR | INTERVAL_MASK_MINUTE:
-		return "DAY TO MINUTE"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_SECOND:
-		return "DAY TO SECOND"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_HOUR | INTERVAL_MASK_SECOND:
-		return "DAY TO SECOND"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_MINUTE | INTERVAL_MASK_SECOND:
-		return "DAY TO SECOND"
-	case INTERVAL_MASK_DAY | INTERVAL_MASK_HOUR | INTERVAL_MASK_MINUTE | INTERVAL_MASK_SECOND:
-		return "DAY TO SECOND"
-	case INTERVAL_MASK_HOUR | INTERVAL_MASK_MINUTE:
-		return "HOUR TO MINUTE"
-	case INTERVAL_MASK_HOUR | INTERVAL_MASK_SECOND:
-		return "HOUR TO SECOND"
-	case INTERVAL_MASK_HOUR | INTERVAL_MASK_MINUTE | INTERVAL_MASK_SECOND:
-		return "HOUR TO SECOND"
-	case INTERVAL_MASK_MINUTE | INTERVAL_MASK_SECOND:
-		return "MINUTE TO SECOND"
-	case INTERVAL_FULL_RANGE:
-		return "FULL_RANGE" // Special marker for precision-only intervals
-	default:
-		return ""
-	}
-}
+func intervalMaskToString(mask int) string { _ = "STUB: not implemented"; return "" }
 
-func (t *TypeName) SqlString() string {
-	if t.Names == nil || t.Names.Len() == 0 {
-		return ""
-	}
+// Special marker for precision-only intervals
 
-	var result string
+func (t *TypeName) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add SETOF prefix if present
-	if t.Setof {
-		result = "SETOF "
-	}
+// Add SETOF prefix if present
 
-	// Collect name parts from the NodeList
-	var nameParts []string
-	for _, item := range t.Names.Items {
-		if str, ok := item.(*String); ok {
-			nameParts = append(nameParts, str.SVal)
-		}
-	}
+// Collect name parts from the NodeList
 
-	// `col%TYPE` references the type of an existing column. The qualified name is
-	// kept verbatim (not alias-normalized) with the %TYPE suffix.
-	if t.PctType {
-		quoted := make([]string, len(nameParts))
-		for i, p := range nameParts {
-			quoted[i] = QuoteIdentifier(p)
-		}
-		return result + strings.Join(quoted, ".") + "%TYPE"
-	}
+// `col%TYPE` references the type of an existing column. The qualified name is
+// kept verbatim (not alias-normalized) with the %TYPE suffix.
 
-	// Use normalizeTypeName to handle both single and qualified names
-	typeName := normalizeTypeName(nameParts)
+// Use normalizeTypeName to handle both single and qualified names
 
-	// Add type modifiers if present
-	if t.Typmods != nil && t.Typmods.Len() > 0 {
-		var modStrs []string
+// Add type modifiers if present
 
-		// Special handling for INTERVAL types
-		if strings.ToLower(typeName) == "interval" && t.Typmods.Len() >= 1 {
-			if firstMod, ok := t.Typmods.Items[0].(*Integer); ok {
-				if firstMod.IVal == INTERVAL_FULL_RANGE {
-					// Skip the INTERVAL_FULL_RANGE (first modifier) and only include the precision (second modifier)
-					for i := 1; i < t.Typmods.Len(); i++ {
-						if mod := t.Typmods.Items[i]; mod != nil {
-							modStrs = append(modStrs, mod.SqlString())
-						}
-					}
-				} else {
-					// Convert interval mask to text representation
-					intervalUnit := intervalMaskToString(firstMod.IVal)
-					if intervalUnit != "" && intervalUnit != "FULL_RANGE" {
-						// For specific units like "minute to second", use that instead of numeric
-						typeName += " " + strings.ToLower(intervalUnit)
+// Special handling for INTERVAL types
 
-						// Add precision if present as second parameter
-						if t.Typmods.Len() >= 2 {
-							if precision, ok := t.Typmods.Items[1].(*Integer); ok {
-								typeName += "(" + precision.SqlString() + ")"
-							}
-						}
-						// Skip the normal modifier processing since we handled it above
-						modStrs = nil
-					} else {
-						// Fallback to regular handling for unrecognized masks
-						for _, mod := range t.Typmods.Items {
-							if mod != nil {
-								modStrs = append(modStrs, mod.SqlString())
-							}
-						}
-					}
-				}
-			} else {
-				// Regular handling if first modifier is not an Integer
-				for _, mod := range t.Typmods.Items {
-					if mod != nil {
-						modStrs = append(modStrs, mod.SqlString())
-					}
-				}
-			}
-		} else {
-			// Regular handling for non-INTERVAL types
-			for _, mod := range t.Typmods.Items {
-				if mod != nil {
-					modStrs = append(modStrs, mod.SqlString())
-				}
-			}
-		}
+// Skip the INTERVAL_FULL_RANGE (first modifier) and only include the precision (second modifier)
 
-		if len(modStrs) > 0 {
-			typeName += "(" + strings.Join(modStrs, ", ") + ")"
-		}
-	}
+// Convert interval mask to text representation
 
-	result += typeName
+// For specific units like "minute to second", use that instead of numeric
 
-	// Add array bounds if present
-	if t.ArrayBounds != nil && t.ArrayBounds.Len() > 0 {
-		var boundsBuilder strings.Builder
-		for _, bound := range t.ArrayBounds.Items {
-			if intBound, ok := bound.(*Integer); ok {
-				if intBound.IVal == -1 {
-					boundsBuilder.WriteString("[]")
-				} else {
-					boundsBuilder.WriteString(fmt.Sprintf("[%d]", intBound.IVal))
-				}
-			}
-		}
-		result += boundsBuilder.String()
-	}
+// Add precision if present as second parameter
 
-	return result
-}
+// Skip the normal modifier processing since we handled it above
+
+// Fallback to regular handling for unrecognized masks
+
+// Regular handling if first modifier is not an Integer
+
+// Regular handling for non-INTERVAL types
+
+// Add array bounds if present
 
 // CollateClause represents a COLLATE clause.
 // This is a placeholder implementation - full CollateClause from parsenodes.h will be implemented later
@@ -1003,51 +460,23 @@ type CollateClause struct {
 }
 
 // NewCollateClause creates a new CollateClause node.
-func NewCollateClause(collname *NodeList) *CollateClause {
-	return &CollateClause{
-		BaseNode: BaseNode{Tag: T_CollateClause, Loc: -1},
-		Collname: collname,
-	}
-}
+func NewCollateClause(collname *NodeList) *CollateClause { _ = "STUB: not implemented"; return nil }
 
-func (c *CollateClause) String() string {
-	collName := ""
-	if c.Collname != nil && c.Collname.Len() > 0 {
-		// Get the last element (unqualified name)
-		if lastNode := c.Collname.Items[c.Collname.Len()-1]; lastNode != nil {
-			if strNode, ok := lastNode.(*String); ok {
-				collName = strNode.SVal
-			}
-		}
-	}
-	return fmt.Sprintf("CollateClause(%s)@%d", collName, c.Location())
-}
+func (c *CollateClause) String() string { _ = "STUB: not implemented"; return "" }
+
+// Get the last element (unqualified name)
 
 // SqlString generates SQL representation of a COLLATE clause
 func (c *CollateClause) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Add the expression if present
-	if c.Arg != nil {
-		parts = append(parts, c.Arg.SqlString())
-	}
-
-	// Add COLLATE and collation name
-	if c.Collname != nil && c.Collname.Len() > 0 {
-		collNames := make([]string, 0, c.Collname.Len())
-		for _, item := range c.Collname.Items {
-			if strNode, ok := item.(*String); ok {
-				// Use QuoteIdentifier to properly handle identifier quoting
-				collNames = append(collNames, QuoteIdentifier(strNode.SVal))
-			}
-		}
-		if len(collNames) > 0 {
-			parts = append(parts, "COLLATE", strings.Join(collNames, "."))
-		}
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add COLLATE and collation name
+
+// Use QuoteIdentifier to properly handle identifier quoting
 
 // ==============================================================================
 
@@ -1062,123 +491,35 @@ type DefElem struct {
 }
 
 // NewDefElem creates a new DefElem node.
-func NewDefElem(defname string, arg Node) *DefElem {
-	return &DefElem{
-		BaseNode:  BaseNode{Tag: T_DefElem},
-		Defname:   defname,
-		Arg:       arg,
-		Defaction: DEFELEM_UNSPEC,
-	}
-}
+func NewDefElem(defname string, arg Node) *DefElem { _ = "STUB: not implemented"; return nil }
 
 // NewDefElemExtended creates a new DefElem node with a qualified name.
 func NewDefElemExtended(defnamespace, defname string, arg Node, action DefElemAction) *DefElem {
-	return &DefElem{
-		BaseNode:     BaseNode{Tag: T_DefElem},
-		Defnamespace: defnamespace,
-		Defname:      defname,
-		Arg:          arg,
-		Defaction:    action,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DefElem) String() string {
-	action := ""
-	if d.Defaction != DEFELEM_UNSPEC {
-		action = fmt.Sprintf(" %s", d.Defaction)
-	}
-	return fmt.Sprintf("DefElem(%s%s)@%d", d.Defname, action, d.Location())
-}
+func (d *DefElem) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of DefElem
-func (d *DefElem) SqlString() string {
-	name := QuoteIdentifier(d.Defname)
-	// A namespace qualifies the option (e.g. the toast.* storage parameters);
-	// dropping it would collide with the un-namespaced option of the same name.
-	if d.Defnamespace != "" {
-		name = QuoteIdentifier(d.Defnamespace) + "." + name
-	}
-	if d.Arg != nil {
-		return fmt.Sprintf("%s = %s", name, d.Arg.SqlString())
-	}
-	return name
-}
+func (d *DefElem) SqlString() string { _ = "STUB: not implemented"; return "" }
+
+// A namespace qualifies the option (e.g. the toast.* storage parameters);
+// dropping it would collide with the un-namespaced option of the same name.
 
 // SqlStringForFunction returns the SQL representation of DefElem for function options
 // This handles the special formatting needed for ALTER FUNCTION statements
-func (d *DefElem) SqlStringForFunction() string {
-	switch d.Defname {
-	case "volatility":
-		if strNode, ok := d.Arg.(*String); ok {
-			return strings.ToUpper(strNode.SVal)
-		}
-	case "strict":
-		if boolNode, ok := d.Arg.(*Boolean); ok {
-			if boolNode.BoolVal {
-				return "STRICT"
-			} else {
-				return "CALLED ON NULL INPUT"
-			}
-		}
-	case "leakproof":
-		if boolNode, ok := d.Arg.(*Boolean); ok {
-			if boolNode.BoolVal {
-				return "LEAKPROOF"
-			} else {
-				return "NOT LEAKPROOF"
-			}
-		}
-	case "security":
-		if boolNode, ok := d.Arg.(*Boolean); ok {
-			if boolNode.BoolVal {
-				return "SECURITY DEFINER"
-			} else {
-				return "SECURITY INVOKER"
-			}
-		}
-	case "cost":
-		if d.Arg != nil {
-			return "COST " + d.Arg.SqlString()
-		}
-	case "rows":
-		if d.Arg != nil {
-			return "ROWS " + d.Arg.SqlString()
-		}
-	case "parallel":
-		if strNode, ok := d.Arg.(*String); ok {
-			return "PARALLEL " + strings.ToUpper(strNode.SVal)
-		}
-	case "support":
-		if d.Arg != nil {
-			// For SUPPORT, we want the unquoted function name
-			if nodeList, ok := d.Arg.(*NodeList); ok && nodeList.Len() > 0 {
-				// Handle qualified names like schema.func_name
-				nameStrs := make([]string, 0, nodeList.Len())
-				for i := 0; i < nodeList.Len(); i++ {
-					if strNode, ok := nodeList.Items[i].(*String); ok {
-						nameStrs = append(nameStrs, strNode.SVal)
-					}
-				}
-				return "SUPPORT " + strings.Join(nameStrs, ".")
-			} else if strNode, ok := d.Arg.(*String); ok {
-				return "SUPPORT " + strNode.SVal
-			} else {
-				return "SUPPORT " + d.Arg.SqlString()
-			}
-		}
-	case "set":
-		// Handle SET/RESET operations via FunctionSetResetClause
-		if d.Arg != nil {
-			return d.Arg.SqlString()
-		}
-	default:
-		// For other options, fall back to the standard format
-		return d.SqlString()
-	}
+func (d *DefElem) SqlStringForFunction() string { _ = "STUB: not implemented"; return "" }
 
-	// Fallback for cases where Arg is nil or doesn't match expected type
-	return d.Defname
-}
+// For SUPPORT, we want the unquoted function name
+
+// Handle qualified names like schema.func_name
+
+// Handle SET/RESET operations via FunctionSetResetClause
+
+// For other options, fall back to the standard format
+
+// Fallback for cases where Arg is nil or doesn't match expected type
 
 // Constraint represents a constraint definition.
 // Ported from postgres/src/include/nodes/parsenodes.h:2728
@@ -1217,329 +558,61 @@ type Constraint struct {
 }
 
 // NewConstraint creates a new Constraint node.
-func NewConstraint(contype ConstrType) *Constraint {
-	return &Constraint{
-		BaseNode:       BaseNode{Tag: T_Constraint},
-		Contype:        contype,
-		InitiallyValid: true, // Constraints are valid by default unless explicitly marked NOT VALID
-	}
-}
+func NewConstraint(contype ConstrType) *Constraint { _ = "STUB: not implemented"; return nil }
 
-func (c *Constraint) String() string {
-	name := c.Conname
-	if name == "" {
-		name = "unnamed"
-	}
-	return fmt.Sprintf("Constraint(%s %s)@%d", c.Contype, name, c.Location())
-}
+// Constraints are valid by default unless explicitly marked NOT VALID
+
+func (c *Constraint) String() string { _ = "STUB: not implemented"; return "" }
 
 // indexConstraintTail renders the trailing clauses shared by PRIMARY KEY and
 // UNIQUE table constraints: INCLUDE non-key columns, an adopted index or index
 // tablespace, and deferrability.
-func (c *Constraint) indexConstraintTail() string {
-	result := ""
-	if c.Including != nil && c.Including.Len() > 0 {
-		result += " INCLUDE (" + strings.Join(nodeListToStrings(c.Including), ", ") + ")"
-	}
-	if c.Indexname != "" {
-		result += " USING INDEX " + QuoteIdentifier(c.Indexname)
-	}
-	if c.Indexspace != "" {
-		result += " USING INDEX TABLESPACE " + QuoteIdentifier(c.Indexspace)
-	}
-	if c.Deferrable {
-		result += " DEFERRABLE"
-	}
-	if c.Initdeferred {
-		result += " INITIALLY DEFERRED"
-	}
-	return result
-}
+func (c *Constraint) indexConstraintTail() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString generates SQL representation of a constraint
-func (c *Constraint) SqlString() string {
-	switch c.Contype {
-	case CONSTR_NOTNULL:
-		if c.Conname != "" {
-			return "CONSTRAINT " + QuoteIdentifier(c.Conname) + " NOT NULL"
-		}
-		return "NOT NULL"
-	case CONSTR_NULL:
-		return "NULL"
-	case CONSTR_DEFAULT:
-		if c.RawExpr != nil {
-			return "DEFAULT " + c.RawExpr.SqlString()
-		}
-		return "DEFAULT"
-	case CONSTR_IDENTITY:
-		var result strings.Builder
-		result.WriteString("GENERATED ")
-		switch c.GeneratedWhen {
-		case ATTRIBUTE_IDENTITY_ALWAYS:
-			result.WriteString("ALWAYS")
-		case ATTRIBUTE_IDENTITY_BY_DEFAULT:
-			result.WriteString("BY DEFAULT")
-		}
-		result.WriteString(" AS IDENTITY")
+func (c *Constraint) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-		// Add sequence options if present
-		if c.Options != nil && len(c.Options.Items) > 0 {
-			for _, item := range c.Options.Items {
-				if defElem, ok := item.(*DefElem); ok {
-					switch defElem.Defname {
-					case "increment":
-						if defElem.Arg != nil {
-							result.WriteString(" SET INCREMENT BY " + defElem.Arg.SqlString())
-						}
-					case "start":
-						if defElem.Arg != nil {
-							result.WriteString(" SET START WITH " + defElem.Arg.SqlString())
-						}
-					case "restart":
-						if defElem.Arg != nil {
-							result.WriteString(" SET RESTART WITH " + defElem.Arg.SqlString())
-						} else {
-							result.WriteString(" RESTART")
-						}
-					case "maxvalue":
-						if defElem.Arg != nil {
-							result.WriteString(" SET MAXVALUE " + defElem.Arg.SqlString())
-						}
-					case "minvalue":
-						if defElem.Arg != nil {
-							result.WriteString(" SET MINVALUE " + defElem.Arg.SqlString())
-						}
-					case "cache":
-						if defElem.Arg != nil {
-							result.WriteString(" SET CACHE " + defElem.Arg.SqlString())
-						}
-					case "cycle":
-						if defElem.Arg != nil {
-							// Check if it's a boolean and handle accordingly
-							if boolNode, ok := defElem.Arg.(*Boolean); ok {
-								if boolNode.BoolVal {
-									result.WriteString(" SET CYCLE")
-								} else {
-									result.WriteString(" SET NO CYCLE")
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return result.String()
-	case CONSTR_GENERATED:
-		// Almost always ALWAYS, but preserve BY DEFAULT if that is what was
-		// parsed (round-trip; PG itself rejects BY DEFAULT for STORED columns).
-		result := "GENERATED ALWAYS AS"
-		if c.GeneratedWhen == ATTRIBUTE_IDENTITY_BY_DEFAULT {
-			result = "GENERATED BY DEFAULT AS"
-		}
-		if c.RawExpr != nil {
-			result += " (" + c.RawExpr.SqlString() + ")"
-		}
-		result += " STORED"
-		return result
-	case CONSTR_PRIMARY:
-		result := ""
-		if c.Conname != "" {
-			result = "CONSTRAINT " + QuoteIdentifier(c.Conname) + " "
-		}
-		result += "PRIMARY KEY"
-		if c.Keys != nil && c.Keys.Len() > 0 {
-			result += " (" + strings.Join(nodeListToStrings(c.Keys), ", ") + ")"
-		}
-		result += c.indexConstraintTail()
-		return result
-	case CONSTR_UNIQUE:
-		result := ""
-		if c.Conname != "" {
-			result = "CONSTRAINT " + QuoteIdentifier(c.Conname) + " "
-		}
-		result += "UNIQUE"
-		// NULLS DISTINCT is the default; only the NOT form needs rendering.
-		if c.NullsNotDistinct {
-			result += " NULLS NOT DISTINCT"
-		}
-		if c.Keys != nil && c.Keys.Len() > 0 {
-			result += " (" + strings.Join(nodeListToStrings(c.Keys), ", ") + ")"
-		}
-		result += c.indexConstraintTail()
-		return result
-	case CONSTR_CHECK:
-		result := ""
-		if c.Conname != "" {
-			result = "CONSTRAINT " + QuoteIdentifier(c.Conname) + " "
-		}
-		result += "CHECK"
-		if c.RawExpr != nil {
-			result += " (" + c.RawExpr.SqlString() + ")"
-		}
+// Add sequence options if present
 
-		// Add NO INHERIT if specified
-		if c.IsNoInherit {
-			result += " NO INHERIT"
-		}
+// Check if it's a boolean and handle accordingly
 
-		// Add NOT VALID if specified (InitiallyValid = false means NOT VALID)
-		if !c.InitiallyValid {
-			result += " NOT VALID"
-		}
+// Almost always ALWAYS, but preserve BY DEFAULT if that is what was
+// parsed (round-trip; PG itself rejects BY DEFAULT for STORED columns).
 
-		return result
-	case CONSTR_FOREIGN:
-		result := ""
-		if c.Conname != "" {
-			result = "CONSTRAINT " + QuoteIdentifier(c.Conname) + " "
-		}
+// NULLS DISTINCT is the default; only the NOT form needs rendering.
 
-		// For column-level constraints, don't include "FOREIGN KEY"
-		// For table-level constraints, include it
-		if c.FkAttrs != nil && c.FkAttrs.Len() > 0 {
-			result += "FOREIGN KEY (" + strings.Join(nodeListToStrings(c.FkAttrs), ", ") + ")"
-		} else {
-			result += "REFERENCES"
-		}
-		if c.Pktable != nil {
-			if c.FkAttrs != nil && c.FkAttrs.Len() > 0 {
-				result += " REFERENCES " + c.Pktable.SqlString()
-			} else {
-				result += " " + c.Pktable.SqlString()
-			}
-			if c.PkAttrs != nil && c.PkAttrs.Len() > 0 {
-				result += "(" + strings.Join(nodeListToStrings(c.PkAttrs), ", ") + ")"
-			}
-		}
+// Add NO INHERIT if specified
 
-		// Add MATCH clause if explicitly specified (non-zero and not default SIMPLE)
-		if c.FkMatchtype != 0 && c.FkMatchtype != FKCONSTR_MATCH_SIMPLE {
-			switch c.FkMatchtype {
-			case FKCONSTR_MATCH_FULL:
-				result += " MATCH FULL"
-			case FKCONSTR_MATCH_PARTIAL:
-				result += " MATCH PARTIAL"
-			}
-		}
+// Add NOT VALID if specified (InitiallyValid = false means NOT VALID)
 
-		// Add foreign key actions (only if explicitly set and not default NO ACTION)
-		if c.FkDelAction != 0 && c.FkDelAction != FKCONSTR_ACTION_NOACTION {
-			switch c.FkDelAction {
-			case FKCONSTR_ACTION_RESTRICT:
-				result += " ON DELETE RESTRICT"
-			case FKCONSTR_ACTION_CASCADE:
-				result += " ON DELETE CASCADE"
-			case FKCONSTR_ACTION_SETNULL:
-				result += " ON DELETE SET NULL"
-				if c.FkDelSetCols != nil && len(c.FkDelSetCols.Items) > 0 {
-					result += " (" + strings.Join(nodeListToStrings(c.FkDelSetCols), ", ") + ")"
-				}
-			case FKCONSTR_ACTION_SETDEFAULT:
-				result += " ON DELETE SET DEFAULT"
-				if c.FkDelSetCols != nil && len(c.FkDelSetCols.Items) > 0 {
-					result += " (" + strings.Join(nodeListToStrings(c.FkDelSetCols), ", ") + ")"
-				}
-			}
-		}
+// For column-level constraints, don't include "FOREIGN KEY"
+// For table-level constraints, include it
 
-		if c.FkUpdAction != 0 && c.FkUpdAction != FKCONSTR_ACTION_NOACTION {
-			switch c.FkUpdAction {
-			case FKCONSTR_ACTION_RESTRICT:
-				result += " ON UPDATE RESTRICT"
-			case FKCONSTR_ACTION_CASCADE:
-				result += " ON UPDATE CASCADE"
-			case FKCONSTR_ACTION_SETNULL:
-				result += " ON UPDATE SET NULL"
-			case FKCONSTR_ACTION_SETDEFAULT:
-				result += " ON UPDATE SET DEFAULT"
-			}
-		}
+// Add MATCH clause if explicitly specified (non-zero and not default SIMPLE)
 
-		// Add DEFERRABLE and INITIALLY DEFERRED attributes
-		if c.Deferrable {
-			result += " DEFERRABLE"
-			if c.Initdeferred {
-				result += " INITIALLY DEFERRED"
-			} else {
-				result += " INITIALLY IMMEDIATE"
-			}
-		}
+// Add foreign key actions (only if explicitly set and not default NO ACTION)
 
-		// Add NOT VALID if specified (InitiallyValid = false means NOT VALID)
-		if !c.InitiallyValid {
-			result += " NOT VALID"
-		}
+// Add DEFERRABLE and INITIALLY DEFERRED attributes
 
-		return result
-	case CONSTR_EXCLUSION:
-		result := ""
-		if c.Conname != "" {
-			result = "CONSTRAINT " + QuoteIdentifier(c.Conname) + " "
-		}
-		result += "EXCLUDE"
+// Add NOT VALID if specified (InitiallyValid = false means NOT VALID)
 
-		// Add access method if specified
-		if c.AccessMethod != "" {
-			result += " USING " + QuoteIdentifier(c.AccessMethod)
-		}
+// Add access method if specified
 
-		// Add exclusion elements (column WITH operator pairs)
-		if c.Exclusions != nil && c.Exclusions.Len() > 0 {
-			var exclusionParts []string
-			for _, item := range c.Exclusions.Items {
-				if nodeList, ok := item.(*NodeList); ok && nodeList.Len() >= 2 {
-					// Each exclusion is a pair: (IndexElem, operator name)
-					if indexElem := nodeList.Items[0]; indexElem != nil {
-						elemStr := indexElem.SqlString()
-						if operList, ok := nodeList.Items[1].(*NodeList); ok && operList.Len() > 0 {
-							// Get the operator
-							if operStr, ok := operList.Items[0].(*String); ok {
-								elemStr += " WITH " + operStr.SVal
-							}
-						}
-						exclusionParts = append(exclusionParts, elemStr)
-					}
-				}
-			}
-			if len(exclusionParts) > 0 {
-				result += " (" + strings.Join(exclusionParts, ", ") + ")"
-			}
-		}
+// Add exclusion elements (column WITH operator pairs)
 
-		// Add INCLUDE non-key columns if specified
-		if c.Including != nil && c.Including.Len() > 0 {
-			result += " INCLUDE (" + strings.Join(nodeListToStrings(c.Including), ", ") + ")"
-		}
+// Each exclusion is a pair: (IndexElem, operator name)
 
-		// Add WHERE clause if specified
-		if c.WhereClause != nil {
-			result += " WHERE " + c.WhereClause.SqlString()
-		}
+// Get the operator
 
-		// Add deferrability
-		if c.Deferrable {
-			result += " DEFERRABLE"
-		}
-		if c.Initdeferred {
-			result += " INITIALLY DEFERRED"
-		}
+// Add INCLUDE non-key columns if specified
 
-		return result
+// Add WHERE clause if specified
 
-	// Constraint attributes parsed as standalone nodes for column constraints
-	// (PostgreSQL merges these into the preceding constraint during analysis;
-	// at raw-parse time they are separate Constraint nodes).
-	case CONSTR_ATTR_DEFERRABLE:
-		return "DEFERRABLE"
-	case CONSTR_ATTR_NOT_DEFERRABLE:
-		return "NOT DEFERRABLE"
-	case CONSTR_ATTR_DEFERRED:
-		return "INITIALLY DEFERRED"
-	case CONSTR_ATTR_IMMEDIATE:
-		return "INITIALLY IMMEDIATE"
-	}
-	return ""
-}
+// Add deferrability
+
+// Constraint attributes parsed as standalone nodes for column constraints
+// (PostgreSQL merges these into the preceding constraint during analysis;
+// at raw-parse time they are separate Constraint nodes).
 
 // ==============================================================================
 // ALTER TABLE STATEMENTS
@@ -1557,21 +630,13 @@ type AlterTableStmt struct {
 
 // NewAlterTableStmt creates a new AlterTableStmt node.
 func NewAlterTableStmt(relation *RangeVar, cmds *NodeList) *AlterTableStmt {
-	return &AlterTableStmt{
-		BaseNode: BaseNode{Tag: T_AlterTableStmt},
-		Relation: relation,
-		Cmds:     cmds,
-		Objtype:  OBJECT_TABLE,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterTableStmt) StatementType() string {
-	return "AlterTableStmt"
-}
+func (a *AlterTableStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterTableStmt) String() string {
-	return a.SqlString()
-}
+func (a *AlterTableStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // ReplicaIdentityStmt represents a REPLICA IDENTITY statement.
 // Ported from postgres/src/include/nodes/parsenodes.h
@@ -1583,38 +648,15 @@ type ReplicaIdentityStmt struct {
 
 // NewReplicaIdentityStmt creates a new ReplicaIdentityStmt node.
 func NewReplicaIdentityStmt(identityType rune, name string) *ReplicaIdentityStmt {
-	return &ReplicaIdentityStmt{
-		BaseNode:     BaseNode{Tag: T_ReplicaIdentityStmt},
-		IdentityType: identityType,
-		Name:         name,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *ReplicaIdentityStmt) StatementType() string {
-	return "ReplicaIdentityStmt"
-}
+func (r *ReplicaIdentityStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (r *ReplicaIdentityStmt) String() string {
-	if r.Name != "" {
-		return fmt.Sprintf("ReplicaIdentityStmt(%c, %s)@%d", r.IdentityType, r.Name, r.Location())
-	}
-	return fmt.Sprintf("ReplicaIdentityStmt(%c)@%d", r.IdentityType, r.Location())
-}
+func (r *ReplicaIdentityStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (r *ReplicaIdentityStmt) SqlString() string {
-	switch r.IdentityType {
-	case REPLICA_IDENTITY_NOTHING:
-		return "REPLICA IDENTITY NOTHING"
-	case REPLICA_IDENTITY_FULL:
-		return "REPLICA IDENTITY FULL"
-	case REPLICA_IDENTITY_DEFAULT:
-		return "REPLICA IDENTITY DEFAULT"
-	case REPLICA_IDENTITY_INDEX:
-		return "REPLICA IDENTITY USING INDEX " + QuoteIdentifier(r.Name)
-	default:
-		return "REPLICA IDENTITY"
-	}
-}
+func (r *ReplicaIdentityStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // AlterTableMoveAllStmt represents moving all tables/indexes/views from one tablespace to another.
 // Ported from postgres/src/include/nodes/parsenodes.h:2348-2356
@@ -1629,125 +671,50 @@ type AlterTableMoveAllStmt struct {
 
 // NewAlterTableMoveAllStmt creates a new AlterTableMoveAllStmt node.
 func NewAlterTableMoveAllStmt(origTablespace string, objtype ObjectType, newTablespace string) *AlterTableMoveAllStmt {
-	return &AlterTableMoveAllStmt{
-		BaseNode:           BaseNode{Tag: T_AlterTableMoveAllStmt},
-		OrigTablespacename: origTablespace,
-		Objtype:            objtype,
-		NewTablespacename:  newTablespace,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterTableMoveAllStmt) node() {}
-func (a *AlterTableMoveAllStmt) stmt() {}
+func (a *AlterTableMoveAllStmt) node() { _ = "STUB: not implemented"; return }
+func (a *AlterTableMoveAllStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (a *AlterTableMoveAllStmt) StatementType() string {
-	return "AlterTableMoveAllStmt"
-}
+func (a *AlterTableMoveAllStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterTableMoveAllStmt) String() string {
-	return fmt.Sprintf("AlterTableMoveAllStmt(%s->%s)@%d", a.OrigTablespacename, a.NewTablespacename, a.Location())
-}
+func (a *AlterTableMoveAllStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 func (a *AlterTableMoveAllStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Start with ALTER
-	parts = append(parts, "ALTER")
-
-	// Add object type
-	switch a.Objtype {
-	case OBJECT_TABLE:
-		parts = append(parts, "TABLE")
-	case OBJECT_INDEX:
-		parts = append(parts, "INDEX")
-	case OBJECT_MATVIEW:
-		parts = append(parts, "MATERIALIZED VIEW")
-	default:
-		parts = append(parts, "TABLE")
-	}
-
-	// Add ALL IN TABLESPACE
-	parts = append(parts, "ALL IN TABLESPACE", QuoteIdentifier(a.OrigTablespacename))
-
-	// Add OWNED BY if roles specified
-	if a.Roles != nil && a.Roles.Len() > 0 {
-		parts = append(parts, "OWNED BY")
-		roleNames := make([]string, 0, a.Roles.Len())
-		for _, item := range a.Roles.Items {
-			if roleSpec, ok := item.(*RoleSpec); ok {
-				roleNames = append(roleNames, roleSpec.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(roleNames, ", "))
-	}
-
-	// Add SET TABLESPACE
-	parts = append(parts, "SET TABLESPACE", QuoteIdentifier(a.NewTablespacename))
-
-	// Add NOWAIT if specified
-	if a.Nowait {
-		parts = append(parts, "NOWAIT")
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add object type
+
+// Add ALL IN TABLESPACE
+
+// Add OWNED BY if roles specified
+
+// Add SET TABLESPACE
+
+// Add NOWAIT if specified
 
 func (a *AlterTableStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// Start with ALTER
-	parts = append(parts, "ALTER")
-
-	// Add object type
-	switch a.Objtype {
-	case OBJECT_TABLE:
-		parts = append(parts, "TABLE")
-	case OBJECT_INDEX:
-		parts = append(parts, "INDEX")
-	case OBJECT_SEQUENCE:
-		parts = append(parts, "SEQUENCE")
-	case OBJECT_VIEW:
-		parts = append(parts, "VIEW")
-	case OBJECT_MATVIEW:
-		parts = append(parts, "MATERIALIZED VIEW")
-	case OBJECT_FOREIGN_TABLE:
-		parts = append(parts, "FOREIGN TABLE")
-	case OBJECT_TYPE:
-		parts = append(parts, "TYPE")
-	default:
-		parts = append(parts, "TABLE")
-	}
-
-	// Add IF EXISTS if specified
-	if a.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	// Add relation name
-	if a.Relation != nil {
-		parts = append(parts, a.Relation.SqlString())
-	}
-
-	// Add commands
-	if a.Cmds != nil && a.Cmds.Len() > 0 {
-		var cmdStrs []string
-		for _, item := range a.Cmds.Items {
-			if cmd, ok := item.(*AlterTableCmd); ok && cmd != nil {
-				if a.Objtype == OBJECT_TYPE {
-					// For composite types, use ATTRIBUTE instead of COLUMN
-					cmdStrs = append(cmdStrs, cmd.SqlStringForCompositeType())
-				} else {
-					cmdStrs = append(cmdStrs, cmd.SqlString())
-				}
-			}
-		}
-		if len(cmdStrs) > 0 {
-			parts = append(parts, strings.Join(cmdStrs, ", "))
-		}
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add object type
+
+// Add IF EXISTS if specified
+
+// Add relation name
+
+// Add commands
+
+// For composite types, use ATTRIBUTE instead of COLUMN
 
 // AlterTableCmd represents one subcommand of an ALTER TABLE.
 // Ported from postgres/src/include/nodes/parsenodes.h:2426
@@ -1765,681 +732,83 @@ type AlterTableCmd struct {
 
 // NewAlterTableCmd creates a new AlterTableCmd node.
 func NewAlterTableCmd(subtype AlterTableType, name string, def Node) *AlterTableCmd {
-	return &AlterTableCmd{
-		BaseNode: BaseNode{Tag: T_AlterTableCmd},
-		Subtype:  subtype,
-		Name:     name,
-		Def:      def,
-		Behavior: DropRestrict,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterTableCmd) String() string {
-	return fmt.Sprintf("AlterTableCmd(%s %s)@%d", a.Subtype, a.Name, a.Location())
-}
+func (a *AlterTableCmd) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterTableCmd) SqlString() string {
-	var parts []string
+func (a *AlterTableCmd) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	switch a.Subtype {
-	case AT_AddColumn:
-		parts = append(parts, "ADD COLUMN")
-		if a.MissingOk {
-			parts = append(parts, "IF NOT EXISTS")
-		}
-		if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
+// For ALTER COLUMN TYPE, we need to handle the type and USING clause specially
 
-	case AT_DropColumn:
-		parts = append(parts, "DROP COLUMN")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-		parts = append(parts, QuoteIdentifier(a.Name))
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
+// Add USING clause if specified (stored in RawDefault for ALTER COLUMN TYPE)
 
-	case AT_AlterColumnType:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "TYPE")
-		if colDef, ok := a.Def.(*ColumnDef); ok && colDef != nil {
-			// For ALTER COLUMN TYPE, we need to handle the type and USING clause specially
-			if colDef.TypeName != nil {
-				parts = append(parts, colDef.TypeName.SqlString())
-			}
-			// Add USING clause if specified (stored in RawDefault for ALTER COLUMN TYPE)
-			if colDef.RawDefault != nil {
-				parts = append(parts, "USING", colDef.RawDefault.SqlString())
-			}
-			// Add collation if specified
-			if colDef.Collclause != nil {
-				parts = append(parts, colDef.Collclause.SqlString())
-			}
-		} else if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
+// Add collation if specified
 
-	case AT_ColumnDefault:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name))
-		if a.Def != nil {
-			parts = append(parts, "SET DEFAULT", a.Def.SqlString())
-		} else {
-			parts = append(parts, "DROP DEFAULT")
-		}
+// The constraint SqlString already includes CONSTRAINT keyword and name
 
-	case AT_SetNotNull:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "SET NOT NULL")
+// For storage modes, we want an identifier, not a quoted string literal
 
-	case AT_DropNotNull:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "DROP NOT NULL")
+// For compression methods, we want an identifier, not a quoted string literal
 
-	case AT_SetStatistics:
-		parts = append(parts, "ALTER COLUMN")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		} else {
-			parts = append(parts, strconv.Itoa(int(a.Num)))
-		}
-		parts = append(parts, "SET STATISTICS")
-		if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
+// a.Def should be a PartitionCmd containing the partition name and bound spec
 
-	case AT_SetExpression:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "SET EXPRESSION AS")
-		if a.Def != nil {
-			parts = append(parts, "(", a.Def.SqlString(), ")")
-		}
+// a.Def should be a PartitionCmd containing the partition name
 
-	case AT_DropExpression:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "DROP EXPRESSION")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
+// a.Def should be a PartitionCmd containing the partition name
 
-	case AT_AddConstraint:
-		parts = append(parts, "ADD")
-		if a.Def != nil {
-			// The constraint SqlString already includes CONSTRAINT keyword and name
-			parts = append(parts, a.Def.SqlString())
-		}
+// Handle identity constraint specially for ADD case
 
-	case AT_DropConstraint:
-		parts = append(parts, "DROP CONSTRAINT")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-		parts = append(parts, QuoteIdentifier(a.Name))
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
+// Build the identity specification with proper formatting for ADD
 
-	case AT_ValidateConstraint:
-		parts = append(parts, "VALIDATE CONSTRAINT", QuoteIdentifier(a.Name))
+// Add sequence options in parentheses (without SET keywords)
 
-	case AT_SetStorage:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "SET STORAGE")
-		if a.Def != nil {
-			// For storage modes, we want an identifier, not a quoted string literal
-			if str, ok := a.Def.(*String); ok {
-				parts = append(parts, QuoteIdentifier(str.SVal))
-			} else {
-				parts = append(parts, a.Def.SqlString())
-			}
-		}
+// Fallback to regular SqlString for non-identity constraints
 
-	case AT_SetCompression:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "SET COMPRESSION")
-		if a.Def != nil {
-			// For compression methods, we want an identifier, not a quoted string literal
-			if str, ok := a.Def.(*String); ok {
-				parts = append(parts, QuoteIdentifier(str.SVal))
-			} else {
-				parts = append(parts, a.Def.SqlString())
-			}
-		}
+// Handle identity specifications - could be a Constraint or DefElems
 
-	case AT_SetOptions:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "SET")
-		if a.Def != nil {
-			parts = append(parts, "("+a.Def.SqlString()+")")
-		}
+// Each option is self-contained: "SET GENERATED ...", a "SET
+// <seqopt>", or a bare "RESTART". Earlier code prepended a global
+// SET and a "GENERATED BY DEFAULT" even when neither was present,
+// which corrupted e.g. "SET INCREMENT BY 2".
 
-	case AT_ResetOptions:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "RESET")
-		if a.Def != nil {
-			parts = append(parts, "("+a.Def.SqlString()+")")
-		}
+// Fallback to default SqlString
 
-	case AT_ClusterOn:
-		parts = append(parts, "CLUSTER ON", QuoteIdentifier(a.Name))
+// Add DEFERRABLE and INITIALLY DEFERRED attributes
 
-	case AT_DropCluster:
-		parts = append(parts, "SET WITHOUT CLUSTER")
+// When Name is empty, it means DEFAULT was explicitly specified
 
-	case AT_SetLogged:
-		parts = append(parts, "SET LOGGED")
+// Handle DefElem with ADD/SET/DROP actions for column options
 
-	case AT_SetUnLogged:
-		parts = append(parts, "SET UNLOGGED")
+// Fallback to regular format - defaction might be DEFELEM_UNSPEC or something else
 
-	case AT_SetTableSpace:
-		parts = append(parts, "SET TABLESPACE", QuoteIdentifier(a.Name))
+// Handle NodeList of DefElems
 
-	case AT_ChangeOwner:
-		parts = append(parts, "OWNER TO")
-		if a.Newowner != nil {
-			parts = append(parts, a.Newowner.SqlString())
-		}
+// Fallback - assume ADD if no action specified
 
-	case AT_AttachPartition:
-		parts = append(parts, "ATTACH PARTITION")
-		if a.Def != nil {
-			// a.Def should be a PartitionCmd containing the partition name and bound spec
-			parts = append(parts, a.Def.SqlString())
-		}
+// Handle DefElem with ADD/SET/DROP actions for table-level options
 
-	case AT_DetachPartition:
-		parts = append(parts, "DETACH PARTITION")
-		if a.Def != nil {
-			// a.Def should be a PartitionCmd containing the partition name
-			if partCmd, ok := a.Def.(*PartitionCmd); ok {
-				if partCmd.Name != nil {
-					parts = append(parts, partCmd.Name.SqlString())
-				}
-				if partCmd.Concurrent {
-					parts = append(parts, "CONCURRENTLY")
-				}
-			}
-		}
+// Fallback - assume ADD if no action specified
 
-	case AT_DetachPartitionFinalize:
-		parts = append(parts, "DETACH PARTITION")
-		if a.Def != nil {
-			// a.Def should be a PartitionCmd containing the partition name
-			if partCmd, ok := a.Def.(*PartitionCmd); ok {
-				if partCmd.Name != nil {
-					parts = append(parts, partCmd.Name.SqlString(), "FINALIZE")
-				}
-			}
-		}
+// Handle NodeList of DefElems for multiple options
 
-	case AT_AddIdentity:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "ADD")
-		if a.Def != nil {
-			// Handle identity constraint specially for ADD case
-			if constraint, ok := a.Def.(*Constraint); ok && constraint.Contype == CONSTR_IDENTITY {
-				// Build the identity specification with proper formatting for ADD
-				result := "GENERATED "
-				switch constraint.GeneratedWhen {
-				case ATTRIBUTE_IDENTITY_ALWAYS:
-					result += "ALWAYS"
-				case ATTRIBUTE_IDENTITY_BY_DEFAULT:
-					result += "BY DEFAULT"
-				}
-				result += " AS IDENTITY"
+// Fallback - assume ADD if no action specified
 
-				// Add sequence options in parentheses (without SET keywords)
-				if constraint.Options != nil && len(constraint.Options.Items) > 0 {
-					var optParts []string
-					for _, item := range constraint.Options.Items {
-						if defElem, ok := item.(*DefElem); ok {
-							switch defElem.Defname {
-							case "increment":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "INCREMENT BY "+defElem.Arg.SqlString())
-								}
-							case "start":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "START WITH "+defElem.Arg.SqlString())
-								}
-							case "restart":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "RESTART WITH "+defElem.Arg.SqlString())
-								} else {
-									optParts = append(optParts, "RESTART")
-								}
-							case "maxvalue":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "MAXVALUE "+defElem.Arg.SqlString())
-								}
-							case "minvalue":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "MINVALUE "+defElem.Arg.SqlString())
-								}
-							case "cache":
-								if defElem.Arg != nil {
-									optParts = append(optParts, "CACHE "+defElem.Arg.SqlString())
-								}
-							case "cycle":
-								if defElem.Arg != nil {
-									if boolNode, ok := defElem.Arg.(*Boolean); ok {
-										if boolNode.BoolVal {
-											optParts = append(optParts, "CYCLE")
-										} else {
-											optParts = append(optParts, "NO CYCLE")
-										}
-									}
-								}
-							}
-						}
-					}
-					if len(optParts) > 0 {
-						result += " (" + strings.Join(optParts, " ") + ")"
-					}
-				}
-				parts = append(parts, result)
-			} else {
-				// Fallback to regular SqlString for non-identity constraints
-				parts = append(parts, a.Def.SqlString())
-			}
-		}
-
-	case AT_SetIdentity:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name))
-		if a.Def != nil {
-			// Handle identity specifications - could be a Constraint or DefElems
-			if constraint, ok := a.Def.(*Constraint); ok {
-				parts = append(parts, "SET", constraint.SqlString())
-			} else if nodeList, ok := a.Def.(*NodeList); ok {
-				// Each option is self-contained: "SET GENERATED ...", a "SET
-				// <seqopt>", or a bare "RESTART". Earlier code prepended a global
-				// SET and a "GENERATED BY DEFAULT" even when neither was present,
-				// which corrupted e.g. "SET INCREMENT BY 2".
-				for _, item := range nodeList.Items {
-					defElem, ok := item.(*DefElem)
-					if !ok {
-						continue
-					}
-					switch defElem.Defname {
-					case "generated":
-						if intNode, ok := defElem.Arg.(*Integer); ok && byte(intNode.IVal) == ATTRIBUTE_IDENTITY_ALWAYS {
-							parts = append(parts, "SET GENERATED ALWAYS")
-						} else {
-							parts = append(parts, "SET GENERATED BY DEFAULT")
-						}
-					case "restart":
-						if defElem.Arg != nil {
-							parts = append(parts, "RESTART WITH "+defElem.Arg.SqlString())
-						} else {
-							parts = append(parts, "RESTART")
-						}
-					case "increment":
-						parts = append(parts, "SET INCREMENT BY "+defElem.Arg.SqlString())
-					case "start":
-						parts = append(parts, "SET START WITH "+defElem.Arg.SqlString())
-					case "maxvalue":
-						parts = append(parts, "SET MAXVALUE "+defElem.Arg.SqlString())
-					case "minvalue":
-						parts = append(parts, "SET MINVALUE "+defElem.Arg.SqlString())
-					case "cache":
-						parts = append(parts, "SET CACHE "+defElem.Arg.SqlString())
-					case "cycle":
-						if boolNode, ok := defElem.Arg.(*Boolean); ok && !boolNode.BoolVal {
-							parts = append(parts, "SET NO CYCLE")
-						} else {
-							parts = append(parts, "SET CYCLE")
-						}
-					}
-				}
-			} else {
-				// Fallback to default SqlString
-				parts = append(parts, a.Def.SqlString())
-			}
-		}
-
-	case AT_DropIdentity:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "DROP IDENTITY")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-
-	case AT_ReplicaIdentity:
-		if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		} else if a.Name != "" {
-			parts = append(parts, "REPLICA IDENTITY USING INDEX", QuoteIdentifier(a.Name))
-		} else {
-			parts = append(parts, "REPLICA IDENTITY")
-		}
-
-	case AT_AlterConstraint:
-		parts = append(parts, "ALTER CONSTRAINT")
-		if constraint, ok := a.Def.(*Constraint); ok && constraint != nil {
-			if constraint.Conname != "" {
-				parts = append(parts, QuoteIdentifier(constraint.Conname))
-			}
-			// Add DEFERRABLE and INITIALLY DEFERRED attributes
-			if constraint.Deferrable {
-				parts = append(parts, "DEFERRABLE")
-				if constraint.Initdeferred {
-					parts = append(parts, "INITIALLY DEFERRED")
-				} else {
-					parts = append(parts, "INITIALLY IMMEDIATE")
-				}
-			} else {
-				parts = append(parts, "NOT DEFERRABLE")
-				if constraint.Initdeferred {
-					parts = append(parts, "INITIALLY DEFERRED")
-				}
-			}
-		}
-
-	case AT_AddInherit:
-		parts = append(parts, "INHERIT")
-		if rangeVar, ok := a.Def.(*RangeVar); ok && rangeVar != nil {
-			parts = append(parts, rangeVar.SqlString())
-		}
-
-	case AT_DropInherit:
-		parts = append(parts, "NO INHERIT")
-		if rangeVar, ok := a.Def.(*RangeVar); ok && rangeVar != nil {
-			parts = append(parts, rangeVar.SqlString())
-		}
-
-	case AT_AddOf:
-		parts = append(parts, "OF")
-		if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
-
-	case AT_DropOf:
-		parts = append(parts, "NOT OF")
-
-	case AT_SetRelOptions:
-		parts = append(parts, "SET")
-		if a.Def != nil {
-			parts = append(parts, "("+a.Def.SqlString()+")")
-		}
-
-	case AT_ResetRelOptions:
-		parts = append(parts, "RESET")
-		if a.Def != nil {
-			parts = append(parts, "("+a.Def.SqlString()+")")
-		}
-
-	case AT_DropOids:
-		parts = append(parts, "SET WITHOUT OIDS")
-
-	case AT_SetAccessMethod:
-		parts = append(parts, "SET ACCESS METHOD")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		} else {
-			// When Name is empty, it means DEFAULT was explicitly specified
-			parts = append(parts, "DEFAULT")
-		}
-
-	case AT_EnableRowSecurity:
-		parts = append(parts, "ENABLE ROW LEVEL SECURITY")
-
-	case AT_DisableRowSecurity:
-		parts = append(parts, "DISABLE ROW LEVEL SECURITY")
-
-	case AT_ForceRowSecurity:
-		parts = append(parts, "FORCE ROW LEVEL SECURITY")
-
-	case AT_NoForceRowSecurity:
-		parts = append(parts, "NO FORCE ROW LEVEL SECURITY")
-
-	case AT_AlterColumnGenericOptions:
-		parts = append(parts, "ALTER COLUMN", QuoteIdentifier(a.Name), "OPTIONS")
-		if a.Def != nil {
-			// Handle DefElem with ADD/SET/DROP actions for column options
-			if defElem, ok := a.Def.(*DefElem); ok {
-				var optStr string
-				switch defElem.Defaction {
-				case DEFELEM_ADD:
-					if defElem.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-					}
-				case DEFELEM_SET:
-					if defElem.Arg != nil {
-						optStr = "SET " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "SET " + QuoteIdentifier(defElem.Defname)
-					}
-				case DEFELEM_DROP:
-					optStr = "DROP " + QuoteIdentifier(defElem.Defname)
-				default:
-					// Fallback to regular format - defaction might be DEFELEM_UNSPEC or something else
-					if defElem.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-					}
-				}
-				parts = append(parts, "("+optStr+")")
-			} else if nodeList, ok := a.Def.(*NodeList); ok {
-				// Handle NodeList of DefElems
-				var optStrs []string
-				for _, item := range nodeList.Items {
-					if defElem, ok := item.(*DefElem); ok {
-						var optStr string
-						switch defElem.Defaction {
-						case DEFELEM_ADD:
-							if defElem.Arg != nil {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-							}
-						case DEFELEM_SET:
-							if defElem.Arg != nil {
-								optStr = "SET " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "SET " + QuoteIdentifier(defElem.Defname)
-							}
-						case DEFELEM_DROP:
-							optStr = "DROP " + QuoteIdentifier(defElem.Defname)
-						default:
-							// Fallback - assume ADD if no action specified
-							if defElem.Arg != nil {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-							}
-						}
-						optStrs = append(optStrs, optStr)
-					}
-				}
-				parts = append(parts, "("+strings.Join(optStrs, ", ")+")")
-			} else {
-				parts = append(parts, "("+a.Def.SqlString()+")")
-			}
-		}
-
-	case AT_GenericOptions:
-		parts = append(parts, "OPTIONS")
-		if a.Def != nil {
-			// Handle DefElem with ADD/SET/DROP actions for table-level options
-			if defElem, ok := a.Def.(*DefElem); ok {
-				var optStr string
-				switch defElem.Defaction {
-				case DEFELEM_ADD:
-					if defElem.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-					}
-				case DEFELEM_SET:
-					if defElem.Arg != nil {
-						optStr = "SET " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "SET " + QuoteIdentifier(defElem.Defname)
-					}
-				case DEFELEM_DROP:
-					optStr = "DROP " + QuoteIdentifier(defElem.Defname)
-				default:
-					// Fallback - assume ADD if no action specified
-					if defElem.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-					}
-				}
-				parts = append(parts, "("+optStr+")")
-			} else if nodeList, ok := a.Def.(*NodeList); ok {
-				// Handle NodeList of DefElems for multiple options
-				var optStrs []string
-				for _, item := range nodeList.Items {
-					if defElem, ok := item.(*DefElem); ok {
-						var optStr string
-						switch defElem.Defaction {
-						case DEFELEM_ADD:
-							if defElem.Arg != nil {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-							}
-						case DEFELEM_SET:
-							if defElem.Arg != nil {
-								optStr = "SET " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "SET " + QuoteIdentifier(defElem.Defname)
-							}
-						case DEFELEM_DROP:
-							optStr = "DROP " + QuoteIdentifier(defElem.Defname)
-						default:
-							// Fallback - assume ADD if no action specified
-							if defElem.Arg != nil {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname) + " " + defElem.Arg.SqlString()
-							} else {
-								optStr = "ADD " + QuoteIdentifier(defElem.Defname)
-							}
-						}
-						optStrs = append(optStrs, optStr)
-					}
-				}
-				parts = append(parts, "("+strings.Join(optStrs, ", ")+")")
-			} else {
-				parts = append(parts, "("+a.Def.SqlString()+")")
-			}
-		}
-
-	case AT_EnableTrig:
-		parts = append(parts, "ENABLE TRIGGER", QuoteIdentifier(a.Name))
-
-	case AT_EnableAlwaysTrig:
-		parts = append(parts, "ENABLE ALWAYS TRIGGER", QuoteIdentifier(a.Name))
-
-	case AT_EnableReplicaTrig:
-		parts = append(parts, "ENABLE REPLICA TRIGGER", QuoteIdentifier(a.Name))
-
-	case AT_DisableTrig:
-		parts = append(parts, "DISABLE TRIGGER", QuoteIdentifier(a.Name))
-
-	case AT_EnableTrigAll:
-		parts = append(parts, "ENABLE TRIGGER ALL")
-
-	case AT_DisableTrigAll:
-		parts = append(parts, "DISABLE TRIGGER ALL")
-
-	case AT_EnableTrigUser:
-		parts = append(parts, "ENABLE TRIGGER USER")
-
-	case AT_DisableTrigUser:
-		parts = append(parts, "DISABLE TRIGGER USER")
-
-	case AT_EnableRule:
-		parts = append(parts, "ENABLE RULE")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-
-	case AT_EnableAlwaysRule:
-		parts = append(parts, "ENABLE ALWAYS RULE")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-
-	case AT_EnableReplicaRule:
-		parts = append(parts, "ENABLE REPLICA RULE")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-
-	case AT_DisableRule:
-		parts = append(parts, "DISABLE RULE")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-
-	default:
-		// Fallback for unhandled subtypes
-		parts = append(parts, fmt.Sprintf("/* %s */", a.Subtype.String()))
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Fallback for unhandled subtypes
 
 // SqlStringForCompositeType returns the SQL string for composite type operations using ATTRIBUTE instead of COLUMN
-func (a *AlterTableCmd) SqlStringForCompositeType() string {
-	var parts []string
+func (a *AlterTableCmd) SqlStringForCompositeType() string { _ = "STUB: not implemented"; return "" }
 
-	switch a.Subtype {
-	case AT_AddColumn:
-		parts = append(parts, "ADD ATTRIBUTE")
-		if a.MissingOk {
-			parts = append(parts, "IF NOT EXISTS")
-		}
-		if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
-		// Add CASCADE behavior if specified
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
+// Add CASCADE behavior if specified
 
-	case AT_DropColumn:
-		parts = append(parts, "DROP ATTRIBUTE")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-		parts = append(parts, QuoteIdentifier(a.Name))
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
+// For ALTER ATTRIBUTE, we only want the type part, not the full column definition
 
-	case AT_AlterColumnType:
-		parts = append(parts, "ALTER ATTRIBUTE", QuoteIdentifier(a.Name), "TYPE")
-		if colDef, ok := a.Def.(*ColumnDef); ok && colDef != nil {
-			// For ALTER ATTRIBUTE, we only want the type part, not the full column definition
-			if colDef.TypeName != nil {
-				parts = append(parts, colDef.TypeName.SqlString())
-			}
-			// Add collation if specified
-			if colDef.Collclause != nil {
-				parts = append(parts, colDef.Collclause.SqlString())
-			}
-		} else if a.Def != nil {
-			parts = append(parts, a.Def.SqlString())
-		}
-		// Add CASCADE or RESTRICT behavior if specified
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
+// Add collation if specified
 
-	case AT_ColumnDefault:
-		parts = append(parts, "ALTER ATTRIBUTE", a.Name)
-		if a.Def != nil {
-			parts = append(parts, "SET DEFAULT", a.Def.SqlString())
-		} else {
-			parts = append(parts, "DROP DEFAULT")
-		}
+// Add CASCADE or RESTRICT behavior if specified
 
-	default:
-		// For other operations, use the regular SqlString method
-		return a.SqlString()
-	}
-
-	return strings.Join(parts, " ")
-}
+// For other operations, use the regular SqlString method
 
 // ==============================================================================
 // INDEX STATEMENTS
@@ -2477,26 +846,15 @@ type IndexStmt struct {
 
 // NewIndexStmt creates a new IndexStmt node.
 func NewIndexStmt(idxname string, relation *RangeVar, indexParams *NodeList) *IndexStmt {
-	return &IndexStmt{
-		BaseNode:     BaseNode{Tag: T_IndexStmt},
-		Idxname:      idxname,
-		Relation:     relation,
-		IndexParams:  indexParams,
-		AccessMethod: "btree", // default access method
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (i *IndexStmt) StatementType() string {
-	return "IndexStmt"
-}
+// default access method
 
-func (i *IndexStmt) String() string {
-	unique := ""
-	if i.Unique {
-		unique = " UNIQUE"
-	}
-	return fmt.Sprintf("IndexStmt(%s%s on %s)@%d", i.Idxname, unique, i.Relation.RelName, i.Location())
-}
+func (i *IndexStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
+
+func (i *IndexStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // IndexElem represents one index element (column or expression).
 // Ported from postgres/src/include/nodes/parsenodes.h:780
@@ -2513,112 +871,38 @@ type IndexElem struct {
 }
 
 // NewIndexElem creates a new IndexElem node.
-func NewIndexElem(name string) *IndexElem {
-	return &IndexElem{
-		BaseNode:      BaseNode{Tag: T_IndexElem},
-		Name:          name,
-		Ordering:      SORTBY_DEFAULT,
-		NullsOrdering: SORTBY_NULLS_DEFAULT,
-	}
-}
+func NewIndexElem(name string) *IndexElem { _ = "STUB: not implemented"; return nil }
 
-func (i *IndexElem) String() string {
-	target := i.Name
-	if target == "" && i.Expr != nil {
-		target = "expr"
-	}
-	order := ""
-	if i.Ordering != SORTBY_DEFAULT {
-		order = fmt.Sprintf(" %s", i.Ordering)
-	}
-	return fmt.Sprintf("IndexElem(%s%s)@%d", target, order, i.Location())
-}
+func (i *IndexElem) String() string { _ = "STUB: not implemented"; return "" }
 
 func (i *IndexElem) SqlString() string {
-	var result string
+	_ = "STUB: not implemented"
 
 	// Get the base column name or expression
-	if i.Name != "" {
-		result = QuoteIdentifier(i.Name)
-	} else if i.Expr != nil {
-		result = "(" + i.Expr.SqlString() + ")"
-	} else {
-		return ""
-	}
-
-	// Add collation if specified (before operator class)
-	if i.Collation != nil && i.Collation.Len() > 0 {
-		// Collation names should be output as identifiers, not string literals
-		var collationParts []string
-		for _, item := range i.Collation.Items {
-			if strNode, ok := item.(*String); ok {
-				// Quote as identifier if needed
-				collationParts = append(collationParts, QuoteIdentifier(strNode.SVal))
-			} else if item != nil {
-				collationParts = append(collationParts, item.SqlString())
-			}
-		}
-		if len(collationParts) > 0 {
-			result += " COLLATE " + strings.Join(collationParts, ".")
-		}
-	}
-
-	// Add operator class if specified (after collation)
-	if i.Opclass != nil && i.Opclass.Len() > 0 {
-		// Format operator class as identifier, not quoted string
-		var opclassParts []string
-		for _, item := range i.Opclass.Items {
-			if strNode, ok := item.(*String); ok {
-				opclassParts = append(opclassParts, strNode.SVal)
-			} else if item != nil {
-				opclassParts = append(opclassParts, item.SqlString())
-			}
-		}
-		if len(opclassParts) > 0 {
-			result += " " + strings.Join(opclassParts, ".")
-		}
-	}
-
-	// Add operator class options if specified
-	if i.Opclassopts != nil && i.Opclassopts.Len() > 0 {
-		// Format operator class options with no spaces around '='
-		var optParts []string
-		for _, item := range i.Opclassopts.Items {
-			if defElem, ok := item.(*DefElem); ok {
-				if defElem.Arg != nil {
-					optParts = append(optParts, fmt.Sprintf("%s = %s", defElem.Defname, defElem.Arg.SqlString()))
-				} else {
-					optParts = append(optParts, defElem.Defname)
-				}
-			} else if item != nil {
-				optParts = append(optParts, item.SqlString())
-			}
-		}
-		if len(optParts) > 0 {
-			result += "(" + strings.Join(optParts, ", ") + ")"
-		}
-	}
-
-	// Add ordering (ASC/DESC) if not default
-	switch i.Ordering {
-	case SORTBY_ASC:
-		result += " asc"
-	case SORTBY_DESC:
-		result += " desc"
-		// SORTBY_DEFAULT means no explicit ordering clause
-	}
-
-	// Add null ordering if not default
-	switch i.NullsOrdering {
-	case SORTBY_NULLS_FIRST:
-		result += " nulls first"
-	case SORTBY_NULLS_LAST:
-		result += " nulls last"
-		// SORTBY_NULLS_DEFAULT means no explicit nulls clause
-	}
-
-	return result
+	return ""
 }
+
+// Add collation if specified (before operator class)
+
+// Collation names should be output as identifiers, not string literals
+
+// Quote as identifier if needed
+
+// Add operator class if specified (after collation)
+
+// Format operator class as identifier, not quoted string
+
+// Add operator class options if specified
+
+// Format operator class options with no spaces around '='
+
+// Add ordering (ASC/DESC) if not default
+
+// SORTBY_DEFAULT means no explicit ordering clause
+
+// Add null ordering if not default
+
+// SORTBY_NULLS_DEFAULT means no explicit nulls clause
 
 // ==============================================================================
 // VIEW STATEMENTS
@@ -2638,97 +922,38 @@ type ViewStmt struct {
 
 // NewViewStmt creates a new ViewStmt node.
 func NewViewStmt(view *RangeVar, query Node, replace bool) *ViewStmt {
-	return &ViewStmt{
-		BaseNode:        BaseNode{Tag: T_ViewStmt},
-		View:            view,
-		Query:           query,
-		Replace:         replace,
-		WithCheckOption: NO_CHECK_OPTION,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (v *ViewStmt) StatementType() string {
-	return "ViewStmt"
-}
+func (v *ViewStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (v *ViewStmt) String() string {
-	replace := ""
-	if v.Replace {
-		replace = " OR REPLACE"
-	}
-	return fmt.Sprintf("ViewStmt(%s%s)@%d", v.View.RelName, replace, v.Location())
-}
+func (v *ViewStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ViewStmt
 func (v *ViewStmt) SqlString() string {
-	var parts []string
+	_ = "STUB: not implemented"
 
 	// CREATE [OR REPLACE] [TEMP] [RECURSIVE] VIEW
-	parts = append(parts, "CREATE")
-	if v.Replace {
-		parts = append(parts, "OR REPLACE")
-	}
-
-	// Add TEMP/TEMPORARY if needed
-	if v.View != nil && v.View.RelPersistence == RELPERSISTENCE_TEMP {
-		parts = append(parts, "TEMPORARY")
-	} else if v.View != nil && v.View.RelPersistence == RELPERSISTENCE_UNLOGGED {
-		parts = append(parts, "UNLOGGED")
-	}
-
-	// TODO: Add RECURSIVE support when we can detect recursive views
-	// For now, we can't easily determine if a view is recursive from the ViewStmt
-
-	parts = append(parts, "VIEW")
-
-	// View name
-	if v.View != nil {
-		parts = append(parts, v.View.SqlString())
-	}
-
-	// Column aliases
-	if v.Aliases != nil && v.Aliases.Len() > 0 {
-		var aliasStrs []string
-		for _, item := range v.Aliases.Items {
-			if alias, ok := item.(*String); ok {
-				aliasStrs = append(aliasStrs, alias.SVal)
-			}
-		}
-		if len(aliasStrs) > 0 {
-			parts = append(parts, fmt.Sprintf("(%s)", strings.Join(aliasStrs, ", ")))
-		}
-	}
-
-	// WITH options
-	if v.Options != nil && v.Options.Len() > 0 {
-		parts = append(parts, "WITH (")
-		var optStrs []string
-		for _, item := range v.Options.Items {
-			if opt, ok := item.(*DefElem); ok {
-				optStrs = append(optStrs, opt.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(optStrs, ", ")+")")
-	}
-
-	// AS query
-	parts = append(parts, "AS")
-	if v.Query != nil {
-		parts = append(parts, v.Query.SqlString())
-	}
-
-	// WITH CHECK OPTION
-	switch v.WithCheckOption {
-	case LOCAL_CHECK_OPTION:
-		parts = append(parts, "WITH LOCAL CHECK OPTION")
-	case CASCADED_CHECK_OPTION:
-		parts = append(parts, "WITH CHECK OPTION")
-	case NO_CHECK_OPTION:
-		// No check option
-	}
-
-	return strings.Join(parts, " ")
+	return ""
 }
+
+// Add TEMP/TEMPORARY if needed
+
+// TODO: Add RECURSIVE support when we can detect recursive views
+// For now, we can't easily determine if a view is recursive from the ViewStmt
+
+// View name
+
+// Column aliases
+
+// WITH options
+
+// AS query
+
+// WITH CHECK OPTION
+
+// No check option
 
 // ==============================================================================
 // DOMAIN STATEMENTS
@@ -2748,86 +973,34 @@ type AlterDomainStmt struct {
 
 // NewAlterDomainStmt creates a new AlterDomainStmt node.
 func NewAlterDomainStmt(subtype byte, typeName *NodeList) *AlterDomainStmt {
-	return &AlterDomainStmt{
-		BaseNode: BaseNode{Tag: T_AlterDomainStmt},
-		Subtype:  subtype,
-		TypeName: typeName,
-		Behavior: DropRestrict,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterDomainStmt) StatementType() string {
-	return "AlterDomainStmt"
-}
+func (a *AlterDomainStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterDomainStmt) String() string {
-	domainName := ""
-	if a.TypeName != nil && len(a.TypeName.Items) > 0 {
-		if str, ok := a.TypeName.Items[len(a.TypeName.Items)-1].(*String); ok {
-			domainName = str.SVal // last part is the domain name
-		}
-	}
-	return fmt.Sprintf("AlterDomainStmt(%s)@%d", domainName, a.Location())
-}
+func (a *AlterDomainStmt) String() string { _ = "STUB: not implemented"; return "" }
+
+// last part is the domain name
 
 // SqlString returns the SQL representation of ALTER DOMAIN statement.
-func (a *AlterDomainStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER DOMAIN")
+func (a *AlterDomainStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add domain name
-	if a.TypeName != nil && len(a.TypeName.Items) > 0 {
-		var nameStrs []string
-		for _, item := range a.TypeName.Items {
-			if str, ok := item.(*String); ok {
-				nameStrs = append(nameStrs, str.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(nameStrs, "."))
-	}
+// Add domain name
 
-	// Handle different subtype commands
-	switch a.Subtype {
-	case 'T': // SET DEFAULT or DROP DEFAULT
-		if a.Def != nil {
-			parts = append(parts, "SET DEFAULT")
-			if defNode, ok := a.Def.(interface{ SqlString() string }); ok {
-				parts = append(parts, defNode.SqlString())
-			}
-		} else {
-			parts = append(parts, "DROP DEFAULT")
-		}
-	case 'N': // DROP NOT NULL
-		parts = append(parts, "DROP NOT NULL")
-	case 'O': // SET NOT NULL
-		parts = append(parts, "SET NOT NULL")
-	case 'C': // ADD CONSTRAINT
-		parts = append(parts, "ADD")
-		if a.Def != nil {
-			if defNode, ok := a.Def.(interface{ SqlString() string }); ok {
-				parts = append(parts, defNode.SqlString())
-			}
-		}
-	case 'X': // DROP CONSTRAINT
-		parts = append(parts, "DROP CONSTRAINT")
-		if a.MissingOk {
-			parts = append(parts, "IF EXISTS")
-		}
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-		if a.Behavior == DropCascade {
-			parts = append(parts, "CASCADE")
-		}
-	case 'V': // VALIDATE CONSTRAINT
-		parts = append(parts, "VALIDATE CONSTRAINT")
-		if a.Name != "" {
-			parts = append(parts, QuoteIdentifier(a.Name))
-		}
-	}
+// Handle different subtype commands
 
-	return strings.Join(parts, " ")
-}
+// SET DEFAULT or DROP DEFAULT
+
+// DROP NOT NULL
+
+// SET NOT NULL
+
+// ADD CONSTRAINT
+
+// DROP CONSTRAINT
+
+// VALIDATE CONSTRAINT
 
 // CreateDomainStmt represents a CREATE DOMAIN statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:3156
@@ -2841,67 +1014,26 @@ type CreateDomainStmt struct {
 
 // NewCreateDomainStmt creates a new CreateDomainStmt node.
 func NewCreateDomainStmt(domainname *NodeList, typeName *TypeName) *CreateDomainStmt {
-	return &CreateDomainStmt{
-		BaseNode:   BaseNode{Tag: T_CreateDomainStmt},
-		Domainname: domainname,
-		TypeName:   typeName,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateDomainStmt) StatementType() string {
-	return "CreateDomainStmt"
-}
+func (c *CreateDomainStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateDomainStmt) String() string {
-	domainName := ""
-	if c.Domainname != nil && len(c.Domainname.Items) > 0 {
-		if str, ok := c.Domainname.Items[len(c.Domainname.Items)-1].(*String); ok {
-			domainName = str.SVal
-		}
-	}
-	return fmt.Sprintf("CreateDomainStmt(%s)@%d", domainName, c.Location())
-}
+func (c *CreateDomainStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CREATE DOMAIN statement.
-func (c *CreateDomainStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE DOMAIN")
+func (c *CreateDomainStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add domain name
-	if c.Domainname != nil && len(c.Domainname.Items) > 0 {
-		var nameStrs []string
-		for _, item := range c.Domainname.Items {
-			if str, ok := item.(*String); ok {
-				nameStrs = append(nameStrs, str.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(nameStrs, "."))
-	}
+// Add domain name
 
-	// Add AS keyword
-	parts = append(parts, "AS")
+// Add AS keyword
 
-	// Add type name
-	if c.TypeName != nil {
-		parts = append(parts, c.TypeName.SqlString())
-	}
+// Add type name
 
-	// Add constraints
-	if c.Constraints != nil {
-		for _, item := range c.Constraints.Items {
-			if constraint, ok := item.(*Constraint); ok {
-				parts = append(parts, constraint.SqlString())
-			}
-		}
-	}
+// Add constraints
 
-	// Add collate clause
-	if c.CollClause != nil {
-		parts = append(parts, c.CollClause.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add collate clause
 
 // ==============================================================================
 // SCHEMA STATEMENTS
@@ -2919,62 +1051,22 @@ type CreateSchemaStmt struct {
 
 // NewCreateSchemaStmt creates a new CreateSchemaStmt node.
 func NewCreateSchemaStmt(schemaname string, ifNotExists bool) *CreateSchemaStmt {
-	return &CreateSchemaStmt{
-		BaseNode:    BaseNode{Tag: T_CreateSchemaStmt},
-		Schemaname:  schemaname,
-		IfNotExists: ifNotExists,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateSchemaStmt) StatementType() string {
-	return "CreateSchemaStmt"
-}
+func (c *CreateSchemaStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateSchemaStmt) String() string {
-	ifNotExists := ""
-	if c.IfNotExists {
-		ifNotExists = " IF NOT EXISTS"
-	}
-	return fmt.Sprintf("CreateSchemaStmt(%s%s)@%d", c.Schemaname, ifNotExists, c.Location())
-}
+func (c *CreateSchemaStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns SQL representation of the CREATE SCHEMA statement
-func (c *CreateSchemaStmt) SqlString() string {
-	var parts []string
+func (c *CreateSchemaStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "CREATE SCHEMA")
+// Add schema name if specified
 
-	if c.IfNotExists {
-		parts = append(parts, "IF NOT EXISTS")
-	}
+// Add AUTHORIZATION clause if specified
 
-	// Add schema name if specified
-	if c.Schemaname != "" {
-		parts = append(parts, QuoteIdentifier(c.Schemaname))
-	}
-
-	// Add AUTHORIZATION clause if specified
-	if c.Authrole != nil {
-		parts = append(parts, "AUTHORIZATION", c.Authrole.SqlString())
-	}
-
-	result := strings.Join(parts, " ")
-
-	// Add embedded statements if any
-	if c.SchemaElts != nil && c.SchemaElts.Len() > 0 {
-		var stmtStrs []string
-		for _, item := range c.SchemaElts.Items {
-			if item != nil {
-				stmtStrs = append(stmtStrs, item.SqlString())
-			}
-		}
-		if len(stmtStrs) > 0 {
-			result += " " + strings.Join(stmtStrs, " ")
-		}
-	}
-
-	return result
-}
+// Add embedded statements if any
 
 // ==============================================================================
 // EXTENSION STATEMENTS
@@ -2991,83 +1083,25 @@ type CreateExtensionStmt struct {
 
 // NewCreateExtensionStmt creates a new CreateExtensionStmt node.
 func NewCreateExtensionStmt(extname string, ifNotExists bool, options *NodeList) *CreateExtensionStmt {
-	return &CreateExtensionStmt{
-		BaseNode:    BaseNode{Tag: T_CreateExtensionStmt},
-		Extname:     extname,
-		IfNotExists: ifNotExists,
-		Options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateExtensionStmt) StatementType() string {
-	return "CreateExtensionStmt"
-}
+func (c *CreateExtensionStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateExtensionStmt) String() string {
-	ifNotExists := ""
-	if c.IfNotExists {
-		ifNotExists = " IF NOT EXISTS"
-	}
-	return fmt.Sprintf("CreateExtensionStmt(%s%s)@%d", c.Extname, ifNotExists, c.Location())
-}
+func (c *CreateExtensionStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // formatExtensionOption formats an extension option DefElem for SQL output
-func formatExtensionOption(opt *DefElem) string {
-	if opt == nil {
-		return ""
-	}
+func formatExtensionOption(opt *DefElem) string { _ = "STUB: not implemented"; return "" }
 
-	switch opt.Defname {
-	case "schema":
-		if opt.Arg != nil {
-			// Schema names are identifiers - use proper identifier quoting
-			if s, ok := opt.Arg.(*String); ok {
-				return "SCHEMA " + QuoteIdentifier(s.SVal)
-			}
-			return "SCHEMA " + opt.Arg.SqlString()
-		}
-		return ""
-	case "version":
-		if opt.Arg != nil {
-			return "VERSION " + opt.Arg.SqlString()
-		}
-		return ""
-	case "cascade":
-		if b, ok := opt.Arg.(*Boolean); ok && b.BoolVal {
-			return "CASCADE"
-		}
-		return ""
-	default:
-		// Fall back to default formatting
-		return opt.SqlString()
-	}
-}
+// Schema names are identifiers - use proper identifier quoting
+
+// Fall back to default formatting
 
 // SqlString returns the SQL representation of CreateExtensionStmt
-func (c *CreateExtensionStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE EXTENSION")
+func (c *CreateExtensionStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if c.IfNotExists {
-		parts = append(parts, "IF NOT EXISTS")
-	}
-
-	parts = append(parts, QuoteIdentifier(c.Extname))
-
-	// Add options if present
-	if c.Options != nil && c.Options.Len() > 0 {
-		for _, item := range c.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				optStr := formatExtensionOption(opt)
-				if optStr != "" {
-					parts = append(parts, optStr)
-				}
-			}
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add options if present
 
 // AlterExtensionStmt represents an ALTER EXTENSION statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2834
@@ -3079,42 +1113,20 @@ type AlterExtensionStmt struct {
 
 // NewAlterExtensionStmt creates a new AlterExtensionStmt node.
 func NewAlterExtensionStmt(extname string, options *NodeList) *AlterExtensionStmt {
-	return &AlterExtensionStmt{
-		BaseNode: BaseNode{Tag: T_AlterExtensionStmt},
-		Extname:  extname,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterExtensionStmt) StatementType() string {
-	return "AlterExtensionStmt"
-}
+func (a *AlterExtensionStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterExtensionStmt) String() string {
-	return fmt.Sprintf("AlterExtensionStmt(%s)@%d", a.Extname, a.Location())
-}
+func (a *AlterExtensionStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterExtensionStmt
-func (a *AlterExtensionStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER EXTENSION", a.Extname, "UPDATE")
+func (a *AlterExtensionStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add options if present
-	if a.Options != nil && a.Options.Len() > 0 {
-		for _, item := range a.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// Special handling for ALTER EXTENSION TO option
-				if opt.Defname == "to" && opt.Arg != nil {
-					parts = append(parts, "TO", opt.Arg.SqlString())
-				} else {
-					parts = append(parts, opt.SqlString())
-				}
-			}
-		}
-	}
+// Add options if present
 
-	return strings.Join(parts, " ")
-}
+// Special handling for ALTER EXTENSION TO option
 
 // AlterExtensionContentsStmt represents an ALTER EXTENSION ADD/DROP statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2842
@@ -3128,107 +1140,32 @@ type AlterExtensionContentsStmt struct {
 
 // NewAlterExtensionContentsStmt creates a new AlterExtensionContentsStmt node.
 func NewAlterExtensionContentsStmt(extname string, action bool, objtype int, object Node) *AlterExtensionContentsStmt {
-	return &AlterExtensionContentsStmt{
-		BaseNode: BaseNode{Tag: T_AlterExtensionContentsStmt},
-		Extname:  extname,
-		Action:   action,
-		Objtype:  objtype,
-		Object:   object,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterExtensionContentsStmt) StatementType() string {
-	return "AlterExtensionContentsStmt"
-}
+func (a *AlterExtensionContentsStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterExtensionContentsStmt) String() string {
-	action := "DROP"
-	if a.Action {
-		action = "ADD"
-	}
-	return fmt.Sprintf("AlterExtensionContentsStmt(%s %s)@%d", a.Extname, action, a.Location())
-}
+func (a *AlterExtensionContentsStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterExtensionContentsStmt
-func (a *AlterExtensionContentsStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER EXTENSION", a.Extname)
+func (a *AlterExtensionContentsStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if a.Action {
-		parts = append(parts, "ADD")
-	} else {
-		parts = append(parts, "DROP")
-	}
+// Add object type and handle special formatting cases
 
-	// Add object type and handle special formatting cases
-	switch a.Objtype {
-	case int(OBJECT_AGGREGATE):
-		parts = append(parts, "AGGREGATE")
-	case int(OBJECT_CAST):
-		parts = append(parts, "CAST")
-		// For CAST, the object is a NodeList with two TypeNames
-		if nodeList, ok := a.Object.(*NodeList); ok && nodeList.Len() >= 2 {
-			parts = append(parts, "(", nodeList.Items[0].SqlString(), "AS", nodeList.Items[1].SqlString(), ")")
-			return strings.Join(parts, " ")
-		}
-	case int(OBJECT_DOMAIN):
-		parts = append(parts, "DOMAIN")
-	case int(OBJECT_FUNCTION):
-		parts = append(parts, "FUNCTION")
-	case int(OBJECT_OPCLASS):
-		parts = append(parts, "OPERATOR CLASS")
-		// For OPERATOR CLASS, need to handle "name USING method" format
-		if nodeList, ok := a.Object.(*NodeList); ok && nodeList.Len() >= 2 {
-			// First item is method name, rest are class name parts
-			methodStr := nodeList.Items[0].SqlString()
-			var nameStr strings.Builder
-			for i := 1; i < nodeList.Len(); i++ {
-				if i > 1 {
-					nameStr.WriteString(".")
-				}
-				nameStr.WriteString(nodeList.Items[i].SqlString())
-			}
-			parts = append(parts, nameStr.String(), "USING", methodStr)
-			return strings.Join(parts, " ")
-		}
-	case int(OBJECT_OPFAMILY):
-		parts = append(parts, "OPERATOR FAMILY")
-		// For OPERATOR FAMILY, need to handle "name USING method" format
-		if nodeList, ok := a.Object.(*NodeList); ok && nodeList.Len() >= 2 {
-			// First item is method name, rest are family name parts
-			methodStr := nodeList.Items[0].SqlString()
-			var nameStr strings.Builder
-			for i := 1; i < nodeList.Len(); i++ {
-				if i > 1 {
-					nameStr.WriteString(".")
-				}
-				nameStr.WriteString(nodeList.Items[i].SqlString())
-			}
-			parts = append(parts, nameStr.String(), "USING", methodStr)
-			return strings.Join(parts, " ")
-		}
-	case int(OBJECT_PROCEDURE):
-		parts = append(parts, "PROCEDURE")
-	case int(OBJECT_ROUTINE):
-		parts = append(parts, "ROUTINE")
-	case int(OBJECT_TYPE):
-		parts = append(parts, "TYPE")
-	case int(OBJECT_TABLE):
-		parts = append(parts, "TABLE")
-	case int(OBJECT_VIEW):
-		parts = append(parts, "VIEW")
-	default:
-		// For other object types, use simple case conversion
-		parts = append(parts, "OBJECT")
-	}
+// For CAST, the object is a NodeList with two TypeNames
 
-	// Add object name for simple cases (non-special formatting)
-	if a.Object != nil && a.Objtype != int(OBJECT_CAST) && a.Objtype != int(OBJECT_OPCLASS) && a.Objtype != int(OBJECT_OPFAMILY) {
-		parts = append(parts, a.Object.SqlString())
-	}
+// For OPERATOR CLASS, need to handle "name USING method" format
 
-	return strings.Join(parts, " ")
-}
+// First item is method name, rest are class name parts
+
+// For OPERATOR FAMILY, need to handle "name USING method" format
+
+// First item is method name, rest are family name parts
+
+// For other object types, use simple case conversion
+
+// Add object name for simple cases (non-special formatting)
 
 // ==============================================================================
 // DDL CONVENIENCE CONSTRUCTORS
@@ -3236,199 +1173,102 @@ func (a *AlterExtensionContentsStmt) SqlString() string {
 
 // NewPrimaryKeyConstraint creates a PRIMARY KEY constraint.
 func NewPrimaryKeyConstraint(conname string, keys []string) *Constraint {
-	constraint := NewConstraint(CONSTR_PRIMARY)
-	constraint.Conname = conname
-	constraint.Keys = stringsToNodeList(keys)
-	return constraint
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewForeignKeyConstraint creates a FOREIGN KEY constraint.
 func NewForeignKeyConstraint(conname string, fkAttrs []string, pktable *RangeVar, pkAttrs []string) *Constraint {
-	constraint := NewConstraint(CONSTR_FOREIGN)
-	constraint.Conname = conname
-	constraint.FkAttrs = stringsToNodeList(fkAttrs)
-	constraint.Pktable = pktable
-	constraint.PkAttrs = stringsToNodeList(pkAttrs)
-	return constraint
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewUniqueConstraint creates a UNIQUE constraint.
 func NewUniqueConstraint(conname string, keys []string) *Constraint {
-	constraint := NewConstraint(CONSTR_UNIQUE)
-	constraint.Conname = conname
-	constraint.Keys = stringsToNodeList(keys)
-	return constraint
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewUniqueConstraintNullsNotDistinct creates a UNIQUE constraint with NULLS NOT DISTINCT.
 func NewUniqueConstraintNullsNotDistinct(conname string, keys []string) *Constraint {
-	constraint := NewConstraint(CONSTR_UNIQUE)
-	constraint.Conname = conname
-	constraint.Keys = stringsToNodeList(keys)
-	constraint.NullsNotDistinct = true
-	return constraint
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewCheckConstraint creates a CHECK constraint.
 func NewCheckConstraint(conname string, rawExpr Node) *Constraint {
-	constraint := NewConstraint(CONSTR_CHECK)
-	constraint.Conname = conname
-	constraint.RawExpr = rawExpr
-	return constraint
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewNotNullConstraint creates a NOT NULL constraint.
-func NewNotNullConstraint(conname string) *Constraint {
-	constraint := NewConstraint(CONSTR_NOTNULL)
-	constraint.Conname = conname
-	return constraint
-}
+func NewNotNullConstraint(conname string) *Constraint { _ = "STUB: not implemented"; return nil }
 
 // NewAddColumnCmd creates an ALTER TABLE ADD COLUMN command.
 func NewAddColumnCmd(columnName string, columnDef Node) *AlterTableCmd {
-	return NewAlterTableCmd(AT_AddColumn, columnName, columnDef)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewDropColumnCmd creates an ALTER TABLE DROP COLUMN command.
 func NewDropColumnCmd(columnName string, behavior DropBehavior) *AlterTableCmd {
-	cmd := NewAlterTableCmd(AT_DropColumn, columnName, nil)
-	cmd.Behavior = behavior
-	return cmd
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewAddConstraintCmd creates an ALTER TABLE ADD CONSTRAINT command.
 func NewAddConstraintCmd(constraint *Constraint) *AlterTableCmd {
-	return NewAlterTableCmd(AT_AddConstraint, constraint.Conname, constraint)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewDropConstraintCmd creates an ALTER TABLE DROP CONSTRAINT command.
 func NewDropConstraintCmd(constraintName string, behavior DropBehavior) *AlterTableCmd {
-	cmd := NewAlterTableCmd(AT_DropConstraint, constraintName, nil)
-	cmd.Behavior = behavior
-	return cmd
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewUniqueIndex creates a unique index statement.
 func NewUniqueIndex(idxname string, relation *RangeVar, indexParams *NodeList) *IndexStmt {
-	idx := NewIndexStmt(idxname, relation, indexParams)
-	idx.Unique = true
-	return idx
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewBtreeIndexElem creates a B-tree index element with default ordering.
-func NewBtreeIndexElem(columnName string) *IndexElem {
-	return NewIndexElem(columnName)
-}
+func NewBtreeIndexElem(columnName string) *IndexElem { _ = "STUB: not implemented"; return nil }
 
 // NewDescIndexElem creates a descending index element.
-func NewDescIndexElem(columnName string) *IndexElem {
-	elem := NewIndexElem(columnName)
-	elem.Ordering = SORTBY_DESC
-	return elem
-}
+func NewDescIndexElem(columnName string) *IndexElem { _ = "STUB: not implemented"; return nil }
 
 // NewExpressionIndexElem creates an index element on an expression.
-func NewExpressionIndexElem(expr Node) *IndexElem {
-	elem := &IndexElem{
-		BaseNode:      BaseNode{Tag: T_IndexElem},
-		Expr:          expr,
-		Ordering:      SORTBY_DEFAULT,
-		NullsOrdering: SORTBY_NULLS_DEFAULT,
-	}
-	return elem
-}
+func NewExpressionIndexElem(expr Node) *IndexElem { _ = "STUB: not implemented"; return nil }
 
 // SqlString returns the SQL representation of CREATE INDEX statement
-func (i *IndexStmt) SqlString() string {
-	var parts []string
+func (i *IndexStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	parts = append(parts, "CREATE")
+// Add UNIQUE if specified
 
-	// Add UNIQUE if specified
-	if i.Unique {
-		parts = append(parts, "UNIQUE")
-	}
+// Add CONCURRENTLY if specified
 
-	parts = append(parts, "INDEX")
+// Add IF NOT EXISTS if specified
 
-	// Add CONCURRENTLY if specified
-	if i.Concurrent {
-		parts = append(parts, "CONCURRENTLY")
-	}
+// Add index name
 
-	// Add IF NOT EXISTS if specified
-	if i.IfNotExists {
-		parts = append(parts, "IF NOT EXISTS")
-	}
+// Add ON table
 
-	// Add index name
-	if i.Idxname != "" {
-		parts = append(parts, QuoteIdentifier(i.Idxname))
-	}
+// Add access method if specified
 
-	// Add ON table
-	parts = append(parts, "ON")
-	if i.Relation != nil {
-		parts = append(parts, i.Relation.SqlString())
-	}
+// Add index columns
 
-	// Add access method if specified
-	if i.AccessMethod != "" {
-		parts = append(parts, "USING", QuoteIdentifier(i.AccessMethod))
-	}
+// Add INCLUDE columns if specified
 
-	// Add index columns
-	if i.IndexParams != nil && i.IndexParams.Len() > 0 {
-		var columnParts []string
-		for _, item := range i.IndexParams.Items {
-			if param, ok := item.(*IndexElem); ok && param != nil {
-				columnParts = append(columnParts, param.SqlString())
-			}
-		}
-		parts = append(parts, "( "+strings.Join(columnParts, ", ")+" )")
-	}
+// Add NULLS NOT DISTINCT if specified
 
-	// Add INCLUDE columns if specified
-	if i.IndexIncludingParams != nil && i.IndexIncludingParams.Len() > 0 {
-		var includeParts []string
-		for _, item := range i.IndexIncludingParams.Items {
-			if param, ok := item.(*IndexElem); ok && param != nil {
-				includeParts = append(includeParts, param.SqlString())
-			}
-		}
-		parts = append(parts, "INCLUDE", "("+strings.Join(includeParts, ", ")+")")
-	}
+// Add WITH options if specified
 
-	// Add NULLS NOT DISTINCT if specified
-	if i.NullsNotDistinct {
-		parts = append(parts, "NULLS NOT DISTINCT")
-	}
+// Add tablespace if specified
 
-	// Add WITH options if specified
-	if i.Options != nil && i.Options.Len() > 0 {
-		var optParts []string
-		for _, item := range i.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				optParts = append(optParts, opt.SqlString())
-			}
-		}
-		if len(optParts) > 0 {
-			parts = append(parts, "WITH", "("+strings.Join(optParts, ", ")+")")
-		}
-	}
-
-	// Add tablespace if specified
-	if i.TableSpace != "" {
-		parts = append(parts, "TABLESPACE", i.TableSpace)
-	}
-
-	// Add WHERE clause if specified
-	if i.WhereClause != nil {
-		parts = append(parts, "WHERE", i.WhereClause.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add WHERE clause if specified
 
 // ==============================================================================
 // FOREIGN DATA WRAPPER AST NODES
@@ -3445,89 +1285,30 @@ type CreateFdwStmt struct {
 
 // NewCreateFdwStmt creates a new CreateFdwStmt node
 func NewCreateFdwStmt(fdwname string, funcOptions, options *NodeList) *CreateFdwStmt {
-	return &CreateFdwStmt{
-		BaseNode:    BaseNode{Tag: T_CreateFdwStmt},
-		FdwName:     fdwname,
-		FuncOptions: funcOptions,
-		Options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateFdwStmt) StatementType() string {
-	return "CreateFdwStmt"
-}
+func (c *CreateFdwStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateFdwStmt) String() string {
-	return fmt.Sprintf("CreateFdwStmt(%s)@%d", c.FdwName, c.Location())
-}
+func (c *CreateFdwStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CreateFdwStmt
-func (c *CreateFdwStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE FOREIGN DATA WRAPPER", QuoteIdentifier(c.FdwName))
+func (c *CreateFdwStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add HANDLER/VALIDATOR options
-	if c.FuncOptions != nil && c.FuncOptions.Len() > 0 {
-		for _, item := range c.FuncOptions.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// Special handling for HANDLER and VALIDATOR
-				switch opt.Defname {
-				case "handler":
-					if opt.Arg != nil {
-						if nodeList, ok := opt.Arg.(*NodeList); ok {
-							// Handle qualified function names (schema.function)
-							var funcParts []string
-							for _, funcItem := range nodeList.Items {
-								if strNode, ok := funcItem.(*String); ok {
-									funcParts = append(funcParts, strNode.SVal)
-								}
-							}
-							parts = append(parts, "HANDLER", strings.Join(funcParts, "."))
-						} else {
-							parts = append(parts, "HANDLER", opt.Arg.SqlString())
-						}
-					}
-				case "validator":
-					if opt.Arg != nil {
-						if nodeList, ok := opt.Arg.(*NodeList); ok {
-							// Handle qualified function names (schema.function)
-							var funcParts []string
-							for _, funcItem := range nodeList.Items {
-								if strNode, ok := funcItem.(*String); ok {
-									funcParts = append(funcParts, strNode.SVal)
-								}
-							}
-							parts = append(parts, "VALIDATOR", strings.Join(funcParts, "."))
-						} else {
-							parts = append(parts, "VALIDATOR", opt.Arg.SqlString())
-						}
-					}
-				default:
-					// For other options, use the standard format
-					parts = append(parts, opt.SqlString())
-				}
-			}
-		}
-	}
+// Add HANDLER/VALIDATOR options
 
-	// Add OPTIONS clause
-	if c.Options != nil && c.Options.Len() > 0 {
-		var optParts []string
-		for _, item := range c.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// For generic options, use PostgreSQL format: key 'value' (no =)
-				if opt.Arg != nil {
-					optParts = append(optParts, QuoteIdentifier(opt.Defname)+" "+opt.Arg.SqlString())
-				} else {
-					optParts = append(optParts, QuoteIdentifier(opt.Defname))
-				}
-			}
-		}
-		parts = append(parts, "OPTIONS", "("+strings.Join(optParts, ", ")+")")
-	}
+// Special handling for HANDLER and VALIDATOR
 
-	return strings.Join(parts, " ")
-}
+// Handle qualified function names (schema.function)
+
+// Handle qualified function names (schema.function)
+
+// For other options, use the standard format
+
+// Add OPTIONS clause
+
+// For generic options, use PostgreSQL format: key 'value' (no =)
 
 // AlterFdwStmt represents ALTER FOREIGN DATA WRAPPER statement
 // Ported from postgres/src/include/nodes/parsenodes.h AlterFdwStmt
@@ -3540,115 +1321,36 @@ type AlterFdwStmt struct {
 
 // NewAlterFdwStmt creates a new AlterFdwStmt node
 func NewAlterFdwStmt(fdwname string, funcOptions, options *NodeList) *AlterFdwStmt {
-	return &AlterFdwStmt{
-		BaseNode:    BaseNode{Tag: T_AlterFdwStmt},
-		FdwName:     fdwname,
-		FuncOptions: funcOptions,
-		Options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterFdwStmt) StatementType() string {
-	return "AlterFdwStmt"
-}
+func (a *AlterFdwStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterFdwStmt) String() string {
-	return fmt.Sprintf("AlterFdwStmt(%s)@%d", a.FdwName, a.Location())
-}
+func (a *AlterFdwStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterFdwStmt
-func (a *AlterFdwStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER FOREIGN DATA WRAPPER", QuoteIdentifier(a.FdwName))
+func (a *AlterFdwStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add HANDLER/VALIDATOR options
-	if a.FuncOptions != nil && a.FuncOptions.Len() > 0 {
-		for _, item := range a.FuncOptions.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// Special handling for HANDLER and VALIDATOR
-				switch opt.Defname {
-				case "handler":
-					if opt.Arg != nil {
-						if nodeList, ok := opt.Arg.(*NodeList); ok {
-							// Handle qualified function names (schema.function)
-							var funcParts []string
-							for _, funcItem := range nodeList.Items {
-								if strNode, ok := funcItem.(*String); ok {
-									funcParts = append(funcParts, strNode.SVal)
-								}
-							}
-							parts = append(parts, "HANDLER", strings.Join(funcParts, "."))
-						} else {
-							parts = append(parts, "HANDLER", opt.Arg.SqlString())
-						}
-					} else {
-						// NO HANDLER case
-						parts = append(parts, "NO HANDLER")
-					}
-				case "validator":
-					if opt.Arg != nil {
-						if nodeList, ok := opt.Arg.(*NodeList); ok {
-							// Handle qualified function names (schema.function)
-							var funcParts []string
-							for _, funcItem := range nodeList.Items {
-								if strNode, ok := funcItem.(*String); ok {
-									funcParts = append(funcParts, strNode.SVal)
-								}
-							}
-							parts = append(parts, "VALIDATOR", strings.Join(funcParts, "."))
-						} else {
-							parts = append(parts, "VALIDATOR", opt.Arg.SqlString())
-						}
-					} else {
-						// NO VALIDATOR case
-						parts = append(parts, "NO VALIDATOR")
-					}
-				default:
-					// For other options, use the standard format
-					parts = append(parts, opt.SqlString())
-				}
-			}
-		}
-	}
+// Add HANDLER/VALIDATOR options
 
-	// Add OPTIONS clause
-	if a.Options != nil && a.Options.Len() > 0 {
-		var optParts []string
-		for _, item := range a.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// For ALTER options, include the action (ADD/SET/DROP) prefix
-				var optStr string
-				switch opt.Defaction {
-				case DEFELEM_ADD:
-					if opt.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_SET:
-					if opt.Arg != nil {
-						optStr = "SET " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "SET " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_DROP:
-					optStr = "DROP " + QuoteIdentifier(opt.Defname)
-				default:
-					// DEFELEM_UNSPEC or other - use without action prefix
-					if opt.Arg != nil {
-						optStr = QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = QuoteIdentifier(opt.Defname)
-					}
-				}
-				optParts = append(optParts, optStr)
-			}
-		}
-		parts = append(parts, "OPTIONS", "("+strings.Join(optParts, ", ")+")")
-	}
+// Special handling for HANDLER and VALIDATOR
 
-	return strings.Join(parts, " ")
-}
+// Handle qualified function names (schema.function)
+
+// NO HANDLER case
+
+// Handle qualified function names (schema.function)
+
+// NO VALIDATOR case
+
+// For other options, use the standard format
+
+// Add OPTIONS clause
+
+// For ALTER options, include the action (ADD/SET/DROP) prefix
+
+// DEFELEM_UNSPEC or other - use without action prefix
 
 // AlterForeignServerStmt represents ALTER SERVER statement
 // Ported from postgres/src/include/nodes/parsenodes.h AlterForeignServerStmt
@@ -3662,70 +1364,22 @@ type AlterForeignServerStmt struct {
 
 // NewAlterForeignServerStmt creates a new AlterForeignServerStmt node
 func NewAlterForeignServerStmt(servername, version string, options *NodeList, hasVersion bool) *AlterForeignServerStmt {
-	return &AlterForeignServerStmt{
-		BaseNode:   BaseNode{Tag: T_AlterForeignServerStmt},
-		Servername: servername,
-		Version:    version,
-		Options:    options,
-		HasVersion: hasVersion,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterForeignServerStmt) StatementType() string {
-	return "AlterForeignServerStmt"
-}
+func (a *AlterForeignServerStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterForeignServerStmt) String() string {
-	return fmt.Sprintf("AlterForeignServerStmt(%s)@%d", a.Servername, a.Location())
-}
+func (a *AlterForeignServerStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterForeignServerStmt
-func (a *AlterForeignServerStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER SERVER", QuoteIdentifier(a.Servername))
+func (a *AlterForeignServerStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if a.HasVersion && a.Version != "" {
-		parts = append(parts, "VERSION", QuoteStringLiteral(a.Version))
-	}
+// Add OPTIONS clause
 
-	// Add OPTIONS clause
-	if a.Options != nil && a.Options.Len() > 0 {
-		var optParts []string
-		for _, item := range a.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// For ALTER options, include the action (ADD/SET/DROP) prefix
-				var optStr string
-				switch opt.Defaction {
-				case DEFELEM_ADD:
-					if opt.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_SET:
-					if opt.Arg != nil {
-						optStr = "SET " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "SET " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_DROP:
-					optStr = "DROP " + QuoteIdentifier(opt.Defname)
-				default:
-					// DEFELEM_UNSPEC or other - use without action prefix
-					if opt.Arg != nil {
-						optStr = QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = QuoteIdentifier(opt.Defname)
-					}
-				}
-				optParts = append(optParts, optStr)
-			}
-		}
-		parts = append(parts, "OPTIONS", "("+strings.Join(optParts, ", ")+")")
-	}
+// For ALTER options, include the action (ADD/SET/DROP) prefix
 
-	return strings.Join(parts, " ")
-}
+// DEFELEM_UNSPEC or other - use without action prefix
 
 // AlterUserMappingStmt represents ALTER USER MAPPING statement
 // Ported from postgres/src/include/nodes/parsenodes.h AlterUserMappingStmt
@@ -3738,65 +1392,22 @@ type AlterUserMappingStmt struct {
 
 // NewAlterUserMappingStmt creates a new AlterUserMappingStmt node
 func NewAlterUserMappingStmt(user *RoleSpec, servername string, options *NodeList) *AlterUserMappingStmt {
-	return &AlterUserMappingStmt{
-		BaseNode:   BaseNode{Tag: T_AlterUserMappingStmt},
-		User:       user,
-		Servername: servername,
-		Options:    options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterUserMappingStmt) StatementType() string {
-	return "AlterUserMappingStmt"
-}
+func (a *AlterUserMappingStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterUserMappingStmt) String() string {
-	return fmt.Sprintf("AlterUserMappingStmt(%s@%s)@%d", a.User.SqlString(), a.Servername, a.Location())
-}
+func (a *AlterUserMappingStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterUserMappingStmt
-func (a *AlterUserMappingStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER USER MAPPING FOR", a.User.SqlString(), "SERVER", QuoteIdentifier(a.Servername))
+func (a *AlterUserMappingStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add OPTIONS clause
-	if a.Options != nil && a.Options.Len() > 0 {
-		var optParts []string
-		for _, item := range a.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				// For ALTER options, include the action (ADD/SET/DROP) prefix
-				var optStr string
-				switch opt.Defaction {
-				case DEFELEM_ADD:
-					if opt.Arg != nil {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "ADD " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_SET:
-					if opt.Arg != nil {
-						optStr = "SET " + QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = "SET " + QuoteIdentifier(opt.Defname)
-					}
-				case DEFELEM_DROP:
-					optStr = "DROP " + QuoteIdentifier(opt.Defname)
-				default:
-					// DEFELEM_UNSPEC or other - use without action prefix
-					if opt.Arg != nil {
-						optStr = QuoteIdentifier(opt.Defname) + " " + opt.Arg.SqlString()
-					} else {
-						optStr = QuoteIdentifier(opt.Defname)
-					}
-				}
-				optParts = append(optParts, optStr)
-			}
-		}
-		parts = append(parts, "OPTIONS", "("+strings.Join(optParts, ", ")+")")
-	}
+// Add OPTIONS clause
 
-	return strings.Join(parts, " ")
-}
+// For ALTER options, include the action (ADD/SET/DROP) prefix
+
+// DEFELEM_UNSPEC or other - use without action prefix
 
 // DropUserMappingStmt represents DROP USER MAPPING statement
 // Ported from postgres/src/include/nodes/parsenodes.h DropUserMappingStmt
@@ -3809,35 +1420,16 @@ type DropUserMappingStmt struct {
 
 // NewDropUserMappingStmt creates a new DropUserMappingStmt node
 func NewDropUserMappingStmt(user *RoleSpec, servername string, missingOk bool) *DropUserMappingStmt {
-	return &DropUserMappingStmt{
-		BaseNode:   BaseNode{Tag: T_DropUserMappingStmt},
-		User:       user,
-		Servername: servername,
-		MissingOk:  missingOk,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DropUserMappingStmt) StatementType() string {
-	return "DropUserMappingStmt"
-}
+func (d *DropUserMappingStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (d *DropUserMappingStmt) String() string {
-	return fmt.Sprintf("DropUserMappingStmt(%s@%s)@%d", d.User.SqlString(), d.Servername, d.Location())
-}
+func (d *DropUserMappingStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of DropUserMappingStmt
-func (d *DropUserMappingStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "DROP USER MAPPING")
-
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	parts = append(parts, "FOR", d.User.SqlString(), "SERVER", QuoteIdentifier(d.Servername))
-
-	return strings.Join(parts, " ")
-}
+func (d *DropUserMappingStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // Event trigger constants
 type TriggerFires int
@@ -3865,65 +1457,20 @@ type CreateEventTrigStmt struct {
 
 // NewCreateEventTrigStmt creates a new CreateEventTrigStmt node
 func NewCreateEventTrigStmt(trigname string, eventname string, funcname *NodeList, whenclause *NodeList) *CreateEventTrigStmt {
-	return &CreateEventTrigStmt{
-		BaseNode:   BaseNode{Tag: T_CreateEventTrigStmt},
-		TrigName:   trigname,
-		EventName:  eventname,
-		FuncName:   funcname,
-		WhenClause: whenclause,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateEventTrigStmt) StatementType() string {
-	return "CreateEventTrigStmt"
-}
+func (c *CreateEventTrigStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateEventTrigStmt) String() string {
-	return fmt.Sprintf("CreateEventTrigStmt(%s ON %s)@%d", c.TrigName, c.EventName, c.Location())
-}
+func (c *CreateEventTrigStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CreateEventTrigStmt
-func (c *CreateEventTrigStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE EVENT TRIGGER", QuoteIdentifier(c.TrigName), "ON", QuoteIdentifier(c.EventName))
+func (c *CreateEventTrigStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add WHEN clause if present
-	if c.WhenClause != nil && c.WhenClause.Len() > 0 {
-		var whenParts []string
-		for _, item := range c.WhenClause.Items {
-			if defElem, ok := item.(*DefElem); ok {
-				// Format as "defname IN (value1, value2, ...)"
-				if defElem.Arg != nil {
-					if valueList, ok := defElem.Arg.(*NodeList); ok {
-						var values []string
-						for _, val := range valueList.Items {
-							if strVal, ok := val.(*String); ok {
-								values = append(values, "'"+strVal.SVal+"'")
-							}
-						}
-						whenParts = append(whenParts, defElem.Defname+" IN ("+strings.Join(values, ", ")+")")
-					}
-				}
-			}
-		}
-		if len(whenParts) > 0 {
-			parts = append(parts, "WHEN", strings.Join(whenParts, " AND "))
-		}
-	}
+// Add WHEN clause if present
 
-	parts = append(parts, "EXECUTE FUNCTION")
-	if c.FuncName != nil {
-		var funcParts []string
-		for _, item := range c.FuncName.Items {
-			if strNode, ok := item.(*String); ok {
-				funcParts = append(funcParts, strNode.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(funcParts, ".")+"()")
-	}
-
-	return strings.Join(parts, " ")
-}
+// Format as "defname IN (value1, value2, ...)"
 
 // AlterEventTrigStmt represents ALTER EVENT TRIGGER statement
 // Ported from postgres/src/include/nodes/parsenodes.h AlterEventTrigStmt
@@ -3935,39 +1482,16 @@ type AlterEventTrigStmt struct {
 
 // NewAlterEventTrigStmt creates a new AlterEventTrigStmt node
 func NewAlterEventTrigStmt(trigname string, tgenabled TriggerFires) *AlterEventTrigStmt {
-	return &AlterEventTrigStmt{
-		BaseNode:  BaseNode{Tag: T_AlterEventTrigStmt},
-		TrigName:  trigname,
-		TgEnabled: tgenabled,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterEventTrigStmt) StatementType() string {
-	return "AlterEventTrigStmt"
-}
+func (a *AlterEventTrigStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterEventTrigStmt) String() string {
-	return fmt.Sprintf("AlterEventTrigStmt(%s)@%d", a.TrigName, a.Location())
-}
+func (a *AlterEventTrigStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of AlterEventTrigStmt
-func (a *AlterEventTrigStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER EVENT TRIGGER", QuoteIdentifier(a.TrigName))
-
-	switch a.TgEnabled {
-	case TRIGGER_FIRES_ON_ORIGIN:
-		parts = append(parts, "ENABLE")
-	case TRIGGER_FIRES_ON_REPLICA:
-		parts = append(parts, "ENABLE REPLICA")
-	case TRIGGER_FIRES_ALWAYS:
-		parts = append(parts, "ENABLE ALWAYS")
-	case TRIGGER_DISABLED:
-		parts = append(parts, "DISABLE")
-	}
-
-	return strings.Join(parts, " ")
-}
+func (a *AlterEventTrigStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // DATABASE STATEMENTS
@@ -3983,80 +1507,31 @@ type CreatedbStmt struct {
 
 // NewCreatedbStmt creates a new CreatedbStmt node.
 func NewCreatedbStmt(dbname string, options *NodeList) *CreatedbStmt {
-	return &CreatedbStmt{
-		BaseNode: BaseNode{Tag: T_CreatedbStmt},
-		Dbname:   dbname,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreatedbStmt) StatementType() string {
-	return "CREATE DATABASE"
-}
+func (c *CreatedbStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreatedbStmt) String() string {
-	return fmt.Sprintf("CreatedbStmt(%s)@%d", c.Dbname, c.Location())
-}
+func (c *CreatedbStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CreatedbStmt
-func (c *CreatedbStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE DATABASE", QuoteIdentifier(c.Dbname))
+func (c *CreatedbStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add options if present
-	if c.Options != nil && c.Options.Len() > 0 {
-		var opts []string
-		for _, item := range c.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				opts = append(opts, c.formatDatabaseOption(opt))
-			}
-		}
-		if len(opts) > 0 {
-			parts = append(parts, "WITH", strings.Join(opts, " "))
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add options if present
 
 // formatDatabaseOption formats database options with proper PostgreSQL keywords
 func (c *CreatedbStmt) formatDatabaseOption(opt *DefElem) string {
+	_ = "STUB: not implemented"
 	// Map option names to their proper PostgreSQL keywords
-	optName := opt.Defname
-	switch optName {
-	case "template":
-		optName = "TEMPLATE"
-	case "encoding":
-		optName = "ENCODING"
-	case "connection_limit":
-		optName = "CONNECTION LIMIT"
-	case "owner":
-		optName = "OWNER"
-	case "tablespace":
-		optName = "TABLESPACE"
-	case "location":
-		optName = "LOCATION"
-	default:
-		optName = strings.ToUpper(optName)
-	}
-
-	if opt.Arg != nil {
-		argStr := opt.Arg.SqlString()
-		// For identifiers that should not be quoted
-		if strNode, ok := opt.Arg.(*String); ok {
-			switch opt.Defname {
-			case "template", "owner", "tablespace":
-				// These should be unquoted identifiers
-				argStr = strNode.SVal
-			case "encoding", "location":
-				// These should remain as quoted strings
-				argStr = strNode.SqlString()
-			}
-		}
-		return fmt.Sprintf("%s = %s", optName, argStr)
-	}
-	return optName
+	return ""
 }
+
+// For identifiers that should not be quoted
+
+// These should be unquoted identifiers
+
+// These should remain as quoted strings
 
 // DropdbStmt represents a DROP DATABASE statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:3800
@@ -4069,54 +1544,18 @@ type DropdbStmt struct {
 
 // NewDropdbStmt creates a new DropdbStmt node.
 func NewDropdbStmt(dbname string, missingOk bool, options *NodeList) *DropdbStmt {
-	return &DropdbStmt{
-		BaseNode:  BaseNode{Tag: T_DropdbStmt},
-		Dbname:    dbname,
-		MissingOk: missingOk,
-		Options:   options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DropdbStmt) StatementType() string {
-	return "DROP DATABASE"
-}
+func (d *DropdbStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (d *DropdbStmt) String() string {
-	ifExists := ""
-	if d.MissingOk {
-		ifExists = " IF EXISTS"
-	}
-	return fmt.Sprintf("DropdbStmt(%s%s)@%d", d.Dbname, ifExists, d.Location())
-}
+func (d *DropdbStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of DropdbStmt
-func (d *DropdbStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "DROP DATABASE")
+func (d *DropdbStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	parts = append(parts, QuoteIdentifier(d.Dbname))
-
-	// Add options if present (e.g., FORCE)
-	if d.Options != nil && d.Options.Len() > 0 {
-		var opts []string
-		for _, item := range d.Options.Items {
-			if opt, ok := item.(*DefElem); ok && opt != nil {
-				if opt.Defname == "force" {
-					opts = append(opts, "FORCE")
-				}
-			}
-		}
-		if len(opts) > 0 {
-			parts = append(parts, "WITH ("+strings.Join(opts, ", ")+")")
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add options if present (e.g., FORCE)
 
 // DropTableSpaceStmt represents a DROP TABLESPACE statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:2790
@@ -4128,38 +1567,16 @@ type DropTableSpaceStmt struct {
 
 // NewDropTableSpaceStmt creates a new DropTableSpaceStmt node.
 func NewDropTableSpaceStmt(tablespacename string, missingOk bool) *DropTableSpaceStmt {
-	return &DropTableSpaceStmt{
-		BaseNode:       BaseNode{Tag: T_DropTableSpaceStmt},
-		Tablespacename: tablespacename,
-		MissingOk:      missingOk,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DropTableSpaceStmt) StatementType() string {
-	return "DROP TABLESPACE"
-}
+func (d *DropTableSpaceStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (d *DropTableSpaceStmt) String() string {
-	ifExists := ""
-	if d.MissingOk {
-		ifExists = " IF EXISTS"
-	}
-	return fmt.Sprintf("DropTableSpaceStmt(%s%s)@%d", d.Tablespacename, ifExists, d.Location())
-}
+func (d *DropTableSpaceStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of DropTableSpaceStmt
-func (d *DropTableSpaceStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "DROP TABLESPACE")
-
-	if d.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	parts = append(parts, QuoteIdentifier(d.Tablespacename))
-
-	return strings.Join(parts, " ")
-}
+func (d *DropTableSpaceStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // ==============================================================================
 // OWNERSHIP STATEMENTS
@@ -4175,42 +1592,20 @@ type DropOwnedStmt struct {
 
 // NewDropOwnedStmt creates a new DropOwnedStmt node.
 func NewDropOwnedStmt(roles *NodeList, behavior DropBehavior) *DropOwnedStmt {
-	return &DropOwnedStmt{
-		BaseNode: BaseNode{Tag: T_DropOwnedStmt},
-		Roles:    roles,
-		Behavior: behavior,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (d *DropOwnedStmt) StatementType() string {
-	return "DROP OWNED"
-}
+func (d *DropOwnedStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (d *DropOwnedStmt) String() string {
-	return fmt.Sprintf("DropOwnedStmt(%d roles)@%d", d.Roles.Len(), d.Location())
-}
+func (d *DropOwnedStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of DropOwnedStmt
-func (d *DropOwnedStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "DROP OWNED BY")
+func (d *DropOwnedStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add role list
-	if d.Roles != nil {
-		var roleNames []string
-		for _, item := range d.Roles.Items {
-			if role, ok := item.(*RoleSpec); ok {
-				roleNames = append(roleNames, role.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(roleNames, ", "))
-	}
+// Add role list
 
-	// Add behavior
-	parts = append(parts, d.Behavior.String())
-
-	return strings.Join(parts, " ")
-}
+// Add behavior
 
 // ReassignOwnedStmt represents a REASSIGN OWNED statement.
 // Ported from postgres/src/include/nodes/parsenodes.h:4084
@@ -4222,45 +1617,18 @@ type ReassignOwnedStmt struct {
 
 // NewReassignOwnedStmt creates a new ReassignOwnedStmt node.
 func NewReassignOwnedStmt(roles *NodeList, newrole *RoleSpec) *ReassignOwnedStmt {
-	return &ReassignOwnedStmt{
-		BaseNode: BaseNode{Tag: T_ReassignOwnedStmt},
-		Roles:    roles,
-		Newrole:  newrole,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (r *ReassignOwnedStmt) StatementType() string {
-	return "REASSIGN OWNED"
-}
+func (r *ReassignOwnedStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (r *ReassignOwnedStmt) String() string {
-	return fmt.Sprintf("ReassignOwnedStmt(%d roles)@%d", r.Roles.Len(), r.Location())
-}
+func (r *ReassignOwnedStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ReassignOwnedStmt
-func (r *ReassignOwnedStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "REASSIGN OWNED BY")
+func (r *ReassignOwnedStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add role list
-	if r.Roles != nil {
-		var roleNames []string
-		for _, item := range r.Roles.Items {
-			if role, ok := item.(*RoleSpec); ok {
-				roleNames = append(roleNames, role.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(roleNames, ", "))
-	}
-
-	parts = append(parts, "TO")
-
-	if r.Newrole != nil {
-		parts = append(parts, r.Newrole.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add role list
 
 // ==============================================================================
 // FOREIGN SCHEMA STATEMENTS
@@ -4277,18 +1645,7 @@ const (
 )
 
 // String returns string representation of ImportForeignSchemaType
-func (t ImportForeignSchemaType) String() string {
-	switch t {
-	case FDW_IMPORT_SCHEMA_ALL:
-		return ""
-	case FDW_IMPORT_SCHEMA_LIMIT_TO:
-		return "LIMIT TO"
-	case FDW_IMPORT_SCHEMA_EXCEPT:
-		return "EXCEPT"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (t ImportForeignSchemaType) String() string { _ = "STUB: not implemented"; return "" }
 
 // ImportForeignSchemaStmt represents an IMPORT FOREIGN SCHEMA statement
 // Ported from postgres/src/include/nodes/parsenodes.h:4105-4115
@@ -4306,75 +1663,19 @@ type ImportForeignSchemaStmt struct {
 func NewImportForeignSchemaStmt(serverName, remoteSchema, localSchema *String,
 	listType ImportForeignSchemaType, tableList, options *NodeList,
 ) *ImportForeignSchemaStmt {
-	return &ImportForeignSchemaStmt{
-		BaseNode:     BaseNode{Tag: T_ImportForeignSchemaStmt},
-		ServerName:   serverName,
-		RemoteSchema: remoteSchema,
-		LocalSchema:  localSchema,
-		ListType:     listType,
-		TableList:    tableList,
-		Options:      options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (i *ImportForeignSchemaStmt) StatementType() string {
-	return "IMPORT FOREIGN SCHEMA"
-}
+func (i *ImportForeignSchemaStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (i *ImportForeignSchemaStmt) String() string {
-	return fmt.Sprintf("ImportForeignSchemaStmt(%s from %s into %s)@%d",
-		i.RemoteSchema.SVal, i.ServerName.SVal, i.LocalSchema.SVal, i.Location())
-}
+func (i *ImportForeignSchemaStmt) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ImportForeignSchemaStmt
-func (i *ImportForeignSchemaStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "IMPORT FOREIGN SCHEMA")
+func (i *ImportForeignSchemaStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if i.RemoteSchema != nil {
-		parts = append(parts, QuoteIdentifier(i.RemoteSchema.SVal))
-	}
+// Add import qualification
 
-	// Add import qualification
-	if i.ListType != FDW_IMPORT_SCHEMA_ALL {
-		parts = append(parts, i.ListType.String())
-		if i.TableList != nil && i.TableList.Len() > 0 {
-			var tableNames []string
-			for _, item := range i.TableList.Items {
-				if rv, ok := item.(*RangeVar); ok {
-					tableNames = append(tableNames, rv.SqlString())
-				}
-			}
-			parts = append(parts, "("+strings.Join(tableNames, ", ")+")")
-		}
-	}
+// Add options
 
-	parts = append(parts, "FROM SERVER")
-	if i.ServerName != nil {
-		parts = append(parts, QuoteIdentifier(i.ServerName.SVal))
-	}
-
-	parts = append(parts, "INTO")
-	if i.LocalSchema != nil {
-		parts = append(parts, QuoteIdentifier(i.LocalSchema.SVal))
-	}
-
-	// Add options
-	if i.Options != nil && i.Options.Len() > 0 {
-		parts = append(parts, "OPTIONS")
-		var optionStrings []string
-		for _, item := range i.Options.Items {
-			if opt, ok := item.(*DefElem); ok {
-				// For foreign schema import, use "name 'value'" format instead of "name = 'value'"
-				if opt.Arg != nil {
-					optionStrings = append(optionStrings, QuoteIdentifier(opt.Defname)+" "+opt.Arg.SqlString())
-				} else {
-					optionStrings = append(optionStrings, QuoteIdentifier(opt.Defname))
-				}
-			}
-		}
-		parts = append(parts, "("+strings.Join(optionStrings, ", ")+")")
-	}
-
-	return strings.Join(parts, " ")
-}
+// For foreign schema import, use "name 'value'" format instead of "name = 'value'"

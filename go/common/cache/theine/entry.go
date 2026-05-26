@@ -53,40 +53,18 @@ type Entry[K cachekey, V any] struct {
 }
 
 func NewEntry[K cachekey, V any](key K, value V, cost int64) *Entry[K, V] {
-	entry := &Entry[K, V]{
-		key:   key,
-		value: value,
-	}
-	entry.cost.Store(cost)
-	return entry
-}
-
-func (e *Entry[K, V]) Next() *Entry[K, V] {
-	if p := e.meta.next; !p.root {
-		return e.meta.next
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (e *Entry[K, V]) Prev() *Entry[K, V] {
-	if p := e.meta.prev; !p.root {
-		return e.meta.prev
-	}
-	return nil
-}
+func (e *Entry[K, V]) Next() *Entry[K, V] { _ = "STUB: not implemented"; return nil }
 
-func (e *Entry[K, V]) prev() *Entry[K, V] {
-	return e.meta.prev
-}
+func (e *Entry[K, V]) Prev() *Entry[K, V] { _ = "STUB: not implemented"; return nil }
 
-func (e *Entry[K, V]) next() *Entry[K, V] {
-	return e.meta.next
-}
+func (e *Entry[K, V]) prev() *Entry[K, V] { _ = "STUB: not implemented"; return nil }
 
-func (e *Entry[K, V]) setPrev(entry *Entry[K, V]) {
-	e.meta.prev = entry
-}
+func (e *Entry[K, V]) next() *Entry[K, V] { _ = "STUB: not implemented"; return nil }
 
-func (e *Entry[K, V]) setNext(entry *Entry[K, V]) {
-	e.meta.next = entry
-}
+func (e *Entry[K, V]) setPrev(entry *Entry[K, V]) { _ = "STUB: not implemented"; return }
+
+func (e *Entry[K, V]) setNext(entry *Entry[K, V]) { _ = "STUB: not implemented"; return }

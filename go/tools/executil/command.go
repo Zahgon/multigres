@@ -76,19 +76,13 @@
 package executil
 
 import (
-	"bytes"
 	"context"
-	"errors"
 	"os"
 	"os/exec"
 	"sync"
-	"syscall"
 	"time"
 
 	"go.opentelemetry.io/otel"
-
-	"github.com/multigres/multigres/go/tools/ctxutil"
-	"github.com/multigres/multigres/go/tools/telemetry"
 )
 
 // DefaultGracePeriod is the time to wait after SIGTERM before escalating to SIGKILL.
@@ -131,7 +125,8 @@ type Cmd struct {
 // By default, the command inherits the parent process environment.
 // Use AddEnv() to add variables, or SetEnv() to replace the entire environment.
 func Command(ctx context.Context, name string, args ...string) *Cmd {
-	return CommandWithGracePeriod(ctx, DefaultGracePeriod, name, args...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // CommandWithGracePeriod creates a Cmd with a custom default grace period.
@@ -143,13 +138,8 @@ func Command(ctx context.Context, name string, args ...string) *Cmd {
 // Use a shorter grace period for commands that should terminate quickly
 // (e.g., 100ms for simple queries).
 func CommandWithGracePeriod(ctx context.Context, gracePeriod time.Duration, name string, args ...string) *Cmd {
-	return &Cmd{
-		Cmd:                exec.Command(name, args...),
-		parentCtx:          ctx,
-		defaultGracePeriod: gracePeriod,
-		terminated:         make(chan struct{}),
-		waitDone:           make(chan struct{}),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AddEnv adds environment variables to the command. Variables are specified
@@ -158,52 +148,31 @@ func CommandWithGracePeriod(ctx context.Context, gracePeriod time.Duration, name
 // Variables are added on top of the inherited environment (or the explicit
 // base if SetEnv was called). The actual environment is finalized when
 // Start/Run/Output/CombinedOutput is called.
-func (c *Cmd) AddEnv(keyvals ...string) *Cmd {
-	c.extraEnv = append(c.extraEnv, keyvals...)
-	return c
-}
+func (c *Cmd) AddEnv(keyvals ...string) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetEnv replaces the entire environment with the provided variables.
 // The command will NOT inherit any environment from the parent process.
 //
 // Call AddEnv() after SetEnv() to add additional variables on top of
 // this explicit base.
-func (c *Cmd) SetEnv(env []string) *Cmd {
-	c.Cmd.Env = env
-	return c
-}
+func (c *Cmd) SetEnv(env []string) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetDir sets the working directory for the command.
-func (c *Cmd) SetDir(dir string) *Cmd {
-	c.Cmd.Dir = dir
-	return c
-}
+func (c *Cmd) SetDir(dir string) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetStdin sets the stdin for the command.
-func (c *Cmd) SetStdin(r *os.File) *Cmd {
-	c.Cmd.Stdin = r
-	return c
-}
+func (c *Cmd) SetStdin(r *os.File) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetStdout sets the stdout for the command.
-func (c *Cmd) SetStdout(w *os.File) *Cmd {
-	c.Cmd.Stdout = w
-	return c
-}
+func (c *Cmd) SetStdout(w *os.File) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetStderr sets the stderr for the command.
-func (c *Cmd) SetStderr(w *os.File) *Cmd {
-	c.Cmd.Stderr = w
-	return c
-}
+func (c *Cmd) SetStderr(w *os.File) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // WithClientSpan enables creating an OpenTelemetry client span around
 // the command execution. The span is started when Start/Run is called
 // and ended when the command completes.
-func (c *Cmd) WithClientSpan() *Cmd {
-	c.clientSpan = true
-	return c
-}
+func (c *Cmd) WithClientSpan() *Cmd { _ = "STUB: not implemented"; return nil }
 
 // WithProcessGroup starts the command in its own process group and sends
 // signals to the entire group instead of just the direct child. This ensures
@@ -218,34 +187,18 @@ func (c *Cmd) WithClientSpan() *Cmd {
 //
 // Callers should also call SetWaitDelay() to prevent hangs from grandchildren
 // holding pipes open after the group leader exits.
-func (c *Cmd) WithProcessGroup() *Cmd {
-	c.processGroup = true
-	return c
-}
+func (c *Cmd) WithProcessGroup() *Cmd { _ = "STUB: not implemented"; return nil }
 
 // SetWaitDelay sets the maximum time Run()/Wait() will wait for I/O goroutines
 // to finish after the process exits. This prevents hangs when child processes
 // inherit stdout/stderr pipes and outlive the parent.
-func (c *Cmd) SetWaitDelay(d time.Duration) *Cmd {
-	c.waitDelay = d
-	return c
-}
+func (c *Cmd) SetWaitDelay(d time.Duration) *Cmd { _ = "STUB: not implemented"; return nil }
 
 // finalizeEnv prepares cmd.Env before execution, including trace propagation.
 func (c *Cmd) finalizeEnv() {
+	_ = "STUB: not implemented"
 	// Add TRACEPARENT if context has a valid span
-	if envVar := telemetry.TraceparentEnvVar(c.parentCtx); envVar != "" {
-		c.extraEnv = append(c.extraEnv, envVar)
-	}
-
-	if len(c.extraEnv) == 0 {
-		return
-	}
-
-	if c.Cmd.Env == nil {
-		c.Cmd.Env = os.Environ()
-	}
-	c.Cmd.Env = append(c.Cmd.Env, c.extraEnv...)
+	return
 }
 
 // watchContext starts a background goroutine that monitors the parent context
@@ -256,28 +209,19 @@ func (c *Cmd) finalizeEnv() {
 // SIGTERM is a no-op and c.terminated is closed — the process then starts
 // and runs indefinitely with no watcher.
 func (c *Cmd) watchContext() {
+	_ = "STUB: not implemented"
 	// Watch for parent context cancellation
-	go func() {
-		select {
-		case <-c.parentCtx.Done():
-			// Parent context cancelled - terminate with default grace period.
-			// Fresh context needed; parent context is cancelled.
-			termCtx, termCancel := context.WithTimeout(ctxutil.Detach(c.parentCtx), c.defaultGracePeriod)
-			_, exited := c.Terminate(termCtx)
-			termCancel()
-			if !exited {
-				// Fresh context needed for kill timeout
-				killCtx, killCancel := context.WithTimeout(ctxutil.Detach(c.parentCtx), DefaultKillTimeout)
-				_, _ = c.Kill(killCtx)
-				killCancel()
-			}
-		case <-c.terminated:
-			// Already terminated explicitly, nothing to do
-		case <-c.waitDone:
-			// Process exited naturally, nothing to do
-		}
-	}()
+	return
 }
+
+// Parent context cancelled - terminate with default grace period.
+// Fresh context needed; parent context is cancelled.
+
+// Fresh context needed for kill timeout
+
+// Already terminated explicitly, nothing to do
+
+// Process exited naturally, nothing to do
 
 // Start starts the command without waiting for it to complete.
 //
@@ -286,41 +230,21 @@ func (c *Cmd) watchContext() {
 //
 // Note: WithClientSpan() has no effect on Start() since the span cannot be
 // ended until Wait() is called. Use Run() for client span support.
-func (c *Cmd) Start() error {
-	c.finalizeEnv()
-	if c.processGroup {
-		if c.Cmd.SysProcAttr == nil {
-			c.Cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-		} else {
-			c.Cmd.SysProcAttr.Setpgid = true
-		}
-		if c.waitDelay > 0 {
-			c.Cmd.WaitDelay = c.waitDelay
-		}
-	}
-	if err := c.Cmd.Start(); err != nil {
-		return err
-	}
-	c.watchContext()
-	return nil
-}
+func (c *Cmd) Start() error { _ = "STUB: not implemented"; return nil }
 
 // Wait waits for the command to exit and returns its exit status.
 // Wait must be called after Start() to release resources.
 // Safe to call multiple times or concurrently - returns cached result.
 func (c *Cmd) Wait() error {
+	_ = "STUB: not implemented"
 	// Ensure we only call the underlying Wait() once.
 	// sync.Once.Do blocks all callers until the first call completes.
-	c.waitOnce.Do(func() {
-		c.waitErr = c.Cmd.Wait()
-		// Channel close provides happens-before guarantee for waitErr read
-		close(c.waitDone)
-	})
-
-	// Block until Wait() completes (no-op if already done), then return cached result
-	<-c.waitDone
-	return c.waitErr
+	return nil
 }
+
+// Channel close provides happens-before guarantee for waitErr read
+
+// Block until Wait() completes (no-op if already done), then return cached result
 
 // Terminate sends SIGTERM to the process and waits for it to exit gracefully.
 //
@@ -334,34 +258,16 @@ func (c *Cmd) Wait() error {
 //
 // Panics if called on a Cmd not created via Command() or CommandWithGracePeriod().
 func (c *Cmd) Terminate(ctx context.Context) (error, bool) {
-	if c.terminated == nil {
-		panic("executil: Terminate called on Cmd not created via Command()")
-	}
-
-	// Send SIGTERM only once
-	c.terminateOnce.Do(func() {
-		close(c.terminated)
-		if c.Process != nil {
-			if c.processGroup {
-				_ = syscall.Kill(-c.Process.Pid, syscall.SIGTERM)
-			} else {
-				_ = c.Process.Signal(syscall.SIGTERM)
-			}
-		}
-	})
-
-	// Ensure Wait() is running in background.
-	// Result is stored in c.waitErr and signaled via c.waitDone.
-	go func() { _ = c.Wait() }()
-
-	// Wait for process exit or context timeout
-	select {
-	case <-c.waitDone:
-		return c.waitErr, true
-	case <-ctx.Done():
-		return nil, false
-	}
+	_ = "STUB: not implemented"
+	return nil, false
 }
+
+// Send SIGTERM only once
+
+// Ensure Wait() is running in background.
+// Result is stored in c.waitErr and signaled via c.waitDone.
+
+// Wait for process exit or context timeout
 
 // Kill sends SIGKILL to the process and waits for it to exit.
 //
@@ -373,27 +279,15 @@ func (c *Cmd) Terminate(ctx context.Context) (error, bool) {
 //
 // Safe to call after Terminate() times out - reuses the same Wait() call.
 func (c *Cmd) Kill(ctx context.Context) (error, bool) {
+	_ = "STUB: not implemented"
 	// Send SIGKILL
-	if c.Process != nil {
-		if c.processGroup {
-			_ = syscall.Kill(-c.Process.Pid, syscall.SIGKILL)
-		} else {
-			_ = c.Process.Kill()
-		}
-	}
-
-	// Ensure Wait() is running in background.
-	// Result is stored in c.waitErr and signaled via c.waitDone.
-	go func() { _ = c.Wait() }()
-
-	// Wait for process exit or context timeout
-	select {
-	case <-c.waitDone:
-		return c.waitErr, true
-	case <-ctx.Done():
-		return ctx.Err(), false
-	}
+	return nil, false
 }
+
+// Ensure Wait() is running in background.
+// Result is stored in c.waitErr and signaled via c.waitDone.
+
+// Wait for process exit or context timeout
 
 // Stop gracefully stops the process: SIGTERM first, then SIGKILL if needed.
 //
@@ -413,85 +307,19 @@ func (c *Cmd) Kill(ctx context.Context) (error, bool) {
 //	defer cancel()
 //	exitErr, stopped := cmd.Stop(ctx)
 //	// Tries SIGTERM for up to 10s, then SIGKILL with 100ms timeout
-func (c *Cmd) Stop(ctx context.Context) (error, bool) {
-	exitErr, exited := c.Terminate(ctx)
-
-	if exited {
-		return exitErr, true
-	}
-
-	killCtx, killCancel := context.WithTimeout(ctxutil.Detach(ctx), 100*time.Millisecond)
-	exitErr, killed := c.Kill(killCtx)
-	killCancel()
-
-	return exitErr, killed
-}
+func (c *Cmd) Stop(ctx context.Context) (error, bool) { _ = "STUB: not implemented"; return nil, false }
 
 // Run starts the command and waits for it to complete.
 // If WithClientSpan() was called, an OpenTelemetry span is created around
 // the command execution.
-func (c *Cmd) Run() error {
-	if c.clientSpan {
-		_, span := tracer.Start(c.parentCtx, c.Cmd.Path)
-		defer span.End()
-	}
-	if err := c.Start(); err != nil {
-		return err
-	}
-	return c.Wait()
-}
+func (c *Cmd) Run() error { _ = "STUB: not implemented"; return nil }
 
 // Output runs the command and returns its stdout.
 // If WithClientSpan() was called, an OpenTelemetry span is created around
 // the command execution.
-func (c *Cmd) Output() ([]byte, error) {
-	if c.clientSpan {
-		_, span := tracer.Start(c.parentCtx, c.Cmd.Path)
-		defer span.End()
-	}
-	if c.Cmd.Stdout != nil {
-		return nil, errors.New("exec: Stdout already set")
-	}
-	var stdout bytes.Buffer
-	c.Cmd.Stdout = &stdout
-	captureStderr := c.Cmd.Stderr == nil
-	var stderr bytes.Buffer
-	if captureStderr {
-		c.Cmd.Stderr = &stderr
-	}
-	err := c.Start()
-	if err == nil {
-		err = c.Wait()
-	}
-	if err != nil && captureStderr {
-		var ee *exec.ExitError
-		if errors.As(err, &ee) {
-			ee.Stderr = stderr.Bytes()
-		}
-	}
-	return stdout.Bytes(), err
-}
+func (c *Cmd) Output() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // CombinedOutput runs the command and returns its combined stdout and stderr.
 // If WithClientSpan() was called, an OpenTelemetry span is created around
 // the command execution.
-func (c *Cmd) CombinedOutput() ([]byte, error) {
-	if c.clientSpan {
-		_, span := tracer.Start(c.parentCtx, c.Cmd.Path)
-		defer span.End()
-	}
-	if c.Cmd.Stdout != nil {
-		return nil, errors.New("exec: Stdout already set")
-	}
-	if c.Cmd.Stderr != nil {
-		return nil, errors.New("exec: Stderr already set")
-	}
-	var buf bytes.Buffer
-	c.Cmd.Stdout = &buf
-	c.Cmd.Stderr = &buf
-	err := c.Start()
-	if err == nil {
-		err = c.Wait()
-	}
-	return buf.Bytes(), err
-}
+func (c *Cmd) CombinedOutput() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

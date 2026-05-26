@@ -25,29 +25,12 @@
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 package ast
 
-import (
-	"strings"
-)
-
 // ==============================================================================
 // ALTER Miscellaneous Statement Nodes - Phase 3J Implementation
 // ==============================================================================
 
 // Helper function to convert NodeList of strings to qualified name
-func nodeListToQualifiedName(nodeList *NodeList) string {
-	if nodeList == nil || nodeList.Len() == 0 {
-		return ""
-	}
-
-	var parts []string
-	for _, item := range nodeList.Items {
-		if str, ok := item.(*String); ok {
-			parts = append(parts, str.SVal)
-		}
-	}
-
-	return FormatQualifiedName(parts...)
-}
+func nodeListToQualifiedName(nodeList *NodeList) string { _ = "STUB: not implemented"; return "" }
 
 // AlterTSConfigType represents the type of ALTER TEXT SEARCH CONFIGURATION operation
 // Ported from postgres/src/include/nodes/parsenodes.h:3700-3706
@@ -62,24 +45,7 @@ const (
 	ALTER_TSCONFIG_DROP_MAPPING
 )
 
-func (a AlterTSConfigType) String() string {
-	switch a {
-	case ALTER_TSCONFIG_ADD_MAPPING:
-		return "ADD MAPPING"
-	case ALTER_TSCONFIG_ALTER_MAPPING_FOR_TOKEN:
-		return "ALTER MAPPING FOR"
-	case ALTER_TSCONFIG_ALTER_MAPPING_REPLACE:
-		return "ALTER MAPPING REPLACE"
-	case ALTER_TSCONFIG_REPLACE_DICT:
-		return "REPLACE"
-	case ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN:
-		return "REPLACE FOR"
-	case ALTER_TSCONFIG_DROP_MAPPING:
-		return "DROP MAPPING"
-	default:
-		return "UNKNOWN"
-	}
-}
+func (a AlterTSConfigType) String() string { _ = "STUB: not implemented"; return "" }
 
 // AlterObjectSchemaStmt represents ALTER ... SET SCHEMA statements
 // Ported from postgres/src/include/nodes/parsenodes.h:3547-3554
@@ -92,83 +58,31 @@ type AlterObjectSchemaStmt struct {
 	MissingOk  bool       `json:"missingOk"`  // Skip error if missing?
 }
 
-func (n *AlterObjectSchemaStmt) node() {}
-func (n *AlterObjectSchemaStmt) stmt() {}
+func (n *AlterObjectSchemaStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterObjectSchemaStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterObjectSchemaStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterObjectSchemaStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterObjectSchemaStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterObjectSchemaStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterObjectSchemaStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER")
+func (n *AlterObjectSchemaStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add object type
-	parts = append(parts, n.ObjectType.String())
+// Add object type
 
-	// Add IF EXISTS if specified
-	if n.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
+// Add IF EXISTS if specified
 
-	// Add object name
-	if n.Relation != nil {
-		parts = append(parts, n.Relation.SqlString())
-	} else if n.Object != nil {
-		if nodeList, ok := n.Object.(*NodeList); ok {
-			// Special handling for OPERATOR CLASS and OPERATOR FAMILY
-			if n.ObjectType == OBJECT_OPCLASS || n.ObjectType == OBJECT_OPFAMILY {
-				// Format as "name USING method" where first item is method, rest is name
-				if nodeList.Len() >= 2 {
-					methodStr := ""
-					if str, ok := nodeList.Items[0].(*String); ok {
-						methodStr = str.SVal
-					} else {
-						methodStr = nodeList.Items[0].SqlString()
-					}
+// Add object name
 
-					var nameStr strings.Builder
-					for i := 1; i < nodeList.Len(); i++ {
-						if i > 1 {
-							nameStr.WriteString(".")
-						}
-						if str, ok := nodeList.Items[i].(*String); ok {
-							nameStr.WriteString(str.SVal)
-						} else {
-							nameStr.WriteString(nodeList.Items[i].SqlString())
-						}
-					}
-					parts = append(parts, nameStr.String(), "USING", methodStr)
-				} else {
-					parts = append(parts, nodeListToQualifiedName(nodeList))
-				}
-			} else {
-				parts = append(parts, nodeListToQualifiedName(nodeList))
-			}
-		} else if strv, ok := n.Object.(*String); ok {
-			parts = append(parts, QuoteIdentifier(strv.SVal))
-		} else {
-			parts = append(parts, n.Object.SqlString())
-		}
-	}
+// Special handling for OPERATOR CLASS and OPERATOR FAMILY
 
-	// Add SET SCHEMA clause
-	parts = append(parts, "SET SCHEMA", QuoteIdentifier(n.NewSchema))
+// Format as "name USING method" where first item is method, rest is name
 
-	return strings.Join(parts, " ")
-}
+// Add SET SCHEMA clause
 
 // NewAlterObjectSchemaStmt creates a new AlterObjectSchemaStmt node
 func NewAlterObjectSchemaStmt(objectType ObjectType, newSchema string) *AlterObjectSchemaStmt {
-	return &AlterObjectSchemaStmt{
-		BaseNode:   BaseNode{Tag: T_AlterObjectSchemaStmt},
-		ObjectType: objectType,
-		NewSchema:  newSchema,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterOperatorStmt represents ALTER OPERATOR statements
@@ -179,49 +93,22 @@ type AlterOperatorStmt struct {
 	Options  *NodeList       `json:"options"`  // List of DefElem nodes
 }
 
-func (n *AlterOperatorStmt) node() {}
-func (n *AlterOperatorStmt) stmt() {}
+func (n *AlterOperatorStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterOperatorStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterOperatorStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterOperatorStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterOperatorStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterOperatorStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterOperatorStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER OPERATOR")
+func (n *AlterOperatorStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Opername != nil {
-		parts = append(parts, n.Opername.SqlString())
-	}
-
-	if n.Options != nil && n.Options.Len() > 0 {
-		parts = append(parts, "SET (")
-		var optStrs []string
-		for _, opt := range n.Options.Items {
-			if defElem, ok := opt.(*DefElem); ok {
-				// COMMUTATOR/NEGATOR carry operator names, which must be emitted
-				// unquoted rather than as string literals.
-				optStrs = append(optStrs, operatorDefElemString(defElem))
-			}
-		}
-		parts = append(parts, strings.Join(optStrs, ", "))
-		parts = append(parts, ")")
-	}
-
-	return strings.Join(parts, " ")
-}
+// COMMUTATOR/NEGATOR carry operator names, which must be emitted
+// unquoted rather than as string literals.
 
 // NewAlterOperatorStmt creates a new AlterOperatorStmt node
 func NewAlterOperatorStmt(opername *ObjectWithArgs, options *NodeList) *AlterOperatorStmt {
-	return &AlterOperatorStmt{
-		BaseNode: BaseNode{Tag: T_AlterOperatorStmt},
-		Opername: opername,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterObjectDependsStmt represents ALTER ... DEPENDS statements
@@ -235,60 +122,27 @@ type AlterObjectDependsStmt struct {
 	Remove     bool       `json:"remove"`     // Set true to remove dep rather than add
 }
 
-func (n *AlterObjectDependsStmt) node() {}
-func (n *AlterObjectDependsStmt) stmt() {}
+func (n *AlterObjectDependsStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterObjectDependsStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterObjectDependsStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterObjectDependsStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterObjectDependsStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterObjectDependsStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterObjectDependsStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER")
+func (n *AlterObjectDependsStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	// Add object type
-	parts = append(parts, n.ObjectType.String())
+// Add object type
 
-	// Add object name
-	if n.ObjectType == OBJECT_TRIGGER && n.Object != nil && n.Relation != nil {
-		// For TRIGGER, format as "trigger_name ON table_name"
-		if str, ok := n.Object.(*String); ok {
-			parts = append(parts, QuoteIdentifier(str.SVal), "ON", n.Relation.SqlString())
-		} else {
-			parts = append(parts, n.Object.SqlString(), "ON", n.Relation.SqlString())
-		}
-	} else if n.Relation != nil {
-		parts = append(parts, n.Relation.SqlString())
-	} else if n.Object != nil {
-		parts = append(parts, n.Object.SqlString())
-	}
+// Add object name
 
-	// Add DEPENDS clause
-	if n.Remove {
-		parts = append(parts, "NO DEPENDS ON EXTENSION")
-	} else {
-		parts = append(parts, "DEPENDS ON EXTENSION")
-	}
+// For TRIGGER, format as "trigger_name ON table_name"
 
-	if n.Extname != nil {
-		parts = append(parts, QuoteIdentifier(n.Extname.SVal))
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add DEPENDS clause
 
 // NewAlterObjectDependsStmt creates a new AlterObjectDependsStmt node
 func NewAlterObjectDependsStmt(objectType ObjectType, extname *String, remove bool) *AlterObjectDependsStmt {
-	return &AlterObjectDependsStmt{
-		BaseNode:   BaseNode{Tag: T_AlterObjectDependsStmt},
-		ObjectType: objectType,
-		Extname:    extname,
-		Remove:     remove,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterCollationStmt represents ALTER COLLATION statements
@@ -298,36 +152,19 @@ type AlterCollationStmt struct {
 	Collname *NodeList `json:"collname"` // Qualified name
 }
 
-func (n *AlterCollationStmt) node() {}
-func (n *AlterCollationStmt) stmt() {}
+func (n *AlterCollationStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterCollationStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterCollationStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterCollationStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterCollationStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterCollationStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterCollationStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER COLLATION")
-
-	if n.Collname != nil {
-		parts = append(parts, nodeListToQualifiedName(n.Collname))
-	}
-
-	parts = append(parts, "REFRESH VERSION")
-
-	return strings.Join(parts, " ")
-}
+func (n *AlterCollationStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterCollationStmt creates a new AlterCollationStmt node
 func NewAlterCollationStmt(collname *NodeList) *AlterCollationStmt {
-	return &AlterCollationStmt{
-		BaseNode: BaseNode{Tag: T_AlterCollationStmt},
-		Collname: collname,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterDatabaseStmt represents ALTER DATABASE statements
@@ -338,41 +175,19 @@ type AlterDatabaseStmt struct {
 	Options *NodeList `json:"options"` // List of DefElem nodes
 }
 
-func (n *AlterDatabaseStmt) node() {}
-func (n *AlterDatabaseStmt) stmt() {}
+func (n *AlterDatabaseStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterDatabaseStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterDatabaseStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterDatabaseStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterDatabaseStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER DATABASE", QuoteIdentifier(n.Dbname))
-
-	if n.Options != nil && n.Options.Len() > 0 {
-		var optStrs []string
-		for _, opt := range n.Options.Items {
-			if defElem, ok := opt.(*DefElem); ok {
-				optStrs = append(optStrs, defElem.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(optStrs, " "))
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *AlterDatabaseStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterDatabaseStmt creates a new AlterDatabaseStmt node
 func NewAlterDatabaseStmt(dbname string, options *NodeList) *AlterDatabaseStmt {
-	return &AlterDatabaseStmt{
-		BaseNode: BaseNode{Tag: T_AlterDatabaseStmt},
-		Dbname:   dbname,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterDatabaseSetStmt represents ALTER DATABASE SET statements
@@ -383,35 +198,19 @@ type AlterDatabaseSetStmt struct {
 	Setstmt *VariableSetStmt `json:"setstmt"` // SET or RESET subcommand
 }
 
-func (n *AlterDatabaseSetStmt) node() {}
-func (n *AlterDatabaseSetStmt) stmt() {}
+func (n *AlterDatabaseSetStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterDatabaseSetStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterDatabaseSetStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterDatabaseSetStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseSetStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterDatabaseSetStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseSetStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER DATABASE", QuoteIdentifier(n.Dbname))
-
-	if n.Setstmt != nil {
-		parts = append(parts, n.Setstmt.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *AlterDatabaseSetStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterDatabaseSetStmt creates a new AlterDatabaseSetStmt node
 func NewAlterDatabaseSetStmt(dbname string, setstmt *VariableSetStmt) *AlterDatabaseSetStmt {
-	return &AlterDatabaseSetStmt{
-		BaseNode: BaseNode{Tag: T_AlterDatabaseSetStmt},
-		Dbname:   dbname,
-		Setstmt:  setstmt,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterDatabaseRefreshCollStmt represents ALTER DATABASE REFRESH COLLATION VERSION statements
@@ -421,27 +220,19 @@ type AlterDatabaseRefreshCollStmt struct {
 	Dbname string `json:"dbname"` // Database name
 }
 
-func (n *AlterDatabaseRefreshCollStmt) node() {}
-func (n *AlterDatabaseRefreshCollStmt) stmt() {}
+func (n *AlterDatabaseRefreshCollStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterDatabaseRefreshCollStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterDatabaseRefreshCollStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterDatabaseRefreshCollStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseRefreshCollStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterDatabaseRefreshCollStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterDatabaseRefreshCollStmt) SqlString() string {
-	return "ALTER DATABASE " + QuoteIdentifier(n.Dbname) + " REFRESH COLLATION VERSION"
-}
+func (n *AlterDatabaseRefreshCollStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterDatabaseRefreshCollStmt creates a new AlterDatabaseRefreshCollStmt node
 func NewAlterDatabaseRefreshCollStmt(dbname string) *AlterDatabaseRefreshCollStmt {
-	return &AlterDatabaseRefreshCollStmt{
-		BaseNode: BaseNode{Tag: T_AlterDatabaseRefreshCollStmt},
-		Dbname:   dbname,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterCompositeTypeStmt represents ALTER TYPE (composite) statements
@@ -453,45 +244,19 @@ type AlterCompositeTypeStmt struct {
 	Cmds     *NodeList `json:"cmds"`     // List of alter type commands
 }
 
-func (n *AlterCompositeTypeStmt) node() {}
-func (n *AlterCompositeTypeStmt) stmt() {}
+func (n *AlterCompositeTypeStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterCompositeTypeStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterCompositeTypeStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterCompositeTypeStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterCompositeTypeStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterCompositeTypeStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterCompositeTypeStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER TYPE")
-
-	if n.TypeName != nil {
-		parts = append(parts, nodeListToQualifiedName(n.TypeName))
-	}
-
-	if n.Cmds != nil && n.Cmds.Len() > 0 {
-		var cmdStrs []string
-		for _, cmd := range n.Cmds.Items {
-			if alterCmd, ok := cmd.(*AlterTableCmd); ok {
-				cmdStrs = append(cmdStrs, alterCmd.SqlString())
-			}
-		}
-		parts = append(parts, strings.Join(cmdStrs, ", "))
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *AlterCompositeTypeStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterCompositeTypeStmt creates a new AlterCompositeTypeStmt node
 func NewAlterCompositeTypeStmt(typeName *NodeList, cmds *NodeList) *AlterCompositeTypeStmt {
-	return &AlterCompositeTypeStmt{
-		BaseNode: BaseNode{Tag: T_AlterCompositeTypeStmt},
-		TypeName: typeName,
-		Cmds:     cmds,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterTSConfigurationStmt represents ALTER TEXT SEARCH CONFIGURATION statements
@@ -507,119 +272,45 @@ type AlterTSConfigurationStmt struct {
 	MissingOk bool              `json:"missingOk"` // For ALTER ... IF EXISTS
 }
 
-func (n *AlterTSConfigurationStmt) node() {}
-func (n *AlterTSConfigurationStmt) stmt() {}
+func (n *AlterTSConfigurationStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterTSConfigurationStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterTSConfigurationStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterTSConfigurationStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterTSConfigurationStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterTSConfigurationStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterTSConfigurationStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER TEXT SEARCH CONFIGURATION")
+func (n *AlterTSConfigurationStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if n.Cfgname != nil {
-		parts = append(parts, nodeListToQualifiedName(n.Cfgname))
-	}
+// Add operation type with special handling for ALTER MAPPING patterns
 
-	// Add operation type with special handling for ALTER MAPPING patterns
-	if (n.Kind == ALTER_TSCONFIG_REPLACE_DICT || n.Kind == ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN) && n.Dicts != nil && n.Dicts.Len() == 2 {
-		// This is likely an ALTER MAPPING REPLACE that was parsed as REPLACE_DICT
-		if n.Tokentype != nil && n.Tokentype.Len() > 0 {
-			// Format: ALTER MAPPING FOR tokens REPLACE
-			parts = append(parts, "ALTER MAPPING")
+// This is likely an ALTER MAPPING REPLACE that was parsed as REPLACE_DICT
 
-			// Add FOR tokens
-			parts = append(parts, "FOR")
-			var tokens []string
-			for _, token := range n.Tokentype.Items {
-				if str, ok := token.(*String); ok {
-					tokens = append(tokens, str.SVal)
-				} else if nodeList, ok := token.(*NodeList); ok {
-					tokens = append(tokens, nodeListToQualifiedName(nodeList))
-				}
-			}
-			parts = append(parts, strings.Join(tokens, ", "))
+// Format: ALTER MAPPING FOR tokens REPLACE
 
-			// Add REPLACE
-			parts = append(parts, "REPLACE")
-		} else {
-			// Format: ALTER MAPPING REPLACE
-			parts = append(parts, "ALTER MAPPING REPLACE")
-		}
-	} else {
-		// Standard operation types
-		parts = append(parts, n.Kind.String())
+// Add FOR tokens
 
-		// Add IF EXISTS if specified (for DROP operations)
-		if n.MissingOk && n.Kind == ALTER_TSCONFIG_DROP_MAPPING {
-			parts = append(parts, "IF EXISTS")
-		}
+// Add REPLACE
 
-		// Add FOR token types if specified (for non-REPLACE operations)
-		if n.Tokentype != nil && n.Tokentype.Len() > 0 {
-			// Only add "FOR" if it's not already in the kind string
-			kindStr := n.Kind.String()
-			if !strings.Contains(kindStr, "FOR") {
-				parts = append(parts, "FOR")
-			}
-			var tokens []string
-			for _, token := range n.Tokentype.Items {
-				if str, ok := token.(*String); ok {
-					tokens = append(tokens, str.SVal)
-				} else if nodeList, ok := token.(*NodeList); ok {
-					tokens = append(tokens, nodeListToQualifiedName(nodeList))
-				}
-			}
-			parts = append(parts, strings.Join(tokens, ", "))
-		}
-	}
+// Format: ALTER MAPPING REPLACE
 
-	// Add WITH dictionaries if specified
-	if n.Dicts != nil && n.Dicts.Len() > 0 {
-		if (n.Kind == ALTER_TSCONFIG_ALTER_MAPPING_REPLACE ||
-			((n.Kind == ALTER_TSCONFIG_REPLACE_DICT || n.Kind == ALTER_TSCONFIG_REPLACE_DICT_FOR_TOKEN) && n.Dicts.Len() == 2)) && n.Dicts.Len() == 2 {
-			// Special format for ALTER MAPPING REPLACE: "old_dict WITH new_dict"
-			var dicts []string
-			for _, dict := range n.Dicts.Items {
-				if str, ok := dict.(*String); ok {
-					dicts = append(dicts, QuoteIdentifier(str.SVal))
-				} else if nodeList, ok := dict.(*NodeList); ok {
-					dicts = append(dicts, nodeListToQualifiedName(nodeList))
-				}
-			}
-			if len(dicts) >= 2 {
-				parts = append(parts, dicts[0], "WITH", dicts[1])
-			}
-		} else {
-			// Standard format: "WITH dict1, dict2, ..."
-			parts = append(parts, "WITH")
-			var dicts []string
-			for _, dict := range n.Dicts.Items {
-				if str, ok := dict.(*String); ok {
-					dicts = append(dicts, QuoteIdentifier(str.SVal))
-				} else if nodeList, ok := dict.(*NodeList); ok {
-					dicts = append(dicts, nodeListToQualifiedName(nodeList))
-				}
-			}
-			parts = append(parts, strings.Join(dicts, ", "))
-		}
-	}
+// Standard operation types
 
-	return strings.Join(parts, " ")
-}
+// Add IF EXISTS if specified (for DROP operations)
+
+// Add FOR token types if specified (for non-REPLACE operations)
+
+// Only add "FOR" if it's not already in the kind string
+
+// Add WITH dictionaries if specified
+
+// Special format for ALTER MAPPING REPLACE: "old_dict WITH new_dict"
+
+// Standard format: "WITH dict1, dict2, ..."
 
 // NewAlterTSConfigurationStmt creates a new AlterTSConfigurationStmt node
 func NewAlterTSConfigurationStmt(kind AlterTSConfigType, cfgname *NodeList) *AlterTSConfigurationStmt {
-	return &AlterTSConfigurationStmt{
-		BaseNode: BaseNode{Tag: T_AlterTSConfigurationStmt},
-		Kind:     kind,
-		Cfgname:  cfgname,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // AlterTSDictionaryStmt represents ALTER TEXT SEARCH DICTIONARY statements
@@ -630,43 +321,17 @@ type AlterTSDictionaryStmt struct {
 	Options  *NodeList `json:"options"`  // List of DefElem nodes
 }
 
-func (n *AlterTSDictionaryStmt) node() {}
-func (n *AlterTSDictionaryStmt) stmt() {}
+func (n *AlterTSDictionaryStmt) node() { _ = "STUB: not implemented"; return }
+func (n *AlterTSDictionaryStmt) stmt() { _ = "STUB: not implemented"; return }
 
-func (n *AlterTSDictionaryStmt) StatementType() string {
-	return "ALTER"
-}
+func (n *AlterTSDictionaryStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterTSDictionaryStmt) String() string {
-	return n.SqlString()
-}
+func (n *AlterTSDictionaryStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (n *AlterTSDictionaryStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER TEXT SEARCH DICTIONARY")
-
-	if n.Dictname != nil {
-		parts = append(parts, nodeListToQualifiedName(n.Dictname))
-	}
-
-	if n.Options != nil && n.Options.Len() > 0 {
-		var optStrs []string
-		for _, opt := range n.Options.Items {
-			if defElem, ok := opt.(*DefElem); ok {
-				optStrs = append(optStrs, defElem.SqlString())
-			}
-		}
-		parts = append(parts, "("+strings.Join(optStrs, ", ")+")")
-	}
-
-	return strings.Join(parts, " ")
-}
+func (n *AlterTSDictionaryStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // NewAlterTSDictionaryStmt creates a new AlterTSDictionaryStmt node
 func NewAlterTSDictionaryStmt(dictname *NodeList, options *NodeList) *AlterTSDictionaryStmt {
-	return &AlterTSDictionaryStmt{
-		BaseNode: BaseNode{Tag: T_AlterTSDictionaryStmt},
-		Dictname: dictname,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

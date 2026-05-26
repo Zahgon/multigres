@@ -41,101 +41,47 @@ type PlanCache struct {
 // If maxMemory is <= 0, the cache is effectively disabled.
 // The doorkeeper (bloom filter admission policy) is enabled to prevent
 // cache pollution from one-off queries.
-func New(maxMemory int) *PlanCache {
-	metrics, _ := NewCacheMetrics()
-	if maxMemory <= 0 {
-		return &PlanCache{metrics: metrics}
-	}
-	return &PlanCache{
-		store:   theine.NewStore[theine.StringKey, *engine.Plan](int64(maxMemory), true),
-		metrics: metrics,
-	}
-}
+func New(maxMemory int) *PlanCache { _ = "STUB: not implemented"; return nil }
 
 // NewForTest creates a PlanCache with the doorkeeper disabled for deterministic tests.
-func NewForTest(maxMemory int) *PlanCache {
-	metrics, _ := NewCacheMetrics()
-	if maxMemory <= 0 {
-		return &PlanCache{metrics: metrics}
-	}
-	return &PlanCache{
-		store:   theine.NewStore[theine.StringKey, *engine.Plan](int64(maxMemory), false),
-		metrics: metrics,
-	}
-}
+func NewForTest(maxMemory int) *PlanCache { _ = "STUB: not implemented"; return nil }
 
 // Get looks up a cached plan by normalized SQL key.
 // Returns the cached plan and true on hit, or nil and false on miss.
 // Entries from a previous epoch are treated as misses.
 func (c *PlanCache) Get(ctx context.Context, normalizedSQL string) (*engine.Plan, bool) {
-	if c.store == nil {
-		c.metrics.RecordMiss(ctx)
-		return nil, false
-	}
-	plan, ok := c.store.Get(theine.StringKey(normalizedSQL), c.epoch.Load())
-	if ok {
-		c.metrics.RecordHit(ctx)
-	} else {
-		c.metrics.RecordMiss(ctx)
-	}
-	return plan, ok
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 // Put inserts or updates a cache entry.
 // The entry is stamped with the current epoch.
-func (c *PlanCache) Put(normalizedSQL string, plan *engine.Plan) {
-	if c.store == nil {
-		return
-	}
-	// cost=0 tells theine to call plan.CachedSize() to determine the entry's memory cost.
-	c.store.Set(theine.StringKey(normalizedSQL), plan, 0, c.epoch.Load())
-}
+func (c *PlanCache) Put(normalizedSQL string, plan *engine.Plan) { _ = "STUB: not implemented"; return }
+
+// cost=0 tells theine to call plan.CachedSize() to determine the entry's memory cost.
 
 // Invalidate invalidates all cached plans by incrementing the epoch.
 // Existing entries become stale and will be treated as misses on subsequent
 // Get calls. Stale entries are lazily cleaned up during eviction.
 // This should be called when DDL or other destructive actions change the schema.
 func (c *PlanCache) Invalidate() {
-	c.epoch.Add(1)
+	_ = "STUB: not implemented"
+
+	// Len returns the number of entries currently in the cache.
+	// This includes stale entries that haven't been evicted yet.
+	return
 }
 
-// Len returns the number of entries currently in the cache.
-// This includes stale entries that haven't been evicted yet.
-func (c *PlanCache) Len() int {
-	if c.store == nil {
-		return 0
-	}
-	return c.store.Len()
-}
+func (c *PlanCache) Len() int { _ = "STUB: not implemented"; return 0 }
 
 // Hits returns the total number of cache hits.
-func (c *PlanCache) Hits() int64 {
-	if c.store == nil {
-		return 0
-	}
-	return c.store.Metrics.Hits()
-}
+func (c *PlanCache) Hits() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Misses returns the total number of cache misses.
-func (c *PlanCache) Misses() int64 {
-	if c.store == nil {
-		return 0
-	}
-	return c.store.Metrics.Misses()
-}
+func (c *PlanCache) Misses() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Evictions returns the total number of cache evictions.
-func (c *PlanCache) Evictions() int64 {
-	if c.store == nil {
-		return 0
-	}
-	return c.store.Metrics.Evicted()
-}
+func (c *PlanCache) Evictions() int64 { _ = "STUB: not implemented"; return 0 }
 
 // Close shuts down the cache and stops the background maintenance goroutine.
-func (c *PlanCache) Close() {
-	if c.store == nil {
-		return
-	}
-	c.store.Close()
-}
+func (c *PlanCache) Close() { _ = "STUB: not implemented"; return }

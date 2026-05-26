@@ -17,39 +17,13 @@ package consensus
 
 import (
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	"github.com/multigres/multigres/go/tools/pgutil"
 )
 
 // CompareRuleNumbers compares two RuleNumbers lexicographically.
 // Returns -1 if a < b, 0 if a == b, 1 if a > b.
 // A nil RuleNumber is treated as zero (the smallest possible value).
 func CompareRuleNumbers(a, b *clustermetadatapb.RuleNumber) int {
-	aTerm := int64(0)
-	aSubterm := int64(0)
-	if a != nil {
-		aTerm = a.GetCoordinatorTerm()
-		aSubterm = a.GetLeaderSubterm()
-	}
-
-	bTerm := int64(0)
-	bSubterm := int64(0)
-	if b != nil {
-		bTerm = b.GetCoordinatorTerm()
-		bSubterm = b.GetLeaderSubterm()
-	}
-
-	if aTerm != bTerm {
-		if aTerm < bTerm {
-			return -1
-		}
-		return 1
-	}
-	if aSubterm != bSubterm {
-		if aSubterm < bSubterm {
-			return -1
-		}
-		return 1
-	}
+	_ = "STUB: not implemented"
 	return 0
 }
 
@@ -63,17 +37,8 @@ func CompareRuleNumbers(a, b *clustermetadatapb.RuleNumber) int {
 // state — e.g. the bootstrap path before recruitment — use this to obtain the
 // outgoing rule number and frozen LSN.
 func MostAdvancedPosition(statuses []*clustermetadatapb.ConsensusStatus) *clustermetadatapb.PoolerPosition {
-	var best *clustermetadatapb.PoolerPosition
-	for _, cs := range statuses {
-		pos := cs.GetCurrentPosition()
-		if _, err := pgutil.ParseLSN(pos.GetLsn()); err != nil {
-			continue
-		}
-		if best == nil || ComparePosition(pos, best) > 0 {
-			best = pos
-		}
-	}
-	return best
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ReplicationPrimaryMatches reports whether a pooler's published
@@ -89,58 +54,17 @@ func MostAdvancedPosition(statuses []*clustermetadatapb.ConsensusStatus) *cluste
 //
 // target and targetRule are required; passing nil for either returns false.
 func ReplicationPrimaryMatches(rp *clustermetadatapb.ReplicationPrimary, target *clustermetadatapb.PoolerAddress, targetRule *clustermetadatapb.ShardRule) bool {
-	if rp == nil || target == nil || targetRule == nil {
-		return false
-	}
-	if CompareRuleNumbers(rp.GetRule().GetRuleNumber(), targetRule.GetRuleNumber()) < 0 {
-		return false
-	}
-	rpPrimary := rp.GetPrimary()
-	if rpPrimary == nil {
-		return false
-	}
-	if !idsEqual(rpPrimary.GetId(), target.GetId()) {
-		return false
-	}
-	if rpPrimary.GetHost() != target.GetHost() {
-		return false
-	}
-	if rpPrimary.GetPostgresPort() != target.GetPostgresPort() {
-		return false
-	}
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
-func idsEqual(a, b *clustermetadatapb.ID) bool {
-	return a.GetComponent() == b.GetComponent() &&
-		a.GetCell() == b.GetCell() &&
-		a.GetName() == b.GetName()
-}
+func idsEqual(a, b *clustermetadatapb.ID) bool { _ = "STUB: not implemented"; return false }
 
 // ComparePosition returns negative, zero, or positive based on whether a is
 // behind, equal to, or ahead of b. Rule number takes precedence; LSN breaks
 // ties within the same rule. A missing or unparsable LSN is treated as less
 // than any valid LSN.
 func ComparePosition(a, b *clustermetadatapb.PoolerPosition) int {
-	if cmp := CompareRuleNumbers(a.GetRule().GetRuleNumber(), b.GetRule().GetRuleNumber()); cmp != 0 {
-		return cmp
-	}
-	lsnA, errA := pgutil.ParseLSN(a.GetLsn())
-	lsnB, errB := pgutil.ParseLSN(b.GetLsn())
-	okA := errA == nil
-	okB := errB == nil
-	switch {
-	case !okA && !okB:
-		return 0
-	case !okA:
-		return -1
-	case !okB:
-		return 1
-	case lsnA < lsnB:
-		return -1
-	case lsnA > lsnB:
-		return 1
-	default:
-		return 0
-	}
+	_ = "STUB: not implemented"
+	return 0
 }

@@ -26,9 +26,8 @@ package multigatewaymanager
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -61,27 +60,18 @@ type multiGatewayManagerClient struct {
 }
 
 func NewMultiGatewayManagerClient(cc grpc.ClientConnInterface) MultiGatewayManagerClient {
-	return &multiGatewayManagerClient{cc}
+	_ = "STUB: not implemented"
+	return *new(MultiGatewayManagerClient)
 }
 
 func (c *multiGatewayManagerClient) GetQueryRegistry(ctx context.Context, in *GetQueryRegistryRequest, opts ...grpc.CallOption) (*GetQueryRegistryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetQueryRegistryResponse)
-	err := c.cc.Invoke(ctx, MultiGatewayManager_GetQueryRegistry_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (c *multiGatewayManagerClient) GetConsolidatorStats(ctx context.Context, in *GetConsolidatorStatsRequest, opts ...grpc.CallOption) (*GetConsolidatorStatsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetConsolidatorStatsResponse)
-	err := c.cc.Invoke(ctx, MultiGatewayManager_GetConsolidatorStats_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiGatewayManagerServer is the server API for MultiGatewayManager service.
@@ -108,13 +98,23 @@ type MultiGatewayManagerServer interface {
 type UnimplementedMultiGatewayManagerServer struct{}
 
 func (UnimplementedMultiGatewayManagerServer) GetQueryRegistry(context.Context, *GetQueryRegistryRequest) (*GetQueryRegistryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetQueryRegistry not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (UnimplementedMultiGatewayManagerServer) GetConsolidatorStats(context.Context, *GetConsolidatorStatsRequest) (*GetConsolidatorStatsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConsolidatorStats not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (UnimplementedMultiGatewayManagerServer) mustEmbedUnimplementedMultiGatewayManagerServer() {}
-func (UnimplementedMultiGatewayManagerServer) testEmbeddedByValue()                             {}
+
+func (UnimplementedMultiGatewayManagerServer) mustEmbedUnimplementedMultiGatewayManagerServer() {
+	_ = "STUB: not implemented"
+	return
+}
+func (UnimplementedMultiGatewayManagerServer) testEmbeddedByValue() {
+	_ = "STUB: not implemented"
+	return
+}
 
 // UnsafeMultiGatewayManagerServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to MultiGatewayManagerServer will
@@ -124,50 +124,22 @@ type UnsafeMultiGatewayManagerServer interface {
 }
 
 func RegisterMultiGatewayManagerServer(s grpc.ServiceRegistrar, srv MultiGatewayManagerServer) {
+	_ = "STUB: not implemented"
 	// If the following call pancis, it indicates UnimplementedMultiGatewayManagerServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MultiGatewayManager_ServiceDesc, srv)
+	return
 }
 
 func _MultiGatewayManager_GetQueryRegistry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetQueryRegistryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiGatewayManagerServer).GetQueryRegistry(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiGatewayManager_GetQueryRegistry_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiGatewayManagerServer).GetQueryRegistry(ctx, req.(*GetQueryRegistryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func _MultiGatewayManager_GetConsolidatorStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetConsolidatorStatsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MultiGatewayManagerServer).GetConsolidatorStats(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MultiGatewayManager_GetConsolidatorStats_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MultiGatewayManagerServer).GetConsolidatorStats(ctx, req.(*GetConsolidatorStatsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MultiGatewayManager_ServiceDesc is the grpc.ServiceDesc for MultiGatewayManager service.

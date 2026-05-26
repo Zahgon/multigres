@@ -14,11 +14,6 @@
 
 package s3
 
-import (
-	"errors"
-	"os"
-)
-
 // Credentials holds AWS credential information
 type Credentials struct {
 	AccessKey    string
@@ -29,21 +24,4 @@ type Credentials struct {
 // ReadCredentialsFromEnv reads AWS credentials from environment variables.
 // Returns an error if required credentials (AccessKey, SecretKey) are not set.
 // SessionToken is optional and may be empty.
-func ReadCredentialsFromEnv() (*Credentials, error) {
-	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
-	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
-	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
-
-	if accessKey == "" {
-		return nil, errors.New("AWS_ACCESS_KEY_ID environment variable is required")
-	}
-	if secretKey == "" {
-		return nil, errors.New("AWS_SECRET_ACCESS_KEY environment variable is required")
-	}
-
-	return &Credentials{
-		AccessKey:    accessKey,
-		SecretKey:    secretKey,
-		SessionToken: sessionToken,
-	}, nil
-}
+func ReadCredentialsFromEnv() (*Credentials, error) { _ = "STUB: not implemented"; return nil, nil }

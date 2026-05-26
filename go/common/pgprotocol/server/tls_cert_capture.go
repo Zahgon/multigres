@@ -16,7 +16,6 @@ package server
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 )
 
 // captureTLSServerCert records the leaf certificate that crypto/tls
@@ -32,24 +31,7 @@ import (
 // Called synchronously from the handshake goroutine before tls.Handshake
 // returns; the subsequent reader (handleSSLRequest / SCRAM advertisement)
 // runs on the same goroutine, so no synchronization is needed.
-func (c *Conn) captureTLSServerCert(tlsCert *tls.Certificate) {
-	if tlsCert == nil {
-		return
-	}
-	if tlsCert.Leaf != nil {
-		c.tlsServerCert = tlsCert.Leaf
-		return
-	}
-	if len(tlsCert.Certificate) == 0 {
-		return
-	}
-	parsed, err := x509.ParseCertificate(tlsCert.Certificate[0])
-	if err != nil {
-		c.logger.Warn("failed to parse selected TLS leaf cert for channel binding", "err", err)
-		return
-	}
-	c.tlsServerCert = parsed
-}
+func (c *Conn) captureTLSServerCert(tlsCert *tls.Certificate) { _ = "STUB: not implemented"; return }
 
 // wrapTLSConfigForCertCapture returns a clone of base whose certificate
 // selection paths (GetCertificate and GetConfigForClient) are instrumented
@@ -80,45 +62,14 @@ func (c *Conn) captureTLSServerCert(tlsCert *tls.Certificate) {
 // owning *Conn which is only read after Handshake returns on the same
 // goroutine).
 func wrapTLSConfigForCertCapture(base *tls.Config, capture func(*tls.Certificate)) *tls.Config {
-	if base == nil || capture == nil {
-		return base
-	}
-	if base.GetCertificate == nil && base.GetConfigForClient == nil {
-		// Pure static deployment — caller's post-handshake fallback
-		// already recovers Certificates[0]. Avoid an unnecessary clone.
-		return base
-	}
-
-	cfg := base.Clone()
-
-	if cfg.GetCertificate != nil {
-		orig := cfg.GetCertificate
-		cfg.GetCertificate = func(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			cert, err := orig(chi)
-			if err == nil && cert != nil {
-				capture(cert)
-			}
-			return cert, err
-		}
-	}
-
-	if cfg.GetConfigForClient != nil {
-		orig := cfg.GetConfigForClient
-		cfg.GetConfigForClient = func(chi *tls.ClientHelloInfo) (*tls.Config, error) {
-			inner, err := orig(chi)
-			if err != nil {
-				return nil, err
-			}
-			if inner == nil {
-				// crypto/tls falls back to the outer config — already wrapped above.
-				return nil, nil
-			}
-			return wrapInnerCfgForCertCapture(inner, capture), nil
-		}
-	}
-
-	return cfg
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Pure static deployment — caller's post-handshake fallback
+// already recovers Certificates[0]. Avoid an unnecessary clone.
+
+// crypto/tls falls back to the outer config — already wrapped above.
 
 // wrapInnerCfgForCertCapture handles the per-handshake *tls.Config returned
 // by a user-supplied GetConfigForClient. crypto/tls uses this returned
@@ -126,44 +77,20 @@ func wrapTLSConfigForCertCapture(base *tls.Config, capture func(*tls.Certificate
 // wrapTLSConfigForCertCapture does not see the eventual cert — we must
 // wrap the inner config as well.
 func wrapInnerCfgForCertCapture(inner *tls.Config, capture func(*tls.Certificate)) *tls.Config {
+	_ = "STUB: not implemented"
 	// Skip cloning when neither cert-selection path is populated — the
 	// clone would be returned unmodified and crypto/tls would still fall
 	// back to the outer (already-wrapped) config. Parallels the static
 	// short-circuit in wrapTLSConfigForCertCapture.
-	if inner.GetCertificate == nil && len(inner.Certificates) == 0 {
-		return inner
-	}
-
-	out := inner.Clone()
-
-	if out.GetCertificate != nil {
-		orig := out.GetCertificate
-		out.GetCertificate = func(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			cert, err := orig(chi)
-			if err == nil && cert != nil {
-				capture(cert)
-			}
-			return cert, err
-		}
-		return out
-	}
-
-	// Inner config has no dynamic getter — crypto/tls will select from
-	// inner.Certificates. Synthesize a GetCertificate that captures the
-	// chosen cert. We replicate crypto/tls's selection rules at a minimum:
-	// the first cert that SupportsCertificate matches, otherwise
-	// Certificates[0]. NameToCertificate is intentionally skipped (see
-	// selectCertificate doc-comment).
-	out.GetCertificate = func(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		cert := selectCertificate(out, chi)
-		if cert != nil {
-			capture(cert)
-		}
-		return cert, nil
-	}
-
-	return out
+	return nil
 }
+
+// Inner config has no dynamic getter — crypto/tls will select from
+// inner.Certificates. Synthesize a GetCertificate that captures the
+// chosen cert. We replicate crypto/tls's selection rules at a minimum:
+// the first cert that SupportsCertificate matches, otherwise
+// Certificates[0]. NameToCertificate is intentionally skipped (see
+// selectCertificate doc-comment).
 
 // selectCertificate mirrors the subset of crypto/tls's internal server cert
 // selection we need for inner configs whose user didn't supply a getter.
@@ -179,16 +106,8 @@ func wrapInnerCfgForCertCapture(inner *tls.Config, capture func(*tls.Certificate
 // See the TODO on wrapTLSConfigForCertCapture — when golang/go#24673
 // lands, this helper goes away with the rest of the file.
 func selectCertificate(cfg *tls.Config, chi *tls.ClientHelloInfo) *tls.Certificate {
-	if len(cfg.Certificates) == 0 {
-		return nil
-	}
-	for i := range cfg.Certificates {
-		cert := &cfg.Certificates[i]
-		if err := chi.SupportsCertificate(cert); err == nil {
-			return cert
-		}
-	}
-	return &cfg.Certificates[0]
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // tlsConfigYieldsServerCert reports whether a TLS config will provide a
@@ -196,9 +115,4 @@ func selectCertificate(cfg *tls.Config, chi *tls.ClientHelloInfo) *tls.Certifica
 // static Certificates, GetCertificate, or GetConfigForClient. Listener
 // init logs a warning when this returns false on a non-nil config so the
 // operator notices the silent SCRAM-SHA-256-PLUS-off state.
-func tlsConfigYieldsServerCert(cfg *tls.Config) bool {
-	if cfg == nil {
-		return false
-	}
-	return len(cfg.Certificates) > 0 || cfg.GetCertificate != nil || cfg.GetConfigForClient != nil
-}
+func tlsConfigYieldsServerCert(cfg *tls.Config) bool { _ = "STUB: not implemented"; return false }

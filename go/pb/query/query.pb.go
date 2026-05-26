@@ -24,12 +24,11 @@
 package query
 
 import (
+	sync "sync"
+
 	clustermetadata "github.com/multigres/multigres/go/pb/clustermetadata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -54,67 +53,31 @@ type QueryResultPayload struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *QueryResultPayload) Reset() {
-	*x = QueryResultPayload{}
-	mi := &file_query_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *QueryResultPayload) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *QueryResultPayload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *QueryResultPayload) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*QueryResultPayload) ProtoMessage() {}
+func (*QueryResultPayload) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *QueryResultPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use QueryResultPayload.ProtoReflect.Descriptor instead.
-func (*QueryResultPayload) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{0}
-}
+func (*QueryResultPayload) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *QueryResultPayload) GetPayload() isQueryResultPayload_Payload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
+	_ = "STUB: not implemented"
+	return *new(isQueryResultPayload_Payload)
 }
 
-func (x *QueryResultPayload) GetResult() *QueryResult {
-	if x != nil {
-		if x, ok := x.Payload.(*QueryResultPayload_Result); ok {
-			return x.Result
-		}
-	}
-	return nil
-}
+func (x *QueryResultPayload) GetResult() *QueryResult { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryResultPayload) GetDiagnostic() *PgDiagnostic {
-	if x != nil {
-		if x, ok := x.Payload.(*QueryResultPayload_Diagnostic); ok {
-			return x.Diagnostic
-		}
-	}
-	return nil
-}
+func (x *QueryResultPayload) GetDiagnostic() *PgDiagnostic { _ = "STUB: not implemented"; return nil }
 
 func (x *QueryResultPayload) GetNotification() *PgNotification {
-	if x != nil {
-		if x, ok := x.Payload.(*QueryResultPayload_Notification); ok {
-			return x.Notification
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -134,13 +97,20 @@ type QueryResultPayload_Notification struct {
 	Notification *PgNotification `protobuf:"bytes,3,opt,name=notification,proto3,oneof"` // Async notification from LISTEN
 }
 
-func (*QueryResultPayload_Result) isQueryResultPayload_Payload() {}
+func (*QueryResultPayload_Result) isQueryResultPayload_Payload() { _ = "STUB: not implemented"; return }
 
-func (*QueryResultPayload_Diagnostic) isQueryResultPayload_Payload() {}
+func (*QueryResultPayload_Diagnostic) isQueryResultPayload_Payload() {
+	_ = "STUB: not implemented"
+	return
+}
 
-func (*QueryResultPayload_Notification) isQueryResultPayload_Payload() {}
+func (*QueryResultPayload_Notification) isQueryResultPayload_Payload() {
+	_ = "STUB: not implemented"
 
-// QueryResult represents the result of executing a query
+	// QueryResult represents the result of executing a query
+	return
+}
+
 type QueryResult struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// fields describes the columns in the result set (nil if no rows returned)
@@ -163,70 +133,29 @@ type QueryResult struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *QueryResult) Reset() {
-	*x = QueryResult{}
-	mi := &file_query_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *QueryResult) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *QueryResult) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *QueryResult) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*QueryResult) ProtoMessage() {}
+func (*QueryResult) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *QueryResult) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use QueryResult.ProtoReflect.Descriptor instead.
-func (*QueryResult) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{1}
-}
+func (*QueryResult) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *QueryResult) GetFields() []*Field {
-	if x != nil {
-		return x.Fields
-	}
-	return nil
-}
+func (x *QueryResult) GetFields() []*Field { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryResult) GetRowsAffected() uint64 {
-	if x != nil {
-		return x.RowsAffected
-	}
-	return 0
-}
+func (x *QueryResult) GetRowsAffected() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *QueryResult) GetRows() []*Row {
-	if x != nil {
-		return x.Rows
-	}
-	return nil
-}
+func (x *QueryResult) GetRows() []*Row { _ = "STUB: not implemented"; return nil }
 
-func (x *QueryResult) GetCommandTag() string {
-	if x != nil {
-		return x.CommandTag
-	}
-	return ""
-}
+func (x *QueryResult) GetCommandTag() string { _ = "STUB: not implemented"; return "" }
 
-func (x *QueryResult) GetHasFields() bool {
-	if x != nil {
-		return x.HasFields
-	}
-	return false
-}
+func (x *QueryResult) GetHasFields() bool { _ = "STUB: not implemented"; return false }
 
 // Field represents metadata about a column in the result set.
 // This includes all PostgreSQL wire protocol metadata needed for RowDescription messages.
@@ -252,91 +181,35 @@ type Field struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Field) Reset() {
-	*x = Field{}
-	mi := &file_query_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Field) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Field) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Field) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Field) ProtoMessage() {}
+func (*Field) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Field) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Field.ProtoReflect.Descriptor instead.
-func (*Field) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{2}
-}
+func (*Field) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Field) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *Field) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Field) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
+func (x *Field) GetType() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Field) GetTableOid() uint32 {
-	if x != nil {
-		return x.TableOid
-	}
-	return 0
-}
+func (x *Field) GetTableOid() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Field) GetTableAttributeNumber() int32 {
-	if x != nil {
-		return x.TableAttributeNumber
-	}
-	return 0
-}
+func (x *Field) GetTableAttributeNumber() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Field) GetDataTypeOid() uint32 {
-	if x != nil {
-		return x.DataTypeOid
-	}
-	return 0
-}
+func (x *Field) GetDataTypeOid() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Field) GetDataTypeSize() int32 {
-	if x != nil {
-		return x.DataTypeSize
-	}
-	return 0
-}
+func (x *Field) GetDataTypeSize() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Field) GetTypeModifier() int32 {
-	if x != nil {
-		return x.TypeModifier
-	}
-	return 0
-}
+func (x *Field) GetTypeModifier() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *Field) GetFormat() int32 {
-	if x != nil {
-		return x.Format
-	}
-	return 0
-}
+func (x *Field) GetFormat() int32 { _ = "STUB: not implemented"; return 0 }
 
 // Row represents a single row of data in the result set.
 type Row struct {
@@ -351,49 +224,23 @@ type Row struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Row) Reset() {
-	*x = Row{}
-	mi := &file_query_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Row) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Row) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Row) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Row) ProtoMessage() {}
+func (*Row) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Row) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Row.ProtoReflect.Descriptor instead.
-func (*Row) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{3}
-}
+func (*Row) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Row) GetLengths() []int64 {
-	if x != nil {
-		return x.Lengths
-	}
-	return nil
-}
+func (x *Row) GetLengths() []int64 { _ = "STUB: not implemented"; return nil }
 
-func (x *Row) GetValues() []byte {
-	if x != nil {
-		return x.Values
-	}
-	return nil
-}
+func (x *Row) GetValues() []byte { _ = "STUB: not implemented"; return nil }
 
 // PgDiagnostic represents a PostgreSQL diagnostic message (error or notice).
 // PostgreSQL uses the same wire format for both ErrorResponse ('E') and NoticeResponse ('N'),
@@ -442,140 +289,49 @@ type PgDiagnostic struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *PgDiagnostic) Reset() {
-	*x = PgDiagnostic{}
-	mi := &file_query_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PgDiagnostic) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PgDiagnostic) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PgDiagnostic) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PgDiagnostic) ProtoMessage() {}
+func (*PgDiagnostic) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PgDiagnostic) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PgDiagnostic.ProtoReflect.Descriptor instead.
-func (*PgDiagnostic) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{4}
-}
+func (*PgDiagnostic) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PgDiagnostic) GetMessageType() int32 {
-	if x != nil {
-		return x.MessageType
-	}
-	return 0
-}
+func (x *PgDiagnostic) GetMessageType() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PgDiagnostic) GetSeverity() string {
-	if x != nil {
-		return x.Severity
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetSeverity() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetCode() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetMessage() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetDetail() string {
-	if x != nil {
-		return x.Detail
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetDetail() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetHint() string {
-	if x != nil {
-		return x.Hint
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetHint() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetPosition() int32 {
-	if x != nil {
-		return x.Position
-	}
-	return 0
-}
+func (x *PgDiagnostic) GetPosition() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PgDiagnostic) GetInternalPosition() int32 {
-	if x != nil {
-		return x.InternalPosition
-	}
-	return 0
-}
+func (x *PgDiagnostic) GetInternalPosition() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PgDiagnostic) GetInternalQuery() string {
-	if x != nil {
-		return x.InternalQuery
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetInternalQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetWhere() string {
-	if x != nil {
-		return x.Where
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetWhere() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetSchemaName() string {
-	if x != nil {
-		return x.SchemaName
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetSchemaName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetTableName() string {
-	if x != nil {
-		return x.TableName
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetTableName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetColumnName() string {
-	if x != nil {
-		return x.ColumnName
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetColumnName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetDataTypeName() string {
-	if x != nil {
-		return x.DataTypeName
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetDataTypeName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgDiagnostic) GetConstraintName() string {
-	if x != nil {
-		return x.ConstraintName
-	}
-	return ""
-}
+func (x *PgDiagnostic) GetConstraintName() string { _ = "STUB: not implemented"; return "" }
 
 // PgNotification represents a PostgreSQL asynchronous notification.
 // Sent via NotificationResponse ('A') messages to clients that have issued LISTEN.
@@ -591,56 +347,25 @@ type PgNotification struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PgNotification) Reset() {
-	*x = PgNotification{}
-	mi := &file_query_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PgNotification) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PgNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PgNotification) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PgNotification) ProtoMessage() {}
+func (*PgNotification) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PgNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PgNotification.ProtoReflect.Descriptor instead.
-func (*PgNotification) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{5}
-}
+func (*PgNotification) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PgNotification) GetPid() int32 {
-	if x != nil {
-		return x.Pid
-	}
-	return 0
-}
+func (x *PgNotification) GetPid() int32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *PgNotification) GetChannel() string {
-	if x != nil {
-		return x.Channel
-	}
-	return ""
-}
+func (x *PgNotification) GetChannel() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PgNotification) GetPayload() string {
-	if x != nil {
-		return x.Payload
-	}
-	return ""
-}
+func (x *PgNotification) GetPayload() string { _ = "STUB: not implemented"; return "" }
 
 // StatementDescription describes a prepared statement or portal.
 // Used for the Describe message ('D') response in the extended query protocol.
@@ -656,49 +381,29 @@ type StatementDescription struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StatementDescription) Reset() {
-	*x = StatementDescription{}
-	mi := &file_query_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *StatementDescription) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *StatementDescription) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *StatementDescription) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*StatementDescription) ProtoMessage() {}
+func (*StatementDescription) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *StatementDescription) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use StatementDescription.ProtoReflect.Descriptor instead.
 func (*StatementDescription) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{6}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (x *StatementDescription) GetParameters() []*ParameterDescription {
-	if x != nil {
-		return x.Parameters
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *StatementDescription) GetFields() []*Field {
-	if x != nil {
-		return x.Fields
-	}
-	return nil
-}
+func (x *StatementDescription) GetFields() []*Field { _ = "STUB: not implemented"; return nil }
 
 // ParameterDescription describes a parameter in a prepared statement.
 type ParameterDescription struct {
@@ -709,42 +414,24 @@ type ParameterDescription struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ParameterDescription) Reset() {
-	*x = ParameterDescription{}
-	mi := &file_query_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ParameterDescription) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ParameterDescription) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ParameterDescription) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ParameterDescription) ProtoMessage() {}
+func (*ParameterDescription) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ParameterDescription) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ParameterDescription.ProtoReflect.Descriptor instead.
 func (*ParameterDescription) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{7}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (x *ParameterDescription) GetDataTypeOid() uint32 {
-	if x != nil {
-		return x.DataTypeOid
-	}
-	return 0
-}
+func (x *ParameterDescription) GetDataTypeOid() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // Target identifies the target for query execution.
 // It specifies which tablegroup, shard, and pooler type to route the query to.
@@ -764,55 +451,27 @@ type Target struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Target) Reset() {
-	*x = Target{}
-	mi := &file_query_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Target) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Target) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Target) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Target) ProtoMessage() {}
+func (*Target) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Target) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Target.ProtoReflect.Descriptor instead.
-func (*Target) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{8}
-}
+func (*Target) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Target) GetTableGroup() string {
-	if x != nil {
-		return x.TableGroup
-	}
-	return ""
-}
+func (x *Target) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Target) GetShard() string {
-	if x != nil {
-		return x.Shard
-	}
-	return ""
-}
+func (x *Target) GetShard() string { _ = "STUB: not implemented"; return "" }
 
 func (x *Target) GetPoolerType() clustermetadata.PoolerType {
-	if x != nil {
-		return x.PoolerType
-	}
-	return clustermetadata.PoolerType(0)
+	_ = "STUB: not implemented"
+	return *new(clustermetadata.PoolerType)
 }
 
 // PreparedStatement represents a prepared statement in the extended query protocol.
@@ -832,56 +491,25 @@ type PreparedStatement struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PreparedStatement) Reset() {
-	*x = PreparedStatement{}
-	mi := &file_query_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PreparedStatement) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PreparedStatement) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PreparedStatement) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PreparedStatement) ProtoMessage() {}
+func (*PreparedStatement) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PreparedStatement) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PreparedStatement.ProtoReflect.Descriptor instead.
-func (*PreparedStatement) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{9}
-}
+func (*PreparedStatement) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *PreparedStatement) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *PreparedStatement) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PreparedStatement) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
+func (x *PreparedStatement) GetQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *PreparedStatement) GetParamTypes() []uint32 {
-	if x != nil {
-		return x.ParamTypes
-	}
-	return nil
-}
+func (x *PreparedStatement) GetParamTypes() []uint32 { _ = "STUB: not implemented"; return nil }
 
 // Portal represents a bound prepared statement with parameters.
 // Portals are created by the Bind message and can be executed via Execute.
@@ -912,77 +540,31 @@ type Portal struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Portal) Reset() {
-	*x = Portal{}
-	mi := &file_query_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *Portal) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *Portal) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *Portal) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*Portal) ProtoMessage() {}
+func (*Portal) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *Portal) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use Portal.ProtoReflect.Descriptor instead.
-func (*Portal) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{10}
-}
+func (*Portal) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *Portal) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
+func (x *Portal) GetName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Portal) GetPreparedStatementName() string {
-	if x != nil {
-		return x.PreparedStatementName
-	}
-	return ""
-}
+func (x *Portal) GetPreparedStatementName() string { _ = "STUB: not implemented"; return "" }
 
-func (x *Portal) GetParamLengths() []int64 {
-	if x != nil {
-		return x.ParamLengths
-	}
-	return nil
-}
+func (x *Portal) GetParamLengths() []int64 { _ = "STUB: not implemented"; return nil }
 
-func (x *Portal) GetParamValues() []byte {
-	if x != nil {
-		return x.ParamValues
-	}
-	return nil
-}
+func (x *Portal) GetParamValues() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *Portal) GetParamFormats() []int32 {
-	if x != nil {
-		return x.ParamFormats
-	}
-	return nil
-}
+func (x *Portal) GetParamFormats() []int32 { _ = "STUB: not implemented"; return nil }
 
-func (x *Portal) GetResultFormats() []int32 {
-	if x != nil {
-		return x.ResultFormats
-	}
-	return nil
-}
+func (x *Portal) GetResultFormats() []int32 { _ = "STUB: not implemented"; return nil }
 
 // ReservedState contains information about a reserved connection.
 // Embedded in response messages to convey the authoritative reservation state from multipooler.
@@ -1007,63 +589,27 @@ type ReservedState struct {
 	sizeCache        protoimpl.SizeCache
 }
 
-func (x *ReservedState) Reset() {
-	*x = ReservedState{}
-	mi := &file_query_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReservedState) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReservedState) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReservedState) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReservedState) ProtoMessage() {}
+func (*ReservedState) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReservedState) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReservedState.ProtoReflect.Descriptor instead.
-func (*ReservedState) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{11}
-}
+func (*ReservedState) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ReservedState) GetReservedConnectionId() uint64 {
-	if x != nil {
-		return x.ReservedConnectionId
-	}
-	return 0
-}
+func (x *ReservedState) GetReservedConnectionId() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ReservedState) GetPoolerId() *clustermetadata.ID {
-	if x != nil {
-		return x.PoolerId
-	}
-	return nil
-}
+func (x *ReservedState) GetPoolerId() *clustermetadata.ID { _ = "STUB: not implemented"; return nil }
 
-func (x *ReservedState) GetReservationReasons() uint32 {
-	if x != nil {
-		return x.ReservationReasons
-	}
-	return 0
-}
+func (x *ReservedState) GetReservationReasons() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ReservedState) GetBackendProcessId() uint32 {
-	if x != nil {
-		return x.BackendProcessId
-	}
-	return 0
-}
+func (x *ReservedState) GetBackendProcessId() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // ExecuteOptions contains execution options for query execution.
 // This includes session state like prepared statements and portals that
@@ -1114,84 +660,39 @@ type ExecuteOptions struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *ExecuteOptions) Reset() {
-	*x = ExecuteOptions{}
-	mi := &file_query_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ExecuteOptions) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ExecuteOptions) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ExecuteOptions) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ExecuteOptions) ProtoMessage() {}
+func (*ExecuteOptions) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ExecuteOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ExecuteOptions.ProtoReflect.Descriptor instead.
-func (*ExecuteOptions) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{12}
-}
+func (*ExecuteOptions) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *ExecuteOptions) GetSessionSettings() map[string]string {
-	if x != nil {
-		return x.SessionSettings
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *ExecuteOptions) GetUser() string {
-	if x != nil {
-		return x.User
-	}
-	return ""
-}
+func (x *ExecuteOptions) GetUser() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ExecuteOptions) GetMaxRows() uint64 {
-	if x != nil {
-		return x.MaxRows
-	}
-	return 0
-}
+func (x *ExecuteOptions) GetMaxRows() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ExecuteOptions) GetReservedConnectionId() uint64 {
-	if x != nil {
-		return x.ReservedConnectionId
-	}
-	return 0
-}
+func (x *ExecuteOptions) GetReservedConnectionId() uint64 { _ = "STUB: not implemented"; return 0 }
 
 func (x *ExecuteOptions) GetPreparedStatement() *PreparedStatement {
-	if x != nil {
-		return x.PreparedStatement
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *ExecuteOptions) GetUserAuth() *UserAuth {
-	if x != nil {
-		return x.UserAuth
-	}
-	return nil
-}
+func (x *ExecuteOptions) GetUserAuth() *UserAuth { _ = "STUB: not implemented"; return nil }
 
-func (x *ExecuteOptions) GetClientConnectionId() uint32 {
-	if x != nil {
-		return x.ClientConnectionId
-	}
-	return 0
-}
+func (x *ExecuteOptions) GetClientConnectionId() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // UserAuth carries cryptographic material extracted from the client's SCRAM
 // handshake at multigateway. The pair (client_key, server_key) is sufficient
@@ -1215,49 +716,23 @@ type UserAuth struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserAuth) Reset() {
-	*x = UserAuth{}
-	mi := &file_query_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *UserAuth) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *UserAuth) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *UserAuth) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*UserAuth) ProtoMessage() {}
+func (*UserAuth) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *UserAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use UserAuth.ProtoReflect.Descriptor instead.
-func (*UserAuth) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{13}
-}
+func (*UserAuth) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *UserAuth) GetClientKey() []byte {
-	if x != nil {
-		return x.ClientKey
-	}
-	return nil
-}
+func (x *UserAuth) GetClientKey() []byte { _ = "STUB: not implemented"; return nil }
 
-func (x *UserAuth) GetServerKey() []byte {
-	if x != nil {
-		return x.ServerKey
-	}
-	return nil
-}
+func (x *UserAuth) GetServerKey() []byte { _ = "STUB: not implemented"; return nil }
 
 // ReservationOptions specifies options when creating or extending a reserved connection.
 // This is passed alongside ExecuteOptions on requests that may need to create or modify
@@ -1297,61 +772,28 @@ type ReservationOptions struct {
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *ReservationOptions) Reset() {
-	*x = ReservationOptions{}
-	mi := &file_query_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *ReservationOptions) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *ReservationOptions) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *ReservationOptions) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*ReservationOptions) ProtoMessage() {}
+func (*ReservationOptions) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *ReservationOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_query_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use ReservationOptions.ProtoReflect.Descriptor instead.
-func (*ReservationOptions) Descriptor() ([]byte, []int) {
-	return file_query_proto_rawDescGZIP(), []int{14}
-}
+func (*ReservationOptions) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
-func (x *ReservationOptions) GetReasons() uint32 {
-	if x != nil {
-		return x.Reasons
-	}
-	return 0
-}
+func (x *ReservationOptions) GetReasons() uint32 { _ = "STUB: not implemented"; return 0 }
 
-func (x *ReservationOptions) GetBeginQuery() string {
-	if x != nil {
-		return x.BeginQuery
-	}
-	return ""
-}
+func (x *ReservationOptions) GetBeginQuery() string { _ = "STUB: not implemented"; return "" }
 
-func (x *ReservationOptions) GetPinPortalNames() []string {
-	if x != nil {
-		return x.PinPortalNames
-	}
-	return nil
-}
+func (x *ReservationOptions) GetPinPortalNames() []string { _ = "STUB: not implemented"; return nil }
 
 func (x *ReservationOptions) GetReleasePortalNames() []string {
-	if x != nil {
-		return x.ReleasePortalNames
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -1470,12 +912,7 @@ var (
 	file_query_proto_rawDescData []byte
 )
 
-func file_query_proto_rawDescGZIP() []byte {
-	file_query_proto_rawDescOnce.Do(func() {
-		file_query_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_query_proto_rawDesc), len(file_query_proto_rawDesc)))
-	})
-	return file_query_proto_rawDescData
-}
+func file_query_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_query_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_query_proto_goTypes = []any{
@@ -1518,31 +955,5 @@ var file_query_proto_depIdxs = []int32{
 	0,  // [0:12] is the sub-list for field type_name
 }
 
-func init() { file_query_proto_init() }
-func file_query_proto_init() {
-	if File_query_proto != nil {
-		return
-	}
-	file_query_proto_msgTypes[0].OneofWrappers = []any{
-		(*QueryResultPayload_Result)(nil),
-		(*QueryResultPayload_Diagnostic)(nil),
-		(*QueryResultPayload_Notification)(nil),
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_query_proto_rawDesc), len(file_query_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   16,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_query_proto_goTypes,
-		DependencyIndexes: file_query_proto_depIdxs,
-		MessageInfos:      file_query_proto_msgTypes,
-	}.Build()
-	File_query_proto = out.File
-	file_query_proto_goTypes = nil
-	file_query_proto_depIdxs = nil
-}
+func init()                  { file_query_proto_init() }
+func file_query_proto_init() { _ = "STUB: not implemented"; return }

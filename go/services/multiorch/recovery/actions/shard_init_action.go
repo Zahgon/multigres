@@ -17,16 +17,9 @@ package actions
 import (
 	"context"
 	"log/slog"
-	"time"
 
-	"google.golang.org/protobuf/proto"
-
-	commonconsensus "github.com/multigres/multigres/go/common/consensus"
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/topoclient"
-	commontypes "github.com/multigres/multigres/go/common/types"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
-	mtrpcpb "github.com/multigres/multigres/go/pb/mtrpc"
 	multiorchdatapb "github.com/multigres/multigres/go/pb/multiorchdata"
 	"github.com/multigres/multigres/go/services/multiorch/config"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
@@ -66,162 +59,64 @@ func NewShardInitAction(
 	topoStore topoclient.Store,
 	logger *slog.Logger,
 ) *ShardInitAction {
-	return &ShardInitAction{
-		config:      cfg,
-		coordinator: coordinator,
-		poolerStore: poolerStore,
-		topoStore:   topoStore,
-		logger:      logger,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Execute performs the initial cohort establishment for a bootstrapped shard.
 func (a *ShardInitAction) Execute(ctx context.Context, problem types.Problem) error {
-	a.logger.InfoContext(ctx, "executing shard init action",
-		"database", problem.ShardKey.Database,
-		"tablegroup", problem.ShardKey.TableGroup,
-		"shard", problem.ShardKey.Shard)
-
-	// The recovery loop force-polls all poolers before calling Execute, so the pooler
-	// store holds fresh state. getInitializedPoolers reads that state: it returns nil
-	// if the cohort is already established, or the list of initialized poolers otherwise.
-	initializedPoolers, cohortEstablished := a.getInitializedPoolers(problem.ShardKey)
-	if cohortEstablished {
-		a.logger.InfoContext(ctx, "cohort already established, skipping",
-			"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-		return nil
-	}
-	if len(initializedPoolers) == 0 {
-		return mterrors.Errorf(mtrpcpb.Code_UNAVAILABLE,
-			"no initialized poolers found for shard %s", problem.ShardKey)
-	}
-
-	// Load the bootstrap durability policy from topology (not from nodes) because poolers
-	// are UNKNOWN type at this point — they have just restored from backup and are in
-	// hot-standby mode.
-	policyProto, err := a.coordinator.GetBootstrapPolicy(ctx, problem.ShardKey.Database)
-	if err != nil {
-		return mterrors.Wrap(err, "failed to load durability policy from topology")
-	}
-	durabilityPolicy, err := commonconsensus.NewPolicyFromProto(policyProto)
-	if err != nil {
-		return mterrors.Wrap(err, "failed to parse durability policy")
-	}
-
-	// Ensure the initialized poolers we see could ever satisfy the durability policy.
-	initializedIDs := make([]*clustermetadatapb.ID, len(initializedPoolers))
-	for i, p := range initializedPoolers {
-		initializedIDs[i] = p.MultiPooler.Id
-	}
-	if err := durabilityPolicy.CheckAchievable(initializedIDs); err != nil {
-		return mterrors.Errorf(mtrpcpb.Code_FAILED_PRECONDITION,
-			"insufficient initialized poolers for initial cohort (have %d): %v", len(initializedPoolers), err)
-	}
-
-	a.logger.InfoContext(ctx, "quorum of initialized poolers available",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey),
-		"initialized_count", len(initializedPoolers),
-		"policy", durabilityPolicy.Description())
-
-	// Claim the exclusive right to initialize this shard and persist the cohort.
-	// On crash-retry the committed cohort is returned so we reuse the same members.
-	won, committedIDs, err := a.topoStore.ClaimShardInitialization(ctx, problem.ShardKey, a.coordinator.GetCoordinatorID(), initializedIDs)
-	if err != nil {
-		return mterrors.Wrap(err, "failed to claim shard initialization")
-	}
-	if !won {
-		a.logger.InfoContext(ctx, "shard initialization claimed by another coordinator, skipping",
-			"shard_key", commontypes.FormatShardKey(problem.ShardKey))
-		return nil
-	}
-
-	a.logger.InfoContext(ctx, "shard initialization claimed",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey),
-		"committed_cohort_size", len(committedIDs))
-
-	// Resolve committed IDs to full PoolerHealthState entries from the pooler store.
-	committedCohort := a.buildCohortFromIDs(initializedPoolers, committedIDs)
-	committedCohortIDs := make([]*clustermetadatapb.ID, len(committedCohort))
-	for i, p := range committedCohort {
-		committedCohortIDs[i] = p.MultiPooler.Id
-	}
-	if err := durabilityPolicy.CheckAchievable(committedCohortIDs); err != nil {
-		return mterrors.Errorf(mtrpcpb.Code_UNAVAILABLE,
-			"insufficient committed cohort poolers reachable (have %d of %d): %v",
-			len(committedCohort), len(committedIDs), err)
-	}
-
-	if err := a.coordinator.AppointInitialLeader(ctx, problem.ShardKey.Shard, committedCohort, problem.ShardKey.Database); err != nil {
-		return mterrors.Wrap(err, "failed to appoint initial leader")
-	}
-
-	a.logger.InfoContext(ctx, "shard init action completed successfully",
-		"shard_key", commontypes.FormatShardKey(problem.ShardKey))
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// The recovery loop force-polls all poolers before calling Execute, so the pooler
+// store holds fresh state. getInitializedPoolers reads that state: it returns nil
+// if the cohort is already established, or the list of initialized poolers otherwise.
+
+// Load the bootstrap durability policy from topology (not from nodes) because poolers
+// are UNKNOWN type at this point — they have just restored from backup and are in
+// hot-standby mode.
+
+// Ensure the initialized poolers we see could ever satisfy the durability policy.
+
+// Claim the exclusive right to initialize this shard and persist the cohort.
+// On crash-retry the committed cohort is returned so we reuse the same members.
+
+// Resolve committed IDs to full PoolerHealthState entries from the pooler store.
 
 // getInitializedPoolers reads fresh pooler state from the store (already refreshed by the
 // recovery loop before Execute is called). It returns the list of initialized poolers, plus
 // a bool indicating whether the cohort is already established (any pooler has CohortMembers).
 // If cohortEstablished is true the returned slice is nil and the caller should no-op.
 func (a *ShardInitAction) getInitializedPoolers(shardKey *clustermetadatapb.ShardKey) (initialized []*multiorchdatapb.PoolerHealthState, cohortEstablished bool) {
-	a.poolerStore.Range(func(_ string, pooler *multiorchdatapb.PoolerHealthState) bool {
-		if pooler == nil || pooler.MultiPooler == nil || pooler.MultiPooler.Id == nil {
-			return true
-		}
-		if !proto.Equal(pooler.MultiPooler.GetShardKey(), shardKey) {
-			return true
-		}
-		if len(pooler.GetStatus().GetCohortMembers()) > 0 {
-			cohortEstablished = true
-			initialized = nil
-			return false // stop iteration
-		}
-		if pooler.GetStatus().GetIsInitialized() {
-			initialized = append(initialized, pooler)
-		}
-		return true
-	})
-	return initialized, cohortEstablished
+	_ = "STUB: not implemented"
+	return nil, false
 }
+
+// stop iteration
 
 // buildCohortFromIDs resolves committed cohort IDs to PoolerHealthState entries
 // from the local pooler store. Returns only the poolers we can find locally.
 func (a *ShardInitAction) buildCohortFromIDs(poolers []*multiorchdatapb.PoolerHealthState, committedIDs []*clustermetadatapb.ID) []*multiorchdatapb.PoolerHealthState {
-	idSet := make(map[string]struct{}, len(committedIDs))
-	for _, id := range committedIDs {
-		idSet[topoclient.ClusterIDString(id)] = struct{}{}
-	}
-
-	var result []*multiorchdatapb.PoolerHealthState
-	for _, p := range poolers {
-		if _, ok := idSet[topoclient.ClusterIDString(p.MultiPooler.Id)]; ok {
-			result = append(result, p)
-		}
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RecoveryAction interface implementation
 
-func (a *ShardInitAction) RequiresHealthyLeader() bool {
-	return false
-}
+func (a *ShardInitAction) RequiresHealthyLeader() bool { _ = "STUB: not implemented"; return false }
 
 func (a *ShardInitAction) Metadata() types.RecoveryMetadata {
-	return types.RecoveryMetadata{
-		Name:        "ShardInit",
-		Description: "Establish initial cohort and appoint first leader for a bootstrapped shard",
-		Timeout:     60 * time.Second,
-		LockTimeout: 15 * time.Second,
-		Retryable:   true,
-	}
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryMetadata)
 }
 
 func (a *ShardInitAction) Priority() types.Priority {
-	return types.PriorityShardBootstrap
+	_ = "STUB: not implemented"
+	return *new(types.Priority)
 }
 
 func (a *ShardInitAction) GracePeriod() *types.GracePeriodConfig {
+	_ = "STUB: not implemented"
 	return nil
 }

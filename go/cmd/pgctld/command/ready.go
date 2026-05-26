@@ -14,25 +14,13 @@
 
 package command
 
-import (
-	"net"
-	"strconv"
-
-	"github.com/multigres/multigres/go/common/timeouts"
-)
-
 // grpcAccepting verifies the gRPC server is accepting connections. Prefers
 // the Unix socket, and falls back to a TCP dial on the configured bind
 // address when only the port is configured.
 // When neither is configured, gRPC is not in use and the check is skipped.
 func grpcAccepting(socketPath, bindAddress string, port int) bool {
-	if socketPath != "" {
-		return unixSocketAccepting(socketPath)
-	}
-	if port != 0 {
-		return tcpAccepting(bindAddress, port)
-	}
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
 // unixSocketAccepting returns true if a process is currently accepting
@@ -40,14 +28,7 @@ func grpcAccepting(socketPath, bindAddress string, port int) bool {
 // kernel handed off to a listener, distinguishing a live listener from a
 // stale socket file left behind (by a crash, for example).
 // Any dial error (e.g. ENOENT, ECONNREFUSED, EACCES, timeout) returns false.
-func unixSocketAccepting(path string) bool {
-	conn, err := net.DialTimeout("unix", path, timeouts.ReadyDialTimeout)
-	if err != nil {
-		return false
-	}
-	_ = conn.Close()
-	return true
-}
+func unixSocketAccepting(path string) bool { _ = "STUB: not implemented"; return false }
 
 // tcpAccepting returns true if a TCP listener is accepting on the given
 // bind address and port.
@@ -57,15 +38,4 @@ func unixSocketAccepting(path string) bool {
 // If bindAddress is a specific address (e.g. "127.0.0.1", "::1", an
 // interface IP) we dial that address directly.
 // See unixSocketAccepting for the error-handling contract.
-func tcpAccepting(bindAddress string, port int) bool {
-	host := bindAddress
-	if host == "" || host == "0.0.0.0" || host == "::" {
-		host = "localhost"
-	}
-	conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, strconv.Itoa(port)), timeouts.ReadyDialTimeout)
-	if err != nil {
-		return false
-	}
-	_ = conn.Close()
-	return true
-}
+func tcpAccepting(bindAddress string, port int) bool { _ = "STUB: not implemented"; return false }

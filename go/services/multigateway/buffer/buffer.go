@@ -31,7 +31,6 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/multigres/multigres/go/common/mterrors"
 	commontypes "github.com/multigres/multigres/go/common/types"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 )
@@ -64,9 +63,7 @@ type Option func(*Buffer)
 // WithNowFunc overrides the clock used by the buffer. Intended for tests
 // that need deterministic time control. Production callers should not set
 // this; it defaults to time.Now.
-func WithNowFunc(now func() time.Time) Option {
-	return func(b *Buffer) { b.now = now }
-}
+func WithNowFunc(now func() time.Time) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // Buffer is the global coordinator for failover buffering.
 // It maintains a global FIFO queue of buffered requests and per-shard
@@ -98,23 +95,8 @@ type Buffer struct {
 
 // New creates a new Buffer. config must not be nil.
 func New(ctx context.Context, config *Config, logger *slog.Logger, opts ...Option) *Buffer {
-	ctx, cancel := context.WithCancel(ctx)
-	b := &Buffer{
-		config:         config,
-		logger:         logger.With("component", "buffer"),
-		stats:          newStats(),
-		now:            time.Now,
-		ctx:            ctx,
-		cancel:         cancel,
-		bufferSizeSema: semaphore.NewWeighted(int64(config.Size.Get())),
-		buffers:        make(map[commontypes.ShardKeyString]*shardBuffer),
-	}
-	for _, opt := range opts {
-		opt(b)
-	}
-	b.timeoutThread = newTimeoutThread(b)
-	b.timeoutThread.start()
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WaitForFailoverEnd blocks the caller if the shard is currently undergoing
@@ -122,12 +104,8 @@ func New(ctx context.Context, config *Config, logger *slog.Logger, opts ...Optio
 // be called after the retry attempt completes. Returns (nil, nil) if
 // buffering is not applicable (disabled, wrong target type, timing guard, etc).
 func (b *Buffer) WaitForFailoverEnd(ctx context.Context, key *clustermetadatapb.ShardKey) (RetryDoneFunc, error) {
-	if !b.config.Enabled.Get() {
-		return nil, nil
-	}
-
-	sb := b.getOrCreateShardBuffer(key)
-	return sb.waitForFailoverEnd(ctx)
+	_ = "STUB: not implemented"
+	return *new(RetryDoneFunc), nil
 }
 
 // WaitIfAlreadyBuffering blocks the caller if the shard is already buffering
@@ -136,92 +114,35 @@ func (b *Buffer) WaitForFailoverEnd(ctx context.Context, key *clustermetadatapb.
 // sending a query to avoid a wasted round-trip to a pooler that is known to be
 // failing over.
 func (b *Buffer) WaitIfAlreadyBuffering(ctx context.Context, key *clustermetadatapb.ShardKey) (RetryDoneFunc, error) {
-	if !b.config.Enabled.Get() {
-		return nil, nil
-	}
-
-	// Lookup only — don't create a shardBuffer for a shard we've never seen.
-	b.mu.Lock()
-	sb, ok := b.buffers[commontypes.FormatShardKey(key)]
-	b.mu.Unlock()
-	if !ok {
-		return nil, nil
-	}
-
-	return sb.waitIfAlreadyBuffering(ctx)
+	_ = "STUB: not implemented"
+	return *new(RetryDoneFunc), nil
 }
+
+// Lookup only — don't create a shardBuffer for a shard we've never seen.
 
 // StopBuffering is called when a new PRIMARY is discovered for the given shard.
 // It transitions the shard from BUFFERING to DRAINING.
-func (b *Buffer) StopBuffering(key *clustermetadatapb.ShardKey) {
-	b.mu.Lock()
-	sb, ok := b.buffers[commontypes.FormatShardKey(key)]
-	b.mu.Unlock()
-
-	if !ok {
-		return
-	}
-	sb.stopBuffering("new primary", 0)
-}
+func (b *Buffer) StopBuffering(key *clustermetadatapb.ShardKey) { _ = "STUB: not implemented"; return }
 
 // Shutdown stops all buffering and evicts all pending entries.
 // It waits for any in-flight drain goroutines to complete before returning.
-func (b *Buffer) Shutdown() {
-	b.mu.Lock()
-	b.stopped = true
-	// Evict all queued entries.
-	if n := len(b.queue); n > 0 {
-		b.stats.addQueueDepth(b.ctx, int64(-n))
-	}
-	for _, e := range b.queue {
-		e.err = mterrors.MTB03.New()
-		close(e.done)
-	}
-	b.queue = nil
+func (b *Buffer) Shutdown() { _ = "STUB: not implemented"; return }
 
-	// Snapshot shard buffers, stop timers, and force BUFFERING shards to
-	// IDLE. This prevents a concurrent stopBuffering() from calling
-	// drainWg.Go() after we've already called drainWg.Wait(), which would
-	// let drain goroutines outlive Shutdown().
-	shardBuffers := make([]*shardBuffer, 0, len(b.buffers))
-	for _, sb := range b.buffers {
-		sb.mu.Lock()
-		if sb.maxDurationTimer != nil {
-			sb.maxDurationTimer.Stop()
-			sb.maxDurationTimer = nil
-		}
-		if sb.state == stateBuffering {
-			sb.state = stateIdle
-		}
-		sb.mu.Unlock()
-		shardBuffers = append(shardBuffers, sb)
-	}
-	b.mu.Unlock()
+// Evict all queued entries.
 
-	// Cancel the buffer context to unblock any in-flight drain goroutines
-	// waiting on entry.bufferCtx.Done().
-	b.cancel()
+// Snapshot shard buffers, stop timers, and force BUFFERING shards to
+// IDLE. This prevents a concurrent stopBuffering() from calling
+// drainWg.Go() after we've already called drainWg.Wait(), which would
+// let drain goroutines outlive Shutdown().
 
-	// Wait for all in-flight drain goroutines to complete.
-	for _, sb := range shardBuffers {
-		sb.drainWg.Wait()
-	}
+// Cancel the buffer context to unblock any in-flight drain goroutines
+// waiting on entry.bufferCtx.Done().
 
-	b.timeoutThread.stop()
-	b.logger.Info("buffer shut down")
-}
+// Wait for all in-flight drain goroutines to complete.
 
 func (b *Buffer) getOrCreateShardBuffer(key *clustermetadatapb.ShardKey) *shardBuffer {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	keyStr := commontypes.FormatShardKey(key)
-	sb, ok := b.buffers[keyStr]
-	if !ok {
-		sb = newShardBuffer(b, key)
-		b.buffers[keyStr] = sb
-	}
-	return sb
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // enqueue adds a new entry to the global FIFO queue. If the buffer is full,
@@ -231,100 +152,42 @@ func (b *Buffer) getOrCreateShardBuffer(key *clustermetadatapb.ShardKey) *shardB
 // common case (single-shard failover) there is no cross-shard interference.
 // Must NOT be called with b.mu held.
 func (b *Buffer) enqueue(shardKey *clustermetadatapb.ShardKey) (*entry, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	if b.stopped {
-		return nil, mterrors.MTB03.New()
-	}
-
-	// Try to acquire a slot from the semaphore. The semaphore (not queue
-	// length) is the source of truth for capacity because drainEntry()
-	// releases slots outside b.mu only after retries complete — entries
-	// that have left the queue but are still in-flight during drain must
-	// still count against the global limit.
-	if !b.bufferSizeSema.TryAcquire(1) {
-		// Buffer is full. Evict the oldest entry globally to make room.
-		if len(b.queue) == 0 {
-			return nil, mterrors.MTB01.New()
-		}
-		oldest := b.queue[0]
-		b.queue = b.queue[1:]
-		oldest.err = mterrors.MTB01.New()
-		b.stats.addQueueDepth(b.ctx, -1)
-		close(oldest.done)
-		b.stats.recordEvicted(b.ctx, string(commontypes.FormatShardKey(oldest.shardKey)), "buffer_full")
-		// The evicted entry's semaphore slot is conceptually transferred to us,
-		// so we don't need to acquire again.
-	}
-
-	bufCtx, bufCancel := context.WithCancel(b.ctx)
-	now := b.now()
-	e := &entry{
-		done:         make(chan struct{}),
-		deadline:     now.Add(b.config.Window.Get()),
-		bufferCtx:    bufCtx,
-		bufferCancel: bufCancel,
-		shardKey:     shardKey,
-		createdAt:    now,
-	}
-	b.queue = append(b.queue, e)
-	b.stats.addQueueDepth(b.ctx, 1)
-	b.stats.recordBuffered(b.ctx, string(commontypes.FormatShardKey(shardKey)))
-
-	// Notify timeout thread only when the queue transitions from empty to
-	// non-empty. Entries are always appended to the tail, and the timeout
-	// thread only watches the head, so subsequent enqueues are irrelevant.
-	if len(b.queue) == 1 {
-		b.timeoutThread.notify()
-	}
-
-	return e, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Try to acquire a slot from the semaphore. The semaphore (not queue
+// length) is the source of truth for capacity because drainEntry()
+// releases slots outside b.mu only after retries complete — entries
+// that have left the queue but are still in-flight during drain must
+// still count against the global limit.
+
+// Buffer is full. Evict the oldest entry globally to make room.
+
+// The evicted entry's semaphore slot is conceptually transferred to us,
+// so we don't need to acquire again.
+
+// Notify timeout thread only when the queue transitions from empty to
+// non-empty. Entries are always appended to the tail, and the timeout
+// thread only watches the head, so subsequent enqueues are irrelevant.
 
 // removeEntry removes a specific entry from the global queue and releases
 // its semaphore slot. Used when a request's context is canceled.
 // Must NOT be called with b.mu held.
-func (b *Buffer) removeEntry(e *entry) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
+func (b *Buffer) removeEntry(e *entry) { _ = "STUB: not implemented"; return }
 
-	// A slice scan is faster than a linked list at our max size (1000):
-	// sequential pointer comparisons are cache-friendly, while a linked
-	// list would add per-element heap allocations and pointer chasing.
-	// This path only runs on context cancellation, not the hot path.
-	for i, qe := range b.queue {
-		if qe == e {
-			b.queue = append(b.queue[:i], b.queue[i+1:]...)
-			b.bufferSizeSema.Release(1)
-			b.stats.addQueueDepth(b.ctx, -1)
-			return
-		}
-	}
-}
+// A slice scan is faster than a linked list at our max size (1000):
+// sequential pointer comparisons are cache-friendly, while a linked
+// list would add per-element heap allocations and pointer chasing.
+// This path only runs on context cancellation, not the hot path.
 
 // drainEntriesForShard removes and returns all entries for the given shard
 // from the global queue.
 // Must NOT be called with b.mu held.
 func (b *Buffer) drainEntriesForShard(shardKey *clustermetadatapb.ShardKey) []*entry {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	shardKeyStr := commontypes.FormatShardKey(shardKey)
-	var drained []*entry
-	remaining := b.queue[:0]
-	for _, e := range b.queue {
-		if commontypes.FormatShardKey(e.shardKey) == shardKeyStr {
-			drained = append(drained, e)
-		} else {
-			remaining = append(remaining, e)
-		}
-	}
-	// Nil out stale pointers in the tail of the backing array so drained
-	// entries can be garbage collected before the queue grows back.
-	for i := len(remaining); i < len(b.queue); i++ {
-		b.queue[i] = nil
-	}
-	b.queue = remaining
-	return drained
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Nil out stale pointers in the tail of the backing array so drained
+// entries can be garbage collected before the queue grows back.

@@ -30,11 +30,6 @@
 // Ported from postgres/src/include/nodes/parsenodes.h and primnodes.h
 package ast
 
-import (
-	"fmt"
-	"strings"
-)
-
 // ==============================================================================
 // QUERY EXECUTION NODES - Essential PostgreSQL Query Processing
 // ==============================================================================
@@ -56,35 +51,19 @@ type TargetEntry struct {
 
 // NewTargetEntry creates a new TargetEntry node.
 func NewTargetEntry(expr Expression, resno AttrNumber, resname string) *TargetEntry {
-	return &TargetEntry{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_TargetEntry}},
-		Expr:     expr,
-		Resno:    resno,
-		Resname:  resname,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewJunkTargetEntry creates a new junk TargetEntry (for internal use).
 func NewJunkTargetEntry(expr Expression, resno AttrNumber) *TargetEntry {
-	return &TargetEntry{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_TargetEntry}},
-		Expr:     expr,
-		Resno:    resno,
-		Resjunk:  true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (te *TargetEntry) ExpressionType() string {
-	return "TargetEntry"
-}
+func (te *TargetEntry) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (te *TargetEntry) String() string {
-	junkStr := ""
-	if te.Resjunk {
-		junkStr = " (junk)"
-	}
-	return fmt.Sprintf("TargetEntry(%s as %s)%s", te.Expr, te.Resname, junkStr)
-}
+func (te *TargetEntry) String() string { _ = "STUB: not implemented"; return "" }
 
 // FromExpr represents a FROM clause.
 // This node represents the FROM clause of a query, including all table references
@@ -98,24 +77,13 @@ type FromExpr struct {
 
 // NewFromExpr creates a new FromExpr node.
 func NewFromExpr(fromlist *NodeList, quals Expression) *FromExpr {
-	return &FromExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_FromExpr}},
-		Fromlist: fromlist,
-		Quals:    quals,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (fe *FromExpr) ExpressionType() string {
-	return "FromExpr"
-}
+func (fe *FromExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (fe *FromExpr) String() string {
-	tableCount := 0
-	if fe.Fromlist != nil {
-		tableCount = len(fe.Fromlist.Items)
-	}
-	return fmt.Sprintf("FromExpr(tables:%d, quals:%v)", tableCount, fe.Quals != nil)
-}
+func (fe *FromExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // JoinType represents the type of join operation.
 // Ported from postgres/src/include/nodes/nodes.h:287
@@ -152,149 +120,49 @@ type JoinExpr struct {
 
 // NewJoinExpr creates a new JoinExpr node.
 func NewJoinExpr(jointype JoinType, larg, rarg Node, quals Expression) *JoinExpr {
-	return &JoinExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_JoinExpr}},
-		Jointype: jointype,
-		Larg:     larg,
-		Rarg:     rarg,
-		Quals:    quals,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewNaturalJoinExpr creates a new natural JOIN expression.
 func NewNaturalJoinExpr(jointype JoinType, larg, rarg Node) *JoinExpr {
-	return &JoinExpr{
-		BaseExpr:  BaseExpr{BaseNode: BaseNode{Tag: T_JoinExpr}},
-		Jointype:  jointype,
-		IsNatural: true,
-		Larg:      larg,
-		Rarg:      rarg,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewUsingJoinExpr creates a new USING JOIN expression.
 func NewUsingJoinExpr(jointype JoinType, larg, rarg Node, usingClause *NodeList) *JoinExpr {
-	return &JoinExpr{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_JoinExpr}},
-		Jointype:    jointype,
-		Larg:        larg,
-		Rarg:        rarg,
-		UsingClause: usingClause,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (je *JoinExpr) ExpressionType() string {
-	return "JoinExpr"
-}
+func (je *JoinExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (je *JoinExpr) String() string {
-	joinTypes := map[JoinType]string{
-		JOIN_INNER: "INNER", JOIN_LEFT: "LEFT", JOIN_RIGHT: "RIGHT", JOIN_FULL: "FULL",
-		JOIN_SEMI: "SEMI", JOIN_ANTI: "ANTI",
-	}
-	joinTypeStr := joinTypes[je.Jointype]
-	if joinTypeStr == "" {
-		joinTypeStr = fmt.Sprintf("JOIN_%d", int(je.Jointype))
-	}
-
-	natural := ""
-	if je.IsNatural {
-		natural = " NATURAL"
-	}
-
-	return fmt.Sprintf("JoinExpr(%s%s JOIN)", joinTypeStr, natural)
-}
+func (je *JoinExpr) String() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of the JOIN expression.
-func (je *JoinExpr) SqlString() string {
-	if je.Larg == nil || je.Rarg == nil {
-		return ""
-	}
+func (je *JoinExpr) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	var result strings.Builder
+// Left side
 
-	// Left side
-	result.WriteString(je.Larg.SqlString())
+// NATURAL keyword
 
-	// NATURAL keyword
-	if je.IsNatural {
-		result.WriteString(" NATURAL")
-	}
+// Join type
 
-	// Join type
-	switch je.Jointype {
-	case JOIN_INNER:
-		if !je.IsNatural {
-			result.WriteString(" INNER")
-		}
-	case JOIN_LEFT:
-		if je.IsNatural {
-			result.WriteString(" LEFT")
-		} else {
-			result.WriteString(" LEFT OUTER")
-		}
-	case JOIN_RIGHT:
-		if je.IsNatural {
-			result.WriteString(" RIGHT")
-		} else {
-			result.WriteString(" RIGHT OUTER")
-		}
-	case JOIN_FULL:
-		if je.IsNatural {
-			result.WriteString(" FULL")
-		} else {
-			result.WriteString(" FULL OUTER")
-		}
-	case JOIN_SEMI:
-		result.WriteString(" SEMI")
-	case JOIN_ANTI:
-		result.WriteString(" ANTI")
-	default:
-		// CROSS JOIN
-		result.WriteString(" CROSS")
-	}
+// CROSS JOIN
 
-	result.WriteString(" JOIN ")
+// Right side
 
-	// Right side
-	result.WriteString(je.Rarg.SqlString())
+// Join qualification
 
-	// Join qualification
-	if je.UsingClause != nil && je.UsingClause.Len() > 0 {
-		result.WriteString(" USING (")
-		for i, col := range je.UsingClause.Items {
-			if i > 0 {
-				result.WriteString(", ")
-			}
-			// For USING clause, treat String nodes as identifiers, not string literals
-			if strNode, ok := col.(*String); ok {
-				result.WriteString(QuoteIdentifier(strNode.SVal))
-			} else {
-				result.WriteString(col.SqlString())
-			}
-		}
-		result.WriteString(")")
-		// USING (...) AS alias names the merged join columns.
-		if je.JoinUsingAlias != nil {
-			result.WriteString(" ")
-			result.WriteString(je.JoinUsingAlias.SqlString())
-		}
-	} else if je.Quals != nil {
-		result.WriteString(" ON ")
-		result.WriteString(je.Quals.SqlString())
-	} else if je.Jointype == JOIN_INNER && !je.IsNatural {
-		// For INNER JOIN without qualifications (converted from CROSS JOIN), add ON TRUE
-		// This is semantically equivalent to CROSS JOIN
-		result.WriteString(" ON TRUE")
-	}
+// For USING clause, treat String nodes as identifiers, not string literals
 
-	// A join with an alias must be parenthesized: (a JOIN b ...) AS j.
-	if je.Alias != nil {
-		return "(" + result.String() + ") " + je.Alias.SqlString()
-	}
+// USING (...) AS alias names the merged join columns.
 
-	return result.String()
-}
+// For INNER JOIN without qualifications (converted from CROSS JOIN), add ON TRUE
+// This is semantically equivalent to CROSS JOIN
+
+// A join with an alias must be parenthesized: (a JOIN b ...) AS j.
 
 // Using existing SubLinkType from expressions.go
 
@@ -324,30 +192,13 @@ type SubPlan struct {
 
 // NewSubPlan creates a new SubPlan node.
 func NewSubPlan(subLinkType SubLinkType, planId int, planName string) *SubPlan {
-	return &SubPlan{
-		BaseExpr:    BaseExpr{BaseNode: BaseNode{Tag: T_SubPlan}},
-		SubLinkType: subLinkType,
-		PlanId:      planId,
-		PlanName:    planName,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (sp *SubPlan) ExpressionType() string {
-	return "SubPlan"
-}
+func (sp *SubPlan) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (sp *SubPlan) String() string {
-	subTypes := map[SubLinkType]string{
-		EXISTS_SUBLINK: "EXISTS", ALL_SUBLINK: "ALL", ANY_SUBLINK: "ANY",
-		EXPR_SUBLINK: "EXPR", ARRAY_SUBLINK: "ARRAY", CTE_SUBLINK: "CTE",
-	}
-	subTypeStr := subTypes[sp.SubLinkType]
-	if subTypeStr == "" {
-		subTypeStr = fmt.Sprintf("SUBLINK_%d", int(sp.SubLinkType))
-	}
-
-	return fmt.Sprintf("SubPlan(%s, plan=%d, name=%s)", subTypeStr, sp.PlanId, sp.PlanName)
-}
+func (sp *SubPlan) String() string { _ = "STUB: not implemented"; return "" }
 
 // AlternativeSubPlan represents alternative execution strategies for a subplan.
 // This allows the executor to choose the most efficient strategy at runtime.
@@ -359,19 +210,13 @@ type AlternativeSubPlan struct {
 
 // NewAlternativeSubPlan creates a new AlternativeSubPlan node.
 func NewAlternativeSubPlan(subplans []Expression) *AlternativeSubPlan {
-	return &AlternativeSubPlan{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_AlternativeSubPlan}},
-		Subplans: subplans,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (asp *AlternativeSubPlan) ExpressionType() string {
-	return "AlternativeSubPlan"
-}
+func (asp *AlternativeSubPlan) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (asp *AlternativeSubPlan) String() string {
-	return fmt.Sprintf("AlternativeSubPlan(%d alternatives)", len(asp.Subplans))
-}
+func (asp *AlternativeSubPlan) String() string { _ = "STUB: not implemented"; return "" }
 
 // CommonTableExpr and related structures are now implemented in statements.go
 
@@ -398,61 +243,21 @@ type WindowClause struct {
 }
 
 // NewWindowClause creates a new WindowClause node.
-func NewWindowClause(name string) *WindowClause {
-	return &WindowClause{
-		BaseNode: BaseNode{Tag: T_WindowClause},
-		Name:     name,
-	}
-}
+func NewWindowClause(name string) *WindowClause { _ = "STUB: not implemented"; return nil }
 
 // NewPartitionedWindowClause creates a new WindowClause with PARTITION BY.
 func NewPartitionedWindowClause(name string, partitionClause *NodeList) *WindowClause {
-	return &WindowClause{
-		BaseNode:        BaseNode{Tag: T_WindowClause},
-		Name:            name,
-		PartitionClause: partitionClause,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewOrderedWindowClause creates a new WindowClause with ORDER BY.
 func NewOrderedWindowClause(name string, orderClause *NodeList) *WindowClause {
-	return &WindowClause{
-		BaseNode:    BaseNode{Tag: T_WindowClause},
-		Name:        name,
-		OrderClause: orderClause,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (wc *WindowClause) String() string {
-	parts := []string{}
-	if wc.Name != "" {
-		parts = append(parts, "name="+wc.Name)
-	}
-	if wc.Refname != "" {
-		parts = append(parts, "ref="+wc.Refname)
-	}
-	partitionCount := 0
-	if wc.PartitionClause != nil {
-		partitionCount = len(wc.PartitionClause.Items)
-	}
-	if partitionCount > 0 {
-		parts = append(parts, fmt.Sprintf("partition=%d", partitionCount))
-	}
-	orderCount := 0
-	if wc.OrderClause != nil {
-		orderCount = len(wc.OrderClause.Items)
-	}
-	if orderCount > 0 {
-		parts = append(parts, fmt.Sprintf("order=%d", orderCount))
-	}
-
-	detail := ""
-	if len(parts) > 0 {
-		detail = fmt.Sprintf(" (%s)", fmt.Sprintf("%v", parts))
-	}
-
-	return "WindowClause" + detail
-}
+func (wc *WindowClause) String() string { _ = "STUB: not implemented"; return "" }
 
 // SortGroupClause represents ORDER BY and GROUP BY clauses.
 // This structure is used for both ORDER BY and GROUP BY operations
@@ -469,32 +274,17 @@ type SortGroupClause struct {
 
 // NewSortGroupClause creates a new SortGroupClause node.
 func NewSortGroupClause(tleSortGroupRef Index, eqop, sortop Oid) *SortGroupClause {
-	return &SortGroupClause{
-		BaseNode:        BaseNode{Tag: T_SortGroupClause},
-		TleSortGroupRef: tleSortGroupRef,
-		Eqop:            eqop,
-		Sortop:          sortop,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewSortGroupClauseNullsFirst creates a new SortGroupClause with NULLS FIRST.
 func NewSortGroupClauseNullsFirst(tleSortGroupRef Index, eqop, sortop Oid) *SortGroupClause {
-	return &SortGroupClause{
-		BaseNode:        BaseNode{Tag: T_SortGroupClause},
-		TleSortGroupRef: tleSortGroupRef,
-		Eqop:            eqop,
-		Sortop:          sortop,
-		NullsFirst:      true,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (sgc *SortGroupClause) String() string {
-	nulls := ""
-	if sgc.NullsFirst {
-		nulls = " NULLS FIRST"
-	}
-	return fmt.Sprintf("SortGroupClause(ref=%d%s)", sgc.TleSortGroupRef, nulls)
-}
+func (sgc *SortGroupClause) String() string { _ = "STUB: not implemented"; return "" }
 
 // RowMarkType represents the type of row marking for SELECT FOR UPDATE/SHARE.
 // Ported from postgres/src/include/nodes/plannodes.h:1327
@@ -532,40 +322,17 @@ type RowMarkClause struct {
 
 // NewRowMarkClause creates a new RowMarkClause node.
 func NewRowMarkClause(rti Index, strength LockClauseStrength) *RowMarkClause {
-	return &RowMarkClause{
-		BaseNode: BaseNode{Tag: T_RowMarkClause},
-		Rti:      rti,
-		Strength: strength,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewRowMarkClauseWithPolicy creates a new RowMarkClause with wait policy.
 func NewRowMarkClauseWithPolicy(rti Index, strength LockClauseStrength, waitPolicy LockWaitPolicy) *RowMarkClause {
-	return &RowMarkClause{
-		BaseNode:   BaseNode{Tag: T_RowMarkClause},
-		Rti:        rti,
-		Strength:   strength,
-		WaitPolicy: waitPolicy,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (rmc *RowMarkClause) String() string {
-	strengths := map[LockClauseStrength]string{
-		LCS_FORKEYSHARE: "KEY SHARE", LCS_FORSHARE: "SHARE",
-		LCS_FORNOKEYUPDATE: "NO KEY UPDATE", LCS_FORUPDATE: "UPDATE",
-	}
-	strengthStr := strengths[rmc.Strength]
-	if strengthStr == "" {
-		strengthStr = fmt.Sprintf("LCS_%d", int(rmc.Strength))
-	}
-
-	policies := map[LockWaitPolicy]string{
-		LockWaitSkip: " SKIP LOCKED", LockWaitError: " NOWAIT",
-	}
-	policyStr := policies[rmc.WaitPolicy]
-
-	return fmt.Sprintf("RowMarkClause(FOR %s%s)", strengthStr, policyStr)
-}
+func (rmc *RowMarkClause) String() string { _ = "STUB: not implemented"; return "" }
 
 // OnConflictAction represents the action to take on conflicts.
 // Ported from postgres/src/include/nodes/nodes.h:415
@@ -577,31 +344,9 @@ const (
 	ONCONFLICT_UPDATE                          // ON CONFLICT DO UPDATE - nodes.h:419
 )
 
-func (o OnConflictAction) String() string {
-	switch o {
-	case ONCONFLICT_NONE:
-		return ""
-	case ONCONFLICT_NOTHING:
-		return "DO NOTHING"
-	case ONCONFLICT_UPDATE:
-		return "DO UPDATE"
-	default:
-		return fmt.Sprintf("OnConflictAction(%d)", int(o))
-	}
-}
+func (o OnConflictAction) String() string { _ = "STUB: not implemented"; return "" }
 
-func (o OnConflictAction) SqlString() string {
-	switch o {
-	case ONCONFLICT_NONE:
-		return ""
-	case ONCONFLICT_NOTHING:
-		return "DO NOTHING"
-	case ONCONFLICT_UPDATE:
-		return "DO UPDATE"
-	default:
-		return fmt.Sprintf("OnConflictAction(%d)", int(o))
-	}
-}
+func (o OnConflictAction) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // OnConflictExpr represents INSERT ... ON CONFLICT expressions.
 // This is an important PostgreSQL-specific feature for handling conflicts
@@ -621,44 +366,19 @@ type OnConflictExpr struct {
 
 // NewOnConflictExpr creates a new OnConflictExpr node.
 func NewOnConflictExpr(action OnConflictAction) *OnConflictExpr {
-	return &OnConflictExpr{
-		BaseExpr: BaseExpr{BaseNode: BaseNode{Tag: T_OnConflictExpr}},
-		Action:   action,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewOnConflictDoNothing creates a new ON CONFLICT DO NOTHING expression.
-func NewOnConflictDoNothing() *OnConflictExpr {
-	return &OnConflictExpr{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_OnConflictExpr}},
-		Action:        ONCONFLICT_NOTHING,
-		ArbiterElems:  NewNodeList(),
-		OnConflictSet: NewNodeList(),
-	}
-}
+func NewOnConflictDoNothing() *OnConflictExpr { _ = "STUB: not implemented"; return nil }
 
 // NewOnConflictDoUpdate creates a new ON CONFLICT DO UPDATE expression.
 func NewOnConflictDoUpdate(onConflictSet *NodeList) *OnConflictExpr {
-	return &OnConflictExpr{
-		BaseExpr:      BaseExpr{BaseNode: BaseNode{Tag: T_OnConflictExpr}},
-		Action:        ONCONFLICT_UPDATE,
-		ArbiterElems:  NewNodeList(),
-		OnConflictSet: onConflictSet,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (oce *OnConflictExpr) ExpressionType() string {
-	return "OnConflictExpr"
-}
+func (oce *OnConflictExpr) ExpressionType() string { _ = "STUB: not implemented"; return "" }
 
-func (oce *OnConflictExpr) String() string {
-	actions := map[OnConflictAction]string{
-		ONCONFLICT_NOTHING: "DO NOTHING", ONCONFLICT_UPDATE: "DO UPDATE",
-	}
-	actionStr := actions[oce.Action]
-	if actionStr == "" {
-		actionStr = fmt.Sprintf("ACTION_%d", int(oce.Action))
-	}
-
-	return fmt.Sprintf("OnConflictExpr(%s)", actionStr)
-}
+func (oce *OnConflictExpr) String() string { _ = "STUB: not implemented"; return "" }

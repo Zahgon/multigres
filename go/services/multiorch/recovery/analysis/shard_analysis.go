@@ -15,10 +15,8 @@
 package analysis
 
 import (
-	"cmp"
 	"time"
 
-	commonconsensus "github.com/multigres/multigres/go/common/consensus"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 )
@@ -109,24 +107,12 @@ type ShardAnalysis struct {
 // IsInStandbyList reports whether the given pooler ID appears in the leader's
 // synchronous standby list. Returns false when no standby list is available.
 func (sa *ShardAnalysis) IsInStandbyList(id *clustermetadatapb.ID) bool {
-	for _, standbyID := range sa.LeaderStandbyIDs {
-		if standbyID.Cell == id.Cell && standbyID.Name == id.Name {
-			return true
-		}
-	}
+	_ = "STUB: not implemented"
 	return false
 }
 
 // Replicas returns the PoolerAnalysis entries for all follower poolers.
-func (sa *ShardAnalysis) Replicas() []*PoolerAnalysis {
-	var replicas []*PoolerAnalysis
-	for _, pa := range sa.Analyses {
-		if !pa.IsLeader {
-			replicas = append(replicas, pa)
-		}
-	}
-	return replicas
-}
+func (sa *ShardAnalysis) Replicas() []*PoolerAnalysis { _ = "STUB: not implemented"; return nil }
 
 // PoolerAnalysis represents the analyzed state of a single pooler
 // and its replication topology. This is the in-memory equivalent of
@@ -176,31 +162,13 @@ type PoolerAnalysis struct {
 // more advanced. LSN is intentionally excluded: for leaders, the coordinator
 // term must be unique per promotion, so equal terms indicate a consensus bug
 // rather than a resolvable tie.
-func compareLeaderTimeline(a, b *PoolerAnalysis) int {
-	return cmp.Compare(
-		commonconsensus.LeaderTerm(a.ConsensusStatus),
-		commonconsensus.LeaderTerm(b.ConsensusStatus),
-	)
-}
+func compareLeaderTimeline(a, b *PoolerAnalysis) int { _ = "STUB: not implemented"; return 0 }
 
 // analyzeAllPoolers runs fn against each pooler analysis in sa, collecting all problems.
 // Both the shard analysis and the per-pooler analysis are passed so callbacks can
 // access shard-level fields (e.g. LeaderReachable) alongside pooler-specific state.
 // Errors are accumulated — the first error encountered is returned alongside any problems collected.
 func analyzeAllPoolers(sa *ShardAnalysis, fn func(*ShardAnalysis, *PoolerAnalysis) (*types.Problem, error)) ([]types.Problem, error) {
-	var problems []types.Problem
-	var firstErr error
-	for _, poolerAnalysis := range sa.Analyses {
-		p, err := fn(sa, poolerAnalysis)
-		if err != nil {
-			if firstErr == nil {
-				firstErr = err
-			}
-			continue
-		}
-		if p != nil {
-			problems = append(problems, *p)
-		}
-	}
-	return problems, firstErr
+	_ = "STUB: not implemented"
+	return nil, nil
 }

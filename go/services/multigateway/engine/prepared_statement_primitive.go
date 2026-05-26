@@ -16,11 +16,7 @@ package engine
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 
-	"github.com/multigres/multigres/go/common/constants"
-	"github.com/multigres/multigres/go/common/mterrors"
 	"github.com/multigres/multigres/go/common/parser/ast"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/preparedstatement"
@@ -66,40 +62,26 @@ type PreparedStatementPrimitive struct {
 
 // NewPreparePrimitive creates a primitive for PREPARE name AS query.
 func NewPreparePrimitive(tableGroup, stmtName, innerQuery string, paramTypes []uint32) *PreparedStatementPrimitive {
-	return &PreparedStatementPrimitive{
-		kind:       preparedStmtPrepare,
-		tableGroup: tableGroup,
-		stmtName:   stmtName,
-		innerQuery: innerQuery,
-		paramTypes: paramTypes,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewExecutePrimitive creates a primitive for EXECUTE name [(params)].
 func NewExecutePrimitive(tableGroup, stmtName string, params [][]byte) *PreparedStatementPrimitive {
-	return &PreparedStatementPrimitive{
-		kind:       preparedStmtExecute,
-		tableGroup: tableGroup,
-		stmtName:   stmtName,
-		params:     params,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewDeallocatePrimitive creates a primitive for DEALLOCATE name.
 func NewDeallocatePrimitive(tableGroup, stmtName string) *PreparedStatementPrimitive {
-	return &PreparedStatementPrimitive{
-		kind:       preparedStmtDeallocate,
-		tableGroup: tableGroup,
-		stmtName:   stmtName,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewDeallocateAllPrimitive creates a primitive for DEALLOCATE ALL.
 func NewDeallocateAllPrimitive(tableGroup string) *PreparedStatementPrimitive {
-	return &PreparedStatementPrimitive{
-		kind:       preparedStmtDeallocateAll,
-		tableGroup: tableGroup,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (p *PreparedStatementPrimitive) StreamExecute(
@@ -110,18 +92,8 @@ func (p *PreparedStatementPrimitive) StreamExecute(
 	_ []*ast.A_Const,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	switch p.kind {
-	case preparedStmtPrepare:
-		return p.executePrepare(ctx, conn, callback)
-	case preparedStmtExecute:
-		return p.executeExecute(ctx, exec, conn, state, callback)
-	case preparedStmtDeallocate:
-		return p.executeDeallocate(ctx, conn, callback)
-	case preparedStmtDeallocateAll:
-		return p.executeDeallocateAll(ctx, conn, callback)
-	default:
-		return fmt.Errorf("unknown prepared statement primitive kind: %d", p.kind)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // executePrepare delegates to HandleParse to register the statement in the consolidator.
@@ -135,13 +107,8 @@ func (p *PreparedStatementPrimitive) executePrepare(
 	conn *server.Conn,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	if conn.Handler().GetPreparedStatementInfo(conn.ConnectionID(), p.stmtName) != nil {
-		return mterrors.NewDuplicatePreparedStatementError(p.stmtName)
-	}
-	if err := conn.Handler().HandleParse(ctx, conn, p.stmtName, p.innerQuery, p.paramTypes); err != nil {
-		return err
-	}
-	return callback(ctx, &sqltypes.Result{CommandTag: "PREPARE"})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // executeExecute delegates to HandleBind to create a portal, then executes it
@@ -159,38 +126,18 @@ func (p *PreparedStatementPrimitive) executeExecute(
 	state *handler.MultiGatewayConnectionState,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
+	_ = "STUB: not implemented"
 	// HandleBind looks up the prepared statement, creates a portal, and stores it in state.
-	if err := conn.Handler().HandleBind(ctx, conn, "", p.stmtName, p.params, nil, nil); err != nil {
-		return err
-	}
-
-	// Retrieve the portal that HandleBind just created.
-	portalInfo := state.GetPortalInfo("")
-	if portalInfo == nil {
-		return fmt.Errorf("internal error: portal not found after bind for statement \"%s\"", p.stmtName)
-	}
-	defer state.DeletePortalInfo("")
-
-	// Get field descriptions via Describe. In the extended protocol this is a
-	// separate step; in the simple protocol it must be folded into the result
-	// stream so the conn writes RowDescription before DataRows.
-	desc, err := conn.Handler().HandleDescribe(ctx, conn, 'P', "")
-	if err != nil {
-		return err
-	}
-
-	// Wrap the callback to inject Fields from Describe into the first result.
-	fieldsInjected := false
-	wrappedCallback := func(ctx context.Context, result *sqltypes.Result) error {
-		if !fieldsInjected && desc != nil && len(desc.Fields) > 0 && len(result.Fields) == 0 {
-			result.Fields = desc.Fields
-			fieldsInjected = true
-		}
-		return callback(ctx, result)
-	}
-
-	return exec.PortalStreamExecute(ctx, p.tableGroup, constants.DefaultShard, conn, state, portalInfo, 0, false, wrappedCallback)
+	return nil
 }
+
+// Retrieve the portal that HandleBind just created.
+
+// Get field descriptions via Describe. In the extended protocol this is a
+// separate step; in the simple protocol it must be folded into the result
+// stream so the conn writes RowDescription before DataRows.
+
+// Wrap the callback to inject Fields from Describe into the first result.
 
 // executeDeallocate uses HandleClose with typ 'D' which errors on nonexistent
 // statements, matching PostgreSQL's DEALLOCATE behavior.
@@ -199,10 +146,8 @@ func (p *PreparedStatementPrimitive) executeDeallocate(
 	conn *server.Conn,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	if err := conn.Handler().HandleClose(ctx, conn, 'D', p.stmtName); err != nil {
-		return err
-	}
-	return callback(ctx, &sqltypes.Result{CommandTag: "DEALLOCATE"})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (p *PreparedStatementPrimitive) executeDeallocateAll(
@@ -210,10 +155,8 @@ func (p *PreparedStatementPrimitive) executeDeallocateAll(
 	conn *server.Conn,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	if err := conn.Handler().HandleClose(ctx, conn, 'A', ""); err != nil {
-		return err
-	}
-	return callback(ctx, &sqltypes.Result{CommandTag: "DEALLOCATE ALL"})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PortalStreamExecute satisfies the Primitive interface for the
@@ -231,25 +174,13 @@ func (p *PreparedStatementPrimitive) PortalStreamExecute(
 	_ bool,
 	callback func(context.Context, *sqltypes.Result) error,
 ) error {
-	return p.StreamExecute(ctx, exec, conn, state, nil, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *PreparedStatementPrimitive) GetTableGroup() string { return p.tableGroup }
-func (p *PreparedStatementPrimitive) GetQuery() string      { return p.innerQuery }
-func (p *PreparedStatementPrimitive) String() string {
-	switch p.kind {
-	case preparedStmtPrepare:
-		return fmt.Sprintf("Prepare(%s)", p.stmtName)
-	case preparedStmtExecute:
-		return fmt.Sprintf("Execute(%s)", p.stmtName)
-	case preparedStmtDeallocate:
-		return fmt.Sprintf("Deallocate(%s)", p.stmtName)
-	case preparedStmtDeallocateAll:
-		return "Deallocate(ALL)"
-	default:
-		return "PreparedStatement(unknown)"
-	}
-}
+func (p *PreparedStatementPrimitive) GetTableGroup() string { _ = "STUB: not implemented"; return "" }
+func (p *PreparedStatementPrimitive) GetQuery() string      { _ = "STUB: not implemented"; return "" }
+func (p *PreparedStatementPrimitive) String() string        { _ = "STUB: not implemented"; return "" }
 
 var _ Primitive = (*PreparedStatementPrimitive)(nil)
 
@@ -257,80 +188,19 @@ var _ Primitive = (*PreparedStatementPrimitive)(nil)
 // nodes to byte arrays for portal creation. Only literal constant values (A_Const)
 // are supported.
 func ExtractExecuteParams(stmt *ast.ExecuteStmt) ([][]byte, error) {
-	if stmt.Params == nil || stmt.Params.Len() == 0 {
-		return nil, nil
-	}
-
-	params := make([][]byte, 0, stmt.Params.Len())
-	for i, param := range stmt.Params.Items {
-		constNode, ok := param.(*ast.A_Const)
-		if !ok {
-			return nil, fmt.Errorf("parameter %d: unsupported expression type %T; only literal values are supported", i+1, param)
-		}
-
-		if constNode.Isnull || constNode.Val == nil {
-			params = append(params, nil)
-			continue
-		}
-
-		val, err := constToBytes(constNode.Val)
-		if err != nil {
-			return nil, fmt.Errorf("parameter %d: %w", i+1, err)
-		}
-		params = append(params, val)
-	}
-
-	return params, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ExtractParamTypeOids resolves the Argtypes from a PREPARE statement to OIDs.
 // Returns nil if there are no argument types. Unrecognized type names are passed
 // as 0 (unspecified), letting the backend infer them.
-func ExtractParamTypeOids(stmt *ast.PrepareStmt) []uint32 {
-	if stmt.Argtypes == nil || stmt.Argtypes.Len() == 0 {
-		return nil
-	}
-	oids := make([]uint32, 0, stmt.Argtypes.Len())
-	for _, item := range stmt.Argtypes.Items {
-		tn, ok := item.(*ast.TypeName)
-		if !ok || tn.Names == nil || tn.Names.Len() == 0 {
-			oids = append(oids, 0)
-			continue
-		}
-		// Use the last name component (e.g., "pg_catalog"."int4" → "int4").
-		lastItem := tn.Names.Items[tn.Names.Len()-1]
-		name := ""
-		if s, ok := lastItem.(*ast.String); ok {
-			name = s.SVal
-		}
-		oids = append(oids, uint32(ast.TypeNameToOid(name)))
-	}
-	return oids
-}
+func ExtractParamTypeOids(stmt *ast.PrepareStmt) []uint32 { _ = "STUB: not implemented"; return nil }
+
+// Use the last name component (e.g., "pg_catalog"."int4" → "int4").
 
 // ExtractInnerQuery extracts the SQL string of the inner query from a PrepareStmt.
-func ExtractInnerQuery(stmt *ast.PrepareStmt) string {
-	if stmt.Query == nil {
-		return ""
-	}
-	return stmt.Query.SqlString()
-}
+func ExtractInnerQuery(stmt *ast.PrepareStmt) string { _ = "STUB: not implemented"; return "" }
 
 // constToBytes converts an AST constant value to its text-format byte representation.
-func constToBytes(val ast.Value) ([]byte, error) {
-	switch v := val.(type) {
-	case *ast.Integer:
-		return []byte(strconv.Itoa(v.IVal)), nil
-	case *ast.Float:
-		return []byte(v.FVal), nil
-	case *ast.String:
-		return []byte(v.SVal), nil
-	case *ast.Boolean:
-		if v.BoolVal {
-			return []byte("true"), nil
-		}
-		return []byte("false"), nil
-	default:
-		return nil, fmt.Errorf("unsupported constant type %T", v)
-	}
-}
+func constToBytes(val ast.Value) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

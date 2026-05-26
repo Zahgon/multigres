@@ -17,16 +17,9 @@ package auth
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
-	"google.golang.org/grpc/codes"
-
-	"github.com/multigres/multigres/go/common/mterrors"
-	"github.com/multigres/multigres/go/common/pgprotocol/scram"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
-	mtrpcpb "github.com/multigres/multigres/go/pb/mtrpc"
 	multipoolerpb "github.com/multigres/multigres/go/pb/multipoolerservice"
 )
 
@@ -66,10 +59,8 @@ type PoolerCredentialProvider struct {
 // and failover buffering internally. metrics is optional — pass nil to
 // disable mg.gateway.auth.credential_lookup.* recording (e.g. in tests).
 func NewPoolerCredentialProvider(client PoolerSystemClient, metrics CredentialLookupRecorder) *PoolerCredentialProvider {
-	return &PoolerCredentialProvider{
-		client:  client,
-		metrics: metrics,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // GetCredentials retrieves the SCRAM-SHA-256 hash and rolreplication flag
@@ -87,62 +78,28 @@ func NewPoolerCredentialProvider(client PoolerSystemClient, metrics CredentialLo
 // also used by gRPC auth interceptors for mTLS / authz failures, so keying
 // on code alone would misclassify those transport errors as user auth errors.
 func (p *PoolerCredentialProvider) GetCredentials(ctx context.Context, username, database string) (*server.Credentials, error) {
+	_ = "STUB: not implemented"
 	// Time every lookup — success and failure both feed
 	// mg.gateway.auth.credential_lookup.duration so the future
 	// password-hash cache work has a baseline including tail-latency
 	// from pooler failover events. Increment the rate counter on the
 	// same defer to keep the two signals correlated.
-	start := time.Now()
-	defer func() {
-		if p.metrics != nil {
-			p.metrics.RecordCredentialLookup(ctx, time.Since(start))
-		}
-	}()
-
-	resp, err := p.client.GetAuthCredentials(ctx, &multipoolerpb.GetAuthCredentialsRequest{
-		Database: database,
-		Username: username,
-	})
-	if err != nil {
-		// App-level auth rejections travel as PgDiagnostic (via RPCError
-		// details). Transport-level failures — mTLS handshake errors, authz
-		// middleware rejections — don't carry a PgDiagnostic and fall through
-		// to the generic wrap below. This keeps the two layers distinct even
-		// when the underlying gRPC code happens to collide.
-		var diag *mterrors.PgDiagnostic
-		if errors.As(err, &diag) {
-			switch diag.Code {
-			case mterrors.PgSSInvalidAuthSpec:
-				return nil, scram.ErrLoginDisabled
-			case mterrors.PgSSAuthFailed:
-				return nil, scram.ErrPasswordExpired
-			}
-		}
-		// User-not-found keeps the gRPC-code mapping: it's returned as a
-		// plain codes.NotFound (no PgDiagnostic) and NotFound isn't used by
-		// typical auth middleware, so the collision risk is negligible.
-		if mterrors.Code(err) == mtrpcpb.Code(codes.NotFound) {
-			return nil, scram.ErrUserNotFound
-		}
-		return nil, fmt.Errorf("failed to get auth credentials: %w", err)
-	}
-
-	// User exists but has no password set.
-	if resp.ScramHash == "" {
-		return nil, scram.ErrUserNotFound
-	}
-
-	// Parse the SCRAM hash.
-	hash, err := scram.ParseScramSHA256Hash(resp.ScramHash)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse SCRAM hash: %w", err)
-	}
-
-	return &server.Credentials{
-		Hash:              hash,
-		IsReplicationRole: resp.IsReplicationRole,
-	}, nil
+	return nil, nil
 }
+
+// App-level auth rejections travel as PgDiagnostic (via RPCError
+// details). Transport-level failures — mTLS handshake errors, authz
+// middleware rejections — don't carry a PgDiagnostic and fall through
+// to the generic wrap below. This keeps the two layers distinct even
+// when the underlying gRPC code happens to collide.
+
+// User-not-found keeps the gRPC-code mapping: it's returned as a
+// plain codes.NotFound (no PgDiagnostic) and NotFound isn't used by
+// typical auth middleware, so the collision risk is negligible.
+
+// User exists but has no password set.
+
+// Parse the SCRAM hash.
 
 // Ensure PoolerCredentialProvider implements server.CredentialProvider so
 // the init.go ListenerConfig assignment fails at compile time if the

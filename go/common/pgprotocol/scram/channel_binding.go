@@ -15,11 +15,7 @@
 package scram
 
 import (
-	"crypto/sha256"
-	"crypto/sha512"
 	"crypto/x509"
-	"errors"
-	"fmt"
 	"hash"
 )
 
@@ -46,15 +42,8 @@ type ChannelBinding struct {
 // be_tls_get_certificate_hash). This is what libpq expects, so any client
 // computing the binding the same way will interoperate.
 func ComputeTLSServerEndPointHash(cert *x509.Certificate) ([]byte, error) {
-	if cert == nil {
-		return nil, errors.New("scram: TLS certificate is nil")
-	}
-	h, err := tlsServerEndPointHasher(cert.SignatureAlgorithm)
-	if err != nil {
-		return nil, err
-	}
-	h.Write(cert.Raw)
-	return h.Sum(nil), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // tlsServerEndPointHasher returns the hash function to use for a given cert
@@ -64,26 +53,6 @@ func ComputeTLSServerEndPointHash(cert *x509.Certificate) ([]byte, error) {
 // to advertise PLUS, so accepting Ed25519 here would diverge from libpq's
 // expected hash and break the cbind check.
 func tlsServerEndPointHasher(sigAlgo x509.SignatureAlgorithm) (hash.Hash, error) {
-	switch sigAlgo {
-	case x509.MD2WithRSA,
-		x509.MD5WithRSA,
-		x509.SHA1WithRSA,
-		x509.DSAWithSHA1,
-		x509.ECDSAWithSHA1,
-		x509.SHA256WithRSA,
-		x509.DSAWithSHA256,
-		x509.ECDSAWithSHA256,
-		x509.SHA256WithRSAPSS:
-		return sha256.New(), nil
-	case x509.SHA384WithRSA,
-		x509.ECDSAWithSHA384,
-		x509.SHA384WithRSAPSS:
-		return sha512.New384(), nil
-	case x509.SHA512WithRSA,
-		x509.ECDSAWithSHA512,
-		x509.SHA512WithRSAPSS:
-		return sha512.New(), nil
-	default:
-		return nil, fmt.Errorf("scram: unsupported certificate signature algorithm %s for tls-server-end-point binding", sigAlgo)
-	}
+	_ = "STUB: not implemented"
+	return *new(hash.Hash), nil
 }

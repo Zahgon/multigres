@@ -26,55 +26,28 @@
 package parser
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/multigres/multigres/go/common/parser/ast"
 )
 
 // linitial returns the first element of a NodeList, equivalent to PostgreSQL's linitial()
-func linitial(list *ast.NodeList) ast.Node {
-	if list == nil || len(list.Items) == 0 {
-		return nil
-	}
-	return list.Items[0]
-}
+func linitial(list *ast.NodeList) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 // lsecond returns the second element of a NodeList, equivalent to PostgreSQL's lsecond()
-func lsecond(list *ast.NodeList) ast.Node {
-	if list == nil || len(list.Items) < 2 {
-		return nil
-	}
-	return list.Items[1]
-}
+func lsecond(list *ast.NodeList) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 // lthird returns the third element of a NodeList, equivalent to PostgreSQL's lthird()
-func lthird(list *ast.NodeList) ast.Node {
-	if list == nil || len(list.Items) < 3 {
-		return nil
-	}
-	return list.Items[2]
-}
+func lthird(list *ast.NodeList) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 // llast returns the last element of a NodeList, equivalent to PostgreSQL's llast()
-func llast(list *ast.NodeList) ast.Node {
-	if list == nil || len(list.Items) == 0 {
-		return nil
-	}
-	return list.Items[len(list.Items)-1]
-}
+func llast(list *ast.NodeList) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
 // makeTypeNameFromNodeList converts *ast.NodeList to *ast.TypeName
 func makeTypeNameFromNodeList(list *ast.NodeList) *ast.TypeName {
-	return &ast.TypeName{
-		BaseNode: ast.BaseNode{Tag: ast.T_TypeName},
-		Names:    list,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func makeTypeNameFromString(str string) *ast.TypeName {
-	return makeTypeNameFromNodeList(ast.NewNodeList(ast.NewString(str)))
-}
+func makeTypeNameFromString(str string) *ast.TypeName { _ = "STUB: not implemented"; return nil }
 
 // makeRangeVarFromAnyName converts a list of (dotted) names to a RangeVar.
 // The "AnyName" refers to the any_name production in the grammar.
@@ -91,63 +64,17 @@ func makeTypeNameFromString(str string) *ast.TypeName {
 //
 // Ported from PostgreSQL's makeRangeVarFromAnyName function.
 func makeRangeVarFromAnyName(names *ast.NodeList, position int) (*ast.RangeVar, error) {
-	if names == nil {
-		return nil, errors.New("names cannot be nil")
-	}
-
-	r := &ast.RangeVar{
-		BaseNode: ast.BaseNode{Tag: ast.T_RangeVar, Loc: position},
-		Inh:      true, // Default to inheritance enabled (no ONLY)
-	}
-
-	length := names.Len()
-	switch length {
-	case 1:
-		// Single name: just the relation name
-		if str, ok := names.Items[0].(*ast.String); ok {
-			r.CatalogName = ""
-			r.SchemaName = ""
-			r.RelName = str.SVal
-		} else {
-			return nil, errors.New("expected string node in names list")
-		}
-	case 2:
-		// Two names: schema.relation
-		if str1, ok := names.Items[0].(*ast.String); ok {
-			if str2, ok := names.Items[1].(*ast.String); ok {
-				r.CatalogName = ""
-				r.SchemaName = str1.SVal
-				r.RelName = str2.SVal
-			} else {
-				return nil, errors.New("expected string node for relation name")
-			}
-		} else {
-			return nil, errors.New("expected string node for schema name")
-		}
-	case 3:
-		// Three names: catalog.schema.relation
-		if str1, ok := names.Items[0].(*ast.String); ok {
-			if str2, ok := names.Items[1].(*ast.String); ok {
-				if str3, ok := names.Items[2].(*ast.String); ok {
-					r.CatalogName = str1.SVal
-					r.SchemaName = str2.SVal
-					r.RelName = str3.SVal
-				} else {
-					return nil, errors.New("expected string node for relation name")
-				}
-			} else {
-				return nil, errors.New("expected string node for schema name")
-			}
-		} else {
-			return nil, errors.New("expected string node for catalog name")
-		}
-	default:
-		return nil, fmt.Errorf("improper qualified name (too many dotted names): expected 1-3 names, got %d", length)
-	}
-
-	r.RelPersistence = ast.RELPERSISTENCE_PERMANENT
-	return r, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Default to inheritance enabled (no ONLY)
+
+// Single name: just the relation name
+
+// Two names: schema.relation
+
+// Three names: catalog.schema.relation
 
 // makeRangeVarFromQualifiedName constructs a RangeVar from a ColId and indirection list.
 // This mirrors PostgreSQL's makeRangeVarFromQualifiedName function which is used in
@@ -167,56 +94,28 @@ func makeRangeVarFromAnyName(names *ast.NodeList, position int) (*ast.RangeVar, 
 //
 // Ported from PostgreSQL's makeRangeVarFromQualifiedName function.
 func makeRangeVarFromQualifiedName(name string, indirection *ast.NodeList, position int) *ast.RangeVar {
-	r := &ast.RangeVar{
-		BaseNode: ast.BaseNode{Tag: ast.T_RangeVar, Loc: position},
-		Inh:      true, // Default to inheritance enabled (no ONLY)
-	}
-
-	// Start with the base name
-	names := []string{name}
-
-	// Add indirection elements
-	if indirection != nil {
-		for _, item := range indirection.Items {
-			if str, ok := item.(*ast.String); ok {
-				names = append(names, str.SVal)
-			}
-			// Note: PostgreSQL also handles A_Star nodes for ".*" but we'll focus on String nodes for now
-		}
-	}
-
-	// Build RangeVar based on number of names
-	switch len(names) {
-	case 1:
-		// Single name: just the relation name
-		r.CatalogName = ""
-		r.SchemaName = ""
-		r.RelName = names[0]
-	case 2:
-		// Two names: schema.relation
-		r.CatalogName = ""
-		r.SchemaName = names[0]
-		r.RelName = names[1]
-	case 3:
-		// Three names: catalog.schema.relation
-		r.CatalogName = names[0]
-		r.SchemaName = names[1]
-		r.RelName = names[2]
-	default:
-		// For more than 3 names, use the last as relation, second-to-last as schema, third-to-last as catalog
-		// This is a fallback - PostgreSQL would likely error on too many names
-		if len(names) >= 3 {
-			r.CatalogName = names[len(names)-3]
-			r.SchemaName = names[len(names)-2]
-			r.RelName = names[len(names)-1]
-		} else {
-			r.RelName = names[len(names)-1]
-		}
-	}
-
-	r.RelPersistence = ast.RELPERSISTENCE_PERMANENT
-	return r
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Default to inheritance enabled (no ONLY)
+
+// Start with the base name
+
+// Add indirection elements
+
+// Note: PostgreSQL also handles A_Star nodes for ".*" but we'll focus on String nodes for now
+
+// Build RangeVar based on number of names
+
+// Single name: just the relation name
+
+// Two names: schema.relation
+
+// Three names: catalog.schema.relation
+
+// For more than 3 names, use the last as relation, second-to-last as schema, third-to-last as catalog
+// This is a fallback - PostgreSQL would likely error on too many names
 
 // SplitColQualList separates a ColQualList (column qualifier list) into constraints and collate clauses.
 // This mirrors PostgreSQL's SplitColQualList function which is used to process column qualifiers
@@ -231,32 +130,14 @@ func makeRangeVarFromQualifiedName(name string, indirection *ast.NodeList, posit
 //   - constraints: A NodeList of Constraint nodes
 //   - collClause: A single CollateClause (PostgreSQL allows only one COLLATE per column/domain)
 func SplitColQualList(qualList *ast.NodeList) (*ast.NodeList, *ast.CollateClause) {
-	var constraints []*ast.Constraint
-	var collClause *ast.CollateClause
-
-	if qualList == nil {
-		return ast.NewNodeList(), nil
-	}
-
-	for _, item := range qualList.Items {
-		switch node := item.(type) {
-		case *ast.Constraint:
-			constraints = append(constraints, node)
-		case *ast.CollateClause:
-			// PostgreSQL allows only one COLLATE clause per column/domain
-			// If multiple are specified, the last one wins
-			collClause = node
-		}
-	}
-
-	// Convert constraints slice to NodeList
-	constraintList := ast.NewNodeList()
-	for _, constraint := range constraints {
-		constraintList.Append(constraint)
-	}
-
-	return constraintList, collClause
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// PostgreSQL allows only one COLLATE clause per column/domain
+// If multiple are specified, the last one wins
+
+// Convert constraints slice to NodeList
 
 // makeOrderedSetArgs processes arguments for hypothetical-set aggregates.
 // It validates VARIADIC argument consistency and returns a list containing:
@@ -267,159 +148,62 @@ func SplitColQualList(qualList *ast.NodeList) (*ast.NodeList, *ast.CollateClause
 //
 // PostgreSQL reference: src/backend/parser/gram.y:makeOrderedSetArgs
 func makeOrderedSetArgs(directArgs *ast.NodeList, orderedArgs *ast.NodeList) (*ast.NodeList, error) {
-	if directArgs == nil {
-		directArgs = ast.NewNodeList()
-	}
-	if orderedArgs == nil {
-		orderedArgs = ast.NewNodeList()
-	}
-
-	// Check if the last direct argument is VARIADIC
-	if directArgs.Len() > 0 {
-		if lastParam, ok := directArgs.Items[directArgs.Len()-1].(*ast.FunctionParameter); ok {
-			if lastParam.Mode == ast.FUNC_PARAM_VARIADIC {
-				// PostgreSQL requires exactly one VARIADIC ordered argument of the same type
-				if orderedArgs.Len() != 1 {
-					return nil, errors.New("an ordered-set aggregate with a VARIADIC direct argument must have one VARIADIC aggregated argument of the same data type")
-				}
-
-				if firstOrdered, ok := orderedArgs.Items[0].(*ast.FunctionParameter); ok {
-					if firstOrdered.Mode != ast.FUNC_PARAM_VARIADIC {
-						return nil, errors.New("an ordered-set aggregate with a VARIADIC direct argument must have one VARIADIC aggregated argument of the same data type")
-					}
-					// TODO: Check that types are equal when we have proper type comparison
-					// For now, we skip type checking but drop the duplicate VARIADIC argument
-					orderedArgs = ast.NewNodeList()
-				}
-			}
-		}
-	}
-
-	// Store the number of direct arguments
-	numDirectArgs := ast.NewInteger(directArgs.Len())
-
-	// Concatenate direct and ordered arguments
-	allArgs := ast.NewNodeList()
-	for _, arg := range directArgs.Items {
-		allArgs.Append(arg)
-	}
-	for _, arg := range orderedArgs.Items {
-		allArgs.Append(arg)
-	}
-
-	// Return [concatenated_args, num_direct_args]
-	return ast.NewNodeList(allArgs, numDirectArgs), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Check if the last direct argument is VARIADIC
+
+// PostgreSQL requires exactly one VARIADIC ordered argument of the same type
+
+// TODO: Check that types are equal when we have proper type comparison
+// For now, we skip type checking but drop the duplicate VARIADIC argument
+
+// Store the number of direct arguments
+
+// Concatenate direct and ordered arguments
+
+// Return [concatenated_args, num_direct_args]
 
 // extractAggrArgTypes extracts just the argument types from the output of the aggr_args production.
 // This is equivalent to PostgreSQL's extractAggrArgTypes function.
 func extractAggrArgTypes(aggrArgs *ast.NodeList) *ast.NodeList {
-	if aggrArgs == nil || aggrArgs.Len() != 2 {
-		return ast.NewNodeList()
-	}
-
-	// First element contains the actual arguments (or nil for *)
-	if firstElem, ok := aggrArgs.Items[0].(*ast.NodeList); ok {
-		return extractArgTypes(firstElem)
-	}
-
-	return ast.NewNodeList()
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// First element contains the actual arguments (or nil for *)
 
 // extractArgTypes extracts just the argument types (TypeNames) from a list of FunctionParameter nodes
 // for input parameters only. This is equivalent to PostgreSQL's extractArgTypes function.
-func extractArgTypes(parameters *ast.NodeList) *ast.NodeList {
-	if parameters == nil {
-		return ast.NewNodeList()
-	}
-
-	result := ast.NewNodeList()
-
-	for _, item := range parameters.Items {
-		if param, ok := item.(*ast.FunctionParameter); ok {
-			if param.Mode != ast.FUNC_PARAM_OUT && param.Mode != ast.FUNC_PARAM_TABLE {
-				if param.ArgType != nil {
-					result.Append(param.ArgType)
-				}
-			}
-		}
-	}
-
-	return result
-}
+func extractArgTypes(parameters *ast.NodeList) *ast.NodeList { _ = "STUB: not implemented"; return nil }
 
 // processConstraintAttributeSpec processes constraint attribute specification bits.
 // This is a simplified version of processCASbits from PostgreSQL.
 func processConstraintAttributeSpec(casbits int, constraint *ast.Constraint) {
-	if casbits&ast.CAS_DEFERRABLE != 0 {
-		constraint.Deferrable = true
-	} else if casbits&ast.CAS_NOT_DEFERRABLE != 0 {
-		constraint.Deferrable = false
-	}
-
-	if casbits&ast.CAS_INITIALLY_DEFERRED != 0 {
-		constraint.Initdeferred = true
-	} else if casbits&ast.CAS_INITIALLY_IMMEDIATE != 0 {
-		constraint.Initdeferred = false
-	}
-
-	if casbits&ast.CAS_NOT_VALID != 0 {
-		constraint.SkipValidation = true
-		constraint.InitiallyValid = false
-	} else {
-		constraint.SkipValidation = false
-		constraint.InitiallyValid = true
-	}
-
-	if casbits&ast.CAS_NO_INHERIT != 0 {
-		constraint.IsNoInherit = true
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // doNegate handles negation of nodes, equivalent to PostgreSQL's doNegate()
 // Ported from postgres/src/backend/parser/gram.y:doNegate
-func doNegate(n ast.Node, location int) ast.Node {
-	if aConst, ok := n.(*ast.A_Const); ok {
-		aConst.SetLocation(location)
+func doNegate(n ast.Node, location int) ast.Node { _ = "STUB: not implemented"; return *new(ast.Node) }
 
-		if intVal, ok := aConst.Val.(*ast.Integer); ok {
-			intVal.IVal = -intVal.IVal
-			return n
-		}
-		if floatVal, ok := aConst.Val.(*ast.Float); ok {
-			doNegateFloat(floatVal)
-			return n
-		}
-	}
-
-	// Default: create unary minus expression
-	name := ast.NewNodeList(ast.NewString("-"))
-	return ast.NewA_Expr(ast.AEXPR_OP, name, nil, n, location)
-}
+// Default: create unary minus expression
 
 // doNegateFloat handles negation of float values
 // Ported from postgres/src/backend/parser/gram.y:doNegateFloat
-func doNegateFloat(v *ast.Float) {
-	oldval := v.FVal
-	if len(oldval) > 0 && oldval[0] == '+' {
-		// Remove leading +
-		v.FVal = "-" + oldval[1:]
-	} else if len(oldval) > 0 && oldval[0] == '-' {
-		// Remove leading -
-		v.FVal = oldval[1:]
-	} else {
-		// Add leading -
-		v.FVal = "-" + oldval
-	}
-}
+func doNegateFloat(v *ast.Float) { _ = "STUB: not implemented"; return }
+
+// Remove leading +
+
+// Remove leading -
+
+// Add leading -
 
 // makeSetOp creates a set operation (UNION, INTERSECT, EXCEPT) SelectStmt
 // Ported from postgres/src/backend/parser/gram.y:makeSetOp
 func makeSetOp(op ast.SetOperation, all bool, larg ast.Stmt, rarg ast.Stmt) ast.Stmt {
-	n := ast.NewSelectStmt()
-	n.Op = op
-	n.All = all
-	n.Larg = larg.(*ast.SelectStmt)
-	n.Rarg = rarg.(*ast.SelectStmt)
-	return n
+	_ = "STUB: not implemented"
+	return *new(ast.Stmt)
 }

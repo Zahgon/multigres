@@ -46,23 +46,4 @@ const (
 // - we generate random int63's
 // - from each int63, we are extracting multiple random letters by bit-shifting and masking
 // - if some index is out of range of alphanums we neglect it (unlikely to happen multiple times in a row)
-func RandomString(n int) string {
-	b := make([]byte, n)
-	rng.Lock()
-	defer rng.Unlock()
-
-	randomInt64 := rng.rand.Int64()
-	remaining := maxAlphanumsPerInt
-	for i := 0; i < n; {
-		if remaining == 0 {
-			randomInt64, remaining = rng.rand.Int64(), maxAlphanumsPerInt
-		}
-		if idx := int(randomInt64 & alphanumsIdxMask); idx < len(alphanums) {
-			b[i] = alphanums[idx]
-			i++
-		}
-		randomInt64 >>= alphanumsIdxBits
-		remaining--
-	}
-	return string(b)
-}
+func RandomString(n int) string { _ = "STUB: not implemented"; return "" }

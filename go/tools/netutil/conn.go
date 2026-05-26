@@ -29,44 +29,26 @@ type ConnWithTimeouts struct {
 
 // NewConnWithTimeouts wraps a net.Conn with read and write deadilnes.
 func NewConnWithTimeouts(conn net.Conn, readTimeout time.Duration, writeTimeout time.Duration) ConnWithTimeouts {
-	return ConnWithTimeouts{Conn: conn, readTimeout: readTimeout, writeTimeout: writeTimeout}
+	_ = "STUB: not implemented"
+	return *new(ConnWithTimeouts)
 }
 
 // Implementation of the Conn interface.
 
 // Read sets a read deadilne and delegates to conn.Read.
-func (c ConnWithTimeouts) Read(b []byte) (int, error) {
-	if c.readTimeout == 0 {
-		return c.Conn.Read(b)
-	}
-	if err := c.Conn.SetReadDeadline(time.Now().Add(c.readTimeout)); err != nil {
-		return 0, err
-	}
-	return c.Conn.Read(b)
-}
+func (c ConnWithTimeouts) Read(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // Write sets a write deadline and delegates to conn.Write
-func (c ConnWithTimeouts) Write(b []byte) (int, error) {
-	if c.writeTimeout == 0 {
-		return c.Conn.Write(b)
-	}
-	if err := c.Conn.SetWriteDeadline(time.Now().Add(c.writeTimeout)); err != nil {
-		return 0, err
-	}
-	return c.Conn.Write(b)
-}
+func (c ConnWithTimeouts) Write(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // SetDeadline implements the Conn SetDeadline method.
-func (c ConnWithTimeouts) SetDeadline(t time.Time) error {
-	panic("can't call SetDeadline for ConnWithTimeouts")
-}
+func (c ConnWithTimeouts) SetDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetReadDeadline implements the Conn SetReadDeadline method.
-func (c ConnWithTimeouts) SetReadDeadline(t time.Time) error {
-	panic("can't call SetReadDeadline for ConnWithTimeouts")
-}
+func (c ConnWithTimeouts) SetReadDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetWriteDeadline implements the Conn SetWriteDeadline method.
 func (c ConnWithTimeouts) SetWriteDeadline(t time.Time) error {
-	panic("can't call SetWriteDeadline for ConnWithTimeouts")
+	_ = "STUB: not implemented"
+	return nil
 }

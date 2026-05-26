@@ -16,23 +16,13 @@ package memorytopo
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/multigres/multigres/go/common/topoclient"
 )
 
 // convertError converts a context error into a topo error.
-func convertError(err error, nodePath string) error {
-	switch {
-	case errors.Is(err, context.Canceled):
-		return topoclient.NewError(topoclient.Interrupted, nodePath)
-	case errors.Is(err, context.DeadlineExceeded):
-		return topoclient.NewError(topoclient.Timeout, nodePath)
-	}
-	return err
-}
+func convertError(err error, nodePath string) error { _ = "STUB: not implemented"; return nil }
 
 // memoryTopoLockDescriptor implements topoclient.LockDescriptor.
 type memoryTopoLockDescriptor struct {
@@ -43,267 +33,125 @@ type memoryTopoLockDescriptor struct {
 
 // TryLock is part of the topoclient.Conn interface.
 func (c *conn) TryLock(ctx context.Context, dirPath, contents string) (topoclient.LockDescriptor, error) {
-	c.factory.mu.Lock()
-	err := c.factory.getOperationError(TryLock, dirPath)
-	c.factory.mu.Unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := c.checkLockExistence(ctx, dirPath, false); err != nil {
-		return nil, err
-	}
-
-	return c.Lock(ctx, dirPath, contents)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // checkLockExistence is a private helper method that checks if a lock already exists for the given path.
 // It returns nil if no lock exists, or &topoclient.TopoError{Code: topoclient.NodeExists} if a lock already exists.
 func (c *conn) checkLockExistence(ctx context.Context, dirPath string, named bool) error {
-	if err := c.dial(ctx); err != nil {
-		return err
-	}
-
-	c.factory.mu.Lock()
-	defer c.factory.mu.Unlock()
-
-	var n *node
-	if named {
-		n = c.factory.getOrCreatePath(c.cell, dirPath)
-	} else {
-		n = c.factory.nodeByPath(c.cell, dirPath)
-	}
-	if n == nil {
-		return topoclient.NewError(topoclient.NoNode, dirPath)
-	}
-
-	// Check if a lock exists
-	if n.lock != nil {
-		return &topoclient.TopoError{Code: topoclient.NodeExists}
-	}
-
-	// No lock exists
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Check if a lock exists
+
+// No lock exists
+
 // Lock is part of the topoclient.Conn interface.
 func (c *conn) Lock(ctx context.Context, dirPath, contents string) (topoclient.LockDescriptor, error) {
-	c.factory.mu.Lock()
-	err := c.factory.getOperationError(Lock, dirPath)
-	c.factory.mu.Unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	return c.lock(ctx, dirPath, contents, false)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // LockWithTTL is part of the topoclient.Conn interface.
 func (c *conn) LockWithTTL(ctx context.Context, dirPath, contents string, ttl time.Duration) (topoclient.LockDescriptor, error) {
-	c.factory.mu.Lock()
-	err := c.factory.getOperationError(Lock, dirPath)
-	c.factory.mu.Unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	return c.lockWithTTL(ctx, dirPath, contents, false, ttl)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // LockName is part of the topoclient.Conn interface.
 func (c *conn) LockName(ctx context.Context, dirPath, contents string) (topoclient.LockDescriptor, error) {
-	return c.lock(ctx, dirPath, contents, true)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // LockNameWithTTL is part of the topoclient.Conn interface.
 func (c *conn) LockNameWithTTL(ctx context.Context, dirPath, contents string, ttl time.Duration) (topoclient.LockDescriptor, error) {
-	return c.lockWithTTL(ctx, dirPath, contents, true, ttl)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // TryLockWithLease is part of the topoclient.Conn interface.
 func (c *conn) TryLockWithLease(ctx context.Context, key, contents string, ttl time.Duration) (topoclient.LockDescriptor, error) {
-	return c.TryLockNameWithTTL(ctx, key, contents, ttl)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // TryLockNameWithTTL is part of the topoclient.Conn interface.
 func (c *conn) TryLockNameWithTTL(ctx context.Context, dirPath, contents string, ttl time.Duration) (topoclient.LockDescriptor, error) {
-	c.factory.mu.Lock()
-	err := c.factory.getOperationError(TryLock, dirPath)
-	c.factory.mu.Unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	// Check if lock exists, using named=true so the path is created if needed
-	if err := c.checkLockExistence(ctx, dirPath, true); err != nil {
-		return nil, err
-	}
-
-	return c.lockWithTTL(ctx, dirPath, contents, true, ttl)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
+
+// Check if lock exists, using named=true so the path is created if needed
 
 // TryLockName is part of the topoclient.Conn interface.
 func (c *conn) TryLockName(ctx context.Context, dirPath, contents string) (topoclient.LockDescriptor, error) {
-	c.factory.mu.Lock()
-	err := c.factory.getOperationError(TryLock, dirPath)
-	c.factory.mu.Unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	// Check if lock exists, using named=true so the path is created if needed
-	if err := c.checkLockExistence(ctx, dirPath, true); err != nil {
-		return nil, err
-	}
-
-	return c.lock(ctx, dirPath, contents, true)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
+
+// Check if lock exists, using named=true so the path is created if needed
 
 // lock acquires a lock without TTL.
 func (c *conn) lock(ctx context.Context, dirPath, contents string, named bool) (topoclient.LockDescriptor, error) {
-	return c.lockWithTTL(ctx, dirPath, contents, named, 0)
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
 
 // lockWithTTL acquires a lock with an optional TTL. If ttl is 0, the lock does not expire.
 func (c *conn) lockWithTTL(ctx context.Context, dirPath, contents string, named bool, ttl time.Duration) (topoclient.LockDescriptor, error) {
-	for {
-		if err := c.dial(ctx); err != nil {
-			return nil, err
-		}
-
-		c.factory.mu.Lock()
-
-		if c.factory.err != nil {
-			c.factory.mu.Unlock()
-			return nil, c.factory.err
-		}
-
-		var n *node
-		if named {
-			n = c.factory.getOrCreatePath(c.cell, dirPath)
-		} else {
-			n = c.factory.nodeByPath(c.cell, dirPath)
-		}
-		if n == nil {
-			c.factory.mu.Unlock()
-			return nil, topoclient.NewError(topoclient.NoNode, dirPath)
-		}
-
-		if l := n.lock; l != nil {
-			// Someone else has the lock. Just wait for it.
-			c.factory.mu.Unlock()
-			select {
-			case <-l:
-				// Node was unlocked, try again to grab it.
-				continue
-			case <-ctx.Done():
-				// Done waiting
-				return nil, convertError(ctx.Err(), dirPath)
-			}
-		}
-
-		// No one has the lock, grab it.
-		lockCh := make(chan struct{})
-		n.lock = lockCh
-		n.lockContents = contents
-
-		// Set up TTL expiration if specified
-		if ttl > 0 {
-			n.lockTTLTimer = time.AfterFunc(ttl, func() {
-				c.factory.mu.Lock()
-				defer c.factory.mu.Unlock()
-				// Only expire if the lock is still held (not already unlocked)
-				if n.lock != nil {
-					clearLock(n)
-				}
-			})
-		}
-
-		for _, w := range n.watches {
-			if w.lock == nil {
-				continue
-			}
-			w.lock <- contents
-		}
-		c.factory.mu.Unlock()
-		return &memoryTopoLockDescriptor{
-			c:       c,
-			dirPath: dirPath,
-			lockCh:  lockCh,
-		}, nil
-	}
+	_ = "STUB: not implemented"
+	return *new(topoclient.LockDescriptor), nil
 }
+
+// Someone else has the lock. Just wait for it.
+
+// Node was unlocked, try again to grab it.
+
+// Done waiting
+
+// No one has the lock, grab it.
+
+// Set up TTL expiration if specified
+
+// Only expire if the lock is still held (not already unlocked)
 
 // Check is part of the topoclient.LockDescriptor interface.
 // Returns an error if the lock has been force-unlocked or stolen by another holder.
 func (ld *memoryTopoLockDescriptor) Check(ctx context.Context) error {
-	ld.c.factory.mu.Lock()
-	defer ld.c.factory.mu.Unlock()
-
-	n := ld.c.factory.nodeByPath(ld.c.cell, ld.dirPath)
-	if n == nil || n.lock != ld.lockCh {
-		return fmt.Errorf("lock lost for %v", ld.dirPath)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Unlock is part of the topoclient.LockDescriptor interface.
 func (ld *memoryTopoLockDescriptor) Unlock(ctx context.Context) error {
-	return ld.c.unlock(ctx, ld.dirPath)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RevokeLockWithLease is part of the topoclient.Conn interface.
 func (c *conn) RevokeLockWithLease(ctx context.Context, key string) error {
-	return c.forceUnlock(ctx, key)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // forceUnlock forcefully removes the lock at the given path regardless of who holds it.
 func (c *conn) forceUnlock(ctx context.Context, dirPath string) error {
-	if c.closed.Load() {
-		return ErrConnectionClosed
-	}
-
-	c.factory.mu.Lock()
-	defer c.factory.mu.Unlock()
-
-	n := c.factory.nodeByPath(c.cell, dirPath)
-	if n == nil {
-		return nil // No node, no lock to remove
-	}
-	if n.lock == nil {
-		return nil // No lock held
-	}
-	clearLock(n)
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// No node, no lock to remove
+
+// No lock held
+
 func (c *conn) unlock(ctx context.Context, dirPath string) error {
-	if c.closed.Load() {
-		return ErrConnectionClosed
-	}
-
-	c.factory.mu.Lock()
-	defer c.factory.mu.Unlock()
-
-	n := c.factory.nodeByPath(c.cell, dirPath)
-	if n == nil {
-		return topoclient.NewError(topoclient.NoNode, dirPath)
-	}
-	if n.lock == nil {
-		return fmt.Errorf("node %v is not locked", dirPath)
-	}
-	clearLock(n)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // clearLock stops any TTL timer, closes the lock channel, and clears
 // lock-related fields. Must be called with factory.mu held.
-func clearLock(n *node) {
-	if n.lockTTLTimer != nil {
-		n.lockTTLTimer.Stop()
-		n.lockTTLTimer = nil
-	}
-	close(n.lock)
-	n.lock = nil
-	n.lockContents = ""
-}
+func clearLock(n *node) { _ = "STUB: not implemented"; return }

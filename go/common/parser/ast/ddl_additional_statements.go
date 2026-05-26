@@ -25,12 +25,6 @@
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 package ast
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
-
 // =============================================================================
 // TABLESPACE Statements
 // =============================================================================
@@ -45,49 +39,18 @@ type CreateTableSpaceStmt struct {
 }
 
 func NewCreateTableSpaceStmt(name string, owner *RoleSpec, location string, options *NodeList) *CreateTableSpaceStmt {
-	return &CreateTableSpaceStmt{
-		BaseNode:       BaseNode{Tag: T_CreateTableSpaceStmt},
-		TablespaceName: name,
-		Owner:          owner,
-		LocationPath:   location,
-		Options:        options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateTableSpaceStmt) String() string {
-	return fmt.Sprintf("CreateTableSpaceStmt(%s)@%d", c.TablespaceName, c.Location())
-}
+func (c *CreateTableSpaceStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateTableSpaceStmt) StatementType() string {
-	return "CreateTableSpaceStmt"
-}
+func (c *CreateTableSpaceStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CREATE TABLESPACE statement
-func (c *CreateTableSpaceStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE TABLESPACE", QuoteIdentifier(c.TablespaceName))
+func (c *CreateTableSpaceStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if c.Owner != nil {
-		parts = append(parts, "OWNER", c.Owner.SqlString())
-	}
-
-	// Always include LOCATION clause since it's required in CREATE TABLESPACE syntax
-	parts = append(parts, "LOCATION", QuoteStringLiteral(c.LocationPath))
-
-	if c.Options != nil && c.Options.Len() > 0 {
-		optionStrs := make([]string, 0, c.Options.Len())
-		for i := 0; i < c.Options.Len(); i++ {
-			if defElem, ok := c.Options.Items[i].(*DefElem); ok {
-				optionStrs = append(optionStrs, defElem.SqlString())
-			}
-		}
-		if len(optionStrs) > 0 {
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Always include LOCATION clause since it's required in CREATE TABLESPACE syntax
 
 // AlterTableSpaceStmt represents ALTER TABLESPACE statement
 type AlterTableSpaceStmt struct {
@@ -98,45 +61,16 @@ type AlterTableSpaceStmt struct {
 }
 
 func NewAlterTableSpaceStmt(name string, options *NodeList, isReset bool) *AlterTableSpaceStmt {
-	return &AlterTableSpaceStmt{
-		BaseNode:       BaseNode{Tag: T_AlterTableSpaceStmt},
-		TablespaceName: name,
-		Options:        options,
-		IsReset:        isReset,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterTableSpaceStmt) String() string {
-	return fmt.Sprintf("AlterTableSpaceStmt(%s)@%d", a.TablespaceName, a.Location())
-}
+func (a *AlterTableSpaceStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterTableSpaceStmt) StatementType() string {
-	return "AlterTableSpaceStmt"
-}
+func (a *AlterTableSpaceStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER TABLESPACE statement
-func (a *AlterTableSpaceStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER TABLESPACE", QuoteIdentifier(a.TablespaceName))
-
-	if a.Options != nil && a.Options.Len() > 0 {
-		optionStrs := make([]string, 0, a.Options.Len())
-		for i := 0; i < a.Options.Len(); i++ {
-			if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-				optionStrs = append(optionStrs, defElem.SqlString())
-			}
-		}
-		if len(optionStrs) > 0 {
-			if a.IsReset {
-				parts = append(parts, "RESET (", strings.Join(optionStrs, ", "), ")")
-			} else {
-				parts = append(parts, "SET (", strings.Join(optionStrs, ", "), ")")
-			}
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+func (a *AlterTableSpaceStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // =============================================================================
 // ACCESS METHOD Statements
@@ -159,48 +93,16 @@ type CreateAmStmt struct {
 }
 
 func NewCreateAmStmt(name string, amType AmType, handler *NodeList) *CreateAmStmt {
-	return &CreateAmStmt{
-		BaseNode:    BaseNode{Tag: T_CreateAmStmt},
-		AmName:      name,
-		AmType:      amType,
-		HandlerName: handler,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateAmStmt) String() string {
-	return fmt.Sprintf("CreateAmStmt(%s)@%d", c.AmName, c.Location())
-}
+func (c *CreateAmStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateAmStmt) StatementType() string {
-	return "CreateAmStmt"
-}
+func (c *CreateAmStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CREATE ACCESS METHOD statement
-func (c *CreateAmStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE ACCESS METHOD", QuoteIdentifier(c.AmName))
-
-	var typeStr string
-	switch c.AmType {
-	case AMTYPE_INDEX:
-		typeStr = "INDEX"
-	case AMTYPE_TABLE:
-		typeStr = "TABLE"
-	}
-	parts = append(parts, "TYPE", typeStr)
-
-	if c.HandlerName != nil && c.HandlerName.Len() > 0 {
-		handlerNames := make([]string, 0, c.HandlerName.Len())
-		for i := 0; i < c.HandlerName.Len(); i++ {
-			if strNode, ok := c.HandlerName.Items[i].(*String); ok {
-				handlerNames = append(handlerNames, strNode.SVal)
-			}
-		}
-		parts = append(parts, "HANDLER", strings.Join(handlerNames, "."))
-	}
-
-	return strings.Join(parts, " ")
-}
+func (c *CreateAmStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // =============================================================================
 // ALTER STATISTICS Statement
@@ -215,48 +117,16 @@ type AlterStatsStmt struct {
 }
 
 func NewAlterStatsStmt(defnames *NodeList, target Node, missingOk bool) *AlterStatsStmt {
-	return &AlterStatsStmt{
-		BaseNode:      BaseNode{Tag: T_AlterStatsStmt},
-		DefNames:      defnames,
-		StxStatTarget: target,
-		MissingOk:     missingOk,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterStatsStmt) String() string {
-	return fmt.Sprintf("AlterStatsStmt@%d", a.Location())
-}
+func (a *AlterStatsStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterStatsStmt) StatementType() string {
-	return "AlterStatsStmt"
-}
+func (a *AlterStatsStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER STATISTICS statement
-func (a *AlterStatsStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER STATISTICS")
-
-	if a.MissingOk {
-		parts = append(parts, "IF EXISTS")
-	}
-
-	if a.DefNames != nil && a.DefNames.Len() > 0 {
-		nameStrs := make([]string, 0, a.DefNames.Len())
-		for i := 0; i < a.DefNames.Len(); i++ {
-			if strNode, ok := a.DefNames.Items[i].(*String); ok {
-				nameStrs = append(nameStrs, strNode.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(nameStrs, "."))
-	}
-
-	parts = append(parts, "SET STATISTICS")
-	if a.StxStatTarget != nil {
-		parts = append(parts, a.StxStatTarget.SqlString())
-	}
-
-	return strings.Join(parts, " ")
-}
+func (a *AlterStatsStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // =============================================================================
 // PUBLICATION Statements
@@ -291,12 +161,8 @@ type PublicationTable struct {
 }
 
 func NewPublicationTable(relation *RangeVar, whereClause Node, columns *NodeList) *PublicationTable {
-	return &PublicationTable{
-		BaseNode:    BaseNode{Tag: T_PublicationTable},
-		Relation:    relation,
-		WhereClause: whereClause,
-		Columns:     columns,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PublicationObjSpec represents a publication object specification
@@ -310,151 +176,49 @@ type PublicationObjSpec struct {
 
 // NewPublicationObjSpecName creates a PublicationObjSpec with just a name
 func NewPublicationObjSpecName(objType PublicationObjSpecType, name string) *PublicationObjSpec {
-	return &PublicationObjSpec{
-		BaseNode:   BaseNode{Tag: T_PublicationObjSpec},
-		PubObjType: objType,
-		Name:       name,
-		PubTable:   nil,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewPublicationObjSpecTable creates a PublicationObjSpec with a PublicationTable
 func NewPublicationObjSpecTable(objType PublicationObjSpecType, pubTable *PublicationTable) *PublicationObjSpec {
-	return &PublicationObjSpec{
-		BaseNode:   BaseNode{Tag: T_PublicationObjSpec},
-		PubObjType: objType,
-		Name:       "",
-		PubTable:   pubTable,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewPublicationObjSpec creates a basic PublicationObjSpec (for schema-only cases)
 func NewPublicationObjSpec(objType PublicationObjSpecType) *PublicationObjSpec {
-	return &PublicationObjSpec{
-		BaseNode:   BaseNode{Tag: T_PublicationObjSpec},
-		PubObjType: objType,
-		Name:       "",
-		PubTable:   nil,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // preprocessPubObjList resolves PUBLICATIONOBJ_CONTINUATION entries — emitted
 // by the grammar because LALR(1) cannot distinguish "TABLE x, y" from
 // "TABLES IN SCHEMA a, b" until a later token — to the type of the preceding
 // explicit entry. Mirrors preprocess_pubobj_list in postgres/src/backend/commands/publicationcmds.c.
-func preprocessPubObjList(pubObjects *NodeList) {
-	if pubObjects == nil {
-		return
-	}
-	prev := PUBLICATIONOBJ_CONTINUATION
-	for _, item := range pubObjects.Items {
-		pubObj, ok := item.(*PublicationObjSpec)
-		if !ok {
-			continue
-		}
-		if pubObj.PubObjType == PUBLICATIONOBJ_CONTINUATION {
-			switch prev {
-			case PUBLICATIONOBJ_TABLE:
-				if pubObj.PubTable == nil && pubObj.Name != "" {
-					pubObj.PubTable = NewPublicationTable(NewRangeVar(pubObj.Name, "", ""), nil, nil)
-					pubObj.Name = ""
-				}
-				pubObj.PubObjType = PUBLICATIONOBJ_TABLE
-			case PUBLICATIONOBJ_TABLES_IN_SCHEMA, PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA:
-				if pubObj.Name == "" && pubObj.PubTable == nil {
-					pubObj.PubObjType = PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA
-				} else {
-					pubObj.PubObjType = PUBLICATIONOBJ_TABLES_IN_SCHEMA
-				}
-			}
-		}
-		prev = pubObj.PubObjType
-	}
-}
+func preprocessPubObjList(pubObjects *NodeList) { _ = "STUB: not implemented"; return }
 
-func formatPubTable(pt *PublicationTable) string {
-	s := pt.Relation.SqlString()
-	if pt.Columns != nil && pt.Columns.Len() > 0 {
-		cols := make([]string, 0, pt.Columns.Len())
-		for _, item := range pt.Columns.Items {
-			if str, ok := item.(*String); ok {
-				cols = append(cols, QuoteIdentifier(str.SVal))
-			}
-		}
-		s += " (" + strings.Join(cols, ", ") + ")"
-	}
-	if pt.WhereClause != nil {
-		s += " WHERE (" + pt.WhereClause.SqlString() + ")"
-	}
-	return s
-}
+func formatPubTable(pt *PublicationTable) string { _ = "STUB: not implemented"; return "" }
 
 // formatPubObjList renders a publication object list, preserving the original
 // order. A TABLE / TABLES IN SCHEMA keyword is emitted only when the object type
 // changes; consecutive same-type objects share the preceding keyword (the
 // inverse of preprocessPubObjList). Grouping the tables and schemas separately
 // would reorder the list and change the parsed tree.
-func formatPubObjList(pubObjects *NodeList) string {
-	var parts []string
-	prev := PUBLICATIONOBJ_CONTINUATION // sentinel: forces a keyword on the first object
-	for _, item := range pubObjects.Items {
-		pubObj, ok := item.(*PublicationObjSpec)
-		if !ok {
-			continue
-		}
-		switch pubObj.PubObjType {
-		case PUBLICATIONOBJ_TABLE:
-			if pubObj.PubTable == nil || pubObj.PubTable.Relation == nil {
-				continue
-			}
-			obj := formatPubTable(pubObj.PubTable)
-			if prev != PUBLICATIONOBJ_TABLE {
-				obj = "TABLE " + obj
-			}
-			parts = append(parts, obj)
-		case PUBLICATIONOBJ_TABLES_IN_SCHEMA:
-			obj := QuoteIdentifier(pubObj.Name)
-			// A continuation entry can carry the name in PubTable instead, along
-			// with any column list / WHERE clause from the original text. Emit
-			// those through formatPubTable so they are not silently dropped (the
-			// combination is rejected by PostgreSQL at analysis time, but it still
-			// parses, so the round-trip must preserve it).
-			if pubObj.Name == "" && pubObj.PubTable != nil && pubObj.PubTable.Relation != nil {
-				obj = formatPubTable(pubObj.PubTable)
-			}
-			if obj == "" {
-				continue
-			}
-			if prev != PUBLICATIONOBJ_TABLES_IN_SCHEMA {
-				obj = "TABLES IN SCHEMA " + obj
-			}
-			parts = append(parts, obj)
-		case PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA:
-			obj := "CURRENT_SCHEMA"
-			if prev != PUBLICATIONOBJ_TABLES_IN_CUR_SCHEMA {
-				obj = "TABLES IN SCHEMA " + obj
-			}
-			parts = append(parts, obj)
-		case PUBLICATIONOBJ_CONTINUATION:
-			// A CONTINUATION that survives preprocessing is a first object with no
-			// preceding TABLE / TABLES IN SCHEMA keyword (e.g. `FOR CURRENT_SCHEMA`
-			// or a bare name). PostgreSQL rejects these at analysis time, but they
-			// parse, so emit the bare spelling to preserve the tree.
-			switch {
-			case pubObj.PubTable != nil && pubObj.PubTable.Relation != nil:
-				parts = append(parts, formatPubTable(pubObj.PubTable))
-			case pubObj.Name != "":
-				parts = append(parts, QuoteIdentifier(pubObj.Name))
-			default:
-				parts = append(parts, "CURRENT_SCHEMA")
-			}
-		default:
-			continue
-		}
-		prev = pubObj.PubObjType
-	}
-	return strings.Join(parts, ", ")
-}
+func formatPubObjList(pubObjects *NodeList) string { _ = "STUB: not implemented"; return "" }
+
+// sentinel: forces a keyword on the first object
+
+// A continuation entry can carry the name in PubTable instead, along
+// with any column list / WHERE clause from the original text. Emit
+// those through formatPubTable so they are not silently dropped (the
+// combination is rejected by PostgreSQL at analysis time, but it still
+// parses, so the round-trip must preserve it).
+
+// A CONTINUATION that survives preprocessing is a first object with no
+// preceding TABLE / TABLES IN SCHEMA keyword (e.g. `FOR CURRENT_SCHEMA`
+// or a bare name). PostgreSQL rejects these at analysis time, but they
+// parse, so emit the bare spelling to preserve the tree.
 
 // CreatePublicationStmt represents CREATE PUBLICATION statement
 type CreatePublicationStmt struct {
@@ -466,51 +230,16 @@ type CreatePublicationStmt struct {
 }
 
 func NewCreatePublicationStmt(name string, objects *NodeList, forAllTables bool, options *NodeList) *CreatePublicationStmt {
-	preprocessPubObjList(objects)
-	return &CreatePublicationStmt{
-		BaseNode:     BaseNode{Tag: T_CreatePublicationStmt},
-		PubName:      name,
-		PubObjects:   objects,
-		ForAllTables: forAllTables,
-		Options:      options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreatePublicationStmt) String() string {
-	return fmt.Sprintf("CreatePublicationStmt(%s)@%d", c.PubName, c.Location())
-}
+func (c *CreatePublicationStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreatePublicationStmt) StatementType() string {
-	return "CreatePublicationStmt"
-}
+func (c *CreatePublicationStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CREATE PUBLICATION statement
-func (c *CreatePublicationStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE PUBLICATION", QuoteIdentifier(c.PubName))
-
-	if c.ForAllTables {
-		parts = append(parts, "FOR ALL TABLES")
-	} else if c.PubObjects != nil && c.PubObjects.Len() > 0 {
-		if list := formatPubObjList(c.PubObjects); list != "" {
-			parts = append(parts, "FOR "+list)
-		}
-	}
-
-	if c.Options != nil && c.Options.Len() > 0 {
-		optionStrs := make([]string, 0, c.Options.Len())
-		for i := 0; i < c.Options.Len(); i++ {
-			if defElem, ok := c.Options.Items[i].(*DefElem); ok {
-				optionStrs = append(optionStrs, defElem.SqlString())
-			}
-		}
-		if len(optionStrs) > 0 {
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+func (c *CreatePublicationStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // AlterPublicationStmt represents ALTER PUBLICATION statement
 type AlterPublicationStmt struct {
@@ -522,56 +251,16 @@ type AlterPublicationStmt struct {
 }
 
 func NewAlterPublicationStmt(name string, options, objects *NodeList, action AlterPublicationType) *AlterPublicationStmt {
-	preprocessPubObjList(objects)
-	return &AlterPublicationStmt{
-		BaseNode:   BaseNode{Tag: T_AlterPublicationStmt},
-		PubName:    name,
-		Options:    options,
-		PubObjects: objects,
-		Action:     action,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterPublicationStmt) String() string {
-	return fmt.Sprintf("AlterPublicationStmt(%s)@%d", a.PubName, a.Location())
-}
+func (a *AlterPublicationStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterPublicationStmt) StatementType() string {
-	return "AlterPublicationStmt"
-}
+func (a *AlterPublicationStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER PUBLICATION statement
-func (a *AlterPublicationStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER PUBLICATION", QuoteIdentifier(a.PubName))
-
-	switch a.Action {
-	case AP_SetOptions:
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "SET (", strings.Join(optionStrs, ", "), ")")
-		}
-	case AP_AddObjects:
-		if a.PubObjects != nil && a.PubObjects.Len() > 0 {
-			parts = append(parts, "ADD "+formatPubObjList(a.PubObjects))
-		}
-	case AP_SetObjects:
-		if a.PubObjects != nil && a.PubObjects.Len() > 0 {
-			parts = append(parts, "SET "+formatPubObjList(a.PubObjects))
-		}
-	case AP_DropObjects:
-		if a.PubObjects != nil && a.PubObjects.Len() > 0 {
-			parts = append(parts, "DROP "+formatPubObjList(a.PubObjects))
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+func (a *AlterPublicationStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // =============================================================================
 // SUBSCRIPTION Statements
@@ -601,90 +290,29 @@ type CreateSubscriptionStmt struct {
 }
 
 func NewCreateSubscriptionStmt(name, connInfo string, publication, options *NodeList) *CreateSubscriptionStmt {
-	return &CreateSubscriptionStmt{
-		BaseNode:    BaseNode{Tag: T_CreateSubscriptionStmt},
-		SubName:     name,
-		ConnInfo:    connInfo,
-		Publication: publication,
-		Options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *CreateSubscriptionStmt) String() string {
-	return fmt.Sprintf("CreateSubscriptionStmt(%s)@%d", c.SubName, c.Location())
-}
+func (c *CreateSubscriptionStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (c *CreateSubscriptionStmt) StatementType() string {
-	return "CreateSubscriptionStmt"
-}
+func (c *CreateSubscriptionStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of CREATE SUBSCRIPTION statement
-func (c *CreateSubscriptionStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "CREATE SUBSCRIPTION", QuoteIdentifier(c.SubName))
-	parts = append(parts, "CONNECTION", QuoteStringLiteral(c.ConnInfo))
+func (c *CreateSubscriptionStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if c.Publication != nil && c.Publication.Len() > 0 {
-		pubStrs := make([]string, 0, c.Publication.Len())
-		for i := 0; i < c.Publication.Len(); i++ {
-			if strNode, ok := c.Publication.Items[i].(*String); ok {
-				// Publication names should be identifiers, not quoted strings
-				pubStrs = append(pubStrs, QuoteIdentifier(strNode.SVal))
-			}
-		}
-		parts = append(parts, "PUBLICATION", strings.Join(pubStrs, ", "))
-	}
+// Publication names should be identifiers, not quoted strings
 
-	if c.Options != nil && c.Options.Len() > 0 {
-		optionStrs := make([]string, 0, c.Options.Len())
-		for i := 0; i < c.Options.Len(); i++ {
-			if defElem, ok := c.Options.Items[i].(*DefElem); ok {
-				// Use special formatting for subscription options
-				optionStrs = append(optionStrs, formatSubscriptionOption(defElem))
-			}
-		}
-		if len(optionStrs) > 0 {
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Use special formatting for subscription options
 
 // formatSubscriptionOption formats DefElem for subscription options
-func formatSubscriptionOption(d *DefElem) string {
-	if d.Arg == nil {
-		return d.Defname
-	}
+func formatSubscriptionOption(d *DefElem) string { _ = "STUB: not implemented"; return "" }
 
-	optionName := d.Defname
+// Special handling for specific subscription options
 
-	switch arg := d.Arg.(type) {
-	case *String:
-		// Special handling for specific subscription options
-		switch optionName {
-		case "slot_name":
-			if strings.ToLower(arg.SVal) == "none" {
-				return optionName + " = NONE"
-			}
-			return optionName + " = " + arg.SVal
-		default:
-			// For other string options, don't quote
-			return optionName + " = " + arg.SVal
-		}
-	case *Boolean:
-		if arg.BoolVal {
-			return optionName + " = true"
-		} else {
-			return optionName + " = false"
-		}
-	case *Integer:
-		return optionName + " = " + strconv.Itoa(arg.IVal)
-	default:
-		// Fallback to regular SqlString for other types
-		return fmt.Sprintf("%s = %s", optionName, arg.SqlString())
-	}
-}
+// For other string options, don't quote
+
+// Fallback to regular SqlString for other types
 
 // AlterSubscriptionStmt represents ALTER SUBSCRIPTION statement
 type AlterSubscriptionStmt struct {
@@ -697,147 +325,18 @@ type AlterSubscriptionStmt struct {
 }
 
 func NewAlterSubscriptionStmt(name string, kind AlterSubscriptionType, connInfo string, publication, options *NodeList) *AlterSubscriptionStmt {
-	return &AlterSubscriptionStmt{
-		BaseNode:    BaseNode{Tag: T_AlterSubscriptionStmt},
-		SubName:     name,
-		Kind:        kind,
-		ConnInfo:    connInfo,
-		Publication: publication,
-		Options:     options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterSubscriptionStmt) String() string {
-	return fmt.Sprintf("AlterSubscriptionStmt(%s)@%d", a.SubName, a.Location())
-}
+func (a *AlterSubscriptionStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterSubscriptionStmt) StatementType() string {
-	return "AlterSubscriptionStmt"
-}
+func (a *AlterSubscriptionStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER SUBSCRIPTION statement
-func (a *AlterSubscriptionStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER SUBSCRIPTION", QuoteIdentifier(a.SubName))
+func (a *AlterSubscriptionStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	switch a.Kind {
-	case ALTER_SUBSCRIPTION_OPTIONS:
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "SET (", strings.Join(optionStrs, ", "), ")")
-		}
-	case ALTER_SUBSCRIPTION_CONNECTION:
-		if a.ConnInfo != "" {
-			parts = append(parts, "CONNECTION", QuoteStringLiteral(a.ConnInfo))
-		}
-	case ALTER_SUBSCRIPTION_REFRESH:
-		parts = append(parts, "REFRESH PUBLICATION")
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	case ALTER_SUBSCRIPTION_ADD_PUBLICATION:
-		parts = append(parts, "ADD PUBLICATION")
-		if a.Publication != nil && a.Publication.Len() > 0 {
-			pubStrs := make([]string, 0, a.Publication.Len())
-			for i := 0; i < a.Publication.Len(); i++ {
-				if strNode, ok := a.Publication.Items[i].(*String); ok {
-					pubStrs = append(pubStrs, QuoteIdentifier(strNode.SVal))
-				}
-			}
-			parts = append(parts, strings.Join(pubStrs, ", "))
-		}
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	case ALTER_SUBSCRIPTION_DROP_PUBLICATION:
-		parts = append(parts, "DROP PUBLICATION")
-		if a.Publication != nil && a.Publication.Len() > 0 {
-			pubStrs := make([]string, 0, a.Publication.Len())
-			for i := 0; i < a.Publication.Len(); i++ {
-				if strNode, ok := a.Publication.Items[i].(*String); ok {
-					pubStrs = append(pubStrs, QuoteIdentifier(strNode.SVal))
-				}
-			}
-			parts = append(parts, strings.Join(pubStrs, ", "))
-		}
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	case ALTER_SUBSCRIPTION_SET_PUBLICATION:
-		parts = append(parts, "SET PUBLICATION")
-		if a.Publication != nil && a.Publication.Len() > 0 {
-			pubStrs := make([]string, 0, a.Publication.Len())
-			for i := 0; i < a.Publication.Len(); i++ {
-				if strNode, ok := a.Publication.Items[i].(*String); ok {
-					pubStrs = append(pubStrs, QuoteIdentifier(strNode.SVal))
-				}
-			}
-			parts = append(parts, strings.Join(pubStrs, ", "))
-		}
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "WITH (", strings.Join(optionStrs, ", "), ")")
-		}
-	case ALTER_SUBSCRIPTION_ENABLED:
-		// The "enabled" option carries whether this is ENABLE or DISABLE.
-		enabled := true
-		if a.Options != nil {
-			for _, item := range a.Options.Items {
-				if defElem, ok := item.(*DefElem); ok && defElem.Defname == "enabled" {
-					if b, ok := defElem.Arg.(*Boolean); ok {
-						enabled = b.BoolVal
-					}
-				}
-			}
-		}
-		if enabled {
-			parts = append(parts, "ENABLE")
-		} else {
-			parts = append(parts, "DISABLE")
-		}
-	case ALTER_SUBSCRIPTION_SKIP:
-		parts = append(parts, "SKIP")
-		if a.Options != nil && a.Options.Len() > 0 {
-			optionStrs := make([]string, 0, a.Options.Len())
-			for i := 0; i < a.Options.Len(); i++ {
-				if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-					optionStrs = append(optionStrs, defElem.SqlString())
-				}
-			}
-			parts = append(parts, "(", strings.Join(optionStrs, ", "), ")")
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// The "enabled" option carries whether this is ENABLE or DISABLE.
 
 // =============================================================================
 // ALTER OPERATOR FAMILY Statement
@@ -853,61 +352,18 @@ type AlterOpFamilyStmt struct {
 }
 
 func NewAlterOpFamilyStmt(name *NodeList, amName string, isDrop bool, items *NodeList) *AlterOpFamilyStmt {
-	return &AlterOpFamilyStmt{
-		BaseNode:     BaseNode{Tag: T_AlterOpFamilyStmt},
-		OpFamilyName: name,
-		AmName:       amName,
-		IsDrop:       isDrop,
-		Items:        items,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterOpFamilyStmt) String() string {
-	return fmt.Sprintf("AlterOpFamilyStmt@%d", a.Location())
-}
+func (a *AlterOpFamilyStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterOpFamilyStmt) StatementType() string {
-	return "AlterOpFamilyStmt"
-}
+func (a *AlterOpFamilyStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER OPERATOR FAMILY statement
-func (a *AlterOpFamilyStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER OPERATOR FAMILY")
+func (a *AlterOpFamilyStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if a.OpFamilyName != nil && a.OpFamilyName.Len() > 0 {
-		nameStrs := make([]string, 0, a.OpFamilyName.Len())
-		for i := 0; i < a.OpFamilyName.Len(); i++ {
-			if strNode, ok := a.OpFamilyName.Items[i].(*String); ok {
-				nameStrs = append(nameStrs, strNode.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(nameStrs, "."))
-	}
-
-	parts = append(parts, "USING", QuoteIdentifier(a.AmName))
-
-	if a.IsDrop {
-		parts = append(parts, "DROP")
-	} else {
-		parts = append(parts, "ADD")
-	}
-
-	// Add the items
-	if a.Items != nil && a.Items.Len() > 0 {
-		itemStrs := make([]string, 0, a.Items.Len())
-		for i := 0; i < a.Items.Len(); i++ {
-			if item, ok := a.Items.Items[i].(*CreateOpClassItem); ok {
-				itemStrs = append(itemStrs, item.SqlString())
-			}
-		}
-		if len(itemStrs) > 0 {
-			parts = append(parts, strings.Join(itemStrs, ", "))
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+// Add the items
 
 // =============================================================================
 // ALTER FUNCTION Statement
@@ -923,57 +379,16 @@ type AlterFunctionStmt struct {
 }
 
 func NewAlterFunctionStmt(objType ObjectType, funcWithArgs *ObjectWithArgs, actions *NodeList) *AlterFunctionStmt {
-	return &AlterFunctionStmt{
-		BaseNode: BaseNode{Tag: T_AlterFunctionStmt},
-		ObjType:  objType,
-		Func:     funcWithArgs,
-		Actions:  actions,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterFunctionStmt) String() string {
-	objTypeStr := "FUNCTION"
-	if a.ObjType == OBJECT_PROCEDURE {
-		objTypeStr = "PROCEDURE"
-	}
-	return fmt.Sprintf("AlterFunctionStmt(%s)@%d", objTypeStr, a.Location())
-}
+func (a *AlterFunctionStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterFunctionStmt) StatementType() string {
-	return "AlterFunctionStmt"
-}
+func (a *AlterFunctionStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER FUNCTION statement
-func (a *AlterFunctionStmt) SqlString() string {
-	var parts []string
-
-	switch a.ObjType {
-	case OBJECT_PROCEDURE:
-		parts = append(parts, "ALTER PROCEDURE")
-	case OBJECT_ROUTINE:
-		parts = append(parts, "ALTER ROUTINE")
-	default:
-		parts = append(parts, "ALTER FUNCTION")
-	}
-
-	if a.Func != nil {
-		parts = append(parts, a.Func.SqlString())
-	}
-
-	if a.Actions != nil && a.Actions.Len() > 0 {
-		actionStrs := make([]string, 0, a.Actions.Len())
-		for i := 0; i < a.Actions.Len(); i++ {
-			if defElem, ok := a.Actions.Items[i].(*DefElem); ok {
-				actionStrs = append(actionStrs, defElem.SqlStringForFunction())
-			}
-		}
-		if len(actionStrs) > 0 {
-			parts = append(parts, strings.Join(actionStrs, " "))
-		}
-	}
-
-	return strings.Join(parts, " ")
-}
+func (a *AlterFunctionStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
 // =============================================================================
 // ALTER TYPE Statements
@@ -988,53 +403,18 @@ type AlterTypeStmt struct {
 }
 
 func NewAlterTypeStmt(typeName *NodeList, options *NodeList) *AlterTypeStmt {
-	return &AlterTypeStmt{
-		BaseNode: BaseNode{Tag: T_AlterTypeStmt},
-		TypeName: typeName,
-		Options:  options,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *AlterTypeStmt) String() string {
-	return fmt.Sprintf("AlterTypeStmt@%d", a.Location())
-}
+func (a *AlterTypeStmt) String() string { _ = "STUB: not implemented"; return "" }
 
-func (a *AlterTypeStmt) StatementType() string {
-	return "AlterTypeStmt"
-}
+func (a *AlterTypeStmt) StatementType() string { _ = "STUB: not implemented"; return "" }
 
 // SqlString returns the SQL representation of ALTER TYPE statement
-func (a *AlterTypeStmt) SqlString() string {
-	var parts []string
-	parts = append(parts, "ALTER TYPE")
+func (a *AlterTypeStmt) SqlString() string { _ = "STUB: not implemented"; return "" }
 
-	if a.TypeName != nil && a.TypeName.Len() > 0 {
-		nameStrs := make([]string, 0, a.TypeName.Len())
-		for i := 0; i < a.TypeName.Len(); i++ {
-			if strNode, ok := a.TypeName.Items[i].(*String); ok {
-				nameStrs = append(nameStrs, strNode.SVal)
-			}
-		}
-		parts = append(parts, strings.Join(nameStrs, "."))
-	}
-
-	if a.Options != nil && a.Options.Len() > 0 {
-		optionStrs := make([]string, 0, a.Options.Len())
-		for i := 0; i < a.Options.Len(); i++ {
-			if defElem, ok := a.Options.Items[i].(*DefElem); ok {
-				if defElem.Arg != nil {
-					optionStrs = append(optionStrs, strings.ToUpper(defElem.Defname)+" = "+defElem.Arg.SqlString())
-				} else {
-					// When Arg is nil, it represents "= NONE" in PostgreSQL
-					optionStrs = append(optionStrs, strings.ToUpper(defElem.Defname)+" = NONE")
-				}
-			}
-		}
-		parts = append(parts, "SET", "("+strings.Join(optionStrs, ", ")+")")
-	}
-
-	return strings.Join(parts, " ")
-}
+// When Arg is nil, it represents "= NONE" in PostgreSQL
 
 // =============================================================================
 // Supporting Types for OPERATOR CLASS

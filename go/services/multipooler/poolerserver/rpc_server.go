@@ -21,8 +21,4 @@ type RegisterPoolerServiceFunc func(*QueryPoolerServer)
 var RegisterPoolerServices []RegisterPoolerServiceFunc
 
 // registerGRPCServices will register all the pooler gRPC service instances.
-func (s *QueryPoolerServer) registerGRPCServices() {
-	for _, f := range RegisterPoolerServices {
-		f(s)
-	}
-}
+func (s *QueryPoolerServer) registerGRPCServices() { _ = "STUB: not implemented"; return }

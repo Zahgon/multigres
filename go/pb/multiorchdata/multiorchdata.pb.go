@@ -21,14 +21,13 @@
 package multiorchdata
 
 import (
+	sync "sync"
+
 	clustermetadata "github.com/multigres/multigres/go/pb/clustermetadata"
 	multipoolermanagerdata "github.com/multigres/multigres/go/pb/multipoolermanagerdata"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -82,126 +81,72 @@ type PoolerHealthState struct {
 	sizeCache               protoimpl.SizeCache
 }
 
-func (x *PoolerHealthState) Reset() {
-	*x = PoolerHealthState{}
-	mi := &file_multiorchdata_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
+func (x *PoolerHealthState) Reset() { _ = "STUB: not implemented"; return }
 
-func (x *PoolerHealthState) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
+func (x *PoolerHealthState) String() string { _ = "STUB: not implemented"; return "" }
 
-func (*PoolerHealthState) ProtoMessage() {}
+func (*PoolerHealthState) ProtoMessage() { _ = "STUB: not implemented"; return }
 
 func (x *PoolerHealthState) ProtoReflect() protoreflect.Message {
-	mi := &file_multiorchdata_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
+	_ = "STUB: not implemented"
+	return *new(protoreflect.Message)
 }
 
 // Deprecated: Use PoolerHealthState.ProtoReflect.Descriptor instead.
-func (*PoolerHealthState) Descriptor() ([]byte, []int) {
-	return file_multiorchdata_proto_rawDescGZIP(), []int{0}
-}
+func (*PoolerHealthState) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
 
 func (x *PoolerHealthState) GetMultiPooler() *clustermetadata.MultiPooler {
-	if x != nil {
-		return x.MultiPooler
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *PoolerHealthState) GetIsUpToDate() bool {
-	if x != nil {
-		return x.IsUpToDate
-	}
-	return false
-}
+func (x *PoolerHealthState) GetIsUpToDate() bool { _ = "STUB: not implemented"; return false }
 
-func (x *PoolerHealthState) GetIsLastCheckValid() bool {
-	if x != nil {
-		return x.IsLastCheckValid
-	}
-	return false
-}
+func (x *PoolerHealthState) GetIsLastCheckValid() bool { _ = "STUB: not implemented"; return false }
 
 func (x *PoolerHealthState) GetLastCheckAttempted() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastCheckAttempted
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetLastCheckSuccessful() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastCheckSuccessful
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetLastSeen() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastSeen
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetConsensusStatus() *clustermetadata.ConsensusStatus {
-	if x != nil {
-		return x.ConsensusStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetLastPostgresReadyTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LastPostgresReadyTime
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetAvailabilityStatus() *clustermetadata.AvailabilityStatus {
-	if x != nil {
-		return x.AvailabilityStatus
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *PoolerHealthState) GetStreamConnected() bool {
-	if x != nil {
-		return x.StreamConnected
-	}
-	return false
-}
+func (x *PoolerHealthState) GetStreamConnected() bool { _ = "STUB: not implemented"; return false }
 
 func (x *PoolerHealthState) GetStreamConnectedSince() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StreamConnectedSince
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (x *PoolerHealthState) GetStatus() *multipoolermanagerdata.Status {
-	if x != nil {
-		return x.Status
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (x *PoolerHealthState) GetStreamSnapshotsReceived() int64 {
-	if x != nil {
-		return x.StreamSnapshotsReceived
-	}
-	return 0
-}
+func (x *PoolerHealthState) GetStreamSnapshotsReceived() int64 { _ = "STUB: not implemented"; return 0 }
 
 var File_multiorchdata_proto protoreflect.FileDescriptor
 
@@ -231,12 +176,7 @@ var (
 	file_multiorchdata_proto_rawDescData []byte
 )
 
-func file_multiorchdata_proto_rawDescGZIP() []byte {
-	file_multiorchdata_proto_rawDescOnce.Do(func() {
-		file_multiorchdata_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_multiorchdata_proto_rawDesc), len(file_multiorchdata_proto_rawDesc)))
-	})
-	return file_multiorchdata_proto_rawDescData
-}
+func file_multiorchdata_proto_rawDescGZIP() []byte { _ = "STUB: not implemented"; return nil }
 
 var file_multiorchdata_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_multiorchdata_proto_goTypes = []any{
@@ -264,26 +204,5 @@ var file_multiorchdata_proto_depIdxs = []int32{
 	0, // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_multiorchdata_proto_init() }
-func file_multiorchdata_proto_init() {
-	if File_multiorchdata_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_multiorchdata_proto_rawDesc), len(file_multiorchdata_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   1,
-			NumExtensions: 0,
-			NumServices:   0,
-		},
-		GoTypes:           file_multiorchdata_proto_goTypes,
-		DependencyIndexes: file_multiorchdata_proto_depIdxs,
-		MessageInfos:      file_multiorchdata_proto_msgTypes,
-	}.Build()
-	File_multiorchdata_proto = out.File
-	file_multiorchdata_proto_goTypes = nil
-	file_multiorchdata_proto_depIdxs = nil
-}
+func init()                          { file_multiorchdata_proto_init() }
+func file_multiorchdata_proto_init() { _ = "STUB: not implemented"; return }

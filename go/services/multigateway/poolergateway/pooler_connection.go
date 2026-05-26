@@ -17,21 +17,16 @@ package poolergateway
 import (
 	"context"
 	"errors"
-	"fmt"
-	"io"
 	"log/slog"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/multigres/multigres/go/common/constants"
 	"github.com/multigres/multigres/go/common/queryservice"
-	"github.com/multigres/multigres/go/common/rpcclient"
 	"github.com/multigres/multigres/go/common/topoclient"
 	clustermetadatapb "github.com/multigres/multigres/go/pb/clustermetadata"
 	"github.com/multigres/multigres/go/pb/multipoolerservice"
 	"github.com/multigres/multigres/go/pb/query"
-	"github.com/multigres/multigres/go/tools/grpccommon"
 	"github.com/multigres/multigres/go/tools/retry"
 
 	"google.golang.org/grpc"
@@ -69,32 +64,14 @@ type PoolerHealth struct {
 }
 
 // IsServing returns true if the pooler is serving traffic.
-func (h *PoolerHealth) IsServing() bool {
-	if h == nil {
-		return false
-	}
-	return h.ServingStatus == clustermetadatapb.PoolerServingStatus_SERVING
-}
+func (h *PoolerHealth) IsServing() bool { _ = "STUB: not implemented"; return false }
 
 // SimpleCopy returns a shallow copy of the PoolerHealth.
 // This is not a deep copy: pointer fields (Target, PoolerID, LeaderObservation)
 // reference the same underlying objects. This is safe because these proto objects
 // are treated as immutable - they are never modified after creation.
 // Returns a shallow copy that is safe to read concurrently.
-func (h *PoolerHealth) SimpleCopy() *PoolerHealth {
-	if h == nil {
-		return nil
-	}
-	return &PoolerHealth{
-		Target:            h.Target,
-		PoolerID:          h.PoolerID,
-		ServingStatus:     h.ServingStatus,
-		LeaderObservation: h.LeaderObservation,
-		ReplicationLagNs:  h.ReplicationLagNs,
-		LastError:         h.LastError,
-		LastResponse:      h.LastResponse,
-	}
-}
+func (h *PoolerHealth) SimpleCopy() *PoolerHealth { _ = "STUB: not implemented"; return nil }
 
 // PoolerConnection manages a single gRPC connection to a multipooler instance.
 // It wraps a QueryService and provides access to pooler metadata.
@@ -159,175 +136,86 @@ func NewPoolerConnection(
 	grpcDialOpt grpc.DialOption,
 	onHealthUpdate func(*PoolerConnection),
 ) (*PoolerConnection, error) {
-	poolerInfo := &topoclient.MultiPoolerInfo{MultiPooler: pooler}
-	poolerID := topoclient.MultiPoolerIDString(pooler.Id)
-	addr := poolerInfo.Addr()
-
-	logger.DebugContext(ctx, "creating pooler connection",
-		"pooler_id", poolerID,
-		"addr", addr,
-		"type", pooler.Type.String())
-
-	// Create gRPC connection with telemetry attributes
-	conn, err := grpccommon.NewClient(addr,
-		grpccommon.WithAttributes(rpcclient.PoolerSpanAttributes(pooler.Id)...),
-		grpccommon.WithDialOptions(grpcDialOpt),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create gRPC client for pooler %s at %s: %w", poolerID, addr, err)
-	}
-
-	// Derive a cancellable context from the service-lifetime context for the
-	// health stream goroutine. This ensures proper shutdown propagation.
-	ctx, cancel := context.WithCancel(ctx)
-
-	// Create QueryService wrapper
-	queryService := newGRPCQueryService(conn, poolerID, logger)
-
-	// Initialize health state to NOT_SERVING until health stream provides data.
-	initialTarget := &query.Target{
-		TableGroup: pooler.GetShardKey().GetTableGroup(),
-		Shard:      pooler.GetShardKey().GetShard(),
-		PoolerType: pooler.Type,
-	}
-
-	pc := &PoolerConnection{
-		conn:           conn,
-		client:         multipoolerservice.NewMultiPoolerServiceClient(conn),
-		queryService:   queryService,
-		logger:         logger,
-		ctx:            ctx,
-		cancel:         cancel,
-		onHealthUpdate: onHealthUpdate,
-		health: &PoolerHealth{
-			Target:        initialTarget,
-			PoolerID:      pooler.Id,
-			ServingStatus: clustermetadatapb.PoolerServingStatus_NOT_SERVING,
-			LastError:     errPoolerUninitialized,
-		},
-	}
-	pc.poolerInfo.Store(poolerInfo)
-
-	// Start health stream goroutine
-	go pc.checkConn()
-
-	logger.DebugContext(ctx, "pooler connection established",
-		"pooler_id", poolerID,
-		"addr", addr)
-
-	return pc, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Create gRPC connection with telemetry attributes
+
+// Derive a cancellable context from the service-lifetime context for the
+// health stream goroutine. This ensures proper shutdown propagation.
+
+// Create QueryService wrapper
+
+// Initialize health state to NOT_SERVING until health stream provides data.
+
+// Start health stream goroutine
 
 // ID returns the unique identifier for this pooler connection.
-func (pc *PoolerConnection) ID() string {
-	return topoclient.MultiPoolerIDString(pc.poolerInfo.Load().Id)
-}
+func (pc *PoolerConnection) ID() string { _ = "STUB: not implemented"; return "" }
 
 // Cell returns the cell where this pooler is located.
-func (pc *PoolerConnection) Cell() string {
-	return pc.poolerInfo.Load().Id.GetCell()
-}
+func (pc *PoolerConnection) Cell() string { _ = "STUB: not implemented"; return "" }
 
 // Type returns the pooler type (PRIMARY or REPLICA).
 func (pc *PoolerConnection) Type() clustermetadatapb.PoolerType {
-	return pc.poolerInfo.Load().Type
+	_ = "STUB: not implemented"
+	return *new(clustermetadatapb.PoolerType)
 }
 
 // UpdatePoolerInfo updates the pooler metadata (e.g., when type changes from UNKNOWN to PRIMARY).
 // This is called when topology watch detects updates to the pooler.
 func (pc *PoolerConnection) UpdatePoolerInfo(pooler *clustermetadatapb.MultiPooler) {
-	oldType := pc.poolerInfo.Load().Type
-	pc.poolerInfo.Store(&topoclient.MultiPoolerInfo{MultiPooler: pooler})
-	if oldType != pooler.Type {
-		pc.logger.Info("pooler type updated",
-			"pooler_id", pc.ID(),
-			"old_type", oldType.String(),
-			"new_type", pooler.Type.String())
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // PoolerInfo returns the underlying pooler metadata.
 func (pc *PoolerConnection) PoolerInfo() *topoclient.MultiPoolerInfo {
-	return pc.poolerInfo.Load()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ServiceClient returns the MultiPoolerServiceClient for admin operations.
 // This can be used for authentication, health checks, and other system-level operations.
 func (pc *PoolerConnection) ServiceClient() multipoolerservice.MultiPoolerServiceClient {
-	return pc.client
+	_ = "STUB: not implemented"
+
+	// QueryService returns the query execution service for this connection.
+	return *new(multipoolerservice.MultiPoolerServiceClient)
 }
 
-// QueryService returns the query execution service for this connection.
 func (pc *PoolerConnection) QueryService() queryservice.QueryService {
-	return pc.queryService
+	_ = "STUB: not implemented"
+	return *
+
+	// Close stops the health stream goroutine and closes the gRPC connection.
+	new(queryservice.QueryService)
 }
 
-// Close stops the health stream goroutine and closes the gRPC connection.
-func (pc *PoolerConnection) Close() error {
-	poolerID := pc.ID()
-	pc.logger.Debug("closing pooler connection", "pooler_id", poolerID)
+func (pc *PoolerConnection) Close() error { _ = "STUB: not implemented"; return nil }
 
-	// Cancel the health stream context to stop the checkConn goroutine
-	if pc.cancel != nil {
-		pc.cancel()
-	}
-
-	if err := pc.queryService.Close(); err != nil {
-		return fmt.Errorf("failed to close query service for pooler %s: %w", poolerID, err)
-	}
-	return nil
-}
+// Cancel the health stream context to stop the checkConn goroutine
 
 // Health returns the current health state.
 // The returned PoolerHealth is a snapshot that can be safely used without
 // synchronization. We don't deep-copy because the PoolerHealth object is
 // never modified after creation.
-func (pc *PoolerConnection) Health() *PoolerHealth {
-	pc.healthMu.Lock()
-	defer pc.healthMu.Unlock()
-	return pc.health
-}
+func (pc *PoolerConnection) Health() *PoolerHealth { _ = "STUB: not implemented"; return nil }
 
 // checkConn performs health checking on the pooler connection.
 // It continuously attempts to maintain a health stream, retrying with
 // exponential backoff on failures.
-func (pc *PoolerConnection) checkConn() {
-	poolerID := pc.ID()
-	pc.logger.Debug("starting health check loop", "pooler_id", poolerID)
+func (pc *PoolerConnection) checkConn() { _ = "STUB: not implemented"; return }
 
-	streamRetrier := retry.New(constants.DefaultHealthRetryDelay, constants.DefaultHealthCheckTimeout)
+// Context cancelled - connection is being closed.
 
-	for attempt, waitErr := range streamRetrier.Attempts(pc.ctx) {
-		if waitErr != nil {
-			// Context cancelled - connection is being closed.
-			pc.logger.Debug("health check loop exiting",
-				"pooler_id", poolerID,
-				"attempt", attempt,
-				"reason", waitErr)
-			return
-		}
+// Create a separate context for this stream attempt.
+// This allows the staleness timer to cancel the stream independently.
 
-		if attempt > 1 {
-			pc.logger.Debug("retrying health stream",
-				"pooler_id", poolerID,
-				"attempt", attempt)
-		}
+// Stream health responses. This blocks until an error or context cancellation.
 
-		// Create a separate context for this stream attempt.
-		// This allows the staleness timer to cancel the stream independently.
-		streamCtx, streamCancel := context.WithCancel(pc.ctx)
-
-		// Stream health responses. This blocks until an error or context cancellation.
-		err := pc.streamHealth(streamCtx, streamCancel, streamRetrier)
-
-		// Always cancel the stream context to clean up resources.
-		streamCancel()
-
-		if err != nil {
-			pc.setHealthError(err)
-		}
-	}
-}
+// Always cancel the stream context to clean up resources.
 
 // streamHealth opens a health stream and processes responses until an error occurs.
 // streamCancel is called by the staleness timer to unblock stream.Recv().
@@ -337,123 +225,47 @@ func (pc *PoolerConnection) streamHealth(
 	streamCancel context.CancelFunc,
 	streamRetrier *retry.Retry,
 ) error {
-	poolerID := pc.ID()
+	_ = "STUB: not implemented"
+	return nil
 
 	// Reset healthTimedOut from any previous stream attempt so a shutdown during
 	// this attempt isn't misclassified as a staleness timeout.
-	pc.healthTimedOut.Store(false)
-
-	// Open the health stream.
-	stream, err := pc.client.StreamPoolerHealth(streamCtx, &multipoolerservice.StreamPoolerHealthRequest{})
-	if err != nil {
-		pc.logger.WarnContext(streamCtx, "failed to open health stream",
-			"pooler_id", poolerID,
-			"error", err)
-		return fmt.Errorf("failed to open health stream: %w", err)
-	}
-
-	pc.logger.DebugContext(streamCtx, "health stream opened", "pooler_id", poolerID)
-
-	// Set up staleness timer. If no message is received within the timeout,
-	// the timer cancels the stream context to unblock stream.Recv().
-	stalenessTimeout := constants.DefaultHealthCheckTimeout
-	stalenessTimer := time.AfterFunc(stalenessTimeout, func() {
-		pc.healthTimedOut.Store(true)
-		pc.logger.Warn("health stream timed out", "pooler_id", poolerID)
-		streamCancel()
-	})
-	defer stalenessTimer.Stop()
-
-	// Process responses from the stream.
-	for {
-		response, err := stream.Recv()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				pc.logger.DebugContext(streamCtx, "health stream closed by server", "pooler_id", poolerID)
-				return io.EOF
-			}
-			if streamCtx.Err() != nil {
-				// Stream context cancelled (either staleness timeout or shutdown).
-				if pc.healthTimedOut.Load() {
-					return errors.New("health stream timed out")
-				}
-				return nil
-			}
-			pc.logger.WarnContext(streamCtx, "health stream error",
-				"pooler_id", poolerID,
-				"error", err)
-			return fmt.Errorf("health stream recv: %w", err)
-		}
-
-		// We received a message successfully.
-		pc.healthTimedOut.Store(false)
-
-		// Reset backoff since we got a successful message.
-		streamRetrier.Reset()
-
-		// Update staleness timeout from server recommendation if provided.
-		if response.RecommendedStalenessTimeout != nil {
-			newTimeout := response.RecommendedStalenessTimeout.AsDuration()
-			if newTimeout > 0 {
-				stalenessTimeout = newTimeout
-			}
-		}
-		stalenessTimer.Reset(stalenessTimeout)
-
-		// Process the health response.
-		pc.processHealthResponse(response)
-	}
 }
+
+// Open the health stream.
+
+// Set up staleness timer. If no message is received within the timeout,
+// the timer cancels the stream context to unblock stream.Recv().
+
+// Process responses from the stream.
+
+// Stream context cancelled (either staleness timeout or shutdown).
+
+// We received a message successfully.
+
+// Reset backoff since we got a successful message.
+
+// Update staleness timeout from server recommendation if provided.
+
+// Process the health response.
 
 // processHealthResponse updates the health state from a StreamPoolerHealthResponse.
 // Creates a new immutable PoolerHealth snapshot.
 func (pc *PoolerConnection) processHealthResponse(response *multipoolerservice.StreamPoolerHealthResponse) {
-	poolerID := pc.ID()
+	_ = "STUB: not implemented"
+	return
 
 	// Build new health snapshot from the response.
-	newHealth := &PoolerHealth{
-		Target:            response.Target,
-		PoolerID:          response.PoolerId,
-		ServingStatus:     response.ServingStatus,
-		LeaderObservation: response.LeaderObservation,
-		ReplicationLagNs:  response.ReplicationLagNs,
-		LastError:         nil,
-		LastResponse:      time.Now(),
-	}
-
-	pc.healthMu.Lock()
-	prevHealth := pc.health
-	pc.health = newHealth
-	pc.healthMu.Unlock()
-
-	// Log state changes.
-	if prevHealth == nil || prevHealth.ServingStatus != newHealth.ServingStatus {
-		pc.logger.Info("pooler health state changed",
-			"pooler_id", poolerID,
-			"serving_status", newHealth.ServingStatus.String(),
-			"is_serving", newHealth.IsServing())
-	}
-
-	// Notify listener of health update.
-	if pc.onHealthUpdate != nil {
-		pc.onHealthUpdate(pc)
-	}
 }
+
+// Log state changes.
+
+// Notify listener of health update.
 
 // setHealthError updates the health state to reflect an error while preserving
 // existing metadata. Uses SimpleCopy to create a new snapshot, then updates
 // error-related fields. This ensures forward compatibility: any new fields
 // added to PoolerHealth will be automatically preserved.
-func (pc *PoolerConnection) setHealthError(err error) {
-	pc.healthMu.Lock()
-	newHealth := pc.health.SimpleCopy()
-	newHealth.ServingStatus = clustermetadatapb.PoolerServingStatus_NOT_SERVING
-	newHealth.LastError = err
-	pc.health = newHealth
-	pc.healthMu.Unlock()
+func (pc *PoolerConnection) setHealthError(err error) { _ = "STUB: not implemented"; return }
 
-	// Notify listener that health changed (pooler is now unhealthy).
-	if pc.onHealthUpdate != nil {
-		pc.onHealthUpdate(pc)
-	}
-}
+// Notify listener that health changed (pooler is now unhealthy).

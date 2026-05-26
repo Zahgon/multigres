@@ -16,10 +16,7 @@ package poolserver
 
 import (
 	"bufio"
-	"fmt"
 	"net"
-	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -34,17 +31,7 @@ type Client struct {
 }
 
 // Connect opens a connection to the pool server at socketPath.
-func Connect(socketPath string) (*Client, error) {
-	if conn, err := net.Dial("unix", socketPath); err != nil {
-		return nil, fmt.Errorf("connect to pool server at %s: %w", socketPath, err)
-	} else {
-		return &Client{
-			conn:    conn,
-			scanner: bufio.NewScanner(conn),
-			writer:  bufio.NewWriter(conn),
-		}, nil
-	}
-}
+func Connect(socketPath string) (*Client, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // maxAllocRetries is the maximum number of collision retries for AllocPort.
 const maxAllocRetries = 10
@@ -57,69 +44,21 @@ const maxAllocRetries = 10
 // In the very rare case where the OS returns a port the server is already
 // tracking (collision), Alloc retries automatically up to maxAllocRetries
 // times before returning an error.
-func (c *Client) AllocPort() (int, error) {
-	for range maxAllocRetries {
-		resp, err := c.send(cmdAlloc)
-		if err != nil {
-			return 0, err
-		}
+func (c *Client) AllocPort() (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-		if after, ok := strings.CutPrefix(resp, respPrefixPort+" "); ok {
-			return strconv.Atoi(after)
-		}
-
-		if !strings.HasPrefix(resp, respErrCollision) {
-			return 0, fmt.Errorf("%s: unexpected response: %s", cmdAlloc, resp)
-		}
-
-		// Transient collision; retry.
-	}
-	return 0, fmt.Errorf("%s: failed to allocate a port after %d attempts due to repeated collisions", cmdAlloc, maxAllocRetries)
-}
+// Transient collision; retry.
 
 // Return tells the server the port is no longer in use by any process.
 // The server removes the port from its tracking tables.
 // Call this from t.Cleanup when a test that used the port completes.
-func (c *Client) ReturnPort(port int) error {
-	if resp, err := c.send(fmt.Sprintf(cmdReturn+" %d", port)); err != nil {
-		return err
-	} else if resp != respOK {
-		return fmt.Errorf("%s %d: unexpected response: %s", cmdReturn, port, resp)
-	}
-	return nil
-}
+func (c *Client) ReturnPort(port int) error { _ = "STUB: not implemented"; return nil }
 
 // Ping checks that the server is alive.
-func (c *Client) Ping() error {
-	if resp, err := c.send(cmdPing); err != nil {
-		return err
-	} else if resp != respPong {
-		return fmt.Errorf("%s: unexpected response: %s", cmdPing, resp)
-	}
-	return nil
-}
+func (c *Client) Ping() error { _ = "STUB: not implemented"; return nil }
 
 // Close closes the connection to the server.
 // The server will automatically clean up any ports still held for this
 // connection.
-func (c *Client) Close() error {
-	return c.conn.Close()
-}
+func (c *Client) Close() error { _ = "STUB: not implemented"; return nil }
 
-func (c *Client) send(msg string) (string, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if _, err := fmt.Fprintln(c.writer, msg); err != nil {
-		return "", fmt.Errorf("send %q: %w", msg, err)
-	}
-	if err := c.writer.Flush(); err != nil {
-		return "", fmt.Errorf("flush %q: %w", msg, err)
-	}
-	if !c.scanner.Scan() {
-		if err := c.scanner.Err(); err != nil {
-			return "", fmt.Errorf("read response for %q: %w", msg, err)
-		}
-		return "", fmt.Errorf("read response for %q: connection closed", msg)
-	}
-	return c.scanner.Text(), nil
-}
+func (c *Client) send(msg string) (string, error) { _ = "STUB: not implemented"; return "", nil }

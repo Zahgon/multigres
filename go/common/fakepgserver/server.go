@@ -19,12 +19,7 @@ package fakepgserver
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"log/slog"
-	"net"
 	"regexp"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -32,7 +27,6 @@ import (
 	"github.com/multigres/multigres/go/common/pgprotocol/client"
 	"github.com/multigres/multigres/go/common/pgprotocol/server"
 	"github.com/multigres/multigres/go/common/sqltypes"
-	"github.com/multigres/multigres/go/pb/query"
 )
 
 // Server is a fake PostgreSQL server for testing.
@@ -134,39 +128,28 @@ type trustAllProvider struct{}
 
 // AllowTrustAuth always returns true, allowing all connections without password.
 func (p *trustAllProvider) AllowTrustAuth(_ context.Context, _, _ string) bool {
-	return true
+	_ = "STUB: not implemented"
+
+	// GetCredentials dispatches to the test-installed CredentialProvider when one
+	// is set. Trust-auth replication startups invoke this path inside
+	// verifyReplicationRole (server/startup.go) when the auth-time SCRAM lookup
+	// was skipped. Without an installed provider, replication startups are
+	// rejected — which is the right default for a fake server.
+	return false
 }
 
-// GetCredentials dispatches to the test-installed CredentialProvider when one
-// is set. Trust-auth replication startups invoke this path inside
-// verifyReplicationRole (server/startup.go) when the auth-time SCRAM lookup
-// was skipped. Without an installed provider, replication startups are
-// rejected — which is the right default for a fake server.
 func (s *Server) GetCredentials(ctx context.Context, user, database string) (*server.Credentials, error) {
-	s.mu.Lock()
-	provider := s.credentialProvider
-	s.mu.Unlock()
-	if provider == nil {
-		return nil, fmt.Errorf("fakepgserver: no credential provider configured for %q", user)
-	}
-	creds, err := provider.GetCredentials(ctx, user, database)
-	if err != nil {
-		return nil, err
-	}
-	// One-shot rejection toggle: clear IsReplicationRole so the post-auth
-	// gate in verifyReplicationRole rejects this connection with a FATAL
-	// 42501, matching production rolreplication-rejection plumbing rather
-	// than a parallel error path. Trust-auth replication startups are the
-	// only path that reaches here under fakepgserver's current listener
-	// config, so non-replication sessions are unaffected. See the
-	// rejectNextReplStartup field comment for the SCRAM caveat.
-	if s.rejectNextReplStartup.CompareAndSwap(true, false) {
-		out := *creds
-		out.IsReplicationRole = false
-		return &out, nil
-	}
-	return creds, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// One-shot rejection toggle: clear IsReplicationRole so the post-auth
+// gate in verifyReplicationRole rejects this connection with a FATAL
+// 42501, matching production rolreplication-rejection plumbing rather
+// than a parallel error path. Trust-auth replication startups are the
+// only path that reaches here under fakepgserver's current listener
+// config, so non-replication sessions are unaffected. See the
+// rejectNextReplStartup field comment for the SCRAM caveat.
 
 // SetRejectNextReplicationStartup arms a one-shot toggle that causes the
 // next replication-mode startup (replication=true / replication=database)
@@ -174,9 +157,7 @@ func (s *Server) GetCredentials(ctx context.Context, user, database string) (*se
 // firing, so subsequent replication startups succeed again. Pass false to
 // disarm explicitly. Tests use this to exercise dial-failure cleanup
 // without dropping the listener.
-func (s *Server) SetRejectNextReplicationStartup(reject bool) {
-	s.rejectNextReplStartup.Store(reject)
-}
+func (s *Server) SetRejectNextReplicationStartup(reject bool) { _ = "STUB: not implemented"; return }
 
 // SetCredentialProvider installs a server.CredentialProvider that the
 // listener's auth path will consult. Tests that exercise replication startup
@@ -184,10 +165,8 @@ func (s *Server) SetRejectNextReplicationStartup(reject bool) {
 // whose Credentials carry IsReplicationRole=true, otherwise the post-auth
 // gate rejects the connection.
 func (s *Server) SetCredentialProvider(provider server.CredentialProvider) *Server {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.credentialProvider = provider
-	return s
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // LastReplicationMode returns the replication mode of the most recently
@@ -199,17 +178,15 @@ func (s *Server) SetCredentialProvider(provider server.CredentialProvider) *Serv
 // after parsing, so tests must use this accessor to verify wire-level
 // replication mode.
 func (s *Server) LastReplicationMode() server.ReplicationMode {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.lastReplicationMode
+	_ = "STUB: not implemented"
+	return *new(server.ReplicationMode)
 }
 
 // recordReplicationMode is invoked by the handler's ConnectionEstablished
 // hook to stash the most recent connection's mode for test assertions.
 func (s *Server) recordReplicationMode(mode server.ReplicationMode) {
-	s.mu.Lock()
-	s.lastReplicationMode = mode
-	s.mu.Unlock()
+	_ = "STUB: not implemented"
+	return
 }
 
 // ExpectedExecuteFetch defines for an expected query the to be faked output.
@@ -228,237 +205,103 @@ type ExpectedExecuteFetch struct {
 
 // New creates a new fake PostgreSQL server for testing.
 // The server listens on a random available TCP port.
-func New(t testing.TB) *Server {
-	s := &Server{
-		t:                        t,
-		name:                     "fakepgserver",
-		data:                     make(map[string]*sqltypes.Result),
-		rejectedData:             make(map[string]error),
-		queryCalled:              make(map[string]int),
-		patternCalled:            make(map[string]int),
-		queryPatternUserCallback: make(map[*regexp.Regexp]func(string)),
-		patternData:              make(map[string]exprResult),
-	}
+func New(t testing.TB) *Server { _ = "STUB: not implemented"; return nil }
 
-	// Create the handler.
-	handler := &fakeHandler{server: s}
+// Create the handler.
 
-	// Create listener on random port with trust auth (simulates Unix socket
-	// trust auth). The server itself is wired as the CredentialProvider so
-	// tests can install one at runtime via SetCredentialProvider — required
-	// for replication-mode startups, which post-auth gate on the role's
-	// IsReplicationRole flag.
-	var err error
-	s.listener, err = server.NewListener(server.ListenerConfig{
-		Address:            "127.0.0.1:0", // Random available port.
-		Handler:            handler,
-		TrustAuthProvider:  &trustAllProvider{},
-		CredentialProvider: s,
-		Logger:             slog.Default(),
-	})
-	if err != nil {
-		t.Fatalf("fakepgserver: failed to create listener: %v", err)
-	}
+// Create listener on random port with trust auth (simulates Unix socket
+// trust auth). The server itself is wired as the CredentialProvider so
+// tests can install one at runtime via SetCredentialProvider — required
+// for replication-mode startups, which post-auth gate on the role's
+// IsReplicationRole flag.
 
-	// Get the actual address.
-	s.address = s.listener.Addr().String()
+// Random available port.
 
-	// Start serving in background.
-	go func() {
-		if err := s.listener.Serve(); err != nil {
-			// Don't log errors if the listener was closed intentionally.
-			if !errors.Is(err, net.ErrClosed) {
-				t.Logf("fakepgserver: serve error: %v", err)
-			}
-		}
-	}()
+// Get the actual address.
 
-	t.Logf("fakepgserver: listening on %s", s.address)
+// Start serving in background.
 
-	return s
-}
+// Don't log errors if the listener was closed intentionally.
 
 // Name returns the name of the server.
-func (s *Server) Name() string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.name
-}
+func (s *Server) Name() string { _ = "STUB: not implemented"; return "" }
 
 // SetName sets the name of the server.
-func (s *Server) SetName(name string) *Server {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.name = name
-	return s
-}
+func (s *Server) SetName(name string) *Server { _ = "STUB: not implemented"; return nil }
 
 // Address returns the server's listening address.
 func (s *Server) Address() string {
-	return s.address
+	_ = "STUB: not implemented"
+
+	// ClientConfig returns a client.Config for connecting to this server.
+	// No password is needed since fakepgserver uses trust authentication.
+	return ""
 }
 
-// ClientConfig returns a client.Config for connecting to this server.
-// No password is needed since fakepgserver uses trust authentication.
-func (s *Server) ClientConfig() *client.Config {
-	host, port, err := net.SplitHostPort(s.address)
-	if err != nil {
-		s.t.Fatalf("fakepgserver: failed to parse address: %v", err)
-	}
-
-	var portNum int
-	_, _ = fmt.Sscanf(port, "%d", &portNum)
-
-	return &client.Config{
-		Host:     host,
-		Port:     portNum,
-		User:     "test",
-		Database: "testdb",
-	}
-}
+func (s *Server) ClientConfig() *client.Config { _ = "STUB: not implemented"; return nil }
 
 // Close closes the server and stops accepting connections.
-func (s *Server) Close() {
-	if err := s.listener.Close(); err != nil {
-		s.t.Logf("fakepgserver: close error: %v", err)
-	}
-}
+func (s *Server) Close() { _ = "STUB: not implemented"; return }
 
 // CloseListener closes only the TCP listener, preventing new connections
 // while keeping existing connections alive. Use this for testing scenarios
 // where the initial connection should work but reconnect attempts should fail.
-func (s *Server) CloseListener() {
-	if err := s.listener.CloseListener(); err != nil {
-		s.t.Logf("fakepgserver: close listener error: %v", err)
-	}
-}
+func (s *Server) CloseListener() { _ = "STUB: not implemented"; return }
 
 // OrderMatters sets the orderMatters flag.
-func (s *Server) OrderMatters() {
-	s.orderMatters.Store(true)
-}
+func (s *Server) OrderMatters() { _ = "STUB: not implemented"; return }
 
 //
 // Methods to add expected queries and results.
 //
 
 // AddQuery adds a query and its expected result.
-func (s *Server) AddQuery(q string, result *sqltypes.Result) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	key := strings.ToLower(q)
-	s.data[key] = result
-	s.queryCalled[key] = 0
-}
+func (s *Server) AddQuery(q string, result *sqltypes.Result) { _ = "STUB: not implemented"; return }
 
 // AddQueryPattern adds an expected result for a set of queries.
 // These patterns are checked if no exact matches from AddQuery() are found.
 // This function forces the addition of begin/end anchors (^$) and turns on
 // case-insensitive matching mode.
 func (s *Server) AddQueryPattern(queryPattern string, result *sqltypes.Result) {
-	expr := regexp.MustCompile("(?is)^" + queryPattern + "$")
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.patternData[queryPattern] = exprResult{
-		queryPattern: queryPattern,
-		expr:         expr,
-		result:       result,
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // RemoveQueryPattern removes a query pattern that was previously added.
-func (s *Server) RemoveQueryPattern(queryPattern string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.patternData, queryPattern)
-	delete(s.patternCalled, queryPattern)
-}
+func (s *Server) RemoveQueryPattern(queryPattern string) { _ = "STUB: not implemented"; return }
 
 // RejectQueryPattern allows a query pattern to be rejected with an error.
-func (s *Server) RejectQueryPattern(queryPattern, errMsg string) {
-	expr := regexp.MustCompile("(?is)^" + queryPattern + "$")
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.patternData[queryPattern] = exprResult{
-		queryPattern: queryPattern,
-		expr:         expr,
-		err:          errMsg,
-	}
-}
+func (s *Server) RejectQueryPattern(queryPattern, errMsg string) { _ = "STUB: not implemented"; return }
 
 // ClearQueryPattern removes all query patterns set up.
-func (s *Server) ClearQueryPattern() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.patternData = make(map[string]exprResult)
-	s.patternCalled = make(map[string]int)
-}
+func (s *Server) ClearQueryPattern() { _ = "STUB: not implemented"; return }
 
 // AddQueryPatternWithCallback is similar to AddQueryPattern: in addition it calls the provided callback function.
 func (s *Server) AddQueryPatternWithCallback(queryPattern string, result *sqltypes.Result, callback func(string)) {
-	s.AddQueryPattern(queryPattern, result)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.queryPatternUserCallback[s.patternData[queryPattern].expr] = callback
+	_ = "STUB: not implemented"
+	return
 }
 
 // DeleteQuery deletes query from the fake server.
-func (s *Server) DeleteQuery(query string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	key := strings.ToLower(query)
-	delete(s.data, key)
-	delete(s.queryCalled, key)
-}
+func (s *Server) DeleteQuery(query string) { _ = "STUB: not implemented"; return }
 
 // DeleteAllQueries deletes all expected queries from the fake server.
-func (s *Server) DeleteAllQueries() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.data = make(map[string]*sqltypes.Result)
-	s.patternData = make(map[string]exprResult)
-	s.queryCalled = make(map[string]int)
-	s.patternCalled = make(map[string]int)
-}
+func (s *Server) DeleteAllQueries() { _ = "STUB: not implemented"; return }
 
 // AddRejectedQuery adds a query which will be rejected at execution time.
-func (s *Server) AddRejectedQuery(query string, err error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.rejectedData[strings.ToLower(query)] = err
-}
+func (s *Server) AddRejectedQuery(query string, err error) { _ = "STUB: not implemented"; return }
 
 // DeleteRejectedQuery deletes query from the fake server.
-func (s *Server) DeleteRejectedQuery(query string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	delete(s.rejectedData, strings.ToLower(query))
-}
+func (s *Server) DeleteRejectedQuery(query string) { _ = "STUB: not implemented"; return }
 
 // GetQueryCalledNum returns how many times the server executed a certain query.
-func (s *Server) GetQueryCalledNum(query string) int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	num, ok := s.queryCalled[strings.ToLower(query)]
-	if !ok {
-		return 0
-	}
-	return num
-}
+func (s *Server) GetQueryCalledNum(query string) int { _ = "STUB: not implemented"; return 0 }
 
 // QueryLog returns the query log as a semicolon separated string.
-func (s *Server) QueryLog() string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return strings.Join(s.querylog, ";")
-}
+func (s *Server) QueryLog() string { _ = "STUB: not implemented"; return "" }
 
 // ResetQueryLog resets the query log.
-func (s *Server) ResetQueryLog() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.querylog = nil
-}
+func (s *Server) ResetQueryLog() { _ = "STUB: not implemented"; return }
 
 //
 // Methods for ordered expected queries.
@@ -466,194 +309,56 @@ func (s *Server) ResetQueryLog() {
 
 // AddExpectedExecuteFetch appends an ExpectedExecuteFetch to the end.
 func (s *Server) AddExpectedExecuteFetch(entry ExpectedExecuteFetch) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.expectedExecuteFetch = append(s.expectedExecuteFetch, entry)
+	_ = "STUB: not implemented"
+	return
 }
 
 // AddExpectedQuery adds a single query with no result.
-func (s *Server) AddExpectedQuery(q string, err error) {
-	s.AddExpectedExecuteFetch(ExpectedExecuteFetch{
-		Query:       q,
-		QueryResult: &sqltypes.Result{},
-		Error:       err,
-	})
-}
+func (s *Server) AddExpectedQuery(q string, err error) { _ = "STUB: not implemented"; return }
 
 // DeleteAllEntries removes all ordered entries.
-func (s *Server) DeleteAllEntries() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.expectedExecuteFetch = make([]ExpectedExecuteFetch, 0)
-	s.expectedExecuteFetchIndex = 0
-}
+func (s *Server) DeleteAllEntries() { _ = "STUB: not implemented"; return }
 
 // VerifyAllExecutedOrFail checks that all expected queries were actually executed.
-func (s *Server) VerifyAllExecutedOrFail() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if s.expectedExecuteFetchIndex != len(s.expectedExecuteFetch) {
-		s.t.Errorf("%v: not all expected queries were executed. leftovers: %v", s.name, s.expectedExecuteFetch[s.expectedExecuteFetchIndex:])
-	}
-}
+func (s *Server) VerifyAllExecutedOrFail() { _ = "STUB: not implemented"; return }
 
 // GetPatternCalledNum returns how many times a pattern was matched.
-func (s *Server) GetPatternCalledNum(pattern string) int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.patternCalled[pattern]
-}
+func (s *Server) GetPatternCalledNum(pattern string) int { _ = "STUB: not implemented"; return 0 }
 
 // VerifyAllPatternsUsedOrFail checks that all registered patterns were matched at least once.
-func (s *Server) VerifyAllPatternsUsedOrFail() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	var unused []string
-	for pattern := range s.patternData {
-		if s.patternCalled[pattern] == 0 {
-			unused = append(unused, pattern)
-		}
-	}
-	if len(unused) > 0 {
-		s.t.Errorf("%v: not all query patterns were used. unused patterns: %v", s.name, unused)
-	}
-}
+func (s *Server) VerifyAllPatternsUsedOrFail() { _ = "STUB: not implemented"; return }
 
 // SetNeverFail makes unmatched queries return empty results instead of errors.
-func (s *Server) SetNeverFail(neverFail bool) {
-	s.neverFail.Store(neverFail)
-}
+func (s *Server) SetNeverFail(neverFail bool) { _ = "STUB: not implemented"; return }
 
 // handleQuery handles a query and returns the result.
 // This is called by the handler.
 func (s *Server) handleQuery(q string) (*sqltypes.Result, error) {
-	if s.orderMatters.Load() {
-		return s.handleQueryOrdered(q)
-	}
-
-	key := strings.ToLower(q)
-	s.mu.Lock()
-	s.queryCalled[key]++
-	s.querylog = append(s.querylog, key)
-
-	// Check if we should reject it.
-	if err, ok := s.rejectedData[key]; ok {
-		s.mu.Unlock()
-		return nil, err
-	}
-
-	// Check explicit queries from AddQuery().
-	result, ok := s.data[key]
-	if ok {
-		s.mu.Unlock()
-		return result, nil
-	}
-
-	// Check query patterns from AddQueryPattern().
-	for _, pat := range s.patternData {
-		if pat.expr.MatchString(q) {
-			s.patternCalled[pat.queryPattern]++
-			userCallback, ok := s.queryPatternUserCallback[pat.expr]
-			s.mu.Unlock()
-			if ok {
-				userCallback(q)
-			}
-			if pat.err != "" {
-				return nil, errors.New(pat.err)
-			}
-			return pat.result, nil
-		}
-	}
-
-	s.mu.Unlock()
-
-	if s.neverFail.Load() {
-		return &sqltypes.Result{CommandTag: "SELECT 0"}, nil
-	}
-
-	// Nothing matched.
-	return nil, fmt.Errorf("fakepgserver: query '%s' is not supported on %v", q, s.name)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
+// Check if we should reject it.
+
+// Check explicit queries from AddQuery().
+
+// Check query patterns from AddQueryPattern().
+
+// Nothing matched.
+
 func (s *Server) handleQueryOrdered(q string) (*sqltypes.Result, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	index := s.expectedExecuteFetchIndex
-
-	if index >= len(s.expectedExecuteFetch) {
-		if s.neverFail.Load() {
-			return &sqltypes.Result{CommandTag: "SELECT 0"}, nil
-		}
-		s.t.Errorf("%v: got unexpected out of bound fetch: %v >= %v (%s)", s.name, index, len(s.expectedExecuteFetch), q)
-		return nil, errors.New("unexpected out of bound fetch")
-	}
-
-	entry := s.expectedExecuteFetch[index]
-	expected := entry.Query
-
-	if strings.HasSuffix(expected, "*") {
-		if !strings.HasPrefix(q, expected[0:len(expected)-1]) {
-			if s.neverFail.Load() {
-				return &sqltypes.Result{CommandTag: "SELECT 0"}, nil
-			}
-			s.t.Errorf("%v: got unexpected query start (index=%v): %v != %v", s.name, index, q, expected)
-			return nil, errors.New("unexpected query")
-		}
-	} else {
-		if q != expected {
-			if s.neverFail.Load() {
-				return &sqltypes.Result{CommandTag: "SELECT 0"}, nil
-			}
-			s.t.Errorf("%v: got unexpected query (index=%v): %v != %v", s.name, index, q, expected)
-			return nil, errors.New("unexpected query")
-		}
-	}
-
-	s.expectedExecuteFetchIndex++
-	s.t.Logf("ExecuteFetch: %v: %v", s.name, q)
-
-	if entry.Error != nil {
-		return nil, entry.Error
-	}
-
-	if entry.AfterCallbackError != nil {
-		return entry.QueryResult, entry.AfterCallbackError
-	}
-
-	return entry.QueryResult, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MakeResult creates a simple sqltypes.Result from column names and row values.
 // This is a convenience function for tests. All values are converted to text format.
 func MakeResult(columns []string, rows [][]any) *sqltypes.Result {
-	fields := make([]*query.Field, len(columns))
-	for i, col := range columns {
-		fields[i] = &query.Field{
-			Name:         col,
-			DataTypeOid:  25, // TEXT type OID
-			DataTypeSize: -1, // Variable length
-		}
-	}
-
-	sqlRows := make([]*sqltypes.Row, len(rows))
-	for i, row := range rows {
-		values := make([]sqltypes.Value, len(row))
-		for j, val := range row {
-			if val == nil {
-				values[j] = nil // NULL
-			} else {
-				values[j] = fmt.Appendf(nil, "%v", val)
-			}
-		}
-		sqlRows[i] = &sqltypes.Row{Values: values}
-	}
-
-	return &sqltypes.Result{
-		Fields:     fields,
-		Rows:       sqlRows,
-		CommandTag: fmt.Sprintf("SELECT %d", len(rows)),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// TEXT type OID
+// Variable length
+
+// NULL

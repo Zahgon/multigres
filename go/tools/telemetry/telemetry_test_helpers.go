@@ -16,11 +16,9 @@ package telemetry
 
 import (
 	"context"
-	"net/http"
 	"sync"
 	"testing"
 
-	"go.opentelemetry.io/otel"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -42,74 +40,45 @@ type testLogProcessor struct {
 }
 
 func (p *testLogProcessor) OnEmit(ctx context.Context, record *sdklog.Record) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.records = append(p.records, record)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (p *testLogProcessor) Enabled(ctx context.Context, params sdklog.EnabledParameters) bool {
-	return true
+	_ = "STUB: not implemented"
+	return false
 }
 
 func (p *testLogProcessor) Shutdown(ctx context.Context) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (p *testLogProcessor) ForceFlush(ctx context.Context) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (p *testLogProcessor) GetRecords() []*sdklog.Record {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	// Return a shallow copy to avoid race conditions
-	return append([]*sdklog.Record(nil), p.records...)
-}
+func (p *testLogProcessor) GetRecords() []*sdklog.Record { _ = "STUB: not implemented"; return nil }
+
+// Return a shallow copy to avoid race conditions
 
 // ForceFlush flushes both the tracer and meter providers.
 func (t *testTelemetrySetup) ForceFlush(ctx context.Context) error {
-	err := t.Telemetry.tracerProvider.ForceFlush(ctx)
-	if err != nil {
-		return err
-	}
-	return t.Telemetry.meterProvider.ForceFlush(ctx)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // setupRestoreDefaultGlobals saves http.DefaultClient.Transport and otel.GetTracerProvider
 // to restore after the test and subtests complete.
-func setupRestoreDefaultGlobals(t *testing.T) {
-	t.Helper()
-	originalTransport := http.DefaultClient.Transport
-	originalTracerProvider := otel.GetTracerProvider()
-	originalMeterProvider := otel.GetMeterProvider()
-	originalTextMapPropagator := otel.GetTextMapPropagator()
-	t.Cleanup(func() {
-		http.DefaultClient.Transport = originalTransport
-		otel.SetTracerProvider(originalTracerProvider)
-		otel.SetMeterProvider(originalMeterProvider)
-		otel.SetTextMapPropagator(originalTextMapPropagator)
-	})
-}
+func setupRestoreDefaultGlobals(t *testing.T) { _ = "STUB: not implemented"; return }
 
 // SetupTestTelemetry creates a telemetry instance with in-memory exporters for testing
 func SetupTestTelemetry(t *testing.T) *testTelemetrySetup {
-	t.Helper()
+	_ = "STUB: not implemented"
 
 	// Save and restore the HTTP client transport
-	setupRestoreDefaultGlobals(t)
-
-	spanExporter := tracetest.NewInMemoryExporter()
-	metricReader := metric.NewManualReader()
-	logProcessor := &testLogProcessor{}
-
-	// Create telemetry with test exporters - this will use them during InitTelemetry
-	telemetry := NewTelemetry().WithTestExporters(spanExporter, metricReader, logProcessor)
-
-	return &testTelemetrySetup{
-		Telemetry:    telemetry,
-		SpanExporter: spanExporter,
-		MetricReader: metricReader,
-		LogProcessor: logProcessor,
-	}
+	return nil
 }
+
+// Create telemetry with test exporters - this will use them during InitTelemetry

@@ -20,81 +20,29 @@ import (
 	"github.com/quasilyte/go-ruleguard/dsl"
 )
 
-func disallowUnderscoreInFlags(m dsl.Matcher) {
-	m.Import("github.com/spf13/pflag")
+func disallowUnderscoreInFlags(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
-	m.Match(
-		`viperutil.Configure($_, $name, $*_)`,
-		`viperutil.Options[$_]{$*_, FlagName: $name, $*_}`).
-		Where(m["name"].Text.Matches("_")).
-		Report("viper flag name contains an underscore; use dashes instead")
+func disallowOtelMeterOutsideMetricsFiles(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
-	m.Match(`$fs.$_($name, $*_)`).
-		Where(
-			m["fs"].Type.Is("*pflag.FlagSet") && m["name"].Text.Matches("_")).
-		Report("FlagSet flag name contains an underscore; use dashes instead")
+func disallowMetricsConstructorArgs(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
-	m.Match(`$fs.$_($ptr, $name, $*_)`).
-		Where(
-			m["fs"].Type.Is("*pflag.FlagSet") && m["ptr"].Type.HasPointers() && m["name"].Text.Matches("_")).
-		Report("FlagSet flag name contains an underscore; use dashes instead")
-}
+func requireContextBackgroundJustification(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
-func disallowOtelMeterOutsideMetricsFiles(m dsl.Matcher) {
-	m.Import("go.opentelemetry.io/otel")
-
-	m.Match(`otel.Meter($*_)`).
-		Where(!m.File().Name.Matches(`(_test|metrics)\.go$`)).
-		Report("otel.Meter() should only be called in *_test.go or *metrics.go files")
-}
-
-func disallowMetricsConstructorArgs(m dsl.Matcher) {
-	m.Match(`func NewMetrics($*params) $*_ { $*_ }`).
-		Where(
-			m.File().Name.Matches(`metrics\.go$`) &&
-				m["params"].Text != "()").
-		Report("NewMetrics() in metrics.go should take no arguments to maintain isolation from service code. Return (*Metrics, error) and let caller handle logging.")
-}
-
-func requireContextBackgroundJustification(m dsl.Matcher) {
-	m.Match(`context.Background()`).
-		Where(
-			!m.File().Name.Matches(`_test\.go$`) &&
-				!m.File().PkgPath.Matches(`/test/|/testutil/|testutil$`)).
-		Report("context.Background() requires justification. Use context.TODO() if no context is available, ctxutil.Detach(ctx) for long-lived background tasks, or add //nolint:gocritic // <reason> for legitimate entry points")
-}
-
-func requireGrpcCommonNewClient(m dsl.Matcher) {
-	m.Import("google.golang.org/grpc")
-
-	m.Match(`grpc.NewClient($*_)`).
-		Where(
-			!m.File().Name.Matches(`_test\.go$`) &&
-				!m.File().PkgPath.Matches(`/grpccommon$|/test/|/testutil/|testutil$`)).
-		Report("use grpccommon.NewClient() instead of grpc.NewClient() to ensure telemetry instrumentation")
-}
+func requireGrpcCommonNewClient(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
 // disallowDirectExecCommandContext enforces use of executil.Command() for
 // graceful termination support, proper environment variable handling, and
 // trace propagation.
 func disallowDirectExecCommandContext(m dsl.Matcher) {
-	m.Import("os/exec")
+	_ = "STUB: not implemented"
 
 	// TODO: Also disallow exec.Command() with no context
-	m.Match(`exec.CommandContext($*_)`).
-		Where(!m.File().PkgPath.Matches(`tools/executil$`)).
-		Report("use executil.Command() instead of exec.CommandContext() for graceful termination, proper env handling, and trace propagation")
+	return
 }
 
 // disallowDirectProcessTermination enforces use of executil functions
 // for consistent graceful SIGTERM -> SIGKILL termination.
-func disallowDirectProcessTermination(m dsl.Matcher) {
-	m.Import("syscall")
-
-	m.Match(`$p.Signal(syscall.SIGTERM)`, `$p.Signal(syscall.SIGKILL)`, `$p.Kill()`).
-		Where(!m.File().PkgPath.Matches(`tools/executil$`)).
-		Report("use Cmd.Stop() if you have executil.Cmd, otherwise StopProcess/StopPID (graceful, preferred), or TerminateProcess/TerminatePID (SIGTERM only)")
-}
+func disallowDirectProcessTermination(m dsl.Matcher) { _ = "STUB: not implemented"; return }
 
 // disallowDirectPgctldStopInTests prevents test code from calling pgctld Stop() directly
 // in test packages that run multipooler alongside pgctld. The postgres monitor runs
@@ -104,13 +52,4 @@ func disallowDirectProcessTermination(m dsl.Matcher) {
 //
 // Excluded: pgctld package tests (no multipooler running) and non-test files (e.g.
 // ShardSetup.StopPostgres itself calls Stop internally in setup.go).
-func disallowDirectPgctldStopInTests(m dsl.Matcher) {
-	m.Import("github.com/multigres/multigres/go/pb/pgctldservice")
-
-	m.Match(`$client.Stop($ctx, $req)`).
-		Where(
-			m["req"].Type.Is("*pgctldservice.StopRequest") &&
-				m.File().PkgPath.Matches(`/test/endtoend/`) &&
-				!m.File().PkgPath.Matches(`/test/endtoend/pgctld$|/test/endtoend/shardsetup$`)).
-		Report("use ShardSetup.StopPostgres instead of calling pgctld Stop directly; the monitor will restart postgres otherwise")
-}
+func disallowDirectPgctldStopInTests(m dsl.Matcher) { _ = "STUB: not implemented"; return }

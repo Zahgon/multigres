@@ -17,10 +17,6 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
-	"fmt"
-	"os"
-	"strings"
 )
 
 // SSLMode mirrors libpq's sslmode connection parameter.
@@ -59,47 +55,14 @@ const (
 // plaintext-then-TLS retry loop on a server-side rejection, which is not
 // implemented here. Accepting the string would silently behave like "disable",
 // breaking the libpq parity an operator would expect.
-func ParseSSLMode(s string) (SSLMode, error) {
-	switch SSLMode(strings.ToLower(strings.TrimSpace(s))) {
-	case "":
-		return SSLModePrefer, nil
-	case SSLModeDisable:
-		return SSLModeDisable, nil
-	case SSLModeAllow:
-		return "", errors.New("sslmode=allow is not supported (no plaintext→TLS retry loop); use disable or prefer")
-	case SSLModePrefer:
-		return SSLModePrefer, nil
-	case SSLModeRequire:
-		return SSLModeRequire, nil
-	case SSLModeVerifyCA:
-		return SSLModeVerifyCA, nil
-	case SSLModeVerifyFull:
-		return SSLModeVerifyFull, nil
-	default:
-		return "", fmt.Errorf("invalid sslmode %q (want disable|prefer|require|verify-ca|verify-full)", s)
-	}
-}
+func ParseSSLMode(s string) (SSLMode, error) { _ = "STUB: not implemented"; return *new(SSLMode), nil }
 
 // AttemptsTLS reports whether the mode wants the SSLRequest negotiation step.
-func (m SSLMode) AttemptsTLS() bool {
-	switch m {
-	case SSLModePrefer, SSLModeRequire, SSLModeVerifyCA, SSLModeVerifyFull:
-		return true
-	default:
-		return false
-	}
-}
+func (m SSLMode) AttemptsTLS() bool { _ = "STUB: not implemented"; return false }
 
 // RequiresTLS reports whether the mode must error if the server declines SSL.
 // prefer is the only tolerant mode that reaches the negotiation path.
-func (m SSLMode) RequiresTLS() bool {
-	switch m {
-	case SSLModeRequire, SSLModeVerifyCA, SSLModeVerifyFull:
-		return true
-	default:
-		return false
-	}
-}
+func (m SSLMode) RequiresTLS() bool { _ = "STUB: not implemented"; return false }
 
 // BuildTLSConfig constructs a *tls.Config matching libpq's sslmode semantics.
 //
@@ -115,112 +78,39 @@ func (m SSLMode) RequiresTLS() bool {
 //
 // rootCertPath is required for verify-ca / verify-full.
 func BuildTLSConfig(mode SSLMode, rootCertPath, host string) (*tls.Config, error) {
-	switch mode {
-	case SSLModeDisable:
-		return nil, nil
-	case SSLModeAllow:
-		return nil, errors.New("sslmode=allow is not supported")
-	case SSLModePrefer, SSLModeRequire:
-		// libpq parity: require/prefer perform no cert verification — encryption only.
-		return &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: true, //nolint:gosec // libpq parity: require/prefer perform no cert verification
-		}, nil
-	case SSLModeVerifyCA, SSLModeVerifyFull:
-		if mode == SSLModeVerifyFull && host == "" {
-			return nil, errors.New("sslmode=verify-full requires a non-empty host for SAN matching")
-		}
-		pool, err := loadCertPool(rootCertPath)
-		if err != nil {
-			return nil, err
-		}
-		cfg := &tls.Config{
-			MinVersion: tls.VersionTLS12,
-			RootCAs:    pool,
-		}
-		// verify-ca skips hostname match; verify-full adds libpq's CN fallback
-		// that Go's default SAN-only verifier won't perform. Both rely on
-		// VerifyConnection for the actual chain check, so InsecureSkipVerify
-		// is set to bypass Go's stricter verifier.
-		cfg.InsecureSkipVerify = true
-		if mode == SSLModeVerifyCA {
-			cfg.VerifyConnection = makeVerifyChain(pool)
-		} else {
-			cfg.ServerName = host
-			cfg.VerifyConnection = makeVerifyFull(pool, host)
-		}
-		return cfg, nil
-	default:
-		return nil, fmt.Errorf("invalid sslmode %q", mode)
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func loadCertPool(path string) (*x509.CertPool, error) {
-	if path == "" {
-		return nil, errors.New("sslrootcert is required for verify-ca and verify-full")
-	}
-	pem, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("read sslrootcert %q: %w", path, err)
-	}
-	pool := x509.NewCertPool()
-	if !pool.AppendCertsFromPEM(pem) {
-		return nil, fmt.Errorf("sslrootcert %q contains no PEM certificates", path)
-	}
-	return pool, nil
-}
+// libpq parity: require/prefer perform no cert verification — encryption only.
+
+//nolint:gosec // libpq parity: require/prefer perform no cert verification
+
+// verify-ca skips hostname match; verify-full adds libpq's CN fallback
+// that Go's default SAN-only verifier won't perform. Both rely on
+// VerifyConnection for the actual chain check, so InsecureSkipVerify
+// is set to bypass Go's stricter verifier.
+
+func loadCertPool(path string) (*x509.CertPool, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // makeVerifyChain returns a VerifyConnection function that validates the peer
 // certificate chain against the supplied root pool but performs no hostname
 // match — verify-ca semantics.
 func makeVerifyChain(pool *x509.CertPool) func(tls.ConnectionState) error {
-	return func(cs tls.ConnectionState) error {
-		if len(cs.PeerCertificates) == 0 {
-			return errors.New("server presented no certificate")
-		}
-		opts := x509.VerifyOptions{
-			Roots:         pool,
-			Intermediates: x509.NewCertPool(),
-		}
-		for _, cert := range cs.PeerCertificates[1:] {
-			opts.Intermediates.AddCert(cert)
-		}
-		_, err := cs.PeerCertificates[0].Verify(opts)
-		return err
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // makeVerifyFull validates the chain and matches the hostname against SAN
 // entries first, then falls back to the certificate's Common Name. The CN
 // fallback is required for libpq parity; Go's stdlib verifier removed it in 1.17.
 func makeVerifyFull(pool *x509.CertPool, host string) func(tls.ConnectionState) error {
-	return func(cs tls.ConnectionState) error {
-		if len(cs.PeerCertificates) == 0 {
-			return errors.New("server presented no certificate")
-		}
-		leaf := cs.PeerCertificates[0]
-		opts := x509.VerifyOptions{
-			Roots:         pool,
-			Intermediates: x509.NewCertPool(),
-		}
-		for _, cert := range cs.PeerCertificates[1:] {
-			opts.Intermediates.AddCert(cert)
-		}
-		if _, err := leaf.Verify(opts); err != nil {
-			return err
-		}
-		// Try Go's SAN-based hostname match first.
-		if err := leaf.VerifyHostname(host); err == nil {
-			return nil
-		}
-		// libpq accepts a match against the certificate Common Name when no SANs
-		// match. Only fall back to CN if the cert has no SANs (matches libpq's
-		// behavior — RFC 6125 deprecates CN when SANs are present).
-		if len(leaf.DNSNames) == 0 && leaf.IPAddresses == nil && leaf.URIs == nil && leaf.EmailAddresses == nil {
-			if strings.EqualFold(leaf.Subject.CommonName, host) {
-				return nil
-			}
-		}
-		return fmt.Errorf("server certificate does not match hostname %q", host)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Try Go's SAN-based hostname match first.
+
+// libpq accepts a match against the certificate Common Name when no SANs
+// match. Only fall back to CN if the cert has no SANs (matches libpq's
+// behavior — RFC 6125 deprecates CN when SANs are present).

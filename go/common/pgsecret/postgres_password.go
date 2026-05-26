@@ -23,14 +23,6 @@
 // byte-for-byte compatible.
 package pgsecret
 
-import (
-	"fmt"
-	"os"
-	"strings"
-
-	"github.com/multigres/multigres/go/common/constants"
-)
-
 // ReadPostgresPassword returns the plaintext PostgreSQL password, resolved in
 // this order, stopping at the first non-empty source:
 //
@@ -43,23 +35,12 @@ import (
 // error message. Trailing CR/LF is trimmed from file contents so a Kubernetes
 // Secret written with `stringData` still yields the intended password.
 func ReadPostgresPassword(filePath string) (string, error) {
-	if filePath != "" {
-		return ReadPasswordFile(filePath)
-	}
-	if envFile := os.Getenv(constants.PgPasswordFileEnvVar); envFile != "" {
-		return ReadPasswordFile(envFile)
-	}
-	return os.Getenv(constants.PgPasswordEnvVar), nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // ReadPasswordFile reads a postgres password from path and trims trailing
 // CR/LF. Exposed for callers that already resolve the file path via their own
 // configuration layer (e.g. viperutil) and only need the file-reading
 // primitive.
-func ReadPasswordFile(path string) (string, error) {
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", fmt.Errorf("read postgres password file %q: %w", path, err)
-	}
-	return strings.TrimRight(string(b), "\r\n"), nil
-}
+func ReadPasswordFile(path string) (string, error) { _ = "STUB: not implemented"; return "", nil }

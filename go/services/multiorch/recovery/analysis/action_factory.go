@@ -21,7 +21,6 @@ import (
 	"github.com/multigres/multigres/go/common/topoclient"
 	"github.com/multigres/multigres/go/services/multiorch/config"
 	"github.com/multigres/multigres/go/services/multiorch/consensus"
-	"github.com/multigres/multigres/go/services/multiorch/recovery/actions"
 	"github.com/multigres/multigres/go/services/multiorch/recovery/types"
 	"github.com/multigres/multigres/go/services/multiorch/store"
 )
@@ -45,50 +44,46 @@ func NewRecoveryActionFactory(
 	coordinator *consensus.Coordinator,
 	logger *slog.Logger,
 ) *RecoveryActionFactory {
-	if coordinator == nil {
-		panic("coordinator cannot be nil")
-	}
-	return &RecoveryActionFactory{
-		config:      cfg,
-		poolerStore: poolerStore,
-		rpcClient:   rpcClient,
-		topoStore:   topoStore,
-		coordinator: coordinator,
-		logger:      logger,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewShardInitAction creates a shard initialization action.
 func (f *RecoveryActionFactory) NewShardInitAction() types.RecoveryAction {
-	return actions.NewShardInitAction(f.config, f.coordinator, f.poolerStore, f.topoStore, f.logger)
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 // NewAppointLeaderAction creates an appoint leader action.
 func (f *RecoveryActionFactory) NewAppointLeaderAction() types.RecoveryAction {
-	return actions.NewAppointLeaderAction(f.config, f.coordinator, f.poolerStore, f.topoStore, f.logger)
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 // NewFixReplicationAction creates a fix replication action.
 func (f *RecoveryActionFactory) NewFixReplicationAction() types.RecoveryAction {
-	return actions.NewFixReplicationAction(f.config, f.rpcClient, f.poolerStore, f.topoStore, f.logger)
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 // NewDemoteStaleLeaderAction creates an action to demote a stale primary.
 func (f *RecoveryActionFactory) NewDemoteStaleLeaderAction() types.RecoveryAction {
-	return actions.NewDemoteStaleLeaderAction(f.config, f.rpcClient, f.poolerStore, f.topoStore, f.logger)
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 // NewReconcileCohortAction creates an action to add or remove a cohort member.
 func (f *RecoveryActionFactory) NewReconcileCohortAction() types.RecoveryAction {
-	return actions.NewReconcileCohortAction(f.config, f.rpcClient, f.poolerStore, f.topoStore, f.logger)
+	_ = "STUB: not implemented"
+	return *new(types.RecoveryAction)
 }
 
 // Logger returns the factory's logger for use by analyzers.
 func (f *RecoveryActionFactory) Logger() *slog.Logger {
-	return f.logger
+	_ = "STUB: not implemented"
+
+	// Config returns the factory's config for use by analyzers.
+	return nil
 }
 
-// Config returns the factory's config for use by analyzers.
-func (f *RecoveryActionFactory) Config() *config.Config {
-	return f.config
-}
+func (f *RecoveryActionFactory) Config() *config.Config { _ = "STUB: not implemented"; return nil }

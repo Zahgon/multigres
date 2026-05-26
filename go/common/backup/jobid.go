@@ -28,12 +28,11 @@ const JobIDSeparator = "_"
 // GenerateJobID creates a unique job ID that embeds the multipooler ID and
 // current timestamp. The format is lexicographically sortable:
 // YYYYMMDD-HHMMSS.microseconds_<multipooler_id>
-func GenerateJobID(multipoolerID string) string {
-	return GenerateJobIDAt(multipoolerID, time.Now())
-}
+func GenerateJobID(multipoolerID string) string { _ = "STUB: not implemented"; return "" }
 
 // GenerateJobIDAt creates a job ID for a specific timestamp.
 // Useful for testing or when a specific timestamp is required.
 func GenerateJobIDAt(multipoolerID string, t time.Time) string {
-	return t.Format(JobIDTimestampFormat) + JobIDSeparator + multipoolerID
+	_ = "STUB: not implemented"
+	return ""
 }
